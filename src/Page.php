@@ -21,7 +21,7 @@ namespace Conductor;
  * @author Philip Graham <philip@lightbox.org>
  * @package Conductor
  */
-class Page extends Oboe_Page {
+class Page extends \Oboe_Page {
 
     /*
      * =========================================================================
@@ -193,7 +193,7 @@ class Page extends Oboe_Page {
                 'Cannot set the page template more than once');
         }
 
-        if (Reed_Config::isDebug()) { 
+        if (\Reed_Config::isDebug()) { 
           $validator = new TemplateValidator($template);
           $validator->validate();
         }

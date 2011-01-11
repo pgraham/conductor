@@ -12,6 +12,20 @@ class Autoloader {
    * @param {string} The name of the class to load.
    */
   public static function loadClass($className) {
-    echo "Loading class $className\n";
+    $pathComponents = explode("\\", $className);
+
+    // Make sure this is a Conductor class
+    $base = array_shift($pathComponents);
+    if ($base != 'Conductor') {
+      return;
+    }
+
+    $logicalPath = implode('/', $pathComponents);
+    $fullPath = self::$basePath.'/'.$logicalPath.'.php';
+    if (file_exists($fullPath)) {
+      require_once $fullPath;
+    }
   }
 }
+
+spl_autoload_register(array('Conductor\Autoloader', 'loadClass'));
