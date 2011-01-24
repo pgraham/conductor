@@ -13,7 +13,7 @@ class Conductor {
 
     // If provided, include optional libraries
     if ($oboeSrc !== null) {
-      require_once $oboeSrc . '/Oboe/Autoloader.php';
+      require_once $oboeSrc . '/Autoloader.php';
     }
 
     if ($bassoonSrc !== null) {

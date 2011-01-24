@@ -1,5 +1,6 @@
 <?php
 namespace Conductor;
+use \Oboe\Item;
 /**
  * =============================================================================
  * Copyright (c) 2010, Philip Graham
@@ -21,7 +22,7 @@ namespace Conductor;
  * @author Philip Graham <philip@lightbox.org>
  * @package Conductor
  */
-class Page extends \Oboe_Page {
+class Page extends \Oboe\Page {
 
     /*
      * =========================================================================
@@ -126,7 +127,7 @@ class Page extends \Oboe_Page {
      *
      * @param element
      */
-    protected function bodyAdd(Oboe_Item_Body $element) {
+    protected function bodyAdd(Item\Body $element) {
         if ($this->_template !== null) {
             $this->_template->getContentContainer()->add($element);
         } else {
