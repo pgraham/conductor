@@ -1,6 +1,9 @@
 <?php
 namespace Conductor;
+
 use \Oboe\Item;
+
+use \Reed\Config;
 /**
  * =============================================================================
  * Copyright (c) 2010, Philip Graham
@@ -53,11 +56,11 @@ class Page extends \Oboe\Page {
      * Make sure we're initialized before allowing an instance to be retieved.
      *
      * N.B. Since it is not possible to override static methods in PHP, any
-     * calls to Oboe_Page::getInstance() before Reep_Page has been initialized
-     * will result in the creation an Oboe_Page instance rather than a Reed_Page
-     * instance.
+     * calls to Oboe\Page::getInstance() before Conductor\Page has been
+     * initialized will result in the creation an Oboe\Page instance rather than
+     * a Conductor\Page instance.
      *
-     * @return Reed_Page instance
+     * @return Conductor\Page instance
      */
     public static function getInstance() {
         self::init();
@@ -65,7 +68,7 @@ class Page extends \Oboe\Page {
     }
 
     /**
-     * Overrides instance to be an instance of Reed_Page.  This method gets
+     * Overrides instance to be an instance of Conductor\Page.  This method gets
      * called when the class is first used.
      */
     public static function init() {
@@ -79,7 +82,7 @@ class Page extends \Oboe\Page {
     /**
      * Set the page's template.
      *
-     * @param Reed_Template
+     * @param Template
      */
     public static function setTemplate(Template $template) {
         self::getInstance()->setPageTemplate($template);
@@ -194,7 +197,7 @@ class Page extends \Oboe\Page {
                 'Cannot set the page template more than once');
         }
 
-        if (\Reed_Config::isDebug()) { 
+        if (Config::isDebug()) { 
           $validator = new TemplateValidator($template);
           $validator->validate();
         }
