@@ -35,8 +35,27 @@ class Fragment implements Item\Body {
 
     $this->_fragment = file_get_contents($path);
 
+    // _flattenArray transforms nested array into top level keys in the form
+    // level1.level2.level3.  So any array defined as
+    // array(
+    //   'level1' => array(
+    //     'level2' => array(
+    //       'level3' => 'level3val'
+    //     ),
+    //     'level2val => 'level2val'
+    //   ),
+    //   'level1val' => 'level1val'
+    // );
+    //
+    // would be transformed to the following:
+    // array(
+    //   'level1.level2.level3' => 'level3val',
+    //   'level1.level2val      => 'level2val',
+    //   'level1val'            => 'level1val'
+    // ); 
     $flat = $this->_flattenArray($values);
-    $this->_fragment = str_replace(array_keys($flat), array_values($flat), $this->_fragment);
+    $this->_fragment = str_replace(array_keys($flat), array_values($flat),
+      $this->_fragment);
   }
 
   public function __toString() {
