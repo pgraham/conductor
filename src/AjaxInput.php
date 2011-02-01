@@ -17,6 +17,7 @@ namespace conductor;
 
 use \Oboe\Composite;
 use \Oboe\Form;
+use \Oboe\Form\Input;
 use \Oboe\Item;
 
 /**
@@ -30,7 +31,7 @@ class AjaxInput extends Composite implements Item\Body {
 
   private $_input;
 
-  public function __construct(Form\Input $wrapped) {
+  public function __construct(Input $wrapped) {
     $form = new Form(null, '#');
     $form->add($wrapped);
 
