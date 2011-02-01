@@ -1,7 +1,29 @@
 <?php
-namespace Conductor;
+/**
+ * =============================================================================
+ * Copyright (c) 2010, Philip Graham
+ * All rights reserved.
+ *
+ * This file is part of Conductor and is licensed by the Copyright holder under
+ * the 3-clause BSD License.  The full text of the license can be found in the
+ * LICENSE.txt file included in the root directory of this distribution or at
+ * the link below.
+ * =============================================================================
+ *
+ * @license http://www.opensource.org/licenses/bsd-license.php
+ * @package conductor
+ */
+namespace conductor;
+
+use \clarinet\Clarinet;
 use \Reed\Config;
 
+/**
+ * The main interface for Conductor setup.
+ *
+ * @author Philip Graham <philip@zeptech.ca>
+ * @package conductor
+ */
 class Conductor {
 
   private static $_initialized = false;
@@ -47,7 +69,7 @@ class Conductor {
     // Include the clarinet autoloader
     require_once __DIR__ . '/Autoloader.php';
 
-    $libPath = (isset($config['libpath']) ? $config['libpath'] : null;
+    $libPath = (isset($config['libpath'])) ? $config['libpath'] : null;
     $reedPath = (isset($config['reedpath'])) ? $config['reedpath'] : null;
     $oboePath = (isset($config['oboepath'])) ? $config['oboepath'] : null;
     $bassoonPath = (isset($config['bassoonpath']))
@@ -69,15 +91,15 @@ class Conductor {
       require_once $libPath . '/oboe/src/Autoloader.php';
     }
 
-    if ($bassoonSrc !== null) {
-      require_once $bassoonSrc . '/src/Autoloader.php';
+    if ($bassoonPath !== null) {
+      require_once $bassoonPath . '/src/Autoloader.php';
     } else if ($libPath !== null) {
       require_once $libPath . '/bassoon/src/Autoloader.php';
     }
 
     $clarinetLoaded = false;
-    if ($clarinetSrc !== null) {
-      require_once $clarinetSrc . '/src/Autoloader.php';
+    if ($clarinetPath !== null) {
+      require_once $clarinetPath . '/src/Autoloader.php';
       $clarinetLoaded = true;
     } else if ($libPath !== null) {
       require_once $libPath . '/clarinet/src/Autoloader.php';
@@ -90,10 +112,11 @@ class Conductor {
       } else {
         // TODO - Give warning if debug is defined
       }
+    }
   }
 
   public static function setConfig(Config $config) {
-    if (!self::$_intialized) {
+    if (!self::$_initialized) {
       throw new Exception('Conductor has not yet been initialized');
     }
 
@@ -101,7 +124,7 @@ class Conductor {
   }
 
   public static function setPageTemplate(Template $template) {
-    if (!self::$_intialized) {
+    if (!self::$_initialized) {
       throw new Exception('Conductor has not yet been initialized');
     }
 

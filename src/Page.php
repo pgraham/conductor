@@ -1,9 +1,4 @@
 <?php
-namespace Conductor;
-
-use \Oboe\Item;
-
-use \Reed\Config;
 /**
  * =============================================================================
  * Copyright (c) 2010, Philip Graham
@@ -16,14 +11,19 @@ use \Reed\Config;
  * =============================================================================
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
- * @package Conductor
+ * @package conductor
  */
+namespace conductor;
+
+use \Oboe\Item;
+
+use \Reed\Config;
 /**
  * This class is an extension to Oboe_Page that adds some handy features.
  * These include transparent page templating and debug capture/output.
  *
- * @author Philip Graham <philip@lightbox.org>
- * @package Conductor
+ * @author Philip Graham <philip@zeptech.ca>
+ * @package conductor
  */
 class Page extends \Oboe\Page {
 

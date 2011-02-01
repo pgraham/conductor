@@ -1,6 +1,4 @@
 <?php
-namespace Conductor;
-use \Oboe\Item;
 /**
  * =============================================================================
  * Copyright (c) 2010, Philip Graham
@@ -13,13 +11,16 @@ use \Oboe\Item;
  * =============================================================================
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
- * @package Conductor
+ * @package conductor
  */
+namespace conductor;
+use \Oboe\Item;
+
 /**
  * This interface defines a page template.
  *
- * @author Philip Graham <philip@lightbox.org>
- * @package Conductor
+ * @author Philip Graham <philip@zeptech.ca>
+ * @package conductor
  */
 interface Template extends Item\Body {
 

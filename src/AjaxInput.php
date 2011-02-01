@@ -1,29 +1,30 @@
 <?php
-namespace Conductor;
-
-use \Oboe\Composite;
-use \Oboe\Form;
-use \Oboe\Item;
 /**
  * =============================================================================
  * Copyright (c) 2010, Philip Graham
  * All rights reserved.
  *
- * This file is part of Reed and is licensed by the Copyright holder under the
- * 3-clause BSD License.  The full text of the license can be found in the
+ * This file is part of Conductor and is licensed by the Copyright holder under
+ * the 3-clause BSD License.  The full text of the license can be found in the
  * LICENSE.txt file included in the root directory of this distribution or at
  * the link below.
  * =============================================================================
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
- * @package Reed
+ * @package conductor
  */
+namespace conductor;
+
+use \Oboe\Composite;
+use \Oboe\Form;
+use \Oboe\Item;
+
 /**
  * This class wraps a Oboe\Item\Form implementation and allows it be added to
  * an element composite that only accepts Oboe\Item\Body implementations.
  *
  * @author Philip Graham <philip@lightbox.org>
- * @package Reed
+ * @package conductor
  */
 class AjaxInput extends Composite implements Item\Body {
 

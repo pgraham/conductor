@@ -1,10 +1,4 @@
 <?php
-namespace Conductor;
-
-use \Bassoon\Generator;
-use \Bassoon\RemoteService;
-
-use \Oboe\Head\Javascript;
 /**
  * =============================================================================
  * Copyright (c) 2010, Philip Graham
@@ -17,14 +11,21 @@ use \Oboe\Head\Javascript;
  * =============================================================================
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
- * @package Conductor
+ * @package conductor
  */
+namespace Conductor;
+
+use \Bassoon\Generator;
+use \Bassoon\RemoteService;
+
+use \Oboe\Head\Javascript;
+
 /**
  * This class is adds the client side proxy for a Bassoon service to the HEAD
  * element.
  *
- * @author Philip Graham <philip@lightbox.org>
- * @package Conductor
+ * @author Philip Graham <philip@zeptech.ca>
+ * @package conductor
  */
 class ServiceProxy {
 

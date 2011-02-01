@@ -1,6 +1,26 @@
 <?php
-namespace Conductor;
+/**
+ * =============================================================================
+ * Copyright (c) 2010, Philip Graham
+ * All rights reserved.
+ *
+ * This file is part of Conductor and is licensed by the Copyright holder under
+ * the 3-clause BSD License.  The full text of the license can be found in the
+ * LICENSE.txt file included in the root directory of this distribution or at
+ * the link below.
+ * =============================================================================
+ *
+ * @license http://www.opensource.org/licenses/bsd-license.php
+ * @package conductor
+ */
+namespace conductor;
 
+/**
+ * Autoloader for conductor classes.
+ *
+ * @author Philip Graham <philip@zeptech.ca>
+ * @package conductor
+ */
 class Autoloader {
 
   /* This is the base path where the Conductor source files are found. */
@@ -12,20 +32,15 @@ class Autoloader {
    * @param {string} The name of the class to load.
    */
   public static function loadClass($className) {
-    $pathComponents = explode("\\", $className);
-
-    // Make sure this is a Conductor class
-    $base = array_shift($pathComponents);
-    if ($base != 'Conductor') {
+    if (substr($className, 0, 10) != 'conductor\\') {
       return;
     }
 
-    $logicalPath = implode('/', $pathComponents);
+    $logicalPath = str_replace('\\', '/', substr($className, 10));
     $fullPath = self::$basePath.'/'.$logicalPath.'.php';
     if (file_exists($fullPath)) {
       require_once $fullPath;
     }
   }
 }
-
-spl_autoload_register(array('Conductor\Autoloader', 'loadClass'));
+spl_autoload_register(array('conductor\Autoloader', 'loadClass'));

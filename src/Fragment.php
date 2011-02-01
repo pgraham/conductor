@@ -1,6 +1,4 @@
 <?php
-namespace Conductor;
-use \Oboe\Item;
 /**
  * =============================================================================
  * Copyright (c) 2010, Philip Graham
@@ -13,15 +11,21 @@ use \Oboe\Item;
  * =============================================================================
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
- * @package Conductor
+ * @package conductor
  */
+namespace Conductor;
+
+use \Exception;
+
+use \Oboe\Item;
+
 /**
  * This class pulls an HTML fragment from a file and wraps it as a document
  * item.  A given array of values can be used to substitute variables in the
  * fragment.
  *
- * @author Philip Graham <philip@lightbox.org>
- * @package Conductor
+ * @author Philip Graham <philip@zeptech.ca>
+ * @package conductor
  */
 class Fragment implements Item\Body {
 
@@ -30,7 +34,7 @@ class Fragment implements Item\Body {
 
   public function __construct($path, array $values = array()) {
     if (!file_exists($path)) {
-      throw new \Exception("Unable to load fragment: Path not found: $path");
+      throw new Exception("Unable to load fragment: Path not found: $path");
     }
 
     $this->_fragment = file_get_contents($path);
