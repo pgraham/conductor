@@ -15,6 +15,8 @@
  */
 namespace conductor;
 
+use \conductor\admin\Template as AdminTemplate;
+use \conductor\config\Parser;
 use \clarinet\Clarinet;
 use \Reed\Config;
 
@@ -27,6 +29,8 @@ use \Reed\Config;
 class Conductor {
 
   private static $_initialized = false;
+
+  private static $_config = null;
 
   /**
    * Initialize the framework.  This consists of registering the autoloaders for
@@ -44,90 +48,68 @@ class Conductor {
    *   name of the library.  This option can be overridden for individual
    *   libraries by specifying a libraries path as part of the configuration.
    *
-   * reedpath
-   *   Base path for Reed
-   *
-   * oboepath
-   *   Base path for Oboe
-   *
-   * bassoonpath
-   *   Base path for Bassoon
-   *
-   * clarinetpath
-   *   Base path for Clarinet
-   *
    * clarinetconfig
    *   Configuration array to be passed to clarinet's intialization function
    */
-  public static function init($config = array()) {
+  public static function init($configPath = null) {
     if (self::$_initialized) {
-      // TODO - Give a warning if DEBUG is defined and set to true
+      if (defined('DEBUG') && DEBUG === true) {
+        // TODO - Give a warning if DEBUG is defined and set to true
+        // TODO - Add logging interface to Reed that can be used for this
+      }
       return;
     }
     self::$_initialized = true;
 
-    // Include the clarinet autoloader
-    require_once __DIR__ . '/Autoloader.php';
+    // TODO - If any of these files don't exist output a better error message
+    $libPath = __DIR__ . '/../../';
+    require_once $libPath . '/reed/src/Autoloader.php';
+    require_once $libPath . '/oboe/src/Autoloader.php';
+    require_once $libPath . '/bassoon/src/Autoloader.php';
+    require_once $libPath . '/clarinet/src/Autoloader.php';
 
-    $libPath = (isset($config['libpath'])) ? $config['libpath'] : null;
-    $reedPath = (isset($config['reedpath'])) ? $config['reedpath'] : null;
-    $oboePath = (isset($config['oboepath'])) ? $config['oboepath'] : null;
-    $bassoonPath = (isset($config['bassoonpath']))
-      ? $config['bassoonpath']
-      : null;
-    $clarinetPath = (isset($config['clarinetpath']))
-      ? $config['clarinetpath']
-      : null;
-
-    if ($reedPath !== null) {
-      require_once $reedPath . '/src/Autoloader.php';
-    } else if ($libPath !== null) {
-      require_once $libPath . '/reed/src/Autoloader.php';
+    // Load the site's configuration from the defined/default path
+    if ($configPath === null) {
+      // The default assumes that conductor is at the following path:
+      //   <website-root>/lib/conductor/src/Conductor.php
+      $configPath = __DIR__ . '/../../../conductor.cfg.xml';
     }
+    
+    self::$_config  = Parser::parse($configPath);
 
-    if ($oboePath !== null) {
-      require_once $oboePath .'/src/Autoloader.php';
-    } else if ($libPath !== null) {
-      require_once $libPath . '/oboe/src/Autoloader.php';
-    }
+    Clarinet::init(Array
+      (
+        'pdo'        => self::$_config['pdo'],
+        'outputPath' => self::$_config['target']
+      )
+    );
+  }
 
-    if ($bassoonPath !== null) {
-      require_once $bassoonPath . '/src/Autoloader.php';
-    } else if ($libPath !== null) {
-      require_once $libPath . '/bassoon/src/Autoloader.php';
-    }
+  public static function loadAdmin() {
+    self::_ensureInitialized();
 
-    $clarinetLoaded = false;
-    if ($clarinetPath !== null) {
-      require_once $clarinetPath . '/src/Autoloader.php';
-      $clarinetLoaded = true;
-    } else if ($libPath !== null) {
-      require_once $libPath . '/clarinet/src/Autoloader.php';
-      $clarinetLoaded = true;
-    }
+//    $template = new AdminTemplate();
+  }
 
-    if (isset($config['clarinetconfig'])) {
-      if ($clarinetLoaded) {
-        Clarinet::init($config['clarinetconfig']);
-      } else {
-        // TODO - Give warning if debug is defined
-      }
-    }
+  public static function loadPage() {
+    self::_ensureInitialized();
   }
 
   public static function setConfig(Config $config) {
-    if (!self::$_initialized) {
-      throw new Exception('Conductor has not yet been initialized');
-    }
+    self::_ensureInitialized();
 
     Config::setConfig($config);
   }
 
   public static function setPageTemplate(Template $template) {
+    self::_ensureInitialized();
+
+    Page::setTemplate($template);
+  }
+
+  private static function _ensureInitialized() {
     if (!self::$_initialized) {
       throw new Exception('Conductor has not yet been initialized');
     }
-
-    Page::setTemplate($template);
   }
 }

@@ -1,0 +1,10 @@
+<?xml version="1.0" standalone="yes"?>
+<conductor>
+
+  <!--
+       This config file is used by ModelTest to test the scandir functionality
+       when a base namespace is defined
+  -->
+  <models scandir="model" nsbase="nsbase" />
+
+</conductor>
