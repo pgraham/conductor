@@ -37,7 +37,7 @@ class Autoloader {
       return;
     }
 
-    $logicalPath = str_replace('\\', '/', substr($className, 14));
+    $logicalPath = str_replace('\\', '/', substr($className, 15));
     $fullPath = self::$_basePath . '/' . $logicalPath . '.php';
     if (file_exists($fullPath)) {
       require_once $fullPath;

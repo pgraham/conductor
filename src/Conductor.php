@@ -18,7 +18,7 @@ namespace conductor;
 use \conductor\admin\Template as AdminTemplate;
 use \conductor\config\Parser;
 use \clarinet\Clarinet;
-use \Reed\Config;
+use \reed\Config;
 
 /**
  * The main interface for Conductor setup.
@@ -34,22 +34,11 @@ class Conductor {
 
   /**
    * Initialize the framework.  This consists of registering the autoloaders for
-   * the libraries for which paths have been provided.
+   * the libraries, connecting to the database and initializing clarinet.
    *
-   * The configuration options are given as a key-value array.
-   *
-   * Options:
-   * --------
-   *
-   * libpath
-   *   Base path for Reed, Oboe, Bassoon and Clarinet.  This is a
-   *   shortcut to providing individual paths.  The individual libraries will be
-   *   assumed to be in a sub directory of the given path with a lower cased
-   *   name of the library.  This option can be overridden for individual
-   *   libraries by specifying a libraries path as part of the configuration.
-   *
-   * clarinetconfig
-   *   Configuration array to be passed to clarinet's intialization function
+   * @param string $configPath Optional path to a conductor.cfg.xml file.  If
+   *   not provided then a default path is used by assume a common directory
+   *   structure.
    */
   public static function init($configPath = null) {
     if (self::$_initialized) {
@@ -88,7 +77,7 @@ class Conductor {
   public static function loadAdmin() {
     self::_ensureInitialized();
 
-//    $template = new AdminTemplate();
+    $template = new AdminTemplate();
   }
 
   public static function loadPage() {

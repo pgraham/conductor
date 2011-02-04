@@ -14,6 +14,7 @@
  * @package conductor
  */
 namespace conductor;
+
 use \Oboe\Item;
 
 /**
@@ -36,7 +37,7 @@ interface Template extends Item\Body {
   /**
    * This method can optionally define a "base" for the page title.
    * E.g. if the title base is defined as "Reed, get it wet" then a call to
-   * Oboe\Page / Reed_Page::dump("News") would result in the page's title being
+   * Oboe\Page / conductor\Page::dump("News") would result in the page's title being
    * "Reed, get it wet - News"
    *
    * @return string can be null

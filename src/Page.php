@@ -17,7 +17,7 @@ namespace conductor;
 
 use \Oboe\Item;
 
-use \Reed\Config;
+use \reed\Config;
 /**
  * This class is an extension to Oboe_Page that adds some handy features.
  * These include transparent page templating and debug capture/output.
@@ -116,9 +116,6 @@ class Page extends \Oboe\Page {
     /* If debug capturing is enabled */
     private $_debugCatcher;
 
-    /* Object that removes extra white space characters from output */
-    private $_whiteSpaceRemover;
-
     /* This is a singleton afterall */
     protected function __construct() {
         parent::__construct();
@@ -146,9 +143,6 @@ class Page extends \Oboe\Page {
             $this->_debugCatcher->flush();
         }
 
-        if ($this->_whiteSpaceRemover !== null) {
-            $this->_whiteSpaceRemover->start();
-        }
         $this->_dumped = true;
         parent::dumpPage();
     }
@@ -166,7 +160,7 @@ class Page extends \Oboe\Page {
         }
 
         if ($this->_debugCatcher === null) {
-            $this->_debugCatcher = new Reed_DebugCatcher();
+            $this->_debugCatcher = new DebugCatcher();
 
             if ($this->_template !== null) {
                 $dc = $this->_template->getDebugContainer();
@@ -188,12 +182,12 @@ class Page extends \Oboe\Page {
      * content is placed.
      *
      * @param template
-     * @throws Reed_Exception
+     * @throws Exception
      */
     protected function setPageTemplate(Template $template) {
         // Template can only be set once
         if ($this->_template !== null) {
-            throw new Reed_Exception(
+            throw new Exception(
                 'Cannot set the page template more than once');
         }
 
@@ -231,27 +225,6 @@ class Page extends \Oboe\Page {
             }
         }
         parent::setPageTitle($title);
-    }
-
-    /**
-     * Set whether or not to suppress white space.
-     *
-     * @param boolean
-     */
-    protected function setSuppressWhiteSpace($suppress) {
-        if ($suppress) {
-            if ($this->_whiteSpaceRemover === null) {
-                $this->_whiteSpaceRemover = new Reed_WhiteSpaceRemover();
-            }
-            if ($this->_dumped) {
-                $this->_whiteSpaceRemover->start();
-            }
-        } else {
-            if ($this->_whiteSpaceRemover !== null) {
-                $this->_whiteSpaceRemover->stop();
-            }
-            $this->_whiteSpaceRemover = null;
-        }
     }
 }
 

@@ -25,7 +25,7 @@ use \Oboe\Form\TextInput;
  * value is only ever submitted using AJAX.
  *
  * @author Philip Graham <philip@lightbox.org>
- * @package Reed
+ * @package conductor
  */
 class AjaxTextInput extends AjaxInput {
 
