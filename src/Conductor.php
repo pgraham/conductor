@@ -15,9 +15,11 @@
  */
 namespace conductor;
 
+use \conductor\admin\Widget as AdminWidget;
 use \conductor\admin\Template as AdminTemplate;
 use \conductor\config\Parser;
 use \clarinet\Clarinet;
+use \clarinet\Criteria;
 use \reed\Config;
 
 /**
@@ -30,7 +32,26 @@ class Conductor {
 
   private static $_initialized = false;
 
-  private static $_config = null;
+  public static $config = null;
+
+  /**
+   * Retrieve the configuration value with the given name.  In order for this to
+   * work the database must be setup to handler configuration values.
+   *
+   * @param {string} $name The name of the configuration value to retrieve.
+   */
+  public static function getConfigValue($name) {
+    $c = new Criteria();
+    $c->addEquals('name', $name);
+
+    $rows = Clarinet::get('conductor\model\ConfigValue', $c);
+    if (count($rows) == 0) {
+      return null;
+    }
+
+    $obj = $rows[0];
+    return $obj->getValue();
+  }
 
   /**
    * Initialize the framework.  This consists of registering the autoloaders for
@@ -63,31 +84,15 @@ class Conductor {
       //   <website-root>/lib/conductor/src/Conductor.php
       $configPath = __DIR__ . '/../../../conductor.cfg.xml';
     }
-    
-    self::$_config  = Parser::parse($configPath);
+    self::$config = Parser::parse($configPath);
 
+    // Initialize clarinet
     Clarinet::init(Array
       (
-        'pdo'        => self::$_config['pdo'],
-        'outputPath' => self::$_config['target']
+        'pdo'        => self::$config['pdo'],
+        'outputPath' => self::$config['target']
       )
     );
-  }
-
-  public static function loadAdmin() {
-    self::_ensureInitialized();
-
-    $template = new AdminTemplate();
-  }
-
-  public static function loadPage() {
-    self::_ensureInitialized();
-  }
-
-  public static function setConfig(Config $config) {
-    self::_ensureInitialized();
-
-    Config::setConfig($config);
   }
 
   public static function setPageTemplate(Template $template) {

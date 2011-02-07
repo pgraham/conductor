@@ -11,8 +11,28 @@
  * =============================================================================
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
- * @package conductor
+ * @package conductor/auth
  */
-namespace conductor\admin;
+namespace conductor\auth;
 
-use \
+use \conduction\model\Session;
+
+/**
+ * This class manages session objects.
+ *
+ * @author Philip Graham <philip@zeptech.ca>
+ * @package conductor/auth
+ */
+class SessionManager {
+
+  /**
+   * Initialize a new session a return its instance.
+   *
+   * @param integer $userId The id of the user with which to associate the
+   *   session
+   * @return new session instance
+   */
+  public static function newSession($userId = null) {
+   
+  }
+}
