@@ -15,22 +15,23 @@
  */
 namespace conductor\model;
 
+use \conductor\model\Permission;
+use \conductor\model\User;
+
 /**
- * This class represents a link between a user and permission.  The relationship
- * is many to many.  This class can be eliminated once Clarinet supports foreign
- * keys.
+ * This class represents a link between a user and a permission and attaches an
+ * access level to the relationship.  The relationship is many to many.
  *
- * @deprecated
  * @author Philip Graham <philip@zeptech.ca>
  * @package conductor/model
  *
  * @Entity(table = users_permissions_link)
  */
-class UserPermLink {
+class UserPermission {
 
   private $_id;
-  private $_userId;
-  private $_permId;
+  private $_user;
+  private $_permission;
   private $_lvl;
 
   /**
@@ -42,22 +43,22 @@ class UserPermLink {
   }
 
   /**
-   * @Column(name = user_id)
+   * @ManyToOne(entity = conductor\model\User)
    */
-  public function getUserId() {
-    return $this->_userId;
+  public function getUser() {
+    return $this->_user;
   }
 
   /**
-   * @Column(name = permission_id)
+   * @ManyToOne(entity = conductor\model\Permission)
    */
-  public function getPermissionId() {
-    return $this->_permId;
+  public function getPermission() {
+    return $this->_permission;
   }
 
   /**
    * @Column(name = level)
-   * @Enumerated(values = { read, write }
+   * @Enumerated(values = { read, write })
    */
   public function getLevel() {
     return $this->_lvl;
@@ -67,15 +68,27 @@ class UserPermLink {
     $this->_id = $id;
   }
 
-  public function setUserId($userId) {
-    $this->_userId = $userId;
+  public function setUser(User $user) {
+    $this->_user = $user;
   }
 
-  public function setPermId($permId) {
-    $this->_permId = $permId;
+  public function setPermission(Permission $permission) {
+    $this->_permission = $permission;
   }
 
   public function setLevel($lvl) {
     $this->_lvl = $lvl;
+  }
+
+  /**
+   * Helper function for getting the linked permission name.
+   *
+   * @return string
+   */
+  public function getPermissionName() {
+    if ($this->_permission === null) {
+      return null;
+    }
+    return $this->_permission->getName();
   }
 }

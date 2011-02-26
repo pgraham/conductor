@@ -11,9 +11,9 @@
  * =============================================================================
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
- * @package conductor
+ * @package conductor/template
  */
-namespace conductor;
+namespace conductor\template;
 
 use \Oboe\ElementComposite;
 use \Oboe\Item;
@@ -23,13 +23,13 @@ use \Oboe\Item;
  * problems are found.
  *
  * @author Philip Graham <philip@zeptech.ca>
- * @package conductor
+ * @package conductor/template
  */
 class TemplateValidator {
 
   private $_template;
 
-  public function __construct(Template $template) {
+  public function __construct(PageTemplate $template) {
     $this->_template = $template;
   }
 

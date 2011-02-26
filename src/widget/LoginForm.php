@@ -41,6 +41,12 @@ class LoginForm extends Composite implements Item\Body {
     $this->initElement(new Form('login'));
     $this->elm->setClass('cdt-LoginForm');
 
+    if ($msg !== null) {
+      $msgDiv = new Div(null, 'cdt-Error');
+      $msgDiv->add($msg);
+      $this->elm->add($msgDiv);
+    }
+
     $usernameLbl = new Div(null, 'cdt-Label');
     $usernameLbl->add("Username:");
     $username = new TextInput('uname');

@@ -17,6 +17,7 @@ namespace conductor\auth;
 
 use \clarinet\Clarinet;
 use \clarinet\Criteria;
+use \conductor\model\User;
 
 /**
  * This class provides authorization capabilities.
@@ -25,20 +26,38 @@ use \clarinet\Criteria;
  * @package conductor/auth
  */
 class Authorize {
+
+  private static $_lvls = Array
+  (
+    'read'  => 1,
+    'write' => 2
+  );
   
   /**
-   * This class loads the permissions for a given user.  This class can be
-   * eliminated once Clarinet supports foreign keys and the Auth class has been
-   * updated to use them.
+   * Determines a wether or not a user has sufficient permissions to perform an
+   * action on a resource.
    *
-   * @deprecated
-   * @param integer $userId The id of the user whose permission to load
-   * @return array An array of Permission model objects.
+   * @param conductor\model\User $user The user whose permission are to be
+   *   checked.  If null false is returned.
+   * @param string $permName The name of the resource on which the action will
+   *   be performed.
+   * @param string $level The level of access required to perform the action.
+   * @return boolean
    */
-  public static function loadPermissions($userId) {
-    $c = new Criteria();
-    $c->addEquals('user_id', $userId);
+  public static function allowed(User $user, $permName, $level) {
+    if ($user === null) {
+      return false;
+    }
 
-    $perms = Clarinet::get('conductor\model\UserPermLink', $c);
+    $requestedLvl = self::$_lvls[$level];
+
+    $userPerms = $user->getPermissions();
+    foreach ($userPerms AS $perm) {
+      if ($perm->getPermissionName() == $permName) {
+        $userLvl = self::$_lvls[$perm->getLevel()];
+        return $userLvl >= $requestedLvl;
+      }
+    }
+    return false;
   }
 }

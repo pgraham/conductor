@@ -11,29 +11,44 @@
  * =============================================================================
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
- * @package conductor/template
+ * @package conductor/admin
  */
-namespace conductor\template;
+namespace conductor\admin;
 
+use \conductor\Conductor;
+use \conductor\template\PageTemplate;
 use \Oboe\Div;
 use \Oboe\Heading;
+use \Oboe\Head\Javascript;
+use \Oboe\Head\StyleSheet;
 
 /**
  * This class is the template for conductor's generated administration
  * interface.
  *
  * @author Philip Graham <philip@zeptech.ca>
- * @package conductor/template
+ * @package conductor/admin
  */
-class AdminTemplate implements \conductor\Template {
+class AdminTemplate implements PageTemplate {
 
   private $_cc, $_dc;
 
-  public function __construct() {
+  public function __construct($jsPath = null, $cssPath = null) {
+    if ($jsPath !== null) {
+      $adminJs = new Javascript($jsPath);
+      $adminJs->addToHead();
+    }
+
+    if ($cssPath !== null) {
+      $styleSheet = new StyleSheet($cssPath);
+      $styleSheet->addToHead();
+    }
+
     $wrap = new Div('wrap');
     $wrap->addToBody();
 
     $head = new Div('head');
+    $head->add(new Heading($this->getBaseTitle()));
     $wrap->add($head);
 
     $menu = new Div('menu');
@@ -44,10 +59,6 @@ class AdminTemplate implements \conductor\Template {
 
     $this->_cc = $ctnt;
     $this->_dc = new Div();
-
-    $this->_populateHead($head);
-    $this->_populateMenu($menu);
-    $this->_populateCtnt($ctnt);
   }
 
   public function getContentContainer() {
@@ -59,16 +70,6 @@ class AdminTemplate implements \conductor\Template {
   }
 
   public function getBaseTitle() {
-    return "Conductor Administration";
-  }
-
-  private function _populateHead($head) {
-    $head->add(new Heading($this->getBaseTitle()));
-  }
-
-  private function _populateMenu($menu) {
-  }
-
-  private function _populateCtnt($ctnt) {
+    return Conductor::$config['title'] . " Administration";
   }
 }

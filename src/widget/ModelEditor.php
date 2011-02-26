@@ -15,8 +15,10 @@
  */
 namespace conductor\widget;
 
+use \conductor\Conductor;
 use \Oboe\Composite;
 use \Oboe\Div;
+use \Oboe\Heading;
 use \Oboe\Item;
 
 /**
@@ -28,7 +30,7 @@ use \Oboe\Item;
  */
 class ModelEditor extends Composite implements Item\Body {
 
-  public function __construct(Array $models) {
+  public function __construct() {
     $this->initElement(new Div('cdt-Admin'));
   }
 }

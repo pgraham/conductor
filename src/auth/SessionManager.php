@@ -15,7 +15,11 @@
  */
 namespace conductor\auth;
 
-use \conduction\model\Session;
+use \clarinet\Clarinet;
+use \clarinet\Criteria;
+use \conductor\model\Session;
+use \conductor\model\User;
+use \reed\Config;
 
 /**
  * This class manages session objects.
@@ -25,14 +29,82 @@ use \conduction\model\Session;
  */
 class SessionManager {
 
+  private static $keyPrefixChars = "abcdefghijklmnopqrstuvwxyz0123456789";
+
+  /**
+   * Checks if the session with the given key is valid.
+   *
+   * @param string $sessionKey
+   * @return boolean
+   */
+  public static function isValid($sessionKey) {
+    if ($sessionKey === null) {
+      return false;
+    }
+
+    $c = new Criteria();
+    $c->addEquals('sess_key', $sessionKey);
+
+    $session = Clarinet::getOne('conductor\model\Session', $c);
+    if ($session === null) {
+      return false;
+    }
+
+    $ttl = Config::getSessionTtl();
+    if (time() - $session->getLastAccess() > $ttl) {
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * Loads the session with the given session key.
+   *
+   * @param string $sessionKey
+   * @return conductor\model\Session|null Return the session with the given key
+   *   or null if none.
+   */
+  public static function loadSession($sessionKey) {
+    $c = new Criteria();
+    $c->addEquals('sess_key', $sessionKey);
+
+    $session = Clarinet::getOne('conductor\model\Session', $c);
+    $session->setLastAccess(time());
+    Clarinet::save($session);
+
+    return $session;
+  }
+
   /**
    * Initialize a new session a return its instance.
    *
-   * @param integer $userId The id of the user with which to associate the
+   * @param conductor\model\User $user The user with which to associate the
    *   session
    * @return new session instance
    */
-  public static function newSession($userId = null) {
-   
+  public static function newSession(User $user = null) {
+    $session = new Session();   
+    if ($user !== null) {
+      $session->setUser($user);
+    }
+
+    $prefix = '';
+    for ($i = 0; $i < 5; $i++) {
+      $char = self::$keyPrefixChars[mt_rand(0, 35)];
+      if (mt_rand(0, 1)) {
+        $char = strtoupper($char);
+      }
+      $prefix .= $char;
+    }
+    $key = uniqid($prefix, true);
+    $session->setKey($key);
+
+    Clarinet::save($session);
+
+    // Send the session key to the client
+    setcookie('conductorsessid', $session->getKey(), 0, '/');
+
+    return $session;
   }
 }

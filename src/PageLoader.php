@@ -15,9 +15,12 @@
  */
 namespace conductor;
 
-use \conductor\template\AdminTemplate;
+use \conductor\admin\AdminGenerator;
+use \conductor\admin\AdminTemplate;
+use \conductor\generator\BassoonServiceGenerator;
 use \conductor\widget\ModelEditor;
 use \conductor\widget\LoginForm;
+use \reed\Config;
 
 /**
  * This class provides methods for loading various predefined pages.
@@ -42,17 +45,27 @@ class PageLoader {
    */
   public static function loadAdmin() {
     // Call conductor init() so that if it hasn't been explicitely intitialized
-    // it will be now or will throw an exception if here is a problem
+    // it will be now or will throw an exception if there is a problem
     Conductor::init();
 
+    $jsDir = Config::getWebWritableDir() . '/js';
+    $jsPath = $jsDir . '/conductor-admin.js';
+
+    if (defined('DEBUG') && DEBUG === false) {
+      // Generate and output the admin javascript
+      $adminGen = new AdminGenerator(Conductor::$config['models']);
+      $adminGen->generate($jsDir);
+    }
+
     // Set the page template to be the admin template
-    Conductor::setPageTemplate(new AdminTemplate());
+    Conductor::setPageTemplate(new AdminTemplate($jsPath));
 
     if (Auth::hasPermission('conductor-admin')) {
       $widget = new ModelEditor();
       $widget->addToBody();
     } else {
-      self::loadLogin();
+      self::loadLogin("You are either not logged in or do not have sufficient"
+        . " privileges to access the admin panel.");
     }
     Page::dump();
   }
@@ -60,8 +73,8 @@ class PageLoader {
   /**
    * Load the login form.  
    */
-  public static function loadLogin() {
-    $login = new LoginForm();
+  public static function loadLogin($msg = null) {
+    $login = new LoginForm($msg);
     $login->addToBody();
   }
 }

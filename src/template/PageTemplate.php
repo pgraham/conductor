@@ -11,9 +11,9 @@
  * =============================================================================
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
- * @package conductor
+ * @package conductor/template
  */
-namespace conductor;
+namespace conductor\template;
 
 use \Oboe\Item;
 
@@ -21,10 +21,9 @@ use \Oboe\Item;
  * This interface defines a page template.
  *
  * @author Philip Graham <philip@zeptech.ca>
- * @package conductor
+ * @package conductor/template
  */
-interface Template extends Item\Body {
-
+interface PageTemplate extends Item\Body { 
   /**
    * This method is responsible for returning an ElementComposite to which
    * page content will be added.

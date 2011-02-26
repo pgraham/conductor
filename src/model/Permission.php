@@ -27,6 +27,7 @@ class Permission {
 
   private $_id;
   private $_name;
+  private $_users;
 
   /**
    * @Id
@@ -43,11 +44,22 @@ class Permission {
     return $this->_name;
   }
 
+  /**
+   * @OneToMany(entity = conductor\model\UserPermission)
+   */
+  public function getUsers() {
+    return $this->_users;
+  }
+
   public function setId($id) {
     $this->_id = $id;
   }
 
   public function setName($name) {
     $this->_name = $name;
+  }
+
+  public function setUsers(array $users) {
+    $this->_users = $users;
   }
 }

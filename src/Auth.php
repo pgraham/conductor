@@ -28,7 +28,6 @@ use \conductor\auth\SessionManager;
 class Auth {
 
   public static $session = null;
-  public static $permissions = null;
 
   /**
    * Authenticate the user.  The process is as follows.  Check if there is
@@ -44,35 +43,57 @@ class Auth {
       return;
     }
 
+    $sessionId = ( isset($_COOKIE['conductorsessid']) )
+      ? $_COOKIE['conductorsessid']
+      : null;
+
+    $session = ( SessionManager::isValid($sessionId) )
+      ? SessionManager::loadSession($sessionId)
+      : null;
+
+    $sessionUser = ( $session !== null )
+      ? $session->getUser()
+      : null;
+
     if (isset($_POST['uname']) || isset($_POST['pw'])) {
-      // This is a login attempt
-      $userId = Authenticate::loginAttempt($_POST['uname'], $_POST['pw']);
+      // This is a login attempt.  If the login attempt is successful this will
+      // return a User object for the now Authenticated user.  Otherwise null
+      // is returned
+      $user = Authenticate::loginAttempt($_POST['uname'], $_POST['pw']);
 
-      if ($userId !== null) {
-        self::$permissions = Authorize::loadPermissions($userId);
-      }
-      
       // Since this is a new login create a new session
-      self::$session = SessionManager::newSession($userId);
+      if ($user !== null) {
+        $userId = $user->getId();
 
-    } else if (isset($_COOKIE['conductorsessid'])) {
-      $sessionId = $_COOKIE['conductorsessid'];
+        if ($session !== null && $sessionUser === null) {
+          $session->setUser($user);
+          Clarinet::save($session);
+        } else if ($sessionUser !== null && $sessionUser->getId() == $userId) {
+          self::$session = $session;
+        } else {
+          self::$session = SessionManager::newSession($user);
+        }
+
+      } else if ($sessionUser === null) {
+        self::$session = $session;
+
+      } else {
+        self::$session = SessionManager::newSession();
+      }
+
+    } else if ($sessionId !== null) {
       // This is a returning visitor, validate their session and if valid
       // check if it is associated with a user.  If the session is associated
       // with a user, then load their permissions.  If the session is no longer
       // valid then generate a new session id
       if (SessionManager::isValid($sessionId)) {
         self::$session = SessionManager::loadSession($sessionId);
-
-        if (self::$session->getUserId() !== null) {
-          $userId = self::$session->getUserId();
-          self::$permissions = Authorize::loadPermissions($userId);
-        }
       } else {
         self::$session = SessionManager::newSession();
       }
 
     } else {
+
       // There is no existing session and the user isn't trying to login so
       // generate a session but don't associate any permissions with it
       self::$session = SessionManager::newSession();
@@ -91,8 +112,8 @@ class Auth {
       self::init();
     }
 
-    if (self::$permissions !== null) {
-      return self::$permissions->allowed($permName, $level);
+    if (self::$session->getUser() !== null) {
+      return Authorize::allowed(self::$session->getUser(), $permName, $level);
     }
     return false;
   }

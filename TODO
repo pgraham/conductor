@@ -1,0 +1,20 @@
+NOW:
+-----
+- Update session to have a last access column
+- Update session manager to delete expired sessions.
+
+
+WHENEVER:
+----------
+- Move source generation capabilities out of clarinet and into a reed package.
+  - Have moved TemplateLoader to reed\generator\CodeTemplateLoader, is there
+    more?
+- Move model parsing and ActorFactory out of clarinet and into a reed package.
+- Update reed/Config to allow all configuration to be set.  This will allow
+  the conductor configuration parser to control these settings.
+    - This will mean that specifying config though overridding will be obsolete
+      and so can be removed
+- Eliminate static methods from libraries (this will make them easier to test)
+  and make the 'singleton' behaviour provided by the static's injectable.  Once
+  this is done update Conductor's initialization and affected tests to do the
+  injection.

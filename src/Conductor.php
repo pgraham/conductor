@@ -15,9 +15,8 @@
  */
 namespace conductor;
 
-use \conductor\admin\Widget as AdminWidget;
-use \conductor\admin\Template as AdminTemplate;
 use \conductor\config\Parser;
+use \conductor\template\PageTemplate;
 use \clarinet\Clarinet;
 use \clarinet\Criteria;
 use \reed\Config;
@@ -95,7 +94,7 @@ class Conductor {
     );
   }
 
-  public static function setPageTemplate(Template $template) {
+  public static function setPageTemplate(PageTemplate $template) {
     self::_ensureInitialized();
 
     Page::setTemplate($template);

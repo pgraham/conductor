@@ -54,8 +54,7 @@ class User {
   }
 
   /**
-   * @ManyToMany(entity = Permission)
-   * @DataColumn(name = level)
+   * @OneToMany(entity = conductor\model\UserPermission)
    */
   public function getPermissions() {
     return $this->_permissions;
@@ -73,7 +72,7 @@ class User {
     $this->_password = $password;
   }
 
-  public function setPermissions() {
-    return $this->_permissions;
+  public function setPermissions(Array $permissions) {
+    $this->_permissions = $permissions;
   }
 }

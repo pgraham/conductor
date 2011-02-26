@@ -15,9 +15,11 @@
  */
 namespace conductor;
 
+use \conductor\template\PageTemplate;
+use \conductor\template\TemplateValidator;
 use \Oboe\Item;
-
 use \reed\Config;
+
 /**
  * This class is an extension to Oboe_Page that adds some handy features.
  * These include transparent page templating and debug capture/output.
@@ -84,7 +86,7 @@ class Page extends \Oboe\Page {
      *
      * @param Template
      */
-    public static function setTemplate(Template $template) {
+    public static function setTemplate(PageTemplate $template) {
         self::getInstance()->setPageTemplate($template);
     }
 
@@ -184,7 +186,7 @@ class Page extends \Oboe\Page {
      * @param template
      * @throws Exception
      */
-    protected function setPageTemplate(Template $template) {
+    protected function setPageTemplate(PageTemplate $template) {
         // Template can only be set once
         if ($this->_template !== null) {
             throw new Exception(

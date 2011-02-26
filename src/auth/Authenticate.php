@@ -43,10 +43,6 @@ class Authenticate {
     $c->addEquals('password', $pwHash);
 
     $user = Clarinet::getOne('conductor\model\User', $c);
-    if ($user !== null) {
-      return $user->getId();
-    } else {
-      return null;
-    }
+    return $user;
   }
 }
