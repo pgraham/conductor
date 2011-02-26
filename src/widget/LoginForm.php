@@ -15,13 +15,13 @@
  */
 namespace conductor\widget;
 
-use \Oboe\Composite;
-use \Oboe\Form;
-use \Oboe\Form\Div;
-use \Oboe\Form\TextInput;
-use \Oboe\Form\Password;
-use \Oboe\Form\Submit;
-use \Oboe\Item;
+use \oboe\Composite;
+use \oboe\Form;
+use \oboe\form\Div;
+use \oboe\form\TextInput;
+use \oboe\form\Password;
+use \oboe\form\Submit;
+use \oboe\item;
 
 /**
  * This class encapsulates a stylable login form.
@@ -29,7 +29,7 @@ use \Oboe\Item;
  * @author Philip Graham <philip@zeptech.ca>
  * @package conductor/widget
  */
-class LoginForm extends Composite implements Item\Body {
+class LoginForm extends Composite implements item\Body {
 
   /**
    * Create a new login form.

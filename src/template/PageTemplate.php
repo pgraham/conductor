@@ -15,7 +15,7 @@
  */
 namespace conductor\template;
 
-use \Oboe\Item;
+use \oboe\item;
 
 /**
  * This interface defines a page template.
@@ -23,7 +23,7 @@ use \Oboe\Item;
  * @author Philip Graham <philip@zeptech.ca>
  * @package conductor/template
  */
-interface PageTemplate extends Item\Body { 
+interface PageTemplate extends item\Body { 
   /**
    * This method is responsible for returning an ElementComposite to which
    * page content will be added.

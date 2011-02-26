@@ -17,10 +17,10 @@ namespace conductor\admin;
 
 use \conductor\Conductor;
 use \conductor\template\PageTemplate;
-use \Oboe\Div;
-use \Oboe\Heading;
-use \Oboe\Head\Javascript;
-use \Oboe\Head\StyleSheet;
+use \oboe\Div;
+use \oboe\Heading;
+use \oboe\head\Javascript;
+use \oboe\head\StyleSheet;
 
 /**
  * This class is the template for conductor's generated administration
