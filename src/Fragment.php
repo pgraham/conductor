@@ -13,11 +13,11 @@
  * @license http://www.opensource.org/licenses/bsd-license.php
  * @package conductor
  */
-namespace Conductor;
+namespace conductor;
 
 use \Exception;
 
-use \Oboe\Item;
+use \oboe\item;
 
 /**
  * This class pulls an HTML fragment from a file and wraps it as a document
@@ -27,7 +27,7 @@ use \Oboe\Item;
  * @author Philip Graham <philip@zeptech.ca>
  * @package conductor
  */
-class Fragment implements Item\Body {
+class Fragment implements item\Body {
 
   /* The fragment */
   private $_fragment;
@@ -64,6 +64,10 @@ class Fragment implements Item\Body {
 
   public function __toString() {
     return $this->_fragment;
+  }
+
+  public function addToBody() {
+    \oboe\Page::addElementToBody($this);
   }
 
   private function _flattenArray(array $toFlatten, $prefix = null) {

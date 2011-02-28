@@ -15,10 +15,11 @@
  */
 namespace conductor;
 
-use \conductor\config\Parser;
-use \conductor\template\PageTemplate;
 use \clarinet\Clarinet;
 use \clarinet\Criteria;
+use \conductor\config\ConductorConfig;
+use \conductor\config\Parser;
+use \conductor\template\PageTemplate;
 use \reed\Config;
 
 /**
@@ -84,6 +85,9 @@ class Conductor {
       $configPath = __DIR__ . '/../../../conductor.cfg.xml';
     }
     self::$config = Parser::parse($configPath);
+
+    // Initialize reed
+    Config::setConfig(new ConductorConfig());
 
     // Initialize clarinet
     Clarinet::init(Array

@@ -16,10 +16,10 @@
 namespace conductor;
 
 use \conductor\AjaxInput;
-use \Oboe\ElementComposite;
-use \Oboe\Form\Input;
-use \Oboe\Item;
-use \Oboe\Table;
+use \oboe\ElementComposite;
+use \oboe\form\Input;
+use \oboe\item;
+use \oboe\Table;
 
 /**
  * This class encapsulates a form that displays groups of input elements
@@ -34,7 +34,7 @@ use \Oboe\Table;
  * @author Philip Graham <philip@lightbox.org>
  * @package conductor
  */
-class LabelForm extends ElementComposite implements Item\Body {
+class LabelForm extends ElementComposite implements item\Body {
 
     private $_tbl;
     private $_cnt;

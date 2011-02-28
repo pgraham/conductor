@@ -77,6 +77,40 @@ class Parser {
       $cfg['pageCfg'] = Page::parse($xmlCfg->pages, $pathRoot);
     }
 
+    // Parse the document root
+    if (isset($xmlCfg->documentRoot)) {
+      $docRoot = $xmlCfg->documentRoot->__toString();
+
+      if (substr($docRoot, 0, 1) != '/') {
+        $docRoot = $pathRoot . '/' . $docRoot;
+      }
+    } else {
+      $docRoot = $pathRoot . '/public_html';
+    }
+    $cfg['documentRoot'] = $docRoot;
+
+    // Parse the file system path to the web-accessible folder that is writable
+    // by the web server
+    if (isset($xmlCfg->webWritable)) {
+      $webWrite = $xmlCfg->webWritable->__toString();
+
+      if (substr($webWrite, 0, 1) != '/') {
+        $webWrite = $pathRoot . '/' . $webWrite;
+      }
+    } else {
+      $webWrite = $docRoot . '/gen';
+    }
+    $cfg['webWritable'] = $webWrite;
+
+    // Parse the root of the website relative to the domain on which it is
+    // hosted
+    if (isset($xmlCfg->webRoot)) {
+      $webRoot = $xmlCfg->webRoot->__toString();
+    } else {
+      $webRoot = '/';
+    }
+    $cfg['webRoot'] = $webRoot;
+
     return $cfg;
   }
 }

@@ -31,13 +31,55 @@ use \reed\Config;
 class PageLoader {
 
   /**
+   * Get the title for the page with the given id.
+   *
+   * @param string $pageId
+   * @return string
+   */
+  public static function getPageTitle($pageId = null) {
+    // Call conductor init() so that if it hasn't been explicitely intitialized
+    // it will be now or will throw an exception if there is a problem
+    Conductor::init();
+
+    if ($pageId === null) {
+      $pageId = Conductor::$config['pageCfg']['default'];
+    }
+
+    if (!isset(Conductor::$config['pageCfg']['pages'][$pageId])) {
+      // TODO This is an error, but what is the appropriate behaviour?
+      return null;
+    }
+
+    return Conductor::$config['pageCfg']['pages'][$pageId]['title'];
+  }
+
+  /**
    * Load a page defined in conductor.cfg.xml.
    *
    * @param string $pageId The id given to the page in the config file. If null
    *   (default) then the default page is loaded.
+   * @return Fragment containing the page content.
    */
   public static function loadPage($pageId = null) {
-    // TODO
+    // Call conductor init() so that if it hasn't been explicitely intitialized
+    // it will be now or will throw an exception if there is a problem
+    Conductor::init();
+
+    if ($pageId === null) {
+      $pageId = Conductor::$config['pageCfg']['default'];
+    }
+
+    if (!isset(Conductor::$config['pageCfg']['pages'][$pageId])) {
+      // TODO This is an error, but what is the appropriate behaviour?
+      return null;
+    }
+
+    $pageInfo = Conductor::$config['pageCfg']['pages'][$pageId];
+    $className = $pageInfo['class'];
+
+    $page = new $className();
+    $frag = $page->getFragment();
+    return $frag;
   }
 
   /**

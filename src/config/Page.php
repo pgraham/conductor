@@ -39,17 +39,19 @@ class Page {
   public static function parse(SimpleXMLElement $cfg, $pathRoot) {
     $pages = Array();
 
-    if (isset($cfg['htmldir'])) {
-      $pageDir = $cfg['htmldir'];
-      if (substr($pageDir, 0, 1) != '/') {
-        $pageDir = $pathRoot . '/' . $pageDir;
+    $ns = '';
+    if (isset($cfg['nsbase'])) {
+      $ns = $cfg['nsbase'];
+
+      if (substr($ns, 0, 1) == '\\') {
+        // Since model classes are loaded using dynamic functionality the
+        // leading backslash will be implied so remove it for consistency
+        $ns = substr($ns, 1);
       }
 
-      if (substr($pageDir, -1) == '/') {
-        $pageDir = substr($pageDir, 0, -1);
+      if (substr($ns, -1) != '\\') {
+        $ns .= '\\';
       }
-    } else {
-      $pageDir = $pathRoot;
     }
 
     foreach ($cfg->page AS $page) {
@@ -64,20 +66,16 @@ class Page {
         $title = ucfirst($id);
       }
 
-      if (isset($page['file'])) {
-        $pagePath = $page['file']->__toString();
-
-        if (substr($pagePath, 0, 1) != '/') {
-          $pagePath = $pageDir . '/' . $pagePath;
-        }
+      if (isset($page['class'])) {
+        $className = $ns . $page['class'];
       } else {
-        $pagePath = $pageDir . '/' . $id . '.php';
+        $className = $ns . ucfirst($id);
       }
 
       $pages[$id] = Array
       (
         'title' => $title,
-        'file'  => $pagePath
+        'class'  => $className
       );
     }
 
