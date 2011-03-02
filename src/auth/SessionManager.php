@@ -19,7 +19,6 @@ use \clarinet\Clarinet;
 use \clarinet\Criteria;
 use \conductor\model\Session;
 use \conductor\model\User;
-use \reed\Config;
 
 /**
  * This class manages session objects.
@@ -28,6 +27,8 @@ use \reed\Config;
  * @package conductor/auth
  */
 class SessionManager {
+
+  const DEFAULT_SESSION_TTL = 1209600; //60 * 60 * 24 * 14 -- 14 days in seconds
 
   private static $keyPrefixChars = "abcdefghijklmnopqrstuvwxyz0123456789";
 
@@ -50,7 +51,7 @@ class SessionManager {
       return false;
     }
 
-    $ttl = Config::getSessionTtl();
+    $ttl = Conductor::$config['sessionTtl'];
     if (time() - $session->getLastAccess() > $ttl) {
       return false;
     }

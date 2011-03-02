@@ -20,7 +20,6 @@ use \conductor\admin\AdminTemplate;
 use \conductor\generator\BassoonServiceGenerator;
 use \conductor\widget\ModelEditor;
 use \conductor\widget\LoginForm;
-use \reed\Config;
 
 /**
  * This class provides methods for loading various predefined pages.
@@ -90,7 +89,7 @@ class PageLoader {
     // it will be now or will throw an exception if there is a problem
     Conductor::init();
 
-    $jsDir = Config::getWebWritableDir() . '/js';
+    $jsDir = Conductor::$config['webWritable'] . '/js';
     $jsPath = $jsDir . '/conductor-admin.js';
 
     if (defined('DEBUG') && DEBUG === false) {

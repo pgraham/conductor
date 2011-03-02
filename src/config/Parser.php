@@ -111,6 +111,13 @@ class Parser {
     }
     $cfg['webRoot'] = $webRoot;
 
+    // Parse session time-to-live value
+    if (isset($xmlCfg->sessionTimeToLive)) {
+      $cfg['sessionTtl'] = (int) $xmlCfg->sessionTimeToLive->__toString();
+    } else {
+      $cfg['sessionTtl'] = SessionManager::DEFAULT_SESSION_TTL;
+    }
+
     return $cfg;
   }
 }
