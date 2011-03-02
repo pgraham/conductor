@@ -13,12 +13,12 @@
  * @license http://www.opensource.org/licenses/bsd-license.php
  * @package conductor
  */
-namespace Conductor;
+namespace conductor;
 
-use \Bassoon\Generator;
-use \Bassoon\RemoteService;
+use \bassoon\Generator;
+use \bassoon\RemoteService;
 
-use \Oboe\Head\Javascript;
+use \oboe\head\Javascript;
 
 /**
  * This class is adds the client side proxy for a Bassoon service to the HEAD
@@ -32,11 +32,25 @@ class ServiceProxy {
   private $_elm;
 
   public function __construct($serviceClass) {
+    $docRoot = Conductor::$config['documentRoot'];
+    $webRoot = Conductor::$config['webRoot'];
+    $webWrite = Conductor::$config['webWritable'];
+
+    $outputPath = $webWrite;
+
+    if (strpos($docRoot, $webWrite) !== false) {
+      $webOutputPath str_replace($docRoot, '', $webWrite);
+    }
+    if ($webRoot != '/') {
+      $webOutputPath = $webRoot . $webOutputPath;
+    }
+    
     $srvc = new RemoteService($serviceClass);
-    $this->_elm = new Javascript($srvc->getProxyWebPath());
 
     $gen = new Generator($srvc);
-    $gen->generate();
+    $pathInfo = $gen->generate($outputPath, $webOutputPath);
+
+    $this->_elm = new Javascript($pathInfo->getProxyWebPath());
   }
 
   public function getElement() {
