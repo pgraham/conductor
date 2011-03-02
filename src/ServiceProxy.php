@@ -37,10 +37,8 @@ class ServiceProxy {
     $webWrite = Conductor::$config['webWritable'];
 
     $outputPath = $webWrite;
+    $webOutputPath = str_replace($docRoot, '', $webWrite);
 
-    if (strpos($docRoot, $webWrite) !== false) {
-      $webOutputPath str_replace($docRoot, '', $webWrite);
-    }
     if ($webRoot != '/') {
       $webOutputPath = $webRoot . $webOutputPath;
     }
@@ -50,7 +48,7 @@ class ServiceProxy {
     $gen = new Generator($srvc);
     $pathInfo = $gen->generate($outputPath, $webOutputPath);
 
-    $this->_elm = new Javascript($pathInfo->getProxyWebPath());
+    $this->_elm = new Javascript($pathInfo->getProxyWebPath($srvc->getName()));
   }
 
   public function getElement() {

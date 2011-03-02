@@ -15,8 +15,8 @@
  */
 namespace conductor\template;
 
-use \Oboe\ElementComposite;
-use \Oboe\Item;
+use \oboe\ElementComposite;
+use \oboe\item;
 
 /**
  * This class validates a Template implementation and throws an Exception if any
@@ -40,25 +40,25 @@ class TemplateValidator {
     }
 
     // Make sure a content container is defined and that it is an instance
-    // of Oboe_ElementBase that implements Oboe_Item_Body
+    // of Oboe_ElementBase that implements oboe\item\Body
     $cc = $this->_template->getContentContainer();
     if ($cc === null) {
       throw new Exception('A template\'s content container can not be null');
     }
-    if (!($cc instanceof ElementComposite) || !($cc instanceof Item\Body)) {
+    if (!($cc instanceof ElementComposite) || !($cc instanceof item\Body)) {
       throw new Exception('A template\'s content container must be'
-        .' an instance of Oboe\ElementComposite that implements'
-        .' Oboe\Item\Body');
+        . ' an instance of oboe\ElementComposite that implements'
+        . ' oboe\item\Body');
     }
 
     // If a debug container is defined make sure that it is an instance of
     // Oboe_ElementBase that implements Oboe_Item_Body
     $dc = $this->_template->getDebugContainer();
     if ($dc !== null) {
-      if (!($dc instanceof ElementComposite) || !($dc instanceof Item\Body)) {
+      if (!($dc instanceof ElementComposite) || !($dc instanceof item\Body)) {
         throw new Exception('A template\'s debug container must be'
-          .' an instance of Oboe\ElementComposite that implements'
-          .' Oboe\Item\Body');
+          . ' an instance of oboe\ElementComposite that implements'
+          . ' oboe\item\Body');
       }
     }
   }
