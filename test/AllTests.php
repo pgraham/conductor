@@ -20,6 +20,10 @@ namespace conductor\test;
 use \PHPUnit_Framework_TestSuite as TestSuite;
 
 require_once __DIR__ . '/test-common.php';
+require_once REED_PATH . '/test/AllTests.php';
+require_once BASSOON_PATH . '/test/AllTests.php';
+require_once CLARINET_PATH . '/test/AllTests.php';
+require_once OBOE_PATH . '/test/AllTests.php';
 
 /**
  * This class build a suite consisting of all tests for conductor.
@@ -33,6 +37,13 @@ class AllTests {
     $suite = new TestSuite('All Clarinet Tests');
 
     $suite->addTestSuite('conductor\test\config\ModelTest');
+
+    // Since conductor relies on reed, clarinet, bassoon and oboe, include
+    // their test suites
+    $suite->addTest(\reed\test\AllTests::suite());
+    $suite->addTest(\bassoon\test\AllTests::suite());
+    $suite->addTest(\clarinet\test\AllTests::suite());
+    $suite->addTest(\oboe\test\AllTests::suite());
 
     return $suite;
   }
