@@ -14,6 +14,7 @@ var Conductor = (function ($) {
      * and clobbers itself so that it can't be called twice.
      */
     init: function () {
+      // Add live click handler for the login form.
       $('.cdt-LoginForm.async .cdt-Submit').live('click', function () {
         var form     = $('.cdt-LoginForm.async'),
             username = form.find('input[name="uname"]').val(),
@@ -21,7 +22,7 @@ var Conductor = (function ($) {
             count    = loginHandlers.length,
             i;
 
-        AuthService.login(username, password, function (resp) {
+        ConductorService.login(username, password, function (resp) {
           if (resp.msg === null) {
             for (i = 0; i < count; i++) {
               loginHandlers[i].call();
@@ -30,10 +31,9 @@ var Conductor = (function ($) {
             $('.cdt-LoginForm.async .cdt-Error').text(resp.msg);
           }
         });
-
-        loginHandler.call(form.get(0), form.serializeArray());
       });
 
+      // Don't let initialization happen twice
       this.init = $.noop;
     },
 

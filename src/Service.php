@@ -21,9 +21,9 @@ namespace conductor;
  * @author Philip Graham <philip@zeptech.ca>
  * @package conductor/auth
  *
- * @Service( name = AuthService )
+ * @Service( name = ConductorService )
  * @CsrfToken conductorsessid
- * @Requires ../Autoloader.php
+ * @Requires Autoloader.php
  */
 class Service {
 
