@@ -15,20 +15,24 @@ var Conductor = (function ($) {
      */
     init: function () {
       // Add live click handler for the login form.
-      $('.cdt-LoginForm.async .cdt-Submit').live('click', function () {
-        var form     = $('.cdt-LoginForm.async'),
-            username = form.find('input[name="uname"]').val(),
-            password = form.find('input[name="pw"]').val(),
+      $('#login.async').find('.cdt-Submit').live('click', function () {
+        var form     = $('#login.async'),
+            username = form.find('input[name="uname"]'),
+            password = form.find('input[name="pw"]'),
+            error    = form.find('.cdt-Error'),
             count    = loginHandlers.length,
             i;
 
-        ConductorService.login(username, password, function (resp) {
+        error.empty();
+        
+        ConductorService.login(username.val(), password.val(), function (resp) {
           if (resp.msg === null) {
             for (i = 0; i < count; i++) {
               loginHandlers[i].call();
             }
           } else {
-            $('.cdt-LoginForm.async .cdt-Error').text(resp.msg);
+            error.text(resp.msg);
+            username.focus().select();
           }
         });
       });

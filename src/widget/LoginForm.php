@@ -32,27 +32,41 @@ use \oboe\Form;
  */
 class LoginForm extends Composite implements item\Body {
 
+  /**
+   * Constant to use with constructor to specify that the form should be
+   * submitted asynchronously.
+   */
+  const ASYNC = true;
+
+  /* The label for the login btn.  Default: 'Login' */
   private $_loginBtn;
+
+  /* The label for the password box.  Default: 'Password:' */
   private $_passwordLbl;
+
+  /* The label for the username box.  Default: 'Username:' */
   private $_usernameLbl;
 
   /**
    * Create a new login form.
    *
-   * @param string $msg An optional message to display to the user about why
+   * @param string $caption An optional message to display to the user about why
    *   they are seeing a login form.
+   * @param boolean $async Whether or not to perform the login (submit the form)
+   *   asynchronously.  Default: false.  To set to true use the ASYNC_SUMIT
+   *   constant, i.e. $form = new LoginForm("LOGIN PLEASE", LoginForm::ASYNC);
    */
-  public function __construct($msg = null, $async = false) {
+  public function __construct($caption = null, $async = false) {
     $this->initElement(new Form('login'));
     $this->elm->setClass('cdt-LoginForm');
     if ($async) {
       $this->elm->addClass('async');
     }
 
-    if ($msg !== null) {
-      $msgDiv = new Div(null, 'cdt-Error');
-      $msgDiv->add($msg);
-      $this->elm->add($msgDiv);
+    if ($caption !== null) {
+      $captionDiv = new Div(null, 'cdt-Caption');
+      $captionDiv->add($caption);
+      $this->elm->add($captionDiv);
     }
 
     $usernameLbl = new Div(null, 'cdt-Label');
@@ -94,6 +108,13 @@ class LoginForm extends Composite implements item\Body {
     $this->elm->add($username);
     $this->elm->add($password);
     $this->elm->add($submit);
+
+    // If form will be submitted asynchronously add a placeholder div for error
+    // messages.
+    if ($async) {
+      $errorDiv = new Div(null, 'cdt-Error');
+      $this->elm->add($errorDiv);
+    }
 
     // Store elements so that they can be modified
     $this->_loginBtn = $loginBtn;
