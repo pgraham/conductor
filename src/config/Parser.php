@@ -15,6 +15,8 @@
  */
 namespace conductor\config;
 
+use \conductor\auth\SessionManager;
+
 /**
  * This class parses a conductor configuration XML file.
  *

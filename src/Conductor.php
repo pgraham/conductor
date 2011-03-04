@@ -17,8 +17,13 @@ namespace conductor;
 
 use \clarinet\Clarinet;
 use \clarinet\Criteria;
+
 use \conductor\config\Parser;
+use \conductor\script\Client;
+use \conductor\script\ServiceProxy;
 use \conductor\template\PageTemplate;
+
+use \oboe\head\Javascript;
 
 /**
  * The main interface for Conductor setup.
@@ -27,6 +32,8 @@ use \conductor\template\PageTemplate;
  * @package conductor
  */
 class Conductor {
+
+  const JQUERY_VERSION = '1.5.1';
 
   private static $_initialized = false;
 
@@ -91,12 +98,41 @@ class Conductor {
         'outputPath' => self::$config['target']
       )
     );
+
+    // Initialize conductor's extensions to oboe\Page and include the conductor
+    // client
+    Page::init();
+
+    $jQuery = new Javascript('http://ajax.googleapis.com/ajax/libs/jquery/'
+      . self::JQUERY_VERSION . '/jquery.min.js');
+    $jQuery->addToHead();
+
+    $client = new Client();
+    $client->addToHead();
+
+    $service = new ServiceProxy('conductor\Service');
+    $service->getElement()->addToHead();
   }
 
-  public static function setPageTemplate(PageTemplate $template) {
+  /**
+   * Loads the framework.  This is only necessary when handling non-ajax
+   * requests.
+   *
+   * @param PageTemplate $template The PageTemplate for the response.
+   */
+  public static function load(PageTemplate $template = null) {
     self::_ensureInitialized();
 
-    Page::setTemplate($template);
+    if ($template !== null) {
+      Page::setTemplate($template);
+    }
+
+    // Authenticate.
+    if (isset($_POST['uname']) && isset($_POST['pw'])) {
+      Auth::init($_POST['uname'], $_POST['pw']);
+    } else {
+      Auth::init();
+    }
   }
 
   private static function _ensureInitialized() {

@@ -19,6 +19,7 @@ use \clarinet\Clarinet;
 use \clarinet\Criteria;
 use \conductor\model\Session;
 use \conductor\model\User;
+use \conductor\Conductor;
 
 /**
  * This class manages session objects.
@@ -33,14 +34,16 @@ class SessionManager {
   private static $keyPrefixChars = "abcdefghijklmnopqrstuvwxyz0123456789";
 
   /**
-   * Checks if the session with the given key is valid.
+   * Loads the session with the given session key if it exists.  If the session
+   * does not exist or the session is expired then a new session is returned.
    *
    * @param string $sessionKey
-   * @return boolean
+   * @return conductor\model\Session|null Return the session with the given key
+   *   or null the session has expired or does not exist.
    */
-  public static function isValid($sessionKey) {
+  public static function loadSession($sessionKey) {
     if ($sessionKey === null) {
-      return false;
+      return null;
     }
 
     $c = new Criteria();
@@ -48,32 +51,15 @@ class SessionManager {
 
     $session = Clarinet::getOne('conductor\model\Session', $c);
     if ($session === null) {
-      return false;
+      return self::newSession();
     }
 
-    $ttl = Conductor::$config['sessionTtl'];
-    if (time() - $session->getLastAccess() > $ttl) {
-      return false;
+    if ($session->isExpired(Conductor::$config['sessionTtl'])) {
+      return self::newSession();
     }
 
-    return true;
-  }
-
-  /**
-   * Loads the session with the given session key.
-   *
-   * @param string $sessionKey
-   * @return conductor\model\Session|null Return the session with the given key
-   *   or null if none.
-   */
-  public static function loadSession($sessionKey) {
-    $c = new Criteria();
-    $c->addEquals('sess_key', $sessionKey);
-
-    $session = Clarinet::getOne('conductor\model\Session', $c);
     $session->setLastAccess(time());
     Clarinet::save($session);
-
     return $session;
   }
 

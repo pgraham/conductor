@@ -11,27 +11,28 @@
  * =============================================================================
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
- * @package conductor
+ * @package conductor/script
  */
-namespace conductor;
+namespace conductor\script;
 
-use \bassoon\Generator;
-use \bassoon\RemoteService;
-
+use \conductor\Conductor;
 use \oboe\head\Javascript;
 
 /**
- * This class is adds the client side proxy for a Bassoon service to the HEAD
- * element.
+ * This class encasulates the client side component of conductor.
  *
  * @author Philip Graham <philip@zeptech.ca>
- * @package conductor
+ * @package conductor/script
  */
-class ServiceProxy {
+class Client extends Javascript {
 
-  private $_elm;
-
-  public function __construct($serviceClass) {
+  /**
+   * Create a new Javascript element for the conductor client script.
+   *
+   * If debug mode is enabled the script will be copied to the web
+   * writable directory.
+   */
+  public function __construct() {
     $docRoot = Conductor::$config['documentRoot'];
     $webRoot = Conductor::$config['webRoot'];
     $webWrite = Conductor::$config['webWritable'];
@@ -42,16 +43,12 @@ class ServiceProxy {
     if ($webRoot != '/') {
       $webOutputPath = $webRoot . $webOutputPath;
     }
-    
-    $srvc = new RemoteService($serviceClass);
 
-    $gen = new Generator($srvc);
-    $pathInfo = $gen->generate($outputPath, $webOutputPath);
+    if (defined('DEBUG') && DEBUG === true) {
+      $srcJsPath = __DIR__ . '/conductor.js';
+      copy($srcJsPath, $webWrite . '/js/conductor.js');
+    }
 
-    $this->_elm = new Javascript($pathInfo->getProxyWebPath($srvc->getName()));
-  }
-
-  public function getElement() {
-    return $this->_elm;
+    parent::__construct($webOutputPath . '/js/conductor.js');
   }
 }

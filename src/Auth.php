@@ -17,6 +17,7 @@ namespace conductor;
 
 use \conductor\auth\Authenticate;
 use \conductor\auth\Authorize;
+use \conductor\auth\AuthService;
 use \conductor\auth\SessionManager;
 /**
  * This class ensures that the requesting user is assigned to a session.  The
@@ -37,67 +38,41 @@ class Auth {
    * permissions associated with the session.  If the session is invalid or
    * there is no session id in the request, then initiate a new session with
    * default permissions.
+   *
+   * @param string $username An optional username to use to authenticate.
+   * @param string $password An optional password to use to authenticate.
    */
-  public static function init() {
+  public static function init($username = null, $password = null) {
+    // Only authenticate once per request
     if (self::$session !== null) {
       return;
     }
 
-    $sessionId = ( isset($_COOKIE['conductorsessid']) )
-      ? $_COOKIE['conductorsessid']
-      : null;
+    // The following ternary will always result in the variable being assigned
+    // something.  This is because the loadSession method will return a new
+    // session if the loaded session is invalid
+    $session = isset($_COOKIE['conductorsessid'])
+      ? SessionManager::loadSession($_COOKIE['conductorsessid'])
+      : SessionManager::newSession();
 
-    $session = ( SessionManager::isValid($sessionId) )
-      ? SessionManager::loadSession($sessionId)
-      : null;
+    // If crendentials have been provided, attempt to authenticate with them
+    if ($username !== null && $password !== null) {
+      // To save some headaches around ambiguous results, never preserve an
+      // already authenticated user.  Otherwise, a failed login attempt could
+      // appear to be successful since the session would still be associated
+      // with a user.  Another way to consider this is that a login attempt
+      // is an implicit logout, whether the login succeeds or not
+      if ($session->getUser() !== null) {
+        $session = SessionManager::newSession();
+      }
 
-    $sessionUser = ( $session !== null )
-      ? $session->getUser()
-      : null;
-
-    if (isset($_POST['uname']) || isset($_POST['pw'])) {
-      // This is a login attempt.  If the login attempt is successful this will
-      // return a User object for the now Authenticated user.  Otherwise null
-      // is returned
-      $user = Authenticate::loginAttempt($_POST['uname'], $_POST['pw']);
-
-      // Since this is a new login create a new session
+      $user =  Authenticate::login($username, $password);
       if ($user !== null) {
-        $userId = $user->getId();
-
-        if ($session !== null && $sessionUser === null) {
-          $session->setUser($user);
-          Clarinet::save($session);
-        } else if ($sessionUser !== null && $sessionUser->getId() == $userId) {
-          self::$session = $session;
-        } else {
-          self::$session = SessionManager::newSession($user);
-        }
-
-      } else if ($sessionUser === null) {
-        self::$session = $session;
-
-      } else {
-        self::$session = SessionManager::newSession();
+        $session->setUser($user);
+        Clarinet::save($session);
       }
-
-    } else if ($sessionId !== null) {
-      // This is a returning visitor, validate their session and if valid
-      // check if it is associated with a user.  If the session is associated
-      // with a user, then load their permissions.  If the session is no longer
-      // valid then generate a new session id
-      if (SessionManager::isValid($sessionId)) {
-        self::$session = SessionManager::loadSession($sessionId);
-      } else {
-        self::$session = SessionManager::newSession();
-      }
-
-    } else {
-
-      // There is no existing session and the user isn't trying to login so
-      // generate a session but don't associate any permissions with it
-      self::$session = SessionManager::newSession();
     }
+    self::$session = $session;
   }
 
   /**

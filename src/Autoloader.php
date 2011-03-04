@@ -15,6 +15,15 @@
  */
 namespace conductor;
 
+// This is the only spot in any of the woodwinds project's where code appears
+// outside of a class.  A planned compiler for conductor will remove this when
+// preparing a site for production
+if (!defined('DEBUG')) {
+  define('DEBUG', true);
+  ini_set('display_errors', 'on');
+  ini_set('html_errors', 'on');
+}
+
 /**
  * Autoloader for conductor classes.
  *

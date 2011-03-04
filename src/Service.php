@@ -13,36 +13,37 @@
  * @license http://www.opensource.org/licenses/bsd-license.php
  * @package conductor/auth
  */
-namespace conductor\auth;
-
-use \clarinet\Clarinet;
-use \clarinet\Criteria;
-use \conductor\Conductor;
-use \conductor\Exception;
+namespace conductor;
 
 /**
- * This class provides authentication capabilities.
+ * This class provides asynchronous login capabilities.
  *
  * @author Philip Graham <philip@zeptech.ca>
  * @package conductor/auth
+ *
+ * @Service( name = AuthService )
+ * @CsrfToken conductorsessid
+ * @Requires ../Autoloader.php
  */
-class Authenticate {
+class Service {
 
   /**
-   * Attempt to login.
-   *
-   * @param string $username The username
-   * @param string $password The password
-   * @return User | null If the login is successful a user object is returned.
+   * Initiate the service.  This ensures that conductor has been initialized.
    */
-  public static function login($username, $password) {
-    $pwHash = md5($password);
+  public function __construct() {
+    Conductor::init();
+  }
 
-    $c = new Criteria();
-    $c->addEquals('username', $username);
-    $c->addEquals('password', $pwHash);
-    $user = Clarinet::getOne('conductor\model\User', $c);
+  /**
+   * @requestType post
+   */
+  public function login($username, $password) {
+    Auth::init($username, $password);
 
-    return $user;
+    if (Auth::$session->getUser() === null) {
+      return Array('msg' => 'Invalid username or password');
+    } else {
+      return Array('msg' => null);
+    }
   }
 }

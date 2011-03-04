@@ -31,7 +31,6 @@ class Session {
   private $_id;
   private $_key;
   private $_user;
-  private $_created;
   private $_lastAccess;
 
   public function __construct() {
@@ -54,10 +53,10 @@ class Session {
   }
 
   /**
-   * @Column
+   * @Column(name = last_access)
    */
-  public function getCreated() {
-    return $this->_created;
+  public function getLastAccess() {
+    return $this->_lastAccess;
   }
 
   /**
@@ -68,11 +67,18 @@ class Session {
   }
 
   /**
-   * @Column(name = last_access)
+   * Transient method that determines if the session represented by this object
+   * has expired.  A session has expired if it has not been accessed in the
+   * configured timeout period.
+   *
+   * @param integer $ttl The time, in seconds, that a session remains valid
+   *   after its most recent access.
+   * @return boolean
    */
-  public function getLastAccess() {
-    return $this->_lastAccess;
+  public function isExpired($ttl) {
+    return time() - $this->getLastAccess() > $ttl;
   }
+
 
   public function setId($id) {
     $this->_id = $id;
@@ -82,15 +88,11 @@ class Session {
     $this->_key = $key;
   }
 
-  public function setCreated($created) {
-    $this->_created = $created;
+  public function setLastAccess($lastAccess) {
+    $this->_lastAccess = $lastAccess;
   }
 
   public function setUser(User $user) {
     $this->_user = $user;
-  }
-
-  public function setLastAccess($lastAccess) {
-    $this->_lastAccess = $lastAccess;
   }
 }
