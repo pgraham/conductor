@@ -9,7 +9,7 @@ CREATE TABLE `config_values` (
 );
 
 -- Permission
-CREATE TABLE `permission` (
+CREATE TABLE `permissions` (
   `id`             integer      AUTO_INCREMENT PRIMARY KEY,
   `name`           varchar(256) NOT NULL UNIQUE
 );

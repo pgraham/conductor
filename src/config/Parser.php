@@ -17,6 +17,8 @@ namespace conductor\config;
 
 use \conductor\auth\SessionManager;
 
+use \reed\WebSitePathInfo;
+
 /**
  * This class parses a conductor configuration XML file.
  *
@@ -50,17 +52,14 @@ class Parser {
       $cfg['title'] = 'Powered by Conductor';
     }
 
-    // Set the output directory, if not specified use a temporary directory
-    if (isset($xmlCfg->targetPath)) {
-      $target = $xmlCfg->targetPath->__toString();
-
-      if (substr($target, 0, 1) != '/') {
-        $target = $pathRoot . '/' . $target;
+    // Parse the website's custom Autoloader
+    if (isset($xmlCfg->autoloader)) {
+      $autoloader = $xmlCfg->autoloader->__toString();
+      if (substr($autoloader, 0, 1) !== '/') {
+        $autoloader = $pathRoot . '/'. $autoloader;
       }
-    } else {
-      $target = sys_get_temp_dir() . '/conductor';
+      $cfg['autoloader'] = $autoloader;
     }
-    $cfg['target'] = $target;
 
     // Create a connection to the database
     if (!isset($xmlCfg->db)) {
@@ -79,6 +78,17 @@ class Parser {
       $cfg['pageCfg'] = Page::parse($xmlCfg->pages, $pathRoot);
     }
 
+    // Set the output directory, if not specified use a temporary directory
+    if (isset($xmlCfg->targetPath)) {
+      $target = $xmlCfg->targetPath->__toString();
+
+      if (substr($target, 0, 1) != '/') {
+        $target = $pathRoot . '/' . $target;
+      }
+    } else {
+      $target = sys_get_temp_dir() . '/conductor';
+    }
+
     // Parse the document root
     if (isset($xmlCfg->documentRoot)) {
       $docRoot = $xmlCfg->documentRoot->__toString();
@@ -89,7 +99,6 @@ class Parser {
     } else {
       $docRoot = $pathRoot . '/public_html';
     }
-    $cfg['documentRoot'] = $docRoot;
 
     // Parse the file system path to the web-accessible folder that is writable
     // by the web server
@@ -102,7 +111,6 @@ class Parser {
     } else {
       $webWrite = $docRoot . '/gen';
     }
-    $cfg['webWritable'] = $webWrite;
 
     // Parse the root of the website relative to the domain on which it is
     // hosted
@@ -111,7 +119,10 @@ class Parser {
     } else {
       $webRoot = '/';
     }
-    $cfg['webRoot'] = $webRoot;
+
+    $pathInfo = new WebSitePathInfo($pathRoot, $webRoot, $docRoot, null, null,
+      $target, $webWrite);
+    $cfg['pathInfo'] = $pathInfo;
 
     // Parse session time-to-live value
     if (isset($xmlCfg->sessionTimeToLive)) {

@@ -15,9 +15,11 @@
  */
 namespace conductor\generator;
 
+use \conductor\generator\ModelInfo;
+
 /**
- * This class generates service classes for a set of model classes that can then
- * be used by bassoon to generate the client-server communication code for
+ * This class generates a service class for a specified model. This class can
+ * then be used by bassoon to generate the client-server communication code for
  * manipulating persisted model instances.
  *
  * @author Philip Graham <philip@zeptech.ca>
@@ -25,15 +27,15 @@ namespace conductor\generator;
  */
 class BassoonServiceGenerator {
 
-  private $_models;
+  private $_model;
 
   /**
-   * Create a new generator for the given set of model classes.
+   * Create a new generator for the given model info
    *
    * @param array $models List of model class names.
    */
-  public function __construct(array $models) {
-    $this->_models = $models;
+  public function __construct(ModelInfo $model) {
+    $this->_model = $model;
   }
 
   /**

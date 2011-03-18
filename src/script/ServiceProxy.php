@@ -17,8 +17,10 @@ namespace conductor\script;
 
 use \bassoon\Generator;
 use \bassoon\RemoteService;
-use \conductor\Conductor;
+
 use \oboe\head\Javascript;
+
+use \reed\WebSitePathInfo;
 
 /**
  * This class is adds the client side proxy for a Bassoon service to the HEAD
@@ -27,31 +29,15 @@ use \oboe\head\Javascript;
  * @author Philip Graham <philip@zeptech.ca>
  * @package conductor/script
  */
-class ServiceProxy {
+class ServiceProxy extends Javascript {
 
-  private $_elm;
-
-  public function __construct($serviceClass) {
-    $docRoot = Conductor::$config['documentRoot'];
-    $webRoot = Conductor::$config['webRoot'];
-    $webWrite = Conductor::$config['webWritable'];
-
-    $outputPath = $webWrite;
-    $webOutputPath = str_replace($docRoot, '', $webWrite);
-
-    if ($webRoot != '/') {
-      $webOutputPath = $webRoot . $webOutputPath;
-    }
-    
+  public function __construct($serviceClass, WebSitePathInfo $pathInfo) {
     $srvc = new RemoteService($serviceClass);
 
     $gen = new Generator($srvc);
-    $pathInfo = $gen->generate($outputPath, $webOutputPath);
+    $genPathInfo = $gen->generate($pathInfo);
 
-    $this->_elm = new Javascript($pathInfo->getProxyWebPath($srvc->getName()));
-  }
-
-  public function getElement() {
-    return $this->_elm;
+    $genPath = $genPathInfo->getProxyWebPath($srvc->getName());
+    parent::__construct($genPath);
   }
 }

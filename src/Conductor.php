@@ -90,28 +90,44 @@ class Conductor {
       $configPath = __DIR__ . '/../../../conductor.cfg.xml';
     }
     self::$config = Parser::parse($configPath);
+    $pathInfo = self::$config['pathInfo'];
+
+    // If a custom autoloader was defined in the configuration, load it now
+    if (isset(self::$config['autoloader'])) {
+      require_once self::$config['autoloader'];
+    }
 
     // Initialize clarinet
     Clarinet::init(Array
       (
         'pdo'        => self::$config['pdo'],
-        'outputPath' => self::$config['target']
+        'outputPath' => $pathInfo->getTarget()
       )
     );
 
-    // Initialize conductor's extensions to oboe\Page and include the conductor
-    // client
-    Page::init();
+    // TODO These scripts are included here instead of in load() because
+    //      It is possible that a template constructor includes scripts
+    //      that rely on jquery or this client.  However, the proper spot
+    //      for these includes is in the load function because they are not
+    //      needed for aynchronous requests.  So, either the page template
+    //      interface needs to be updated to include a facility for retrieving
+    //      scripts that are to be added to the page, or the conductor.cfg.xml
+    //      parser needs to be updated to support specifying global and page
+    //      level scripts
+    $jQueryName = 'jquery.min.js';
+    if (defined('DEBUG') && DEBUG === true) {
+      $jQueryName = 'jquery.js';
+    }
 
     $jQuery = new Javascript('http://ajax.googleapis.com/ajax/libs/jquery/'
-      . self::JQUERY_VERSION . '/jquery.min.js');
+      . self::JQUERY_VERSION . DIRECTORY_SEPARATOR . $jQueryName);
     $jQuery->addToHead();
 
-    $client = new Client();
+    $client = new Client($pathInfo);
     $client->addToHead();
 
-    $service = new ServiceProxy('conductor\Service');
-    $service->getElement()->addToHead();
+    $service = new ServiceProxy('conductor\Service', $pathInfo);
+    $service->addToHead();
   }
 
   /**
@@ -122,6 +138,10 @@ class Conductor {
    */
   public static function load(PageTemplate $template = null) {
     self::_ensureInitialized();
+
+    // Initialize conductor's extensions to oboe\Page and include the conductor
+    // client
+    Page::init();
 
     if ($template !== null) {
       Page::setTemplate($template);

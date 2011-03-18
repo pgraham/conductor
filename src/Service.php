@@ -35,6 +35,14 @@ class Service {
   }
 
   /**
+   * @returnType html
+   */
+  public function loadPage($pageId) {
+    $elm = PageLoader::loadPage($pageId, true);
+    return $elm->__toString();
+  }
+
+  /**
    * @requestType post
    */
   public function login($username, $password) {

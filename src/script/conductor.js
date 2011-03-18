@@ -6,30 +6,39 @@
  */
 var Conductor = (function ($) {
 
-  var loginHandlers = [];
+  var curPage,
+      curPageSel,
+
+      /* Internal function for accessing the loadPage RPC */
+      loadPage = function (pageId, sel) {
+        ConductorService.loadPage(pageId, function (data) {
+          curPage = pageId;
+          curPageSel = sel;
+
+          $(sel).html(data);
+        });
+      };
 
   return {
     /**
      * Initialize the conductor client.  This function is called automatically
      * and clobbers itself so that it can't be called twice.
      */
-    init: function () {
+    init: function (curPageId) {
+      curPage = curPageId;
+
       // Add live click handler for the login form.
       $('#login.async').find('.cdt-Submit').live('click', function () {
         var form     = $('#login.async'),
             username = form.find('input[name="uname"]'),
             password = form.find('input[name="pw"]'),
-            error    = form.find('.cdt-Error'),
-            count    = loginHandlers.length,
-            i;
+            error    = form.find('.cdt-Error');
 
         error.empty();
         
         ConductorService.login(username.val(), password.val(), function (resp) {
           if (resp.msg === null) {
-            for (i = 0; i < count; i++) {
-              loginHandlers[i].call();
-            }
+            loadPage(curPage, curPageSel);
           } else {
             error.text(resp.msg);
             username.focus().select();
@@ -37,17 +46,22 @@ var Conductor = (function ($) {
         });
       });
 
-      // Don't let initialization happen twice
-      this.init = $.noop;
+      // Don't let initialization happen twice but still allow the initial page
+      // to be set
+      this.init = function (curPageId) {
+        curPage = curPageId;
+      }
     },
 
     /**
-     * Register a function to invoke after a successful login attempt.
+     * Load the page with the given id.
      *
-     * @param function handler
+     * @param string pageId
+     * @param string sel Selector for the element with which to populate the
+     *   loaded page.
      */
-    onLogin: function (handler) {
-      loginHandlers.push(handler);
+    loadPage: function (pageId, sel) {
+      loadPage(pageId, sel);
     }
   }
 }(jQuery));

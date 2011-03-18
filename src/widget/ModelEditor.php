@@ -16,14 +16,18 @@
 namespace conductor\widget;
 
 use \conductor\Conductor;
-use \Oboe\Composite;
-use \Oboe\Div;
-use \Oboe\Heading;
-use \Oboe\Item;
+
+use \oboe\item;
+use \oboe\BaseList;
+use \oboe\Composite;
+use \oboe\Div;
+use \oboe\Heading;
+use \oboe\ListEl;
 
 /**
  * This class builds an administration interface for manipulating the given set
- * of model classes.
+ * of model classes.  The structure contained by this widget is just a shell
+ * that will be populated by the generated conductor-admin.js script.
  *
  * @author Philip Graham <philip@zeptech.ca>
  * @package conductor/widget
@@ -32,5 +36,12 @@ class ModelEditor extends Composite implements Item\Body {
 
   public function __construct() {
     $this->initElement(new Div('cdt-Admin'));
+
+    $menu = new Div('menu');
+    $menu->add(new ListEl(BaseList::UNORDERED));
+    $this->elm->add($menu);
+
+    $ctnt = new Div('ctnt');
+    $this->elm->add($ctnt);
   }
 }

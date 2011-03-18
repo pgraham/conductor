@@ -15,11 +15,13 @@
  */
 namespace conductor;
 
-use \conductor\admin\AdminGenerator;
-use \conductor\admin\AdminTemplate;
-use \conductor\generator\BassoonServiceGenerator;
+use \conductor\admin\AdminClient;
+use \conductor\auth\AuthorizationException;
+use \conductor\script\JQueryUiIncluder;
 use \conductor\widget\ModelEditor;
 use \conductor\widget\LoginForm;
+
+use \reed\FsToWebPathConverter;
 
 /**
  * This class provides methods for loading various predefined pages.
@@ -57,58 +59,88 @@ class PageLoader {
    *
    * @param string $pageId The id given to the page in the config file. If null
    *   (default) then the default page is loaded.
+   * @param boolean $async If this loadPage request is part of an asynchronous
+   *   request. Default: false.
    * @return Fragment containing the page content.
    */
-  public static function loadPage($pageId = null) {
-    // Call conductor init() so that if it hasn't been explicitely intitialized
-    // it will be now or will throw an exception if there is a problem
-    Conductor::init();
+  public static function loadPage($pageId = null, $async = false) {
+    try {
+      Conductor::init();
 
-    if ($pageId === null) {
-      $pageId = Conductor::$config['pageCfg']['default'];
+      if ($pageId === null) {
+        $pageId = Conductor::$config['pageCfg']['default'];
+      }
+
+      if (!isset(Conductor::$config['pageCfg']['pages'][$pageId])) {
+        header("HTTP/1.0 404 Not Found");
+        return new Fragment(__DIR__ . '/html/404.html');
+      }
+
+      $pageInfo = Conductor::$config['pageCfg']['pages'][$pageId];
+      $className = $pageInfo['class'];
+
+      $page = new $className();
+      $frag = $page->getFragment();
+      return $frag;
+
+    } catch (AuthorizationException $e) {
+      $loginForm = self::_buildLoginForm($e, $async);
+      return $loginForm;
     }
-
-    if (!isset(Conductor::$config['pageCfg']['pages'][$pageId])) {
-      // TODO This is an error, but what is the appropriate behaviour?
-      return null;
-    }
-
-    $pageInfo = Conductor::$config['pageCfg']['pages'][$pageId];
-    $className = $pageInfo['class'];
-
-    $page = new $className();
-    $frag = $page->getFragment();
-    return $frag;
   }
 
   /**
    * Load the admin interface for the models defined in conductor.cfg.xml.
+   *
+   * @param boolean $async If this loadPage request is part of an asynchronous
+   *   request. Default: false.
    */
-  public static function loadAdmin() {
-    // Call conductor init() so that if it hasn't been explicitely intitialized
-    // it will be now or will throw an exception if there is a problem
-    Conductor::init();
+  public static function loadAdmin($async = false) {
+    try {
+      Conductor::init();
 
-    $jsDir = Conductor::$config['webWritable'] . '/js';
-    $jsPath = $jsDir . '/conductor-admin.js';
+      if (!Auth::hasPermission('cdt-admin')) {
+        throw new AuthorizationException("Please login.");
+      }
 
-    if (defined('DEBUG') && DEBUG === false) {
-      // Generate and output the admin javascript
-      $adminGen = new AdminGenerator(Conductor::$config['models']);
-      $adminGen->generate($jsDir);
+      $pathInfo = Conductor::$config['pathInfo'];
+
+      $jQueryUiIncluder = new JQueryUiIncluder($pathInfo);
+
+      foreach ($jQueryUiIncluder->getScripts() AS $script) {
+        $script->addToHead();
+      }
+
+      $jQueryUiIncluder->getStyleSheet()->addToHead(); 
+
+      $adminClient = new AdminClient(Conductor::$config['models'], $pathInfo);
+      $adminClient->getScript()->addToHead();
+
+      foreach ($adminClient->getStyleSheets() AS $sheet) {
+        $sheet->addToHead();
+      }
+
+      return new ModelEditor();
+    } catch (AuthorizationException $e) {
+      $loginForm = self::_buildLoginForm($e, $async);
+      return $loginForm;
     }
+  }
 
-    // Set the page template to be the admin template
-    Conductor::setPageTemplate(new AdminTemplate($jsPath));
-
-    if (Auth::hasPermission('conductor-admin')) {
-      $widget = new ModelEditor();
-      $widget->addToBody();
-    } else {
-      self::loadLogin("You are either not logged in or do not have sufficient"
-        . " privileges to access the admin panel.");
+  /* Create a login form from the given authorization exception. */
+  private static function _buildLoginForm($e, $async) {
+    $msg = $e->getMessage();
+    if ($msg === null) {
+      $msg = 'You must provide credentials with sufficient permissions to'
+        . ' perform the requested action.';
     }
-    Page::dump();
+    $loginForm = new LoginForm($msg, $async);
+
+    if ($e->getUsernameLabel() !== null) {
+      $loginForm->setUsernameLabel($e->getUsernameLabel());
+      $loginForm->setPasswordLabel($e->getPasswordLabel());
+    }
+    return $loginForm;
   }
 
   /**

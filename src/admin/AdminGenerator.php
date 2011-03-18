@@ -15,6 +15,12 @@
  */
 namespace conductor\admin;
 
+use \SplFileObject;
+
+use \conductor\generator\ModelInfoSet;
+
+use \reed\WebSitePathInfo;
+
 /**
  * This class generates the javascript for editing a set of model classes.
  *
@@ -30,17 +36,36 @@ class AdminGenerator {
    *
    * @param array $models List of model class names.
    */
-  public function __construct(array $models) {
+  public function __construct(ModelInfoSet $models) {
     $this->_models = $models;
   }
 
   /**
-   * Generate the javascript and output it to the given directory.
+   * Generate the javascript and output it to the given directory.  The
+   * generated script will output to $outputPath . '/js/conductor-admin.js';
    *
    * @param string $outputPath The path for where to write the generated
    *   javascript file.
    */
-  public function generate($outputPath) {
+  public function generate(WebSitePathInfo $pathInfo) {
+    foreach ($this->_models AS $model) {
+      // Generate a bassoon service for the model and then use Bassoon to
+      // generate a client side proxy for the service.
+      $generator = new BassoonServiceGenerator($model);
+      $generator->generate($pathInfo);
+    }
 
+    $builder = new AdminBuilder($this->_models);
+    $template = $builder->build();
+
+    // Ensure the output directory exists
+    $outputPath = $pathInfo->getWebTarget() . '/js';
+    if (!file_exists($outputPath)) {
+      mkdir($outputPath, 0755, true);
+    }
+
+    $adminPath = $pathInfo->getWebTarget() . '/js/conductor-admin.js';
+    $file = new SplFileObject($adminPath, 'w');
+    $file->fwrite($template);
   }
 }

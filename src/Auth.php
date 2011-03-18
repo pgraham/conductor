@@ -15,10 +15,13 @@
  */
 namespace conductor;
 
+use \clarinet\Clarinet;
+
 use \conductor\auth\Authenticate;
 use \conductor\auth\Authorize;
 use \conductor\auth\AuthService;
 use \conductor\auth\SessionManager;
+
 /**
  * This class ensures that the requesting user is assigned to a session.  The
  * session can optionally be associated with a user.

@@ -11,9 +11,9 @@
  * =============================================================================
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
- * @package conductor
+ * @package conductor/auth
  */
-namespace conductor;
+namespace conductor\auth;
 
 /**
  * Clarinet exception class.  All messages are prepended with 'Clarinet: '.
@@ -21,12 +21,21 @@ namespace conductor;
  * given without requiring a code.
  *
  * @author Philip Graham <philip@zeptech.ca>
- * @package conductor
+ * @package conductor/auth
  */
-class Exception extends \Exception {
+class AuthorizationException extends \Exception {
+
+  /* Used by PageLoader::loadPage to customize the returned login form */
+  private $_usernameLbl;
+
+  /* Used by PageLoader::loadPage to customize the returned login form */
+  private $_passwordLbl;
 
   /**
-   * Create a new conductor exception
+   * Create a new authorization exception.  Throwing an authorization exception
+   * as a result of calling PageLoader::loadPage() will result in the a login
+   * form being displayed.  For this reason it is possible to set customization
+   * information for the login form through this exception.
    *
    * @param string $msg The exception's message.
    * @param integer|Exception $code Either the exception's code or the causing
@@ -34,13 +43,23 @@ class Exception extends \Exception {
    * @param Exception $previous The exception that is the reason this exception
    *     is being thrown.
    */
-  public function __construct($msg, $code = 0, \Exception $previous = null) {
-    $msg = 'Conductor: ' . $msg;
+  public function __construct($msg = null) {
+    parent::__construct($msg);
+  }
 
-    if ($code instanceof \Exception) {
-      $previous = $code;
-      $code = 0;
-    }
-    parent::__construct($msg, $code, $previous);
+  public function getPasswordLabel() {
+    return $this->_passwordLbl;
+  }
+
+  public function getUsernameLabel() {
+    return $this->_usernameLbl;
+  }
+
+  public function setPasswordLabel($passwordLbl) {
+    $this->_passwordLbl = $passwordLbl;
+  }
+
+  public function setUsernameLabel($usernameLbl) {
+    $this->_usernameLbl = $usernameLbl;
   }
 }

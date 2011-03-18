@@ -15,11 +15,12 @@
  */
 namespace conductor\script;
 
-use \conductor\Conductor;
 use \oboe\head\Javascript;
 
+use \reed\WebSitePathInfo;
+
 /**
- * This class encasulates the client side component of conductor.
+ * This class encapsulates the client side component of conductor.
  *
  * @author Philip Graham <philip@zeptech.ca>
  * @package conductor/script
@@ -32,23 +33,15 @@ class Client extends Javascript {
    * If debug mode is enabled the script will be copied to the web
    * writable directory.
    */
-  public function __construct() {
-    $docRoot = Conductor::$config['documentRoot'];
-    $webRoot = Conductor::$config['webRoot'];
-    $webWrite = Conductor::$config['webWritable'];
-
-    $outputPath = $webWrite;
-    $webOutputPath = str_replace($docRoot, '', $webWrite);
-
-    if ($webRoot != '/') {
-      $webOutputPath = $webRoot . $webOutputPath;
-    }
+  public function __construct(WebSitePathInfo $pathInfo) {
+    $webTarget = $pathInfo->getWebTarget();
+    $webPath = $pathInfo->getWebAccessibleTarget();
 
     if (defined('DEBUG') && DEBUG === true) {
       $srcJsPath = __DIR__ . '/conductor.js';
-      copy($srcJsPath, $webWrite . '/js/conductor.js');
+      copy($srcJsPath, $webTarget . '/js/conductor.js');
     }
 
-    parent::__construct($webOutputPath . '/js/conductor.js');
+    parent::__construct($webPath . '/js/conductor.js');
   }
 }
