@@ -11,11 +11,14 @@
  * =============================================================================
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
- * @package conductor/generator
  */
 namespace conductor\generator;
 
+use \SplFileObject;
+
 use \conductor\generator\ModelInfo;
+
+use \reed\WebSitePathInfo;
 
 /**
  * This class generates a service class for a specified model. This class can
@@ -23,7 +26,6 @@ use \conductor\generator\ModelInfo;
  * manipulating persisted model instances.
  *
  * @author Philip Graham <philip@zeptech.ca>
- * @package conductor/generator
  */
 class BassoonServiceGenerator {
 
@@ -43,7 +45,20 @@ class BassoonServiceGenerator {
    *
    * @param string $outputPath The path for where to write the generated files.
    */
-  public function generate($outputPath) {
-    // TODO
+  public function generate(WebSitePathInfo $pathInfo) {
+    $builder = new BassoonServiceBuilder($this->_model, $pathInfo);
+    $template = $builder->build();
+
+    // Ensure the output directory exists
+    $serviceRelPath = str_replace('\\', '/', ModelInfo::CRUD_SERVICE_NS);
+    $outputPath = $pathInfo->getTarget() . '/' . $serviceRelPath;
+    if (!file_exists($outputPath)) {
+      mkdir($outputPath, 0755, true);
+    }
+
+    $serviceFileName = $this->_model->getCrudServiceName() . '.php';
+    $servicePath = $outputPath . '/' . $serviceFileName;
+    $file = new SplFileObject($servicePath, 'w');
+    $file->fwrite($template);
   }
 }

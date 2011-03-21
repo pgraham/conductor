@@ -14,12 +14,14 @@
  */
 namespace conductor\generator;
 
+use \Iterator;
+
 /**
  * This class encapsulates a set of related ModelInfo objects.
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class ModelInfoSet {
+class ModelInfoSet implements Iterator {
 
   /* The list of models in the set */
   private $_models = Array();
@@ -57,5 +59,33 @@ class ModelInfoSet {
       $json[] = $modelJson;
     }
     return $json;
+  }
+
+  /*
+   * ===========================================================================
+   * Iterator implementation.
+   * ===========================================================================
+   */
+
+  public function current() {
+    return current($this->_models);
+  }
+
+  public function key() {
+    return key($this->_models);
+  }
+
+  public function next() {
+    next($this->_models);
+  }
+
+  public function rewind() {
+    reset($this->_models);
+  }
+
+  public function valid() {
+    // This is safe to do since we know that the _models array will not contain
+    // any false elements
+    return current($this->_models) !== false;
   }
 }

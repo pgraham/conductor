@@ -10,3 +10,6 @@ WHENEVER:
   and make the 'singleton' behaviour provided by the static's injectable.  Once
   this is done update Conductor's initialization and affected tests to do the
   injection.
+
+- Move the ModelInfo and ModelInfoSet classes out of the generator package and
+  into the model package

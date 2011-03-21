@@ -11,7 +11,6 @@
  * =============================================================================
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
- * @package conductor/admin
  */
 namespace conductor\admin;
 
@@ -24,7 +23,6 @@ use \reed\generator\CodeTemplateLoader;
  * info.
  *
  * @author Philip Graham <philip@zeptech.ca>
- * @package conductor/admin
  */
 class AdminBuilder {
 
@@ -45,9 +43,16 @@ class AdminBuilder {
    * @return string Populated conductor-admin.js
    */
   public function build() {
+    $modelEditorBuilder = new ModelEditorBuilder();
+    $editorTemplates = Array();
+    foreach ($this->_modelInfo AS $model) {
+      $editorTemplates[] = $modelEditorBuilder->build($model);
+    }
+
     $templateValues = Array
     (
-      'models' => $this->_modelInfo->asJsonArray()
+      'models' => $this->_modelInfo->asJsonArray(),
+      'editorTemplates' => $editorTemplates
     );
 
     $templateLoader = CodeTemplateLoader::get(__DIR__);

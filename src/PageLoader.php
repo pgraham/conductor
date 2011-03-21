@@ -114,7 +114,9 @@ class PageLoader {
       $jQueryUiIncluder->getStyleSheet()->addToHead(); 
 
       $adminClient = new AdminClient(Conductor::$config['models'], $pathInfo);
-      $adminClient->getScript()->addToHead();
+      foreach ($adminClient->getScripts() AS $script) {
+        $script->addToHead();
+      }
 
       foreach ($adminClient->getStyleSheets() AS $sheet) {
         $sheet->addToHead();

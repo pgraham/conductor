@@ -34,14 +34,18 @@ class Client extends Javascript {
    * writable directory.
    */
   public function __construct(WebSitePathInfo $pathInfo) {
-    $webTarget = $pathInfo->getWebTarget();
-    $webPath = $pathInfo->getWebAccessibleTarget();
+    $webTarget = $pathInfo->getWebTarget() . '/js';
+    $webPath = $pathInfo->getWebAccessibleTarget() . '/js';
 
     if (defined('DEBUG') && DEBUG === true) {
+      if (!file_exists($webTarget)) {
+        mkdir($webTarget, 0755, true);
+      }
+
       $srcJsPath = __DIR__ . '/conductor.js';
-      copy($srcJsPath, $webTarget . '/js/conductor.js');
+      copy($srcJsPath, $webTarget . '/conductor.js');
     }
 
-    parent::__construct($webPath . '/js/conductor.js');
+    parent::__construct($webPath . '/conductor.js');
   }
 }

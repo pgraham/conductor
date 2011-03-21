@@ -16,6 +16,8 @@ namespace conductor\generator;
 
 use \ReflectionClass;
 
+use \clarinet\model\Info;
+
 use \reed\util\ReflectionHelper;
 
 /**
@@ -26,14 +28,30 @@ use \reed\util\ReflectionHelper;
  */
 class ModelInfo {
 
+  /**
+   * The namespace in which generated CRUD services live.
+   */
+  const CRUD_SERVICE_NS = 'conductor\service\crud';
+
+  /* The model's class name */
+  private $_className;
+
   /* The display name for the model */
   private $_displayName;
 
   /* The display name for the model in a plural context */
   private $_displayNamePlural;
 
-  /* The name of the model's CRUD service */
+  /*
+   * The name of the model's CRUD service.  This is used as the name of the
+   * client side variable that contains the service's proxy methods as well as
+   * the basename of the service's class name.  The service's class will live
+   * in the name space defined in a constant in this class.
+   */
   private $_crudServiceName;
+
+  /* The model's properties' display names */
+  private $_propertyDisplayNames;
 
   /**
    * Create a new ModelInfo object.
@@ -41,6 +59,8 @@ class ModelInfo {
    * @param string $modelName The represented model's class name.
    */
   public function __construct($modelName) {
+    $this->_className = $modelName;
+
     $classInfo = new ReflectionClass($modelName);
     $docComment = $classInfo->getDocComment();
     $annotations = ReflectionHelper::getAnnotations($docComment);
@@ -58,6 +78,27 @@ class ModelInfo {
     }
 
     $this->_serviceName = str_replace('\\', '_', $modelName) . 'CRUD';
+
+    $info = new Info($this->_className);
+    $this->_properties = $info->getProperties();
+  }
+
+  /**
+   * Getter for the mode's class name.
+   *
+   * @return string
+   */
+  public function getClassName() {
+    return $this->_className;
+  }
+
+  /**
+   * Getter for the fully qualified name of the mode's CRUD service class.
+   *
+   * @return string
+   */
+  public function getCrudServiceClass() {
+    return self::CRUD_SERVICE_NS . '\\' . $this->_serviceName;
   }
 
   /**
@@ -85,5 +126,14 @@ class ModelInfo {
    */
   public function getDisplayNamePlural() {
     return $this->_displayNamePlural;
+  }
+
+  /**
+   * Getter for the model's properties.
+   *
+   * @return clarinet\model\Property[]
+   */
+  public function getProperties() {
+    return $this->_properties();
   }
 }

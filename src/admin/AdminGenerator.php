@@ -17,6 +17,7 @@ namespace conductor\admin;
 
 use \SplFileObject;
 
+use \conductor\generator\BassoonServiceGenerator;
 use \conductor\generator\ModelInfoSet;
 
 use \reed\WebSitePathInfo;
@@ -64,7 +65,7 @@ class AdminGenerator {
       mkdir($outputPath, 0755, true);
     }
 
-    $adminPath = $pathInfo->getWebTarget() . '/js/conductor-admin.js';
+    $adminPath = $outputPath . '/conductor-admin.js';
     $file = new SplFileObject($adminPath, 'w');
     $file->fwrite($template);
   }

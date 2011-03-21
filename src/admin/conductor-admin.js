@@ -3,11 +3,6 @@
  */
 (function ($) {
 
-  /*
-   * ===========================================================================
-   * Menu Object
-   * ===========================================================================
-   */
   function Menu(sel) {
     this.elm = $(sel).get(0);
   }
@@ -22,12 +17,6 @@
     $(this.elm).menu();
   };
 
-  /*
-   * ===========================================================================
-   * Content Object
-   * ===========================================================================
-   */
-
   function Content(sel) {
     this.elm = $(sel).get(0);
   }
@@ -35,12 +24,6 @@
   Content.prototype.setContent = function (ctnt) {
     $(this.elm).empty().append(ctnt.getElement());
   };
-
-  /*
-   * ===========================================================================
-   * Base Widget
-   * ===========================================================================
-   */
 
   function BaseView(elm) {
     this._elm = elm;
@@ -54,12 +37,6 @@
     }
   };
 
-  /*
-   * ===========================================================================
-   * Dashboard Object
-   * ===========================================================================
-   */
-
   function Dashboard() {
     BaseView.call(this, this.build());
   }
@@ -71,26 +48,9 @@
     }
   });
 
-  /*
-   * ===========================================================================
-   * ModelEditor Object
-   * ===========================================================================
-   */
-
-  function ModelEditor(model) {
-    BaseView.call(this, this.build(model.name.plural));
-    this.model = model;
-
-    window[model.crudService].get(/*new Filters(), 0, 0, function (data) {
-      console.log(data);
-    }*/);
-  }
-
-  ModelEditor.prototype = $.extend({}, new BaseView(), {
-    build: function (pluralModelName) {
-      return $('<div/>').text('Manage ' + pluralModelName).get(0);
-    }
-  });
+  ${each:editorTemplates as template}
+    ${template}
+  ${done}
 
   /*
    * ===========================================================================

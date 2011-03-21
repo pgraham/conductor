@@ -16,6 +16,7 @@
 namespace conductor\admin;
 
 use \conductor\generator\ModelInfoSet;
+use \conductor\script\ServiceProxy;
 use \conductor\Conductor;
 
 use \oboe\head\Javascript;
@@ -35,7 +36,7 @@ class AdminClient {
 
   const FONT_PATH = 'http://fonts.googleapis.com/css?family=Allerta';
 
-  private $_js;
+  private $_js = Array();
   private $_css;
 
   /**
@@ -47,6 +48,8 @@ class AdminClient {
    * @param array $modelNames Array of models for which to build the client
    */
   public function __construct(Array $modelNames, WebSitePathInfo $pathInfo) {
+    $modelSet = new ModelInfoSet($modelNames);
+
     $webWrite = $pathInfo->getWebTarget();
     $webPath = $pathInfo->getWebAccessibleTarget();
 
@@ -62,11 +65,17 @@ class AdminClient {
         $webWrite . '/css/conductor-admin.css');
     }
 
-    $this->_js = new Javascript($webPath . '/js/conductor-admin.js');
+    // Add CRUD service proxies for each of the models
+    foreach ($modelSet AS $modelInfo) {
+      $serviceClass = $modelInfo->getCrudServiceClass();
+      $this->_js[] = new ServiceProxy($serviceClass, $pathInfo);
+    }
+
+    $this->_js[] = new Javascript($webPath . '/js/conductor-admin.js');
     $this->_css = new StyleSheet($webPath . '/css/conductor-admin.css');
   }
 
-  public function getScript() {
+  public function getScripts() {
     return $this->_js;
   }
 

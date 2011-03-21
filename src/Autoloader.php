@@ -15,6 +15,9 @@
  */
 namespace conductor;
 
+// This block of code is here as this is the entry point into the woodwinds
+// project.
+//
 // This is the only spot in any of the woodwinds project's where code appears
 // outside of a class.  A planned compiler for conductor will remove this when
 // preparing a site for production
@@ -32,8 +35,11 @@ if (!defined('DEBUG')) {
  */
 class Autoloader {
 
+  /* This is the base path for generated source files */
+  public static $genBasePath = null;
+
   /* This is the base path where the Conductor source files are found. */
-  public static $basePath = __DIR__;
+  private static $_basePath = __DIR__;
 
   /**
    * Autoload function for Conductor class files.
@@ -46,9 +52,14 @@ class Autoloader {
     }
 
     $logicalPath = str_replace('\\', '/', substr($className, 10));
-    $fullPath = self::$basePath.'/'.$logicalPath.'.php';
+    $fullPath = self::$_basePath.'/'.$logicalPath.'.php';
     if (file_exists($fullPath)) {
       require_once $fullPath;
+    } else if (self::$genBasePath !== null) {
+      $genFullPath = self::$genBasePath . '/' . $logicalPath . '.php';
+      if (file_exists($genFullPath)) {
+        require_once $genFullPath;
+      }
     }
   }
 }

@@ -32,6 +32,8 @@ use \reed\WebSitePathInfo;
 class ServiceProxy extends Javascript {
 
   public function __construct($serviceClass, WebSitePathInfo $pathInfo) {
+    // TODO Add path generation to the RemoteService class so that generation
+    //      only needs to happen if DEBUG is on
     $srvc = new RemoteService($serviceClass);
 
     $gen = new Generator($srvc);

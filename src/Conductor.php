@@ -91,6 +91,7 @@ class Conductor {
     }
     self::$config = Parser::parse($configPath);
     $pathInfo = self::$config['pathInfo'];
+    Autoloader::$genBasePath = $pathInfo->getTarget() . '/conductor';
 
     // If a custom autoloader was defined in the configuration, load it now
     if (isset(self::$config['autoloader'])) {

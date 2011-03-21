@@ -11,7 +11,6 @@
  * =============================================================================
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
- * @package conductor/auth
  */
 namespace conductor;
 
@@ -19,7 +18,6 @@ namespace conductor;
  * This class provides asynchronous login capabilities.
  *
  * @author Philip Graham <philip@zeptech.ca>
- * @package conductor/auth
  *
  * @Service( name = ConductorService )
  * @CsrfToken conductorsessid
