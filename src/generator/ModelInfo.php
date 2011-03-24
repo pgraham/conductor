@@ -42,13 +42,16 @@ class ModelInfo {
   /* The display name for the model in a plural context */
   private $_displayNamePlural;
 
+  /* The name used to identify the model in javascript code */
+  private $_name;
+
   /*
    * The name of the model's CRUD service.  This is used as the name of the
    * client side variable that contains the service's proxy methods as well as
    * the basename of the service's class name.  The service's class will live
    * in the name space defined in a constant in this class.
    */
-  private $_crudServiceName;
+  private $_serviceName;
 
   /* The model's properties' display names */
   private $_propertyDisplayNames;
@@ -67,6 +70,7 @@ class ModelInfo {
 
     $modelNameParts = explode('\\', $modelName);
     $this->_displayName = array_pop($modelNameParts);
+    $this->_name = strtolower($this->_displayName);
 
     if (isset($annotations['display']['name'])) {
       $this->_displayName = $annotations['display']['name'];
@@ -77,9 +81,9 @@ class ModelInfo {
       $this->_displayNamePlural = $annotations['display']['plural'];
     }
 
-    $this->_serviceName = str_replace('\\', '_', $modelName) . 'CRUD';
-
     $info = new Info($this->_className);
+    $this->_serviceName = $info->getActor() . 'Crud';
+
     $this->_properties = $info->getProperties();
   }
 
@@ -129,11 +133,20 @@ class ModelInfo {
   }
 
   /**
+   * Getter for the model's identifier name.
+   *
+   * @return string
+   */
+  public function getName() {
+    return $this->_name;
+  }
+
+  /**
    * Getter for the model's properties.
    *
    * @return clarinet\model\Property[]
    */
   public function getProperties() {
-    return $this->_properties();
+    return $this->_properties;
   }
 }

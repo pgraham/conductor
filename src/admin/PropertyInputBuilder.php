@@ -14,38 +14,29 @@
  */
 namespace conductor\admin;
 
-use \conductor\generator\ModelInfo;
+use \clarinet\model\Property;
 
 use \reed\generator\CodeTemplateLoader;
 
 /**
- * Populator for the model-editor.js template.
+ * Populator for the property-input-*.js templates.
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class ModelEditorBuilder {
-
+class PropertyInputBuilder {
+  
   private $_templateLoader;
 
   public function __construct() {
     $this->_templateLoader = CodeTemplateLoader::get(__DIR__);
   }
 
-  public function build(ModelInfo $model) {
-    $headers = Array();
-    $properties = Array();
-    foreach ($model->getProperties() AS $prop) {
-      $headers[] = $prop->getName();
-      $properties[] = strtolower($prop->getName());
-    }
-
+  public function build(Property $model) {
     $templateValues = Array
     (
-      'model'      => $model->getName(),
-      'headers'    => $headers,
-      'properties' => $properties
     );
 
-    return $this->_templateLoader->load('model-editor.js', $templateValues);
+    return $this->_templateLoader->load(
+      'property-input-text.js', $templateValues);
   }
 }

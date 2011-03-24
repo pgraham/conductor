@@ -5,6 +5,7 @@ body {
 #menu ul.ui-menu li.ui-menu-item,
 #menu ul.ui-menu li.ui-menu-item a {
   display:inline;
+  margin:0 1px;
 }
 
 #ctnt {

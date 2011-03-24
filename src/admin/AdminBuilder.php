@@ -44,15 +44,23 @@ class AdminBuilder {
    */
   public function build() {
     $modelEditorBuilder = new ModelEditorBuilder();
-    $editorTemplates = Array();
+    $modelFormBuilder = new ModelFormBuilder();
+
+    $editors = Array();
+    $forms = Array();
+    $modelNames = Array();
     foreach ($this->_modelInfo AS $model) {
-      $editorTemplates[] = $modelEditorBuilder->build($model);
+      $editors[] = $modelEditorBuilder->build($model);
+      $forms[] = $modelFormBuilder->build($model);
+      $modelNames[] = strtolower($model->getName());
     }
 
     $templateValues = Array
     (
-      'models' => $this->_modelInfo->asJsonArray(),
-      'editorTemplates' => $editorTemplates
+      'models'     => $this->_modelInfo->asJsonArray(),
+      'modelNames' => $modelNames,
+      'editors'    => $editors,
+      'forms'      => $forms
     );
 
     $templateLoader = CodeTemplateLoader::get(__DIR__);

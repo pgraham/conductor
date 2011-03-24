@@ -39,6 +39,7 @@ class JQueryUiIncluder {
     '/ui/jquery.ui.widget.js',
     '/ui/jquery.ui.mouse.js',
     '/ui/jquery.ui.draggable.js',
+    '/ui/jquery.ui.position.js',
     '/ui/jquery.ui.resizable.js',
     '/ui/jquery.ui.selectable.js',
     '/ui/jquery.ui.sortable.js',
@@ -46,7 +47,8 @@ class JQueryUiIncluder {
   );
 
   public static $widgets = Array(
-    '/ui/jquery.ui.menu.js'
+    '/ui/jquery.ui.menu.js',
+    '/ui/jquery.ui.dialog.js'
   );
 
   private $_cssOutputPath;

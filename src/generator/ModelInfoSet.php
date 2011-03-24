@@ -56,7 +56,7 @@ class ModelInfoSet implements Iterator {
         'crudService' => $model->getCrudServiceName()
       );
 
-      $json[] = $modelJson;
+      $json[$model->getName()] = $modelJson;
     }
     return $json;
   }

@@ -19,11 +19,11 @@ use \conductor\generator\ModelInfo;
 use \reed\generator\CodeTemplateLoader;
 
 /**
- * Populator for the model-editor.js template.
+ * Populator for the model-form.js template.
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class ModelEditorBuilder {
+class ModelFormBuilder {
 
   private $_templateLoader;
 
@@ -32,20 +32,22 @@ class ModelEditorBuilder {
   }
 
   public function build(ModelInfo $model) {
-    $headers = Array();
+    $propertyInputBuilder = new PropertyInputBuilder();
+
     $properties = Array();
+    $inputs = Array();
     foreach ($model->getProperties() AS $prop) {
-      $headers[] = $prop->getName();
       $properties[] = strtolower($prop->getName());
+      $inputs[] = $propertyInputBuilder->build($prop);
     }
 
     $templateValues = Array
     (
-      'model'      => $model->getName(),
-      'headers'    => $headers,
-      'properties' => $properties
+      'model'          => $model->getName(),
+      'properties'     => $properties,
+      'propertyInputs' => $inputs
     );
 
-    return $this->_templateLoader->load('model-editor.js', $templateValues);
+    return $this->_templateLoader->load('model-form.js', $templateValues);
   }
 }

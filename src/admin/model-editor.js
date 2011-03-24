@@ -1,42 +1,38 @@
-
 function ${model}Editor() {
-  this.container = $('<div/>');
-  this.tbl       = $('<table/>').addClass('cdt-ModelEditor');
+  this.container = $('<div/>').addClass('cdt-ModelEditor')
+    .append(
+      $('<div/>').addClass('cdt-ModelEditorBtns')
+        .append(
+          $('<input type="button" value="New" />').click(function () {
+            new ${model}Form(null);
+          }))
+        .append(
+          $('<input type="button" value="Edit" />').click(function () {
+            new ${model}Form(this.getSelected().last());
+          }))
+        .append(
+          $('<input type="button" value="Delete" />').click(function () {
+            new ${model}Delete(this.getSelected());
+          })))
+    .append(
+      $('<table/>').addClass('cdt-ModelEditorGrid')
+        .append(
+          $('<tr/>').addClass('cdt-ModelEditorGridHeaders')
+            ${each:headers as header}
+              .append($('<td/>').text('${header}'))
+            ${done}
+        ));
 
-  var newBtn  = $('<input type="button" value="New" />')
-        .click(function () {
-          console.log('Create new edit form');
-        }),
-      editBtn = $('<input type="button" value="Edit" />')
-        .click(function () {
-          console.log('Create new edit form');
-        }),
-      delBtn  = $('<input type="button" value="Delete" />')
-        .click(function () {
-          console.log('Prompt for delete');
-        }),
-      btns = $('<div/>')
-        .append(newBtn)
-        .append(editBtn)
-        .append(delBtn);
-  this.container.append(btns);
-
-  var headers = $('<tr>').addClass('cdt-Header');
-  ${each:headers as header}
-    headers.append($('<td>${header}</td>'));
-  ${done}
-  this.tbl.append(headers);
-
-  this.container.append($('<div>Manager ${pluralName}</div>'));
-  this.container.append(tbl);
-
-  BaseView.call(this, this.container.get(0));
+  this.retrieve();
 }
 
-${model}Editor.prototype = $.extend({}, new BaseView(), {
+${model}Editor.prototype = {
+  getElement: function () {
+    return this.container;
+  },
 
   buildTableRow: function (model) {
-    var row = $('<tr/>').addClass('cdt-Row');
+    var row = $('<tr/>').addClass('cdt-ModelEditorRow');
 
     ${each:properties as property}
       row.append($('<td>' + model[${property}] + '</td>'));
@@ -46,15 +42,17 @@ ${model}Editor.prototype = $.extend({}, new BaseView(), {
   },
 
   retrieve: function () {
-    window['${serviceVar}'].retrieve(function (data) {
-      console.log(data);
+    window[models['${model}'].crudService].retrieve(function (data) {
 
       var count = data.length,
           i;
 
       for (i = 0; i < count; i++) {
-        this.tbl.append(this.buildTable(data[i]));
+        this.tbl.append(this.buildTableRow(data[i]));
       }
     });
   }
-});
+};
+
+function ${model}Delete(selected) {
+}
