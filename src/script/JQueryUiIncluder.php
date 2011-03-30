@@ -32,7 +32,8 @@ use \reed\WebSitePathInfo;
  */
 class JQueryUiIncluder {
 
-  const SRC_PATH = '/home/pgraham/projects/jquery-ui';
+  // TODO - Figure out why this isn't working
+  //public static $SRC_PATH = __DIR__ . '/../../../jquery-ui';
 
   public static $coreScripts = Array(
     '/ui/jquery.ui.core.js',
@@ -61,6 +62,8 @@ class JQueryUiIncluder {
   private $_styleSheet;
 
   public function __construct(WebSitePathInfo $pathInfo) {
+    $this->_srcPath = __DIR__ . '/../../../jquery-ui';
+
     $webTarget = $pathInfo->getWebTarget();
 
     $this->_cssOutputPath = $webTarget . '/css/ui';
@@ -85,7 +88,8 @@ class JQueryUiIncluder {
       }
 
       // Copy javascripts into web writable
-      $jsDir = new DirectoryIterator(self::SRC_PATH . '/ui');
+      //$jsDir = new DirectoryIterator(self::$SRC_PATH . '/ui');
+      $jsDir = new DirectoryIterator($this->_srcPath . '/ui');
       foreach ($jsDir AS $file) {
         if ($file->isDot() || $file->isDir()) {
           continue;
@@ -95,7 +99,8 @@ class JQueryUiIncluder {
       }
 
       // Copy stylesheets and images web writable
-      $cssDir = new DirectoryIterator(self::SRC_PATH . '/themes/base');
+      //$cssDir = new DirectoryIterator(self::$SRC_PATH . '/themes/base');
+      $cssDir = new DirectoryIterator($this->_srcPath . '/themes/base');
       foreach ($cssDir AS $file) {
         if ($file->isDot() || $file->isDir()) {
           continue;
@@ -105,7 +110,8 @@ class JQueryUiIncluder {
       }
 
       // Copy images into web writable
-      $imgDir = new DirectoryIterator(self::SRC_PATH . '/themes/base/images');
+      //$imgDir = new DirectoryIterator(self::$SRC_PATH . '/themes/base/images');
+      $imgDir = new DirectoryIterator($this->_srcPath . '/themes/base/images');
       foreach ($imgDir AS $file) {
         if ($file->isDot() || $file->isDir()) {
           continue;

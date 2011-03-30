@@ -1,27 +1,50 @@
 function ${model}Editor() {
-  this.container = $('<div/>').addClass('cdt-ModelEditor')
+  this.rows = $('<tbody/>')
+    .addClass('cdt-ModelEditorBody')
+    .addClass('ui-widget-content');
+
+  this.container = $('<div/>')
+    .addClass('cdt-ModelEditor')
+    .addClass('ui-widget')
     .append(
       $('<div/>').addClass('cdt-ModelEditorBtns')
         .append(
-          $('<input type="button" value="New" />').click(function () {
-            new ${model}Form(null);
-          }))
+          $('<button />')
+            .attr('type', 'button')
+            .text('New')
+            .data('parent', this)
+            .click(function () {
+              new ${model}Form($(this).data('parent'), null);
+            }))
         .append(
-          $('<input type="button" value="Edit" />').click(function () {
-            new ${model}Form(this.getSelected().last());
-          }))
+          $('<button />')
+            .attr('type', 'button')
+            .text('Edit')
+            .click(function () {
+              new ${model}Form(this.getSelected().last());
+            }))
         .append(
-          $('<input type="button" value="Delete" />').click(function () {
-            new ${model}Delete(this.getSelected());
-          })))
+          $('<button />')
+            .attr('type', 'button')
+            .text('Delete')
+            .click(function () {
+              new ${model}Delete(this.getSelected());
+            })))
     .append(
-      $('<table/>').addClass('cdt-ModelEditorGrid')
+      $('<table/>')
+        .addClass('cdt-ModelEditorGrid')
         .append(
-          $('<tr/>').addClass('cdt-ModelEditorGridHeaders')
-            ${each:headers as header}
-              .append($('<td/>').text('${header}'))
-            ${done}
-        ));
+          $('<thead/>')
+            .addClass('cdt-ModelEditorHead')
+            .addClass('ui-widget-header')
+            .append(
+              $('<tr/>')
+                .addClass('cdt-ModelEditorRow')
+                ${each:headers as header}
+                  .append($('<th/>').text('${header}'))
+                ${done}
+            ))
+        .append(this.rows));
 
   this.retrieve();
 }
@@ -35,22 +58,22 @@ ${model}Editor.prototype = {
     var row = $('<tr/>').addClass('cdt-ModelEditorRow');
 
     ${each:properties as property}
-      row.append($('<td>' + model[${property}] + '</td>'));
+      row.append($('<td>' + model.${property} + '</td>'));
     ${done}
 
     return row;
   },
 
   retrieve: function () {
-    window[models['${model}'].crudService].retrieve(function (data) {
-
-      var count = data.length,
-          i;
-
-      for (i = 0; i < count; i++) {
-        this.tbl.append(this.buildTableRow(data[i]));
-      }
-    });
+    this.rows.empty();
+    window[models['${model}'].crudService].retrieve((function (editor) {
+      return function (data) {
+        var count = data.length, i;
+        for (i = 0; i < count; i++) {
+          editor.rows.append(editor.buildTableRow(data[i]));
+        }
+      };
+    } (this)));
   }
 };
 

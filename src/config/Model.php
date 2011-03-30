@@ -64,7 +64,6 @@ class Model {
         }
       }
 
-
       // For all php files in the scanned directory.  The classname is derieved
       // as $ns\directory-path-relative-to-scandir\filename-without-extension
       $i = new RecursiveIteratorIterator(
@@ -96,7 +95,7 @@ class Model {
 
     if (isset($cfg->model)) {
       foreach ($cfg->model AS $model) {
-        $models[] = $model;
+        $models[] = $model['class']->__toString();
       }
     }
 

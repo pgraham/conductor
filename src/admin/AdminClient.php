@@ -15,7 +15,10 @@
  */
 namespace conductor\admin;
 
-use \conductor\generator\ModelInfoSet;
+use \conductor\generator\CrudServiceGenerator;
+use \conductor\generator\CrudServiceModelDecoratorFactory;
+use \conductor\model\DecoratedModel;
+use \conductor\model\ModelSet;
 use \conductor\script\ServiceProxy;
 use \conductor\Conductor;
 
@@ -36,8 +39,8 @@ class AdminClient {
 
   const FONT_PATH = 'http://fonts.googleapis.com/css?family=Allerta';
 
-  private $_js = Array();
   private $_css;
+  private $_js = array();
 
   /**
    * Create a new Javascript element for the conductor admin client.
@@ -45,29 +48,35 @@ class AdminClient {
    * If debug mode is enabled, then the script will generated using the site's
    * specified model classes.
    *
-   * @param array $modelNames Array of models for which to build the client
+   * @param array $models Array of clarinet\model\Models for which to build the
+   *   client
+   * @param WebSitePathInfo $pathInfo Information about the web site's directory
+   *   structure, in which the client and it's supporting files exist (or should
+   *   exist if in DEBUG mode).
    */
-  public function __construct(Array $modelNames, WebSitePathInfo $pathInfo) {
-    $modelSet = new ModelInfoSet($modelNames);
+  public function __construct(ModelSet $models, WebSitePathInfo $pathInfo) {
+    // We need to know CrudService information about the model in order to
+    // load its proxy
+    $models->decorate(new CrudServiceModelDecoratorFactory());
 
-    $webWrite = $pathInfo->getWebTarget();
     $webPath = $pathInfo->getWebAccessibleTarget();
 
     if (defined('DEBUG') && DEBUG === true) {
-      $generator = new AdminGenerator(new ModelInfoSet($modelNames));
-      $generator->generate($pathInfo);
-
-      if (!file_exists($webWrite . '/css')) {
-        mkdir($webWrite . '/css', 0755, true);
+      // Generate a crud service for each model.
+      foreach ($models AS $model) {
+        $generator = new CrudServiceGenerator($model);
+        $generator->generate($pathInfo);
       }
-      copy(
-        __DIR__ . '/conductor-admin.css',
-        $webWrite . '/css/conductor-admin.css');
+
+      // Generate the admin client
+      $generator = new AdminGenerator($models);
+      $generator->generate($pathInfo);
     }
 
     // Add CRUD service proxies for each of the models
-    foreach ($modelSet AS $modelInfo) {
-      $serviceClass = $modelInfo->getCrudServiceClass();
+    foreach ($models AS $model) {
+      $serviceClass = $model->getCrudServiceClass();
+
       $this->_js[] = new ServiceProxy($serviceClass, $pathInfo);
     }
 

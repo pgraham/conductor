@@ -14,7 +14,7 @@
  */
 namespace conductor\admin;
 
-use \conductor\generator\ModelInfo;
+use \conductor\model\DecoratedModel;
 
 use \reed\generator\CodeTemplateLoader;
 
@@ -31,17 +31,17 @@ class ModelEditorBuilder {
     $this->_templateLoader = CodeTemplateLoader::get(__DIR__);
   }
 
-  public function build(ModelInfo $model) {
+  public function build(DecoratedModel $model) {
     $headers = Array();
     $properties = Array();
     foreach ($model->getProperties() AS $prop) {
-      $headers[] = $prop->getName();
-      $properties[] = strtolower($prop->getName());
+      $headers[] = $prop->getDisplayName();
+      $properties[] = strtolower($prop->getIdentifier());
     }
 
     $templateValues = Array
     (
-      'model'      => $model->getName(),
+      'model'      => $model->getIdentifier(),
       'headers'    => $headers,
       'properties' => $properties
     );

@@ -17,8 +17,7 @@ namespace conductor\admin;
 
 use \SplFileObject;
 
-use \conductor\generator\BassoonServiceGenerator;
-use \conductor\generator\ModelInfoSet;
+use \conductor\model\ModelSet;
 
 use \reed\WebSitePathInfo;
 
@@ -35,10 +34,12 @@ class AdminGenerator {
   /**
    * Create a new generator for the given set of model classes.
    *
-   * @param array $models List of model class names.
+   * @param ModelSet $models Set of models for which to generate an interface.
    */
-  public function __construct(ModelInfoSet $models) {
+  public function __construct(ModelSet $models) {
     $this->_models = $models;
+
+    $models->decorate(new AdminModelDecoratorFactory());
   }
 
   /**
@@ -49,13 +50,6 @@ class AdminGenerator {
    *   javascript file.
    */
   public function generate(WebSitePathInfo $pathInfo) {
-    foreach ($this->_models AS $model) {
-      // Generate a bassoon service for the model and then use Bassoon to
-      // generate a client side proxy for the service.
-      $generator = new BassoonServiceGenerator($model);
-      $generator->generate($pathInfo);
-    }
-
     $builder = new AdminBuilder($this->_models);
     $template = $builder->build();
 
@@ -68,5 +62,14 @@ class AdminGenerator {
     $adminPath = $outputPath . '/conductor-admin.js';
     $file = new SplFileObject($adminPath, 'w');
     $file->fwrite($template);
+
+    // Copy the stylesheet to the approprivate directory
+    $outputPath = $pathInfo->getWebTarget() . '/css';
+    if (!file_exists($outputPath)) {
+      mkdir($outputPath, 0755, true);
+    }
+    copy(
+      __DIR__ . '/conductor-admin.css',
+      $outputPath . '/conductor-admin.css');
   }
 }

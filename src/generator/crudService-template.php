@@ -1,6 +1,7 @@
 <?php
 namespace ${ns};
 
+use \clarinet\ActorFactory;
 use \clarinet\Clarinet;
 use \clarinet\Criteria;
 
@@ -23,7 +24,13 @@ class ${className} {
     Conductor::init();
   }
 
-  public function create() {
+  /**
+   * @RequestType post
+   */
+  public function create($params) {
+    $transformer = ActorFactory::getActor('transformer', '${model}');
+    $model = $transformer->fromArray($params);
+    Clarinet::save($model);
   }
 
   public function retrieve() {

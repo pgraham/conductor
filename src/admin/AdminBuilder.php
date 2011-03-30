@@ -14,7 +14,8 @@
  */
 namespace conductor\admin;
 
-use \conductor\generator\ModelInfoSet;
+use \conductor\generator\CrudServiceModelDecorator;
+use \conductor\model\ModelSet;
 
 use \reed\generator\CodeTemplateLoader;
 
@@ -26,15 +27,15 @@ use \reed\generator\CodeTemplateLoader;
  */
 class AdminBuilder {
 
-  private $_modelInfo;
+  private $_models;
 
   /**
    * Create a new builder for the conductor-admin.js template.
    *
    * @param ModelInfo $modelInfo
    */
-  public function __construct(ModelInfoSet $modelInfo) {
-    $this->_modelInfo = $modelInfo;
+  public function __construct(ModelSet $models) {
+    $this->_models = $models;
   }
 
   /**
@@ -49,15 +50,16 @@ class AdminBuilder {
     $editors = Array();
     $forms = Array();
     $modelNames = Array();
-    foreach ($this->_modelInfo AS $model) {
+    foreach ($this->_models AS $model) {
       $editors[] = $modelEditorBuilder->build($model);
       $forms[] = $modelFormBuilder->build($model);
-      $modelNames[] = strtolower($model->getName());
+
+      $modelNames[] = strtolower($model->getIdentifier());
     }
 
     $templateValues = Array
     (
-      'models'     => $this->_modelInfo->asJsonArray(),
+      'models'     => $this->_buildModelJsonArray(),
       'modelNames' => $modelNames,
       'editors'    => $editors,
       'forms'      => $forms
@@ -66,5 +68,24 @@ class AdminBuilder {
     $templateLoader = CodeTemplateLoader::get(__DIR__);
     $js = $templateLoader->load('conductor-admin.js', $templateValues);
     return $js;
+  }
+
+  /* Build a JSONable array for the encapsulated model set */
+  private function _buildModelJsonArray() {
+    $jsonable = Array();
+    foreach ($this->_models AS $modelInfo) {
+      $modelJson = Array
+      (
+        'name' => Array
+          (
+            'singular' => $modelInfo->getDisplayName(),
+            'plural'   => $modelInfo->getDisplayNamePlural()
+          ),
+        'crudService' => $modelInfo->getCrudServiceName()
+      );
+
+      $jsonable[$modelInfo->getIdentifier()] = $modelJson;
+    }
+    return $jsonable;
   }
 }

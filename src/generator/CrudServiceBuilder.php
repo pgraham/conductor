@@ -14,6 +14,8 @@
  */
 namespace conductor\generator;
 
+use \conductor\model\DecoratedModel;
+
 use \reed\generator\CodeTemplateLoader;
 use \reed\WebSitePathInfo;
 
@@ -22,7 +24,7 @@ use \reed\WebSitePathInfo;
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class BassoonServiceBuilder {
+class CrudServiceBuilder {
 
   private $_model;
   private $_pathInfo;
@@ -32,7 +34,8 @@ class BassoonServiceBuilder {
    *
    * @param ModelInfo $model
    */
-  public function __construct(ModelInfo $model, WebSitePathInfo $pathInfo) {
+  public function __construct(DecoratedModel $model, WebSitePathInfo $pathInfo)
+  {
     $this->_model = $model;
     $this->_pathInfo = $pathInfo;
   }
@@ -51,12 +54,20 @@ class BassoonServiceBuilder {
       'autoloader' => $autoloaderPath,
       'class'      => $this->_model->getCrudServiceClass(),
       'className'  => $this->_model->getCrudServiceName(),
-      'model'      => $this->_model->getClassName(),
-      'ns'         => ModelInfo::CRUD_SERVICE_NS
+      'model'      => $this->_model->getClass(),
+      'ns'         => CrudServiceModelDecorator::CRUD_SERVICE_NS
     );
 
     $templateLoader = CodeTemplateLoader::get(__DIR__);
-    $crudService = $templateLoader->load('crudService.php', $templateValues);
-    return $crudService;
+    return $templateLoader->load('crudService-template.php', $templateValues);
+  }
+
+  /**
+   * Getter for the model's properties.
+   *
+   * @return clarinet\model\Property[]
+   */
+  public function getProperties() {
+    return $this->_model->getProperties();
   }
 }

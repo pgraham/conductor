@@ -14,7 +14,7 @@
  */
 namespace conductor\admin;
 
-use \conductor\generator\ModelInfo;
+use \conductor\model\DecoratedModel;
 
 use \reed\generator\CodeTemplateLoader;
 
@@ -31,21 +31,22 @@ class ModelFormBuilder {
     $this->_templateLoader = CodeTemplateLoader::get(__DIR__);
   }
 
-  public function build(ModelInfo $model) {
+  public function build(DecoratedModel $model) {
     $propertyInputBuilder = new PropertyInputBuilder();
 
     $properties = Array();
     $inputs = Array();
     foreach ($model->getProperties() AS $prop) {
-      $properties[] = strtolower($prop->getName());
+      $properties[] = strtolower($prop->getIdentifier());
       $inputs[] = $propertyInputBuilder->build($prop);
     }
 
     $templateValues = Array
     (
-      'model'          => $model->getName(),
+      'model'          => $model->getIdentifier(),
       'properties'     => $properties,
-      'propertyInputs' => $inputs
+      'propertyInputs' => $inputs,
+      'crudServiceVar' => $model->getCrudServiceName()
     );
 
     return $this->_templateLoader->load('model-form.js', $templateValues);

@@ -15,10 +15,13 @@
  */
 namespace conductor;
 
+use \clarinet\model\Parser as ModelParser;
 use \clarinet\Clarinet;
 use \clarinet\Criteria;
 
 use \conductor\config\Parser;
+use \conductor\model\DecoratedModel;
+use \conductor\model\ModelSet;
 use \conductor\script\Client;
 use \conductor\script\ServiceProxy;
 use \conductor\template\PageTemplate;
@@ -35,9 +38,11 @@ class Conductor {
 
   const JQUERY_VERSION = '1.5.1';
 
-  private static $_initialized = false;
-
+  /** Conductor configuration values */
   public static $config = null;
+
+  /* Whether or not conductor has been initialized */
+  private static $_initialized = false;
 
   /**
    * Retrieve the configuration value with the given name.  In order for this to
@@ -46,6 +51,8 @@ class Conductor {
    * @param {string} $name The name of the configuration value to retrieve.
    */
   public static function getConfigValue($name) {
+    self::_ensureInitialized();
+
     $c = new Criteria();
     $c->addEquals('name', $name);
 
@@ -56,6 +63,18 @@ class Conductor {
 
     $obj = $rows[0];
     return $obj->getValue();
+  }
+
+  /**
+   * Retrieve a {link ModelSet} for the model classes defined in the conductor
+   * config.
+   *
+   * @return ModelSet
+   */
+  public static function getModels() {
+    self::_ensureInitialized();
+
+    return new ModelSet(self::$config['models']);
   }
 
   /**
@@ -99,7 +118,7 @@ class Conductor {
     }
 
     // Initialize clarinet
-    Clarinet::init(Array
+    Clarinet::init(array
       (
         'pdo'        => self::$config['pdo'],
         'outputPath' => $pathInfo->getTarget()

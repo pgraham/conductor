@@ -16,6 +16,9 @@ namespace conductor\admin;
 
 use \clarinet\model\Property;
 
+use \conductor\model\DecoratedProperty;
+use \conductor\Exception;
+
 use \reed\generator\CodeTemplateLoader;
 
 /**
@@ -31,12 +34,48 @@ class PropertyInputBuilder {
     $this->_templateLoader = CodeTemplateLoader::get(__DIR__);
   }
 
-  public function build(Property $model) {
-    $templateValues = Array
-    (
-    );
+  public function build(DecoratedProperty $property) {
+    $type = $property->getType();
 
-    return $this->_templateLoader->load(
-      'property-input-text.js', $templateValues);
+    switch ($property->getType()) {
+      case Property::TYPE_BOOLEAN:
+      $template = 'property-input-boolean.js';
+      break;
+
+      case Property::TYPE_DATE:
+      $template = 'property-input-date.js';
+      break;
+
+      case Property::TYPE_FLOAT:
+      $template = 'property-input-float.js';
+      break;
+
+      case Property::TYPE_INTEGER:
+      $template = 'property-input-integer.js';
+      break;
+
+      case Property::TYPE_STRING:
+      $template = 'property-input-string.js';
+      break;
+
+      case Property::TYPE_TIMESTAMP:
+      $template = 'property-input-timestamp.js';
+      break;
+
+      default:
+      assert("false /*Unrecognized property type: $type */");
+      return '';
+    }
+
+    return $this->_templateLoader->load($template,
+      $this->_getTemplateValues($property));
+  }
+
+  private function _getTemplateValues($property) {
+    return array(
+      'model'    => $property->getModel()->getIdentifier(),
+      'property' => $property->getIdentifier(),
+      'label'    => $property->getDisplayName()
+    );
   }
 }

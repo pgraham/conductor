@@ -16,7 +16,7 @@ namespace conductor\generator;
 
 use \SplFileObject;
 
-use \conductor\generator\ModelInfo;
+use \conductor\model\DecoratedModel;
 
 use \reed\WebSitePathInfo;
 
@@ -27,7 +27,7 @@ use \reed\WebSitePathInfo;
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class BassoonServiceGenerator {
+class CrudServiceGenerator {
 
   private $_model;
 
@@ -36,7 +36,7 @@ class BassoonServiceGenerator {
    *
    * @param array $models List of model class names.
    */
-  public function __construct(ModelInfo $model) {
+  public function __construct(DecoratedModel $model) {
     $this->_model = $model;
   }
 
@@ -46,11 +46,12 @@ class BassoonServiceGenerator {
    * @param string $outputPath The path for where to write the generated files.
    */
   public function generate(WebSitePathInfo $pathInfo) {
-    $builder = new BassoonServiceBuilder($this->_model, $pathInfo);
+    $builder = new CrudServiceBuilder($this->_model, $pathInfo);
     $template = $builder->build();
 
     // Ensure the output directory exists
-    $serviceRelPath = str_replace('\\', '/', ModelInfo::CRUD_SERVICE_NS);
+    $serviceRelPath = str_replace('\\', '/',
+      CrudServiceModelDecorator::CRUD_SERVICE_NS);
     $outputPath = $pathInfo->getTarget() . '/' . $serviceRelPath;
     if (!file_exists($outputPath)) {
       mkdir($outputPath, 0755, true);
