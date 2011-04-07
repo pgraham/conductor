@@ -32,18 +32,26 @@ class ModelEditorBuilder {
   }
 
   public function build(DecoratedModel $model) {
-    $headers = Array();
-    $properties = Array();
+    $headers = array();
+    $properties = array();
+    $propertyStrs = array();
+
     foreach ($model->getProperties() AS $prop) {
+      $propId = strtolower($prop->getIdentifier());
+
       $headers[] = $prop->getDisplayName();
-      $properties[] = strtolower($prop->getIdentifier());
+      $properties[] = $propId;
+      $propertyStrs[] = '"' . $propId . '"';
     }
 
     $templateValues = Array
     (
-      'model'      => $model->getIdentifier(),
-      'headers'    => $headers,
-      'properties' => $properties
+      'model'        => $model->getIdentifier(),
+      'id_prop'      => strtolower($model->getId()->getName()),
+      'crudService'  => $model->getCrudServiceName(),
+      'headers'      => $headers,
+      'properties'   => $properties,
+      'propertyStrs' => $propertyStrs
     );
 
     return $this->_templateLoader->load('model-editor.js', $templateValues);

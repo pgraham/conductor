@@ -34,10 +34,13 @@ class ModelFormBuilder {
   public function build(DecoratedModel $model) {
     $propertyInputBuilder = new PropertyInputBuilder();
 
-    $properties = Array();
-    $inputs = Array();
+    $properties = array();
+    $inputs = array();
+
     foreach ($model->getProperties() AS $prop) {
-      $properties[] = strtolower($prop->getIdentifier());
+      $propId = strtolower($prop->getIdentifier());
+
+      $properties[] = $propId;
       $inputs[] = $propertyInputBuilder->build($prop);
     }
 

@@ -24,6 +24,12 @@ use \conductor\Conductor;
 
 use \oboe\head\Javascript;
 use \oboe\head\StyleSheet;
+use \oboe\item\Body as BodyItem;
+use \oboe\Anchor;
+use \oboe\BaseList;
+use \oboe\Composite;
+use \oboe\Div;
+use \oboe\ListEl;
 
 use \reed\FsToWebPathConverter;
 use \reed\WebSitePathInfo;
@@ -35,7 +41,7 @@ use \reed\WebSitePathInfo;
  * @author Philip Graham <philip@zeptech.ca>
  * @package conductor/admin
  */
-class AdminClient {
+class AdminClient extends Composite implements BodyItem {
 
   const FONT_PATH = 'http://fonts.googleapis.com/css?family=Allerta';
 
@@ -55,6 +61,16 @@ class AdminClient {
    *   exist if in DEBUG mode).
    */
   public function __construct(ModelSet $models, WebSitePathInfo $pathInfo) {
+    $this->initElement(new Div('cdt-Admin'));
+    $menu = new Div('menu');
+    $menu->add(new ListEl(BaseList::UNORDERED));
+    $this->elm->add($menu);
+
+    $ctnt = new Div('ctnt');
+    $this->elm->add($ctnt);
+
+    $this->elm->add(new Anchor($pathInfo->getWebRoot(), 'View Site'));
+
     // We need to know CrudService information about the model in order to
     // load its proxy
     $models->decorate(new CrudServiceModelDecoratorFactory());

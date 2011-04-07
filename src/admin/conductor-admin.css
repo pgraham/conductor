@@ -17,13 +17,18 @@ body {
   height:25px;
 }
 
-.cdt-FormDialog input {
+.cdt-FormDialog input,
+.cdt-FormDialog textarea {
   display: block;
-  height:20px;
   margin:5px 0 5px 150px;
 }
 
-.cdt-FormDialog input.text {
+.cdt-FormDialog input {
+  height:20px;
+}
+
+.cdt-FormDialog input.text,
+.cdt-FormDialog textarea {
   width: 300px;
 }
 

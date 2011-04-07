@@ -44,9 +44,23 @@ class ${className} {
     return $json;
   }
 
-  public function update() {
+  /**
+   * @RequestType post
+   */
+  public function update($params) {
+    $transformer = ActorFactory::getActor('transformer', '${model}');
+    $model = $transformer->fromArray($params);
+    Clarinet::save($model);
   }
 
-  public function delete() {
+  /**
+   * @RequestType post
+   */
+  public function delete(array $ids) {
+    $persister = ActorFactory::getActor('persister', '${model}');
+    foreach ($ids AS $id) {
+      $model = $persister->getById($id);
+      $persister->delete($model);
+    }
   }
 }

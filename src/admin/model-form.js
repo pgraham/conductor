@@ -55,7 +55,7 @@ function ${model}Form(editor, model) {
     modal: true,
     buttons: this.btns,
     dialogClass: 'cdt-FormDialog',
-    width: 500,
+    width: 505,
     close: (function (form) {
       return function () {
         form.cancel();
@@ -85,7 +85,7 @@ ${model}Form.prototype = {
         onDone = (function (form) {
           return function (data) {
             form.cancel();
-            form.editor.retrieve();
+            form.editor.refresh();
           };
         } (this));
     ${each:properties as property}
@@ -95,6 +95,7 @@ ${model}Form.prototype = {
     if (this.model === null) {
       ${crudServiceVar}.create(props, onDone);
     } else {
+      props.id = this.model.guid;
       ${crudServiceVar}.update(props, onDone);
     }
   }

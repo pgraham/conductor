@@ -58,6 +58,10 @@ class PropertyInputBuilder {
       $template = 'property-input-string.js';
       break;
 
+      case Property::TYPE_TEXT:
+      $template = 'property-input-text.js';
+      break;
+
       case Property::TYPE_TIMESTAMP:
       $template = 'property-input-timestamp.js';
       break;

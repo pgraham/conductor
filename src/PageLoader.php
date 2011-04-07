@@ -111,7 +111,9 @@ class PageLoader {
         $script->addToHead();
       }
 
-      $jQueryUiIncluder->getStyleSheet()->addToHead(); 
+      foreach ($jQueryUiIncluder->getStyleSheets() AS $styleSheet) {
+        $styleSheet->addToHead();
+      }
 
       $adminClient = new AdminClient(Conductor::getModels(), $pathInfo);
       foreach ($adminClient->getScripts() AS $script) {
@@ -122,10 +124,10 @@ class PageLoader {
         $sheet->addToHead();
       }
 
-      return new ModelEditor();
+      $adminClient->addToBody();
     } catch (AuthorizationException $e) {
       $loginForm = self::_buildLoginForm($e, $async);
-      return $loginForm;
+      $loginForm->addToBody();
     }
   }
 
