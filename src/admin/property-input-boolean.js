@@ -6,7 +6,8 @@ function ${model}_${property}Input() {
   this.input = $('<input />')
     .attr('type', 'checkbox')
     .attr('name', '${property}')
-    .addClass('check')
+    .attr('value', '${property}')
+    .addClass('check');
 }
 
 ${model}_${property}Input.prototype = {
@@ -20,10 +21,16 @@ ${model}_${property}Input.prototype = {
   },
 
   getValue: function () {
-    return this.input.attr('checked');
+    debugger;
+    var ret = this.input.is(':checked');
+    return ret;
   },
 
   setValue: function (val) {
-    this.input.val(val);
+    if (val) {
+      this.input.val([ '${property}' ]);
+    } else {
+      this.input.val([]);
+    }
   }
 };

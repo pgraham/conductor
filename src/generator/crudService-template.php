@@ -26,11 +26,14 @@ class ${className} {
 
   /**
    * @RequestType post
+   * @JsonParameters(parameters = { params })
    */
   public function create($params) {
     $transformer = ActorFactory::getActor('transformer', '${model}');
     $model = $transformer->fromArray($params);
-    Clarinet::save($model);
+
+    $persister = ActorFactory::getActor('persister', '${model}');
+    $persister->create($model);
   }
 
   public function retrieve() {

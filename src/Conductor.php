@@ -36,7 +36,7 @@ use \oboe\head\Javascript;
  */
 class Conductor {
 
-  const JQUERY_VERSION = '1.5.1';
+  const JQUERY_VERSION = '1.5.2';
 
   /** Conductor configuration values */
   public static $config = null;

@@ -69,10 +69,13 @@ class Auth {
         $session = SessionManager::newSession();
       }
 
-      $user =  Authenticate::login($username, $password);
+      $user = Authenticate::login($username, $password);
       if ($user !== null) {
         $session->setUser($user);
         Clarinet::save($session);
+
+        // TODO - If this is a synchronous request, redirect to the current page
+        //        so that a reload doesn't resubmit the login credentials
       }
     }
     self::$session = $session;
