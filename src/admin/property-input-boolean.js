@@ -21,7 +21,6 @@ ${model}_${property}Input.prototype = {
   },
 
   getValue: function () {
-    debugger;
     var ret = this.input.is(':checked');
     return ret;
   },

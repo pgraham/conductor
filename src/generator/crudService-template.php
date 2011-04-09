@@ -2,7 +2,6 @@
 namespace ${ns};
 
 use \clarinet\ActorFactory;
-use \clarinet\Clarinet;
 use \clarinet\Criteria;
 
 use \conductor\Conductor;
@@ -26,9 +25,8 @@ class ${className} {
 
   /**
    * @RequestType post
-   * @JsonParameters(parameters = { params })
    */
-  public function create($params) {
+  public function create(array $params) {
     $transformer = ActorFactory::getActor('transformer', '${model}');
     $model = $transformer->fromArray($params);
 
@@ -37,12 +35,15 @@ class ${className} {
   }
 
   public function retrieve() {
+    $persister = ActorFactory::getActor('persister', '${model}');
+    $transformer = ActorFactory::getActor('transformer', '${model}');
+
     $c = new Criteria();
-    $models = Clarinet::get('${model}', $c);
+    $models = $persister->retrieve($c);
     
-    $json = Array();
+    $json = array();
     foreach ($models AS $model) {
-      $json[] = Clarinet::asArray($model);
+      $json[] = $transformer->asArray($model);
     }
     return $json;
   }
@@ -50,10 +51,12 @@ class ${className} {
   /**
    * @RequestType post
    */
-  public function update($params) {
+  public function update(array $params) {
     $transformer = ActorFactory::getActor('transformer', '${model}');
     $model = $transformer->fromArray($params);
-    Clarinet::save($model);
+
+    $persister = ActorFactory::getActor('persister', '${model}');
+    $persister->update($model);
   }
 
   /**
