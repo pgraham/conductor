@@ -47,9 +47,11 @@ class ModelFormBuilder {
     $templateValues = Array
     (
       'model'          => $model->getIdentifier(),
+      'singular'       => $model->getDisplayName(),
       'properties'     => $properties,
       'propertyInputs' => $inputs,
-      'crudServiceVar' => $model->getCrudServiceName()
+      'crudServiceVar' => $model->getCrudServiceName(),
+      'idProperty'     => strtolower($model->getId()->getName())
     );
 
     return $this->_templateLoader->load('model-form.js', $templateValues);
