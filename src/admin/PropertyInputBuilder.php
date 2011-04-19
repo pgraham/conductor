@@ -37,7 +37,7 @@ class PropertyInputBuilder {
   public function build(DecoratedProperty $property) {
     $type = $property->getType();
 
-    switch ($property->getType()) {
+    switch ($type) {
       case Property::TYPE_BOOLEAN:
       $template = 'property-input-boolean.js';
       break;

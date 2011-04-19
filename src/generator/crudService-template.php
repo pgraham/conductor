@@ -34,11 +34,25 @@ class ${className} {
     $persister->create($model);
   }
 
-  public function retrieve() {
+  /**
+   * Retrieve instances that match the given sort-paging-filtering criteria.
+   *
+   * @param array $spf
+   */
+  public function retrieve($spf) {
+    if (is_object($spf)) {
+      $spf = (array) $spf;
+    }
+
     $persister = ActorFactory::getActor('persister', '${model}');
     $transformer = ActorFactory::getActor('transformer', '${model}');
 
     $c = new Criteria();
+    if (isset($spf['filter'])) {
+      foreach ($spf['filter'] AS $column => $value) {
+        $c->addEquals($column, $value);
+      }
+    }
     $models = $persister->retrieve($c);
     
     $json = array();

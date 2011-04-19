@@ -11,7 +11,6 @@
  * =============================================================================
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
- * @package conductor/script
  */
 namespace conductor\script;
 
@@ -20,20 +19,24 @@ use \oboe\head\Javascript;
 use \reed\WebSitePathInfo;
 
 /**
- * This class encapsulates the client side component of conductor.
+ * This class encapsulates a conductor provided javascript.  If the site is
+ * running in debug mode then the script will be copied into the site's
+ * web target.
  *
  * @author Philip Graham <philip@zeptech.ca>
- * @package conductor/script
  */
-class Client extends Javascript {
+class ConductorScript extends Javascript {
 
   /**
    * Create a new Javascript element for the conductor client script.
    *
    * If debug mode is enabled the script will be copied to the web
    * writable directory.
+   *
+   * @param string $name The name of script.
+   * @param WebSitePathInfo $pathInfo The web site's path info.
    */
-  public function __construct(WebSitePathInfo $pathInfo) {
+  public function __construct($name, WebSitePathInfo $pathInfo) {
     $webTarget = $pathInfo->getWebTarget() . '/js';
     $webPath = $pathInfo->getWebAccessibleTarget() . '/js';
 
@@ -42,10 +45,10 @@ class Client extends Javascript {
         mkdir($webTarget, 0755, true);
       }
 
-      $srcJsPath = __DIR__ . '/conductor.js';
-      copy($srcJsPath, $webTarget . '/conductor.js');
+      $srcJsPath = __DIR__ . "/$name.js";
+      copy($srcJsPath, $webTarget . "/$name.js");
     }
 
-    parent::__construct($webPath . '/conductor.js');
+    parent::__construct($webPath . "/$name.js");
   }
 }

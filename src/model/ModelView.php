@@ -79,6 +79,28 @@ abstract class ModelView implements ModelDecorator {
   }
 
   /**
+   * Store relations annotations and delegate.
+   */
+  public function decorateRelationship(DecoratedRelationship $relationship) {
+    // If no view interface has been defined then there is nothing to do here
+    if ($this->_classInfo === null) {
+      $this->_initRelationship($relationship, null);
+      return;
+    }
+
+    $relName = $relationship->getLhsProperty();
+    $methodName = 'get' . ucfirst($relName);
+
+    $annotations = null;
+    if ($this->_classInfo->hasMethod($methodName)) {
+      $method = $this->_classInfo->getMethod($methodName);
+      $annotations = new Annotations($method);
+    }
+
+    $this->_initRelationship($relationship, $annotations);
+  }
+
+  /**
    * Initialize the view with the decorated model.
    *
    * @param Model $model
@@ -113,4 +135,10 @@ abstract class ModelView implements ModelDecorator {
    */
   protected abstract function _initProperty(DecoratedProperty $property,
     Annotations $annotations = null);
+
+  /**
+   * This is called to decorate a relationship.
+   */
+  protected abstract function _initRelationship(
+      DecoratedRelationship $relationship, Annotations $annotations = null);
 }

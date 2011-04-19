@@ -36,6 +36,7 @@ class ModelFormBuilder {
 
     $properties = array();
     $inputs = array();
+    $tabs = array();
 
     foreach ($model->getProperties() AS $prop) {
       $propId = strtolower($prop->getIdentifier());
@@ -44,12 +45,26 @@ class ModelFormBuilder {
       $inputs[] = $propertyInputBuilder->build($prop);
     }
 
+    $relationshipInputBuilder = new RelationshipInputBuilder();
+    foreach ($model->getRelationships() AS $rel) {
+      if ($rel->getDisplay() === AdminModelDecorator::DISPLAY_EDIT) {
+        $propId = strtolower($rel->getLhsProperty());
+
+        $inputs[] = $relationshipInputBuilder->build($rel);
+        $tabs = "inputs.push("
+          . "{$model->getIdentifier()}_{$propId}_input(model));\n"
+          . "tabs['{$rel->getDisplayName()}'] = "
+          . "inputs[inputs.length - 1].elm;";
+      }
+    }
+
     $templateValues = Array
     (
       'model'          => $model->getIdentifier(),
       'singular'       => $model->getDisplayName(),
       'properties'     => $properties,
-      'propertyInputs' => $inputs,
+      'inputs'         => $inputs,
+      'tabs'           => $tabs,
       'crudServiceVar' => $model->getCrudServiceName(),
       'idProperty'     => strtolower($model->getId()->getName())
     );

@@ -38,9 +38,26 @@ class ModelEditorBuilder {
       $propId = strtolower($prop->getIdentifier());
 
       $columns[] = array(
-        'id'  => $propId,
+        'id'  => array(
+          'field' => $propId,
+          'html'  => true
+        ),
         'lbl' => $prop->getDisplayName()
       );
+    }
+
+    foreach ($model->getRelationships() AS $rel) {
+      if ($rel->getDisplay() !== AdminModelDecorator::DISPLAY_NONE) {
+        $propId = strtolower($rel->getLhsProperty());
+
+        $columns[] = array(
+          'id'  => array(
+            'field' => $propId,
+            'html'  => true
+          ),
+          'lbl' => $rel->getDisplayName()
+        );
+      }
     }
 
     $templateValues = Array

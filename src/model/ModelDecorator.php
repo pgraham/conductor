@@ -37,6 +37,17 @@ interface ModelDecorator {
   public function decorateProperty(DecoratedProperty $property);
 
   /**
+   * This method is responsible for decorating a relationship of the decorated
+   * model with zero or more decorators.  Implemenations are not required to
+   * decorate relationships, this is simply provided as a means of enabling
+   * better encapsulation for decorators that also provide additional
+   * information for properties.
+   *
+   * @param DecoratedRelationship $relationship
+   */
+  public function decorateRelationship(DecoratedRelationship $relationship);
+
+  /**
    * This method is responsible for the creating the one-to-one relationship
    * with the decorated Model instance.
    *

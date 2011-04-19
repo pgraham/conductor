@@ -31,13 +31,16 @@ class DecoratedModel {
   private $_model;
 
   /* The model's decorators */
-  private $_decorators = Array();
+  private $_decorators = array();
 
   /* A string identifier for the model */
   private $_id;
 
   /* Decorated model properties */
-  private $_properties = Array();
+  private $_properties = array();
+
+  /* Decorated model relationships */
+  private $_relationships = array();
 
   /**
    * Wrap with given model with decoration capabilities.
@@ -50,6 +53,10 @@ class DecoratedModel {
 
     foreach ($model->getProperties() AS $property) {
       $this->_properties[] = new DecoratedProperty($property, $this);
+    }
+
+    foreach ($model->getRelationships() AS $relationship) {
+      $this->_relationships[] = new DecoratedRelationship($relationship, $this);
     }
   }
 
@@ -91,6 +98,10 @@ class DecoratedModel {
     foreach ($this->_properties AS $property) {
       $decorator->decorateProperty($property);
     }
+
+    foreach ($this->_relationships AS $relationship) {
+      $decorator->decorateRelationship($relationship);
+    }
   }
 
   /**
@@ -101,6 +112,17 @@ class DecoratedModel {
   public function decorateProperty(PropertyDecorator $decorator) {
     foreach ($this->_properties AS $property) {
       $property->decorate($decorator);
+    }
+  }
+
+  /**
+   * Add a Relationship decorator to the model's relationships.
+   *
+   * @param RelationshipDecorator $decorator
+   */
+  public function decorateRelationship(RelationshipDecorator $decorator) {
+    foreach ($this->_relationships AS $relationship) {
+      $relationship->decorate($decorator);
     }
   }
 
@@ -120,5 +142,14 @@ class DecoratedModel {
    */
   public function getProperties() {
     return $this->_properties;
+  }
+
+  /**
+   * Getter for the model's relationships.
+   *
+   * @return DecoratedRelationship[]
+   */
+  public function getRelationships() {
+    return $this->_relationships;
   }
 }

@@ -13,3 +13,5 @@ WHENEVER:
 
 - Move the ModelInfo and ModelInfoSet classes out of the generator package and
   into the model package
+
+- Update CRUD service retrieve method to support sorting and paging

@@ -17,6 +17,7 @@ namespace conductor\generator;
 use \clarinet\model\Model;
 
 use \conductor\model\DecoratedProperty;
+use \conductor\model\DecoratedRelationship;
 use \conductor\model\ModelDecorator;
 
 /**
@@ -48,6 +49,11 @@ class CrudServiceModelDecorator implements ModelDecorator {
    * ModelDecorator implementation, nothing to do here.
    */
   public function decorateProperty(DecoratedProperty $property) {}
+
+  /**
+   * ModelDecorator implementation, nothing to do here.
+   */
+  public function decorateRelationship(DecoratedRelationship $relationship) {}
 
   /**
    * Getter for the fully qualified name of the mode's CRUD service class.

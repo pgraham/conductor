@@ -22,7 +22,7 @@ use \clarinet\Criteria;
 use \conductor\config\Parser;
 use \conductor\model\DecoratedModel;
 use \conductor\model\ModelSet;
-use \conductor\script\Client;
+use \conductor\script\ConductorScript;
 use \conductor\script\ServiceProxy;
 use \conductor\template\PageTemplate;
 
@@ -143,7 +143,7 @@ class Conductor {
       . self::JQUERY_VERSION . DIRECTORY_SEPARATOR . $jQueryName);
     $jQuery->addToHead();
 
-    $client = new Client($pathInfo);
+    $client = new ConductorScript('conductor', $pathInfo);
     $client->addToHead();
 
     $service = new ServiceProxy('conductor\Service', $pathInfo);

@@ -1,29 +1,75 @@
 var ${model}_form = function (model) {
-  var that, inputs = [];
+  var that, inputs = [], genInputs = [], tabs = [], btns, title, fieldset, i,
+    len;
 
   ${each:properties as property}
-    inputs.push(${model}_${property}_input(model !== null
+    genInputs.push(${model}_${property}_input(model !== null
       ? model.${property}
       : null));
+    inputs.push(genInputs[genInputs.length - 1]);
   ${done}
 
-  that = form({
-    type: '${model}',
-    name: '${singular}',
-    model: model,
-    inputs: inputs,
-    create: function (props, cb) {
-      window['${crudServiceVar}'].create(props, cb);
-    },
-    update: function (id, props, cb) {
-      props.${idProperty} = id;
-      window['${crudServiceVar}'].update(props, cb);
+  if (genInputs.length > 0) {
+    tabs["General"] = $('<form><fieldset/></form>');
+    fieldset = tabs["General"].find('fieldset');
+    for (i = 0, len = genInputs.length; i < len; i += 1) {
+      fieldset.append(
+        $('<label/>')
+          .attr('for', genInputs[i].name)
+          .text(genInputs[i].lbl));
+
+      fieldset.append(genInputs[i].elm);
     }
+  }
+
+  ${each:tabs as tab}
+    ${tab}
+  ${done}
+
+  if (model === null) {
+    btns = {
+      "Create" : function () {
+        var props = {}, i, len;
+
+        for (i = 0, len = inputs.length; i < len; i += 1) {
+          props[inputs[i].name] = inputs[i].getValue();
+        }
+        
+        window['${crudServiceVar}'].create(props, that.close);
+      }
+    };
+    title = 'New ${singular}';
+  } else {
+    btns = {
+      "Save" : function () {
+        var props = {}, i, len;
+        props.${idProperty} = model.id;
+
+        for (i = 0, len = inputs.length; i < len; i += 1) {
+          props[inputs[i].name] = inputs[i].getValue();
+        }
+        
+        window['${crudServiceVar}'].update(props, that.close);
+      },
+      "Reset" : function () {
+        var i, len;
+        for (i = 0, len = inputs.length; i < len; i += 1) {
+          inputs[i].reset();
+        }
+      }
+    }
+    title = 'Edit ${singular}';
+  }
+
+  that = CDT.tabbedDialog({
+    tabs: tabs,
+    btns: btns,
+    title: title
   });
 
   return that;
 };
 
-${each:propertyInputs as input}
+${each:inputs as input}
   ${input}
 ${done}

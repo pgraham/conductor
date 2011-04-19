@@ -62,6 +62,8 @@ $(document).ready(function () {
 });
 
 // Add some handy extensions, a la Crockford
+// -----------------------------------------------------------------------------
+
 if (typeof Object.create !== 'function') {
   Object.create = function (o) {
     var F = function () {};
@@ -78,6 +80,7 @@ if (typeof Function.prototype.method !== 'function') {
 }
 
 // Some parts
+// -----------------------------------------------------------------------------
 
 var hasValue = function (that, spec) {
   var reset = function () {
@@ -90,4 +93,48 @@ var hasValue = function (that, spec) {
 
   // Set the initial value
   spec.setValue(spec.initial);
-}
+};
+
+// From Javascript: The Good Parts by Douglas Crockford
+var eventuality = function (that) {
+  var registry = {};
+
+  that.fire = function (event) {
+    var array,
+        func,
+        handler,
+        i,
+        type = typeof event === 'string' ? event : event.type;
+
+    if (registry.hasOwnProperty(type)) {
+      array = registry[type];
+      for (i = 0; i < array.length; i++) {
+        handler = array[i];
+
+        func = handler.method;
+        if (typeof func === 'string') {
+          func = this[func]
+        }
+
+        func.apply(this, handler.parameters || [ event ]);
+      }
+    }
+    return this;
+  };
+
+  that.on = function (type, method, parameters) {
+    var handler = {
+      method: method,
+      parameters: parameters
+    };
+
+    if (registry.hasOwnProperty(type)) {
+      registry[type].push(handler);
+    } else {
+      registry[type] = [ handler ];
+    }
+    return this;
+  };
+
+  return that;
+};

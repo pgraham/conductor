@@ -1,36 +1,40 @@
 var ${model}_editor = function () {
   var that, cols = ${json:columns};
 
-  that = editor({
-    type : '${model}',
-    cols : cols,
-    form : ${model}_form,
-    del  : ${model}_delete
+  that = CDT.modelCollectionGrid({
+    cols        : cols,
+    crudService : window.${crudService},
+    idProperty  : '${idProperty}',
+    dataitem    : typeof ${model} === 'function' ? ${model}() : {},
+    buttons     : {
+      "New" : function () {
+        ${model}_form(null).on('close', function () {
+          that.refresh();
+        }).show();
+      },
+      "Edit" : function () {
+        var model = that.getSelected().pop();
+
+        if (model !== undefined) {
+          ${model}_form(model).on('close', function () {
+            that.refresh();
+          }).show();
+        }
+      },
+      "Delete" : function () {
+        var models = that.getSelected();
+
+        if (models.length > 0) {
+          ${model}_delete(models).show(function () {
+            that.refresh();
+          });
+        }
+      }
+    }
   });
 
   return that;
 }
-
-$.ui.dataitem.extend('${model}', {
-  selected: function () {
-    return '<input type="checkbox" name="${model}_sel[]"' +
-       ' value="' + this.get('id') + '" class="${model}_check"/>';
-  }
-});
-
-$.ui.datasource({
-  type: '${model}',
-  source: function (request, response) {
-    window.${crudService}.retrieve(function (data) {
-      for (var i = 0, length = data.length; i < length; i++) {
-        // The grid widget expects the identifier property to be in a
-        // property called guid
-        data[i].guid = data[i].${idProperty};
-      }
-      response(data);
-    });
-  }
-});
 
 var ${model}_delete = function (models) {
   var that, elm, title, msg, show;

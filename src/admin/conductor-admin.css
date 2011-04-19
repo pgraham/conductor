@@ -12,26 +12,45 @@ body {
   padding: 20px 0;
 }
 
-.cdt-FormDialog label {
+.cdt-TabbedDialog.ui-dialog .ui-dialog-content {
+  padding:0;
+}
+
+.cdt-TabbedDialog.ui-dialog .ui-dialog-content .ui-tabs {
+  padding:0;
+  border: none;
+}
+
+.cdt-TabbedDialog fieldset {
+  border: none;
+}
+
+.cdt-TabbedDialog fieldset label {
   float: left;
   height:25px;
 }
 
-.cdt-FormDialog input,
-.cdt-FormDialog textarea {
+.cdt-TabbedDialog fieldset input,
+.cdt-TabbedDialog fieldset textarea {
   display: block;
   margin:5px 0 5px 150px;
 }
 
-.cdt-FormDialog input {
+.cdt-TabbedDialog fieldset input {
   height:20px;
 }
 
-.cdt-FormDialog input.text,
-.cdt-FormDialog textarea {
+.cdt-TabbedDialog fieldset input.text,
+.cdt-TabbedDialog fieldset textarea {
   width: 300px;
 }
 
-.cdt-FormDialog fieldset {
-  border: none;
+.cdt-ModelDualGrid .cdt-ModelEditorGrid,
+.cdt-ModelDualGrid .cdt-ModelDualGridControls {
+  float:left;
+}
+.cdt-ModelDualGrid .cdt-ModelDualGridControls button {
+  display:block;
+  width: 150px;
+  margin: 10px;
 }

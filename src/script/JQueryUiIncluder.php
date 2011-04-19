@@ -47,6 +47,7 @@ class JQueryUiIncluder {
     '/ui/jquery.effects.core.js',
     '/ui/jquery.ui.menu.js',
     '/ui/jquery.ui.dialog.js',
+    '/ui/jquery.ui.tabs.js',
     '/grid-datamodel/dataitem.js',
     '/grid-datamodel/datastore.js',
     '/grid-datamodel/datasource.js',

@@ -14,9 +14,12 @@
  */
 namespace conductor\admin;
 
+use \ReflectionClass;
+
 use \clarinet\model\Model;
 
 use \conductor\model\DecoratedProperty;
+use \conductor\model\DecoratedRelationship;
 use \conductor\model\ModelView;
 
 use \reed\reflection\Annotations;
@@ -29,11 +32,47 @@ use \reed\reflection\Annotations;
  */
 class AdminModelDecorator extends ModelView {
 
+  /**
+   * Constant used to display the property or relationship as editable.  This
+   * means that an input for the property/relationship will be generated and
+   * display in the model's grid as a column as well as in the model's edit
+   * form.  This is the default value for properties.
+   */
+  const DISPLAY_EDIT = 'edit';
+
+  /**
+   * Constant used to hide the property or relationship in the admin interface.
+   * If a property or relationship is annotated with @Display none, then it will
+   * not be displayed anywhere in the admin interface.  This is the default
+   * value for relationships.
+   */
+  const DISPLAY_NONE = 'none';
+
+  /**
+   * Constant used to display the property or relationship in the admin
+   * interface as read-only.  This means that the property/relationship will
+   * be displayed in the model's grid as a column but will not be displayed in
+   * the model's edit form.
+   */
+  const DISPLAY_READONLY = 'read-only';
+
+  /*
+   * The file to include in the client that provides client side extensions to
+   * the model.
+   */
+  private $_clientModel;
+
   /* The display name for the model */
   private $_displayName;
 
   /* The display name for the model in a plural context */
   private $_displayNamePlural;
+
+  /*
+   * The model property that contains the label to be used for individual
+   * entities in a list.
+   */
+  private $_nameProperty;
 
   /**
    * Create a new AdminModelDecorator instance for the the Model.
@@ -43,6 +82,16 @@ class AdminModelDecorator extends ModelView {
    */
   public function __construct() {
     parent::__construct('Display');
+  }
+
+  /**
+   * Getter for the path to the file that contains client side model extensions.
+   * If one is not defined this will return null.
+   *
+   * @return string
+   */
+  public function getClientModel() {
+    return $this->_clientModel;
   }
 
   /**
@@ -63,21 +112,62 @@ class AdminModelDecorator extends ModelView {
     return $this->_displayNamePlural;
   }
 
+  /**
+   * Getter for the model's name property.  This is specified by the @LabelledBy
+   * annotations. Default is 'Name' if the model has a property called name
+   * the model's id property if it does not.
+   *
+   * @return string
+   */
+  public function getNameProperty() {
+    return $this->_nameProperty;
+  }
+
   protected function _init(Annotations $annotations = null) {
-    if (isset($annotations['display']['name'])) {
-      $this->_displayName = $annotations['display']['name'];
-    } else {
-      // The default display name is the basename of the model's class
-      $nameParts = explode('\\', $this->_model->getClass());
-      $this->_displayName = ucfirst(array_pop($nameParts));
+    if (isset($annotations['display'])) {
+      if (isset($annotations['display']['name'])) {
+        $this->_displayName = $annotations['display']['name'];
+      }
+
+      if (isset($annotations['display']['plural'])) {
+        $this->_displayNamePlural = $annotations['display']['plural'];
+      }
     }
 
-    if (isset($annotations['display']['plural'])) {
-      $this->_displayNamePlural = $annotations['display']['plural'];
-    } else {
+    if (isset($annotations['labelledby'])) {
+      $this->_nameProperty = $annotations['labelledby'];
+    }
+
+    // We'll need this in a couple of spots
+    $nameParts = explode('\\', $this->_model->getClass());
+    $classBaseName = array_pop($nameParts);
+
+    // Set defaults if necessary
+    if ($this->_displayName === null) {
+      // The default display name is the basename of the model's class
+      $this->_displayName = ucfirst($classBaseName);
+    }
+    if ($this->_displayNamePlural === null) {
       // The default plural display name is the singular display name with an
       // 's' appended to the end
       $this->_displayNamePlural = $this->_displayName . 's';
+    }
+    if ($this->_nameProperty === null) {
+      // The default for the name property is a property named name, if it
+      // exists, or the id property
+      if ($this->_model->hasProperty('Name')) {
+        $this->_nameProperty = 'name';
+      } else {
+        $this->_nameProperty = strtolower($this->_model->getId()->getName());
+      }
+    }
+
+    // See if a client model has been defined
+    $classInfo = new ReflectionClass($this->_model->getClass());
+    $clientModelFile = dirname($classInfo->getFileName())
+      . "/$classBaseName.js";
+    if (file_exists($clientModelFile)) {
+      $this->_clientModel = $clientModelFile;
     }
   }
 
@@ -85,5 +175,12 @@ class AdminModelDecorator extends ModelView {
       Annotations $annotations = null)
   {
     $property->decorate(new AdminPropertyDecorator($property, $annotations));
+  }
+
+  protected function _initRelationship(DecoratedRelationship $relationship,
+      Annotations $annotations = null)
+  {
+    $relationship->decorate(new AdminRelationshipDecorator($relationship,
+      $annotations));
   }
 }

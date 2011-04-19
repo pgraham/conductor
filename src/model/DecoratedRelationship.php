@@ -16,18 +16,18 @@ namespace conductor\model;
 
 use \BadMethodCallException;
 
-use \clarinet\model\Property;
+use \clarinet\model\Relationship;
 
 /**
- * Wrapper class for a clarinet\model\Property that allows additional
+ * Wrapper class for a clarinet\model\Relationship that allows additional
  * information to be attached via a decorator.  This class supports the same
- * interface as a clarinet\model\Property.
+ * interface as a clarinet\model\Relationship.
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class DecoratedProperty {
+class DecoratedRelationship {
 
-  /* The property's decorators */
+  /* The relationship's decorators */
   private $_decorators = array();
 
   /* An identifier for the property */
@@ -36,30 +36,35 @@ class DecoratedProperty {
   /* The model to which this property belongs */
   private $_model;
 
-  /* The decorated property */
-  private $_property;
+  /* The decorated relationship */
+  private $_relationship;
 
   /**
-   * Wrap the given property with decoration capabilities.
+   * Wrap the given relationship with decoration capabilities.
    *
-   * @param Property $property
+   * @param Relationship $relationship
    */
-  public function __construct(Property $property, DecoratedModel $model) {
-    $this->_property = $property;
+  public function __construct(Relationship $relationship, DecoratedModel $model)
+  {
+    $this->_relationship = $relationship;
     $this->_model = $model;
 
-    $this->_id = strtolower($property->getName());
+    $this->_id = strtolower(
+      $relationship->getLhs()->getActor() .
+      '-' .
+      $relationship->getRhs()->getActor());
   }
 
   /**
-   * Magic method to delegate to the wrapped model or one of its decorators.
+   * Magic method to delegate to the wrapped relationship or one of its
+   * decorators.
    *
-   * @param string $name The name of the function being called.
+   * @param string $name The name of the method being called.
    * @param string $args The arguments to pass to the invoked function.
    */
   public function __call($name, $args) {
-    if (method_exists($this->_property, $name)) {
-      return call_user_func_array(array($this->_property, $name), $args);
+    if (method_exists($this->_relationship, $name)) {
+      return call_user_func_array(array($this->_relationship, $name), $args);
     }
 
     foreach ($this->_decorators AS $decorator) {
@@ -71,32 +76,33 @@ class DecoratedProperty {
     // If we've reached this point then neither the model nor any of its
     // decorators support the invoked method, so throw an Exception.
     throw new BadMethodCallException(
-      "Property does not support nor is decorated with method $name");
+      "Relationship does not support nor is decorated with method $name");
   }
 
   /**
    * Decorate the property with information provided by the given decorator.
-   * Once a decorator has been attached, the instance is extend with the
-   * decorator's interface.  Any single PropertyDecorator instance can only
-   * decorate one property.
+   * Once a decorator has been attached, the instance is extended with the
+   * decorator's interface.  Any single RelationshipDecorator instance can only
+   * decorate one relationship.
    *
-   * @param PropertyDecorator $decorator
+   * @param RelationshipDecorator $decorator
    */
-  public function decorate(PropertyDecorator $decorator) {
+  public function decorate(RelationshipDecorator $decorator) {
     $this->_decorators[] = $decorator;
   }
 
   /**
-   * Getter for the property's string identifier.
+   * Getter for the relationship's string identifier.
    *
-   * @return string An identifying string for the model represented by the view.
+   * @return string An indentifying string for the model represented by the
+   *   view.
    */
   public function getIdentifier() {
     return $this->_id;
   }
 
   /**
-   * Getter for the model to which the property belongs.
+   * Getter for the model to which the relationship belongs.
    *
    * @return DecoratedModel
    */

@@ -19,6 +19,7 @@ use \conductor\generator\CrudServiceGenerator;
 use \conductor\generator\CrudServiceModelDecoratorFactory;
 use \conductor\model\DecoratedModel;
 use \conductor\model\ModelSet;
+use \conductor\script\ConductorScript;
 use \conductor\script\ServiceProxy;
 use \conductor\Conductor;
 
@@ -71,22 +72,40 @@ class AdminClient extends Composite implements BodyItem {
 
     $this->elm->add(new Anchor($pathInfo->getWebRoot(), 'View Site'));
 
-    // We need to know CrudService information about the model in order to
-    // load its proxy
+    // Decorate models
     $models->decorate(new CrudServiceModelDecoratorFactory());
+    $models->decorate(new AdminModelDecoratorFactory());
 
     $webPath = $pathInfo->getWebAccessibleTarget();
+    $jsOutputDir = $pathInfo->getWebTarget() . '/js';
 
     if (defined('DEBUG') && DEBUG === true) {
-      // Generate a crud service for each model.
       foreach ($models AS $model) {
+        // Generate a crud service for each model.
         $generator = new CrudServiceGenerator($model);
         $generator->generate($pathInfo);
+
+        // Copy any client side model extensions to the web target
+        if ($model->getClientModel() !== null) {
+          $src = $model->getClientModel();
+          $dest = $jsOutputDir . "/{$model->getActor()}.js";          
+
+          copy($src, $dest);
+        }
       }
 
       // Generate the admin client
       $generator = new AdminGenerator($models);
       $generator->generate($pathInfo);
+    }
+
+    // Add Client-side model extensions
+    foreach ($models AS $model) {
+      if ($model->getClientModel() !== null) {
+
+        $this->_js[] = new Javascript(
+          $pathInfo->fsToWeb($jsOutputDir . "/{$model->getActor()}.js"));
+      }
     }
 
     // Add CRUD service proxies for each of the models
@@ -96,6 +115,8 @@ class AdminClient extends Composite implements BodyItem {
       $this->_js[] = new ServiceProxy($serviceClass, $pathInfo);
     }
 
+    $this->_js[] = new ConductorScript('grid', $pathInfo);
+    $this->_js[] = new ConductorScript('tabbedDialog', $pathInfo);
     $this->_js[] = new Javascript($webPath . '/js/conductor-admin.js');
     $this->_css = new StyleSheet($webPath . '/css/conductor-admin.css');
   }

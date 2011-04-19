@@ -38,8 +38,6 @@ class AdminGenerator {
    */
   public function __construct(ModelSet $models) {
     $this->_models = $models;
-
-    $models->decorate(new AdminModelDecoratorFactory());
   }
 
   /**
