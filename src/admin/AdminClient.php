@@ -17,11 +17,9 @@ namespace conductor\admin;
 
 use \conductor\generator\CrudServiceGenerator;
 use \conductor\generator\CrudServiceModelDecoratorFactory;
-use \conductor\model\DecoratedModel;
 use \conductor\model\ModelSet;
-use \conductor\script\ConductorScript;
 use \conductor\script\ServiceProxy;
-use \conductor\Conductor;
+use \conductor\Resource;
 
 use \oboe\head\Javascript;
 use \oboe\head\StyleSheet;
@@ -32,7 +30,6 @@ use \oboe\Composite;
 use \oboe\Div;
 use \oboe\ListEl;
 
-use \reed\FsToWebPathConverter;
 use \reed\WebSitePathInfo;
 
 /**
@@ -46,8 +43,7 @@ class AdminClient extends Composite implements BodyItem {
 
   const FONT_PATH = 'http://fonts.googleapis.com/css?family=Allerta';
 
-  private $_css;
-  private $_js = array();
+  private $_resources = array();
 
   /**
    * Create a new Javascript element for the conductor admin client.
@@ -102,9 +98,8 @@ class AdminClient extends Composite implements BodyItem {
     // Add Client-side model extensions
     foreach ($models AS $model) {
       if ($model->getClientModel() !== null) {
-
-        $this->_js[] = new Javascript(
-          $pathInfo->fsToWeb($jsOutputDir . "/{$model->getActor()}.js"));
+        $this->_resources[] = new Javascript(
+          $pathInfo->fsToWeb("$jsOutputDir/{$model->getActor()}.js"));
       }
     }
 
@@ -112,20 +107,16 @@ class AdminClient extends Composite implements BodyItem {
     foreach ($models AS $model) {
       $serviceClass = $model->getCrudServiceClass();
 
-      $this->_js[] = new ServiceProxy($serviceClass, $pathInfo);
+      $this->_resources[] = new ServiceProxy($serviceClass, $pathInfo);
     }
 
-    $this->_js[] = new ConductorScript('grid', $pathInfo);
-    $this->_js[] = new ConductorScript('tabbedDialog', $pathInfo);
-    $this->_js[] = new Javascript($webPath . '/js/conductor-admin.js');
-    $this->_css = new StyleSheet($webPath . '/css/conductor-admin.css');
+    $this->_resources[] = new Resource('grid.js', $pathInfo);
+    $this->_resources[] = new Resource('tabbedDialog.js', $pathInfo);
+    $this->_resources[] = new Javascript($webPath . '/js/conductor-admin.js');
+    $this->_resources[] = new StyleSheet($webPath . '/css/conductor-admin.css');
   }
 
-  public function getScripts() {
-    return $this->_js;
-  }
-
-  public function getStyleSheets() {
-    return Array( $this->_css, new StyleSheet(self::FONT_PATH) );
+  public function getResources() {
+    return $this->_resources;
   }
 }

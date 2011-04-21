@@ -1,6 +1,8 @@
 /**
  * Extension to the jQuery UI grid widget that adapts to a CrudServiceProxy.
  *
+ * Requires the grid-model files
+ *
  * @author Philip Graham <philip@zeptech.ca>
  */
 (function ($, that, undefined) {
