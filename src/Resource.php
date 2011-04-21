@@ -29,6 +29,10 @@ use \reed\WebSitePathInfo;
  * resources directory into the web target.  Resource type is determined by
  * extension and is included in the web page via the addToHead() method.
  *
+ * Note: Conflicts are possible due to the use of basename.  Two different
+ *       resources from different paths with the same basename will result
+ *       in a conflict.
+ *
  * @author Philip Graham <philip@zeptech.ca>
  */
 class Resource {
@@ -41,34 +45,43 @@ class Resource {
   );
 
   private $_elm;
+
   private $_fsPath;
 
   public function __construct($resource, WebSitePathInfo $pathInfo,
       array $templateValues = null)
   {
-    $webTarget = $pathInfo->getWebTarget();
-    $webPath = $pathInfo->getWebAccessibleTarget();
-
+    $resourceName = basename($resource);
     $resourceType = $this->_determineResourceType($resource);
-    $this->_fsPath = __DIR__ . "/resources/$resourceType/$resource";
+    $this->_fsPath = $this->_determineFsPath($resource, $resourceType);
+
 
     if (defined('DEBUG') && DEBUG === true) {
-      $resourceTarget = "$webTarget/$resourceType";
-      if (!file_exists($resourceTarget)) {
-        mkdir($resourceTarget, 0755, true);
+      $resourceTarget = $pathInfo->getWebTarget();
+      if ($resourceType !== null) {
+        $resourceTarget .= "/$resourceType";
+        if (!file_exists($resourceTarget)) {
+          mkdir($resourceTarget, 0755, true);
+        }
       }
 
       if ($templateValues === null) {
-        copy($this->_fsPath, "$resourceTarget/$resource");
+        copy($this->_fsPath, "$resourceTarget/$resourceName");
       } else {
         $templateLoader = CodeTemplateLoader::get(dirname($this->_fsPath));
-        $resourceContent = $templateLoader->load($resource, $templateValues);
+        $resourceContent = $templateLoader->load($resourceName, $templateValues);
 
-        file_put_contents("$resourceTarget/$resource", $resourceContent);
+        file_put_contents("$resourceTarget/$resourceName", $resourceContent);
       }
     }
 
-    $resourcePath = "$webPath/$resourceType/$resource";
+    $webPath = $pathInfo->getWebAccessibleTarget();
+    if ($resourceType !== null) {
+      $resourcePath = "$webPath/$resourceType/$resourceName";
+    } else {
+      $resourcePath = "$webPath/$resourceName";
+    }
+
     switch ($resourceType) {
       case 'css':
       $this->_elm = new StyleSheet($resourcePath);
@@ -83,11 +96,16 @@ class Resource {
       break;
 
       default:
-      assert("false /* Unrecognized resource type: $resourceType */");
+      $this->_elm = null;
     }
   }
 
-  public function addToPage() {
+  /**
+   * If the represented resource is capable of being added to the <head/>
+   * element then add it.  This method does nothing for image and
+   * unrecognized resource types.
+   */
+  public function addToHead() {
     if ($this->_elm === null) {
       return;
     }
@@ -103,6 +121,24 @@ class Resource {
 
   public function getFsPath() {
     return $this->_fsPath;
+  }
+
+  private function _determineFsPath($resource, $resourceType) {
+    if (strpos($resource, '/') === false) {
+      // Resource is specified as either a supported type or in
+      // the resource directory for unsupported types.
+      if ($resourceType === null) {
+        return __DIR__ . "/resources/$resource";
+      } else {
+        return __DIR__ . "/resources/$resourceType/$resource";
+      }
+    } else if (substr($resource, 0, 1) === '/') {
+      // Resource is specified as absolute
+      return $resource;
+    } else {
+      // Resource is specified as relative to the resources directory
+      return __DIR__ . "/resources/$resource";
+    }
   }
 
   private function _determineResourceType($resource) {

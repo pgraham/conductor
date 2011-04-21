@@ -45,9 +45,9 @@ class Client {
       $templateValues);
   }
 
-  public function addToPage() {
+  public function addToHead() {
     foreach ($this->_resources AS $resource) {
-      $resource->addToPage();
+      $resource->addToHead();
     }
   }
 }

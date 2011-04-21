@@ -142,13 +142,13 @@ class Conductor {
     $jQuery->addToHead();
 
     $client = new Client($pathInfo);
-    $client->addToPage();
+    $client->addToHead();
 
     $service = new ServiceProxy('conductor\Service', $pathInfo);
     $service->addToHead();
 
     $reset = new Resource('reset.css', $pathInfo);
-    $reset->addToPage();
+    $reset->addToHead();
   }
 
   /**
