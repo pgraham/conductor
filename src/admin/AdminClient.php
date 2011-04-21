@@ -75,6 +75,7 @@ class AdminClient extends Composite implements BodyItem {
     $webPath = $pathInfo->getWebAccessibleTarget();
     $jsOutputDir = $pathInfo->getWebTarget() . '/js';
 
+    $templateValues = null;
     if (defined('DEBUG') && DEBUG === true) {
       foreach ($models AS $model) {
         // Generate a crud service for each model.
@@ -91,8 +92,8 @@ class AdminClient extends Composite implements BodyItem {
       }
 
       // Generate the admin client
-      $generator = new AdminGenerator($models);
-      $generator->generate($pathInfo);
+      $builder = new AdminBuilder($models);
+      $templateValues = $builder->build();
     }
 
     // Add Client-side model extensions
@@ -112,8 +113,10 @@ class AdminClient extends Composite implements BodyItem {
 
     $this->_resources[] = new Resource('grid.js', $pathInfo);
     $this->_resources[] = new Resource('tabbedDialog.js', $pathInfo);
-    $this->_resources[] = new Javascript($webPath . '/js/conductor-admin.js');
-    $this->_resources[] = new StyleSheet($webPath . '/css/conductor-admin.css');
+    $this->_resources[] = new Resource('conductor-admin.js', $pathInfo,
+      $templateValues);
+
+    $this->_resources[] = new Resource('conductor-admin.css', $pathInfo);
   }
 
   public function getResources() {

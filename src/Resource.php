@@ -17,6 +17,7 @@ namespace conductor;
 use \oboe\head\Javascript;
 use \oboe\head\StyleSheet;
 
+use \reed\generator\CodeTemplateLoader;
 use \reed\WebSitePathInfo;
 
 /**
@@ -25,15 +26,15 @@ use \reed\WebSitePathInfo;
  * resources directory into the web target.  Resource type is determined by
  * extension and is included in the web page via the addToHead() method.
  *
- * TODO Support templated resources
- *
  * @author Philip Graham <philip@zeptech.ca>
  */
 class Resource {
 
   private $_elm;
 
-  public function __construct($resource, WebSitePathInfo $pathInfo) {
+  public function __construct($resource, WebSitePathInfo $pathInfo,
+      array $templateValues = null)
+  {
     $webTarget = $pathInfo->getWebTarget();
     $webPath = $pathInfo->getWebAccessibleTarget();
 
@@ -46,8 +47,15 @@ class Resource {
         mkdir($resourceTarget, 0755, true);
       }
 
-      $srcPath = __DIR__ . "/resources/$resourceType/$resource";
-      copy($srcPath, "$resourceTarget/$resource");
+      if ($templateValues === null) {
+        $srcPath = __DIR__ . "/resources/$resourceType/$resource";
+        copy($srcPath, "$resourceTarget/$resource");
+      } else {
+        $templateLoader = CodeTemplateLoader::get(
+          __DIR__ . "/resources/$resourceType");
+        $resourceContent = $templateLoader->load($resource, $templateValues);
+        file_put_contents("$resourceTarget/$resource", $resourceContent);
+      }
     }
 
     $resourcePath = "$webPath/$resourceType/$resource";

@@ -14,10 +14,7 @@
  */
 namespace conductor\admin;
 
-use \conductor\generator\CrudServiceModelDecorator;
 use \conductor\model\ModelSet;
-
-use \reed\generator\CodeTemplateLoader;
 
 /**
  * This class populates the conductor-admin.js template with the given model
@@ -65,9 +62,7 @@ class AdminBuilder {
       'forms'      => $forms
     );
 
-    $templateLoader = CodeTemplateLoader::get(__DIR__);
-    $js = $templateLoader->load('conductor-admin.js', $templateValues);
-    return $js;
+    return $templateValues;
   }
 
   /* Build a JSONable array for the encapsulated model set */
