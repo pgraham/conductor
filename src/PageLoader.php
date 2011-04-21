@@ -110,7 +110,7 @@ class PageLoader {
 
       $adminClient = new AdminClient(Conductor::getModels(), $pathInfo);
       foreach ($adminClient->getResources() AS $resource) {
-        $resource->addToHead();
+        $resource->addToPage();
       }
 
       $adminClient->addToBody();

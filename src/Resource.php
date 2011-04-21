@@ -16,6 +16,8 @@ namespace conductor;
 
 use \oboe\head\Javascript;
 use \oboe\head\StyleSheet;
+use \oboe\item\Body as BodyItem;
+use \oboe\item\Head as HeadItem;
 
 use \reed\generator\CodeTemplateLoader;
 use \reed\WebSitePathInfo;
@@ -30,6 +32,13 @@ use \reed\WebSitePathInfo;
  */
 class Resource {
 
+  public static $IMG_TYPES = array(
+    'png',
+    'gif',
+    'jpg',
+    'jpeg'
+  );
+
   private $_elm;
 
   public function __construct($resource, WebSitePathInfo $pathInfo,
@@ -38,8 +47,7 @@ class Resource {
     $webTarget = $pathInfo->getWebTarget();
     $webPath = $pathInfo->getWebAccessibleTarget();
 
-    $resourceParts = explode('.', $resource);
-    $resourceType = array_pop($resourceParts);
+    $resourceType = $this->_determineResourceType($resource);
 
     if (defined('DEBUG') && DEBUG === true) {
       $resourceTarget = "$webTarget/$resourceType";
@@ -68,12 +76,39 @@ class Resource {
       $this->_elm = new Javascript($resourcePath);
       break;
 
+      case 'img':
+      $this->_elm = new Image($resourcePath, 'Image Resource');
+      break;
+
       default:
       assert("false /* Unrecognized resource type: $resourceType */");
     }
   }
 
-  public function addToHead() {
-    $this->_elm->addToHead();
+  public function addToPage() {
+    if ($this->_elm === null) {
+      return;
+    }
+
+    if ($this->_elm instanceof HeadItem) {
+      $this->_elm->addToHead();
+    } else if ($this->_elm instanceof BodyItem) {
+      $this->_elm->addToBody();
+    }
+  }
+
+  private function _determineResourceType($resource) {
+    $resourceParts = explode('.', $resource);
+    $resourceType = array_pop($resourceParts);
+
+    if ($resourceType === 'css' || $resourceType === 'js') {
+      return $resourceType;
+    }
+
+    if (in_array($resourceType, self::$IMG_TYPES)) {
+      return 'img';
+    }
+
+    return null;
   }
 }

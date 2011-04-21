@@ -31,7 +31,7 @@ class Client {
     $templateValues = null;
     if (defined('DEBUG') && DEBUG === true) {
       $webTarget = $pathInfo->getWebTarget();
-      $webPath = $pathInfo->getWebAccessibleTarget();
+      $webPath   = $pathInfo->getWebAccessibleTarget();
 
       // Ensure directory structure
       if (!file_exists("$webTarget/img")) {
@@ -55,9 +55,9 @@ class Client {
       $templateValues);
   }
 
-  public function addToHead() {
+  public function addToPage() {
     foreach ($this->_resources AS $resource) {
-      $resource->addToHead();
+      $resource->addToPage();
     }
   }
 }
