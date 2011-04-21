@@ -34,6 +34,7 @@ class Service {
 
   /**
    * @returnType html
+   * @noCache don't cache, this is temporary until Bassoon supports the use of ETags
    */
   public function loadPage($pageId) {
     $elm = PageLoader::loadPage($pageId, true);

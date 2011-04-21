@@ -1,15 +1,27 @@
 body {
   font-family: 'Allerta', sans-serif;
+  font-size: 70%;
+}
+td, th {
+  padding: 0.5em;
 }
 
+#menu ul.ui-menu {
+  float:none;
+}
 #menu ul.ui-menu li.ui-menu-item,
 #menu ul.ui-menu li.ui-menu-item a {
+  float:none;
   display:inline;
   margin:0 1px;
 }
 
 #ctnt {
-  padding: 20px 0;
+  margin: 20px 0;
+}
+
+#cdt-Admin {
+  padding:20px;
 }
 
 .cdt-TabbedDialog.ui-dialog .ui-dialog-content {

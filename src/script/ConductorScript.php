@@ -24,6 +24,7 @@ use \reed\WebSitePathInfo;
  * web target.
  *
  * @author Philip Graham <philip@zeptech.ca>
+ * @deprecated use conductor\Resource instead
  */
 class ConductorScript extends Javascript {
 

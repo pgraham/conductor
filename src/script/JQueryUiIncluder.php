@@ -11,11 +11,14 @@
  * =============================================================================
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
- * @package conductor/script
  */
 namespace conductor\script;
 
 use \DirectoryIterator;
+use \RecursiveIteratorIterator;
+use \RecursiveDirectoryIterator;
+
+use \conductor\Exception;
 
 use \oboe\head\Javascript;
 use \oboe\head\StyleSheet;
@@ -23,12 +26,11 @@ use \oboe\head\StyleSheet;
 use \reed\WebSitePathInfo;
 
 /**
- * This class includes the necessary JQueryUiScripts for a set a specified
+ * This class includes the necessary JQueryUiScripts for a set of specified
  * components.  If debug mode is on then the scripts are copied from the
  * current development repository found at the specified path.
  *
  * @author Philip Graham <philip@zeptech.ca>
- * @package conductor/script
  */
 class JQueryUiIncluder {
 
@@ -70,8 +72,7 @@ class JQueryUiIncluder {
     '/themes/base/jquery.ui.slider.css',
     '/themes/base/jquery.ui.spinner.css',
     '/themes/base/jquery.ui.tabs.css',
-    '/themes/base/jquery.ui.tooltip.css',
-    '/grid-datamodel/grid.css'
+    '/themes/base/jquery.ui.tooltip.css'
   );
 
   private $_cssOutputPath;
@@ -81,7 +82,7 @@ class JQueryUiIncluder {
   private $_scripts = array();
   private $_styleSheets = array();
 
-  public function __construct(WebSitePathInfo $pathInfo) {
+  public function __construct(WebSitePathInfo $pathInfo, $theme = null) {
     $this->_srcPath = realpath(__DIR__ . '/../../../jquery-ui');
 
     $webTarget = $pathInfo->getWebTarget();
@@ -91,47 +92,7 @@ class JQueryUiIncluder {
     $this->_pathInfo = $pathInfo;
 
     if (defined('DEBUG') && DEBUG === true) {
-      // Make sure image directory exists
-      $imgOut = $webTarget . '/css/themes/base/images';
-      if (!file_exists($imgOut)) {
-        mkdir($imgOut, 0755, true);
-      }
-
-      // Copy javascripts into web writable
-      foreach (self::$scripts AS $script) {
-        $scriptPath = $this->_srcPath . $script;
-        
-        // Make that the output directory exists
-        $outputPath = $this->_jsOutputPath . dirname($script);
-        if (!file_exists($outputPath)) {
-          mkdir($outputPath, 0755, true);
-        }
-
-        copy($scriptPath, $outputPath . '/' . basename($scriptPath));
-      }
-
-      // Copy stylesheets and images web writable
-      foreach (self::$styleSheets AS $styleSheet) {
-        $cssPath = $this->_srcPath . $styleSheet;
-
-        // Make sure that the output directory exists
-        $outputPath = $this->_cssOutputPath . dirname($styleSheet);
-        if (!file_exists($outputPath)) {
-          mkdir($outputPath, 0755, true);
-        }
-
-        copy($cssPath, $outputPath . '/' . basename($styleSheet));
-      }
-
-      // Copy images into web writable
-      $imgDir = new DirectoryIterator($this->_srcPath . '/themes/base/images');
-      foreach ($imgDir AS $file) {
-        if ($file->isDot() || $file->isDir()) {
-          continue;
-        }
-
-        copy($file->getPathName() , $imgOut . '/' . $file->getFileName());
-      }
+      $this->_compile($pathInfo, $theme);
     }
 
     // The grid widget relies on the Templates plugin.
@@ -145,12 +106,27 @@ class JQueryUiIncluder {
       $this->_scripts[] = new Javascript($webPath);
     }
 
+    if ($theme === null) {
+      foreach (self::$styleSheets AS $styleSheet) {
+        $styleSheetPath = $this->_cssOutputPath . $styleSheet;
 
-    foreach (self::$styleSheets AS $styleSheet) {
-      $styleSheetPath = $this->_cssOutputPath . $styleSheet;
+        $webPath = $this->_pathInfo->fsToWeb($styleSheetPath);
+        $this->_styleSheets[] = new StyleSheet($webPath);
+      }
+    } else {
+      $sheetPath = "{$this->_cssOutputPath}/$theme-theme/jquery-ui.css";
 
-      $webPath = $this->_pathInfo->fsToWeb($styleSheetPath);
+      $webPath = $pathInfo->fsToWeb($sheetPath);
       $this->_styleSheets[] = new StyleSheet($webPath);
+    }
+  }
+
+  public function addToHead() {
+    foreach ($this->_scripts AS $script) {
+      $script->addToHead();
+    }
+    foreach ($this->_styleSheets AS $styleSheet) {
+      $styleSheet->addToHead();
     }
   }
 
@@ -160,5 +136,94 @@ class JQueryUiIncluder {
 
   public function getStyleSheets() {
     return $this->_styleSheets;
+  }
+
+  /* Copy necessary resources to web target */
+  private function _compile($pathInfo, $theme) {
+    if ($theme === null) {
+      $this->_compileDefaultTheme($pathInfo);
+    } else {
+      $this->_compileTheme($pathInfo, $theme);
+    }
+
+    $this->_compileJavascript($pathInfo);
+  }
+
+  private function _compileDefaultTheme($pathInfo) {
+    $webTarget = $pathInfo->getWebTarget();
+
+    // Copy stylesheets and images web writable
+    foreach (self::$styleSheets AS $styleSheet) {
+      $cssPath = $this->_srcPath . $styleSheet;
+
+      // Make sure that the output directory exists
+      $outputPath = $this->_cssOutputPath . dirname($styleSheet);
+      if (!file_exists($outputPath)) {
+        mkdir($outputPath, 0755, true);
+      }
+
+      copy($cssPath, $outputPath . '/' . basename($styleSheet));
+    }
+
+    // Make sure image directory exists
+    $imgOut = $webTarget . '/css/themes/base/images';
+    if (!file_exists($imgOut)) {
+      mkdir($imgOut, 0755, true);
+    }
+
+    // Copy images into web writable
+    $imgDir = new DirectoryIterator($this->_srcPath . '/themes/base/images');
+    foreach ($imgDir AS $file) {
+      if ($file->isDot() || $file->isDir()) {
+        continue;
+      }
+
+      copy($file->getPathName() , $imgOut . '/' . $file->getFileName());
+    }
+  }
+
+  private function _compileTheme($pathInfo, $theme) {
+    // Make sure theme directory exists
+    $themeDir = realpath(__DIR__ . "/../resources/$theme-theme");
+    if (!file_exists($themeDir) || !is_dir($themeDir)) {
+      throw new Exception("Specified theme does not exist: $theme.  It was"
+        . " expected to be found at $themeDir");
+    }
+
+    // Make sure the output directory exists.
+    $target = "{$this->_cssOutputPath}/$theme-theme";
+    if (!file_exists($target)) {
+      mkdir($target, 0755, true);
+    }
+
+    $files = new RecursiveDirectoryIterator($themeDir);
+    $iter = new RecursiveIteratorIterator($files);
+    foreach ($iter AS $file) {
+      if (!$file->isDir()) {
+        $relativePath = str_replace($themeDir, '', $file->getRealPath());
+        $targetPath = $target . $relativePath;
+
+        if (!file_exists(dirname($targetPath))) {
+          mkdir(dirname($targetPath));
+        }
+
+        copy($file->getRealPath(), $targetPath);
+      }
+    }
+  }
+
+  private function _compileJavascript($pathInfo) {
+    // Copy javascripts into web writable
+    foreach (self::$scripts AS $script) {
+      $scriptPath = $this->_srcPath . $script;
+      
+      // Make that the output directory exists
+      $outputPath = $this->_jsOutputPath . dirname($script);
+      if (!file_exists($outputPath)) {
+        mkdir($outputPath, 0755, true);
+      }
+
+      copy($scriptPath, $outputPath . '/' . basename($scriptPath));
+    }
   }
 }

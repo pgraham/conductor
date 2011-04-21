@@ -11,7 +11,6 @@
  * =============================================================================
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
- * @package conductor
  */
 namespace conductor;
 
@@ -22,7 +21,7 @@ use \clarinet\Criteria;
 use \conductor\config\Parser;
 use \conductor\model\DecoratedModel;
 use \conductor\model\ModelSet;
-use \conductor\script\ConductorScript;
+use \conductor\script\Client;
 use \conductor\script\ServiceProxy;
 use \conductor\template\PageTemplate;
 
@@ -32,7 +31,6 @@ use \oboe\head\Javascript;
  * The main interface for Conductor setup.
  *
  * @author Philip Graham <philip@zeptech.ca>
- * @package conductor
  */
 class Conductor {
 
@@ -143,11 +141,14 @@ class Conductor {
       . self::JQUERY_VERSION . DIRECTORY_SEPARATOR . $jQueryName);
     $jQuery->addToHead();
 
-    $client = new ConductorScript('conductor', $pathInfo);
+    $client = new Client($pathInfo);
     $client->addToHead();
 
     $service = new ServiceProxy('conductor\Service', $pathInfo);
     $service->addToHead();
+
+    $reset = new Resource('reset.css', $pathInfo);
+    $reset->addToHead();
   }
 
   /**

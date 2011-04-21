@@ -105,15 +105,8 @@ class PageLoader {
 
       $pathInfo = Conductor::$config['pathInfo'];
 
-      $jQueryUiIncluder = new JQueryUiIncluder($pathInfo);
-
-      foreach ($jQueryUiIncluder->getScripts() AS $script) {
-        $script->addToHead();
-      }
-
-      foreach ($jQueryUiIncluder->getStyleSheets() AS $styleSheet) {
-        $styleSheet->addToHead();
-      }
+      $jQueryUiIncluder = new JQueryUiIncluder($pathInfo, 'admin');
+      $jQueryUiIncluder->addToHead();
 
       $adminClient = new AdminClient(Conductor::getModels(), $pathInfo);
       foreach ($adminClient->getScripts() AS $script) {
