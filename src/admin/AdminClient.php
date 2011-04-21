@@ -21,8 +21,6 @@ use \conductor\model\ModelSet;
 use \conductor\script\ServiceProxy;
 use \conductor\Resource;
 
-use \oboe\head\Javascript;
-use \oboe\head\StyleSheet;
 use \oboe\item\Body as BodyItem;
 use \oboe\Anchor;
 use \oboe\BaseList;
