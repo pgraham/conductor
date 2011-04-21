@@ -28,29 +28,19 @@ class Client {
   private $_resources = array();
 
   public function __construct(WebSitePathInfo $pathInfo) {
+    $working = new Resource('working.gif', $pathInfo);
+    $this->_resources[] = $working;
+
     $templateValues = null;
     if (defined('DEBUG') && DEBUG === true) {
-      $webTarget = $pathInfo->getWebTarget();
-      $webPath   = $pathInfo->getWebAccessibleTarget();
-
-      // Ensure directory structure
-      if (!file_exists("$webTarget/img")) {
-        mkdir("$webTarget/img", 0755, true);
-      }
-
-      // Copy any supporting files to the web target
-      $workingImg = __DIR__ . "/working.gif";
-      copy($workingImg, "$webTarget/img/working.gif");
-
       // Prepare template values for conductor.js resource
-      $workingImgInfo = getimagesize($workingImg);
+      $workingImgInfo = getimagesize($working->getFsPath());
       $templateValues = array(
-        'basePath'  => $webPath,
+        'basePath'  => $pathInfo->getWebAccessibleTarget(),
         'imgWidth'  => $workingImgInfo[0],
         'imgHeight' => $workingImgInfo[1]
       );
     }
-
     $this->_resources[] = new Resource('conductor.js', $pathInfo,
       $templateValues);
   }

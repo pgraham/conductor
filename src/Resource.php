@@ -18,6 +18,7 @@ use \oboe\head\Javascript;
 use \oboe\head\StyleSheet;
 use \oboe\item\Body as BodyItem;
 use \oboe\item\Head as HeadItem;
+use \oboe\Image;
 
 use \reed\generator\CodeTemplateLoader;
 use \reed\WebSitePathInfo;
@@ -40,6 +41,7 @@ class Resource {
   );
 
   private $_elm;
+  private $_fsPath;
 
   public function __construct($resource, WebSitePathInfo $pathInfo,
       array $templateValues = null)
@@ -48,6 +50,7 @@ class Resource {
     $webPath = $pathInfo->getWebAccessibleTarget();
 
     $resourceType = $this->_determineResourceType($resource);
+    $this->_fsPath = __DIR__ . "/resources/$resourceType/$resource";
 
     if (defined('DEBUG') && DEBUG === true) {
       $resourceTarget = "$webTarget/$resourceType";
@@ -56,12 +59,11 @@ class Resource {
       }
 
       if ($templateValues === null) {
-        $srcPath = __DIR__ . "/resources/$resourceType/$resource";
-        copy($srcPath, "$resourceTarget/$resource");
+        copy($this->_fsPath, "$resourceTarget/$resource");
       } else {
-        $templateLoader = CodeTemplateLoader::get(
-          __DIR__ . "/resources/$resourceType");
+        $templateLoader = CodeTemplateLoader::get(dirname($this->_fsPath));
         $resourceContent = $templateLoader->load($resource, $templateValues);
+
         file_put_contents("$resourceTarget/$resource", $resourceContent);
       }
     }
@@ -92,9 +94,15 @@ class Resource {
 
     if ($this->_elm instanceof HeadItem) {
       $this->_elm->addToHead();
-    } else if ($this->_elm instanceof BodyItem) {
-      $this->_elm->addToBody();
     }
+
+    // Images are not added to the page in this since it is likely that
+    // the image resource is reference by a stylesheet, but does not get
+    // included in the page an an <img/> element
+  }
+
+  public function getFsPath() {
+    return $this->_fsPath;
   }
 
   private function _determineResourceType($resource) {
