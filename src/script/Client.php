@@ -14,9 +14,8 @@
  */
 namespace conductor\script;
 
-use \oboe\head\Javascript;
+use \conductor\Resource;
 
-use \reed\generator\CodeTemplateLoader;
 use \reed\WebSitePathInfo;
 
 /**
@@ -24,45 +23,41 @@ use \reed\WebSitePathInfo;
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class Client extends Javascript {
+class Client {
+
+  private $_resources = array();
 
   public function __construct(WebSitePathInfo $pathInfo) {
-    $this->_compile($pathInfo);
+    $templateValues = null;
+    if (defined('DEBUG') && DEBUG === true) {
+      $webTarget = $pathInfo->getWebTarget();
+      $webPath = $pathInfo->getWebAccessibleTarget();
 
-    $webPath = $pathInfo->getWebAccessibleTarget();
-    parent::__construct("$webPath/js/conductor.js");
+      // Ensure directory structure
+      if (!file_exists("$webTarget/img")) {
+        mkdir("$webTarget/img", 0755, true);
+      }
+
+      // Copy any supporting files to the web target
+      $workingImg = __DIR__ . "/working.gif";
+      copy($workingImg, "$webTarget/img/working.gif");
+
+      // Prepare template values for conductor.js resource
+      $workingImgInfo = getimagesize($workingImg);
+      $templateValues = array(
+        'basePath'  => $webPath,
+        'imgWidth'  => $workingImgInfo[0],
+        'imgHeight' => $workingImgInfo[1]
+      );
+    }
+
+    $this->_resources[] = new Resource('conductor.js', $pathInfo,
+      $templateValues);
   }
 
-  private function _compile($pathInfo) {
-    if (!defined('DEBUG') || DEBUG !== true) {
-      return;
+  public function addToHead() {
+    foreach ($this->_resources AS $resource) {
+      $resource->addToHead();
     }
-
-    $webTarget = $pathInfo->getWebTarget();
-    $webPath = $pathInfo->getWebAccessibleTarget();
-
-    // Ensure directory structure
-    if (!file_exists("$webTarget/js")) {
-      mkdir("$webTarget/js", 0755, true);
-    }
-    if (!file_exists("$webTarget/img")) {
-      mkdir("$webTarget/img", 0755, true);
-    }
-
-    // Copy any supporting files to the web target
-    $workingImg = __DIR__ . "/working.gif";
-    copy($workingImg, "$webTarget/img/working.gif");
-
-    // Generate script
-    $templateLoader = CodeTemplateLoader::get(__DIR__);
-
-    $workingImgInfo = getimagesize($workingImg);
-    $templateValues = array(
-      'basePath'  => $webPath,
-      'imgWidth'  => $workingImgInfo[0],
-      'imgHeight' => $workingImgInfo[1]
-    );
-    $src = $templateLoader->load('conductor.js', $templateValues);
-    file_put_contents("$webTarget/js/conductor.js", $src);
   }
 }
