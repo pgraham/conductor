@@ -62,18 +62,13 @@ class AdminClient extends Composite implements BodyItem {
     $menu = new Div('menu');
     $menu->add(new ListEl(BaseList::UNORDERED));
     $this->elm->add($menu);
-
     $ctnt = new Div('ctnt');
     $this->elm->add($ctnt);
-
     $this->elm->add(new Anchor($pathInfo->getWebRoot(), 'View Site'));
 
     // Decorate models
     $models->decorate(new CrudServiceModelDecoratorFactory());
     $models->decorate(new AdminModelDecoratorFactory());
-
-    $webPath = $pathInfo->getWebAccessibleTarget();
-    $jsOutputDir = $pathInfo->getWebTarget() . '/js';
 
     $templateValues = null;
     if (defined('DEBUG') && DEBUG === true) {
@@ -81,14 +76,6 @@ class AdminClient extends Composite implements BodyItem {
         // Generate a crud service for each model.
         $generator = new CrudServiceGenerator($model);
         $generator->generate($pathInfo);
-
-        // Copy any client side model extensions to the web target
-        if ($model->getClientModel() !== null) {
-          $src = $model->getClientModel();
-          $dest = $jsOutputDir . "/{$model->getActor()}.js";          
-
-          copy($src, $dest);
-        }
       }
 
       // Generate the admin client
@@ -96,18 +83,14 @@ class AdminClient extends Composite implements BodyItem {
       $templateValues = $builder->build();
     }
 
-    // Add Client-side model extensions
     foreach ($models AS $model) {
+      // Add Client-side model extensions
       if ($model->getClientModel() !== null) {
-        $this->_resources[] = new Javascript(
-          $pathInfo->fsToWeb("$jsOutputDir/{$model->getActor()}.js"));
+        $this->_resources[] = new Resource($model->getClientModel(), $pathInfo);
       }
-    }
 
-    // Add CRUD service proxies for each of the models
-    foreach ($models AS $model) {
+      // Add CRUD service proxies for each of the models
       $serviceClass = $model->getCrudServiceClass();
-
       $this->_resources[] = new ServiceProxy($serviceClass, $pathInfo);
     }
 
@@ -115,7 +98,6 @@ class AdminClient extends Composite implements BodyItem {
     $this->_resources[] = new Resource('tabbedDialog.js', $pathInfo);
     $this->_resources[] = new Resource('conductor-admin.js', $pathInfo,
       $templateValues);
-
     $this->_resources[] = new Resource('conductor-admin.css', $pathInfo);
   }
 
