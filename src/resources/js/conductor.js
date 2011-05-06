@@ -9,18 +9,35 @@ var CDT = {};
 
 (function ($, CDT, undefined) {
 
-  var curPage, curPageSel, loadPage, init;
+  var curPage, curPageSel, loadPage, resourcePath, init;
 
   /* Internal function for accessing the loadPage RPC */
-  loadPage = function (pageId, sel) {
+  loadPage = function (pageId, sel, cb) {
+    $(sel).working();
     ConductorService.loadPage(pageId, function (data) {
       curPage = pageId;
       curPageSel = sel;
 
-      $(sel).html(data);
+      $(sel).html(data).done();
+      if (cb !== undefined) {
+        cb();
+      }
     });
   };
   CDT.loadPage = loadPage;
+
+  /*
+   * Function for creating a path to a resource. This path will append the
+   * site root to the given path.
+   */
+  resourcePath = function (path) {
+    ${if:rootPath = /}
+      return path;    
+    ${else}
+      return '${rootPath}' + path;
+    ${fi}
+  }
+  CDT.resourcePath = resourcePath;
 
   /**
    * Initialize the conductor client.  This function is called automatically
@@ -84,7 +101,7 @@ $(document).ready(function () {
               })
               .width(${imgWidth})
               .height(${imgHeight})
-              .attr('src', '${basePath}/img/working.gif'));
+              .attr('src', '${targetPath}/img/working.gif'));
 
         ctx.data('working-mask', mask);
       }
@@ -106,7 +123,7 @@ $(document).ready(function () {
 
 })( jQuery );
 
-// A jQuery extension that adds a helpful bar internet explorer.
+// A jQuery extension that adds a helpful bar for internet explorer users.
 //
 // Usage:
 // ------

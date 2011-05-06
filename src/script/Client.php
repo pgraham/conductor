@@ -36,9 +36,10 @@ class Client {
       // Prepare template values for conductor.js resource
       $workingImgInfo = getimagesize($working->getFsPath());
       $templateValues = array(
-        'basePath'  => $pathInfo->getWebAccessibleTarget(),
-        'imgWidth'  => $workingImgInfo[0],
-        'imgHeight' => $workingImgInfo[1]
+        'rootPath'    => $pathInfo->getWebRoot(),
+        'targetPath'  => $pathInfo->getWebAccessibleTarget(),
+        'imgWidth'    => $workingImgInfo[0],
+        'imgHeight'   => $workingImgInfo[1]
       );
     }
     $this->_resources[] = new Resource('conductor.js', $pathInfo,
