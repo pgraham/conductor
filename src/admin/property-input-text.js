@@ -1,30 +1,26 @@
-function ${model}_${property}Input() {
-  this.label = $('<label/>')
-    .attr('for', '${property}')
-    .text('${label}');
+var ${model}_${property}_input = function (value) {
+  var that, elm;
 
-  this.input = $('<textarea/>')
-    .attr('name', '${property}')
+  elm = $('<textarea/>')
     .addClass('text')
     .addClass('ui-widget-content')
     .addClass('ui-corner-all');
-}
 
-${model}_${property}Input.prototype = {
+  that = {
+    elm: elm,
+    name: '${property}',
+    lbl: '${label}'
+  };
 
-  getLabel: function () {
-    return this.label;
-  },
+  hasValue(that, {
+    initial: value,
+    getValue: function () {
+      return elm.val();
+    },
+    setValue: function(val) {
+      elm.val(val);
+    }
+  });
 
-  getInput: function () {
-    return this.input;
-  },
-
-  getValue: function () {
-    return this.input.val();
-  },
-
-  setValue: function (val) {
-    this.input.val(val);
-  }
+  return that;
 };
