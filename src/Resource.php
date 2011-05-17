@@ -48,6 +48,19 @@ class Resource {
 
   private $_fsPath;
 
+  /**
+   * Construct a new resource wrapper.  If DEBUG mode is enabled, then the
+   * identified resource is copied from it's source (presumably
+   * non-webaccessible directory) into the web target.  If template values are
+   * provided then they are substituted into the source before being output.
+   *
+   * @param string $resource The name of the resource.
+   * @param WebSitePathInfo $pathInfo Encapsulated path information about the
+   *   web site.
+   * @param array $templateValues Array of substitution values if the identified
+   *   resource is a template.  This only has an effect if DEBUG mode is
+   *   enabled.
+   */
   public function __construct($resource, WebSitePathInfo $pathInfo,
       array $templateValues = null)
   {
@@ -69,7 +82,8 @@ class Resource {
         copy($this->_fsPath, "$resourceTarget/$resourceName");
       } else {
         $templateLoader = CodeTemplateLoader::get(dirname($this->_fsPath));
-        $resourceContent = $templateLoader->load($resourceName, $templateValues);
+        $resourceContent = $templateLoader->load($resourceName,
+          $templateValues);
 
         file_put_contents("$resourceTarget/$resourceName", $resourceContent);
       }

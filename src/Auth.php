@@ -74,8 +74,19 @@ class Auth {
         $session->setUser($user);
         Clarinet::save($session);
 
-        // TODO - If this is a synchronous request, redirect to the current page
-        //        so that a reload doesn't resubmit the login credentials
+        // If this is a synchronous request, redirect to the current page so
+        // that a reload doesn't resubmit the login credentials
+        $asyncRequest = false;
+        if (isset($_SERVER['HTTP_X_REQUESTED_WITH'])) {
+          $requestType = strtolower($_SERVER['HTTP_X_REQUESTED_WITH']);
+          if ($requestType == 'xmlhttprequest') {
+            $asyncRequest = true;
+          }
+        }
+        if (!$asyncRequest) {
+          header('Location: ' . $_SERVER['PHP_SELF']);
+          exit;
+        }
       }
     }
     self::$session = $session;

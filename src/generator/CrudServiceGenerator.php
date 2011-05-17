@@ -34,7 +34,7 @@ class CrudServiceGenerator {
   /**
    * Create a new generator for the given model info
    *
-   * @param array $models List of model class names.
+   * @param DecoartedModel $model The model for which to generate a service.
    */
   public function __construct(DecoratedModel $model) {
     $this->_model = $model;
