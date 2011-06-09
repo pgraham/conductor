@@ -66,3 +66,7 @@ td, th {
   width: 150px;
   margin: 10px;
 }
+.cdt-ConfigEditor textarea {
+  width: 470px;
+  height: 200px;
+}

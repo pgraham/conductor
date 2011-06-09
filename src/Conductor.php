@@ -15,6 +15,7 @@
 namespace conductor;
 
 use \clarinet\model\Parser as ModelParser;
+use \clarinet\ActorFactory;
 use \clarinet\Clarinet;
 use \clarinet\Criteria;
 
@@ -44,7 +45,7 @@ class Conductor {
 
   /**
    * Retrieve the configuration value with the given name.  In order for this to
-   * work the database must be setup to handler configuration values.
+   * work the database must be setup to handle configuration values.
    *
    * @param {string} $name The name of the configuration value to retrieve.
    */
@@ -54,13 +55,43 @@ class Conductor {
     $c = new Criteria();
     $c->addEquals('name', $name);
 
-    $rows = Clarinet::get('conductor\model\ConfigValue', $c);
+    $persister = ActorFactory::getActor('persister',
+      'conductor\model\ConfigValue');
+    $rows = $persister->retrieve($c);
     if (count($rows) == 0) {
       return null;
     }
 
     $obj = $rows[0];
     return $obj->getValue();
+  }
+
+  /**
+   * Retrieve a list of configuration values that belong to the given group(s).
+   * Nested groups can be accessed by provided a dot separated path to the
+   * nested group.  Configuration values can be retrieved for several groups at
+   * once by providing an array of group names.
+   *
+   * @param mixed $groups Either a single string group name or an array of
+   *   group names.
+   * @return A list of ConfigValue instances.
+   */
+  public static function getConfigValues($groups) {
+    if (!is_array($groups)) {
+      return self::getConfigValues(array($groups));
+    }
+
+    $groupConditions = array();
+    foreach ($groups AS $group) {
+      $groupConditions[] = "$group.%";
+    }
+
+    $c = new Criteria();
+    $c->addLike('name', $groupConditions);
+
+    $persister = ActorFactory::getActor('persister',
+      'conductor\model\ConfigValue');
+    return $persister->retrieve($c);
   }
 
   /**
