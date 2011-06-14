@@ -46,6 +46,10 @@ class PropertyInputBuilder {
       $template = 'property-input-date.js';
       break;
 
+      case Property::TYPE_DECIMAL:
+      $template = 'property-input-decimal.js';
+      break;
+
       case Property::TYPE_FLOAT:
       $template = 'property-input-float.js';
       break;
@@ -79,7 +83,8 @@ class PropertyInputBuilder {
     return array(
       'model'    => $property->getModel()->getIdentifier(),
       'property' => $property->getIdentifier(),
-      'label'    => $property->getDisplayName()
+      'label'    => $property->getDisplayName(),
+      'default'  => $property->getDefault()
     );
   }
 }

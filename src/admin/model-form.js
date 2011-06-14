@@ -1,26 +1,26 @@
 var ${model}_form = function (model) {
   var that, inputs = [], genInputs = [], tabs = [], btns, title, fieldset, i,
-    len;
+    len, input;
 
-  ${each:properties as property}
-    genInputs.push(${model}_${property}_input(model !== null
-      ? model.${property}
-      : null));
-    inputs.push(genInputs[genInputs.length - 1]);
-  ${done}
-
-  if (genInputs.length > 0) {
+  ${if:numProperties > 0}
     tabs["General"] = $('<form><fieldset/></form>');
     fieldset = tabs["General"].find('fieldset');
-    for (i = 0, len = genInputs.length; i < len; i += 1) {
-      fieldset.append(
-        $('<label/>')
-          .attr('for', genInputs[i].name)
-          .text(genInputs[i].lbl));
+  ${fi}
 
-      fieldset.append(genInputs[i].elm);
-    }
-  }
+  ${each:properties as property}
+    input = ${model}_${property[id]}_input(model !== null
+      ? model.${property[id]}
+      : ${property[default]});
+    genInputs.push(input);
+    inputs.push(input);
+
+    fieldset.append(
+      $('<label/>')
+        .attr('for', input.name)
+        .text(input.lbl));
+
+    fieldset.append(input.elm);
+  ${done}
 
   ${each:tabs as tab}
     ${tab}

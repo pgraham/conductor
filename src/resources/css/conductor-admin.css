@@ -43,7 +43,8 @@ td, th {
 }
 
 .cdt-TabbedDialog fieldset input,
-.cdt-TabbedDialog fieldset textarea {
+.cdt-TabbedDialog fieldset textarea,
+.cdt-TabbedDialog fieldset select {
   display: block;
   margin:5px 0 5px 150px;
 }
@@ -53,7 +54,8 @@ td, th {
 }
 
 .cdt-TabbedDialog fieldset input.text,
-.cdt-TabbedDialog fieldset textarea {
+.cdt-TabbedDialog fieldset textarea,
+.cdt-TabbedDialog fieldset select {
   width: 300px;
 }
 

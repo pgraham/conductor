@@ -14,6 +14,8 @@
  */
 namespace conductor\admin;
 
+use \clarinet\model\Relationship;
+
 use \conductor\model\DecoratedRelationship;
 use \conductor\model\RelationshipDecorator;
 
@@ -64,7 +66,14 @@ class AdminRelationshipDecorator implements RelationshipDecorator {
 
     // Set defaults if necessary
     if ($this->_display === null) {
-      $this->_display = AdminModelDecorator::DISPLAY_NONE;
+      switch ($relationship->getType()) {
+        case Relationship::TYPE_MANYTOONE:
+        $this->_display = AdminModelDecorator::DISPLAY_EDIT;
+        break;
+
+        default:
+        $this->_display = AdminModelDecorator::DISPLAY_NONE;
+      }
     }
     if ($this->_displayName === null) {
       $this->_displayName = ucfirst($relationship->getLhsProperty());

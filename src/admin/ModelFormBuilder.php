@@ -14,6 +14,8 @@
  */
 namespace conductor\admin;
 
+use \clarinet\model\Relationship;
+
 use \conductor\model\DecoratedModel;
 
 use \reed\generator\CodeTemplateLoader;
@@ -38,24 +40,37 @@ class ModelFormBuilder {
     $inputs = array();
     $tabs = array();
 
-    foreach ($model->getProperties() AS $prop) {
-      $propId = strtolower($prop->getIdentifier());
-
-      $properties[] = $propId;
-      $inputs[] = $propertyInputBuilder->build($prop);
-    }
-
     $relationshipInputBuilder = new RelationshipInputBuilder();
     foreach ($model->getRelationships() AS $rel) {
       if ($rel->getDisplay() === AdminModelDecorator::DISPLAY_EDIT) {
         $propId = strtolower($rel->getLhsProperty());
 
         $inputs[] = $relationshipInputBuilder->build($rel);
-        $tabs = "inputs.push("
-          . "{$model->getIdentifier()}_{$propId}_input(model));\n"
-          . "tabs['{$rel->getDisplayName()}'] = "
-          . "inputs[inputs.length - 1].elm;";
+
+        if ($rel->getType() === Relationship::TYPE_MANYTOONE) {
+          $properties[] = array(
+            'id' => $propId,
+            'default' => 'null'
+          );
+        } else {
+          $tabs = "inputs.push("
+            . "{$model->getIdentifier()}_{$propId}_input(model));\n"
+            . "tabs['{$rel->getDisplayName()}'] = "
+            . "inputs[inputs.length - 1].elm;";
+        }
       }
+    }
+
+    foreach ($model->getProperties() AS $prop) {
+      $propId = strtolower($prop->getIdentifier());
+
+      $properties[] = array(
+        'id' => $propId,
+        'default' => $prop->getDefault() !== null
+          ? $prop->getDefault()
+          : 'null'
+      );
+      $inputs[] = $propertyInputBuilder->build($prop);
     }
 
     $templateValues = Array
@@ -63,6 +78,7 @@ class ModelFormBuilder {
       'model'          => $model->getIdentifier(),
       'singular'       => $model->getDisplayName(),
       'properties'     => $properties,
+      'numProperties'  => count($properties),
       'inputs'         => $inputs,
       'tabs'           => $tabs,
       'crudServiceVar' => $model->getCrudServiceName(),

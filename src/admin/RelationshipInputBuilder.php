@@ -14,7 +14,7 @@
  */
 namespace conductor\admin;
 
-use \clarinet\model\AbstractRelationship;
+use \clarinet\model\Relationship;
 
 use \conductor\model\DecoratedModel;
 use \conductor\model\DecoratedRelationship;
@@ -38,14 +38,15 @@ class RelationshipInputBuilder {
   public function build(DecoratedRelationship $relationship) {
     $type = $relationship->getType();
     switch ($type) {
-      case AbstractRelationship::TYPE_MANYTOMANY:
+      case Relationship::TYPE_MANYTOMANY:
       $template = 'property-input-many-to-many.js';
       break;
 
-      case AbstractRelationship::TYPE_MANYTOONE:
-      return '';
+      case Relationship::TYPE_MANYTOONE:
+      $template = 'property-input-many-to-one.js';
+      break;
 
-      case AbstractRelationship::TYPE_ONETOMANY:
+      case Relationship::TYPE_ONETOMANY:
       $template = 'property-input-one-to-many.js';
       break;
 
@@ -64,7 +65,7 @@ class RelationshipInputBuilder {
     $rhs = new DecoratedModel($relationship->getRhs());
     $rhs->decorate(new AdminModelDecorator());
 
-    return array(
+    $values = array(
       // The identifier for the model to which the relationship belongs
       'model'         => $model->getIdentifier(),
 
@@ -76,11 +77,6 @@ class RelationshipInputBuilder {
 
       // The left side's id property
       'lhsIdProperty' => strtolower($model->getId()->getName()),
-
-      // The name of the property in the left side model that contains the
-      // relationship, will be null for all except many-to-one
-      // TODO This is only relevant for one-to-many
-      'rhsColumn'      => $relationship->getRhsColumn(),
 
       // The right side's ID property
       'rhsIdProperty' => strtolower($rhs->getId()->getName()),
@@ -95,5 +91,10 @@ class RelationshipInputBuilder {
       // right side of the relationship
       'nameProperty'  => $rhs->getNameProperty()
     );
+
+    if ($relationship->getType() === Relationship::TYPE_ONETOMANY) {
+      $values['rhsColumn'] = $relationship->getRhsColumn();
+    }
+    return $values;
   }
 }

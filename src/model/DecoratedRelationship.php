@@ -109,4 +109,5 @@ class DecoratedRelationship {
   public function getModel() {
     return $this->_model;
   }
+
 }
