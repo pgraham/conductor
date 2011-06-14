@@ -15,7 +15,12 @@ var ${model}_${property}_input = function (value) {
   hasValue(that, {
     initial: value,
     getValue: function () {
-      return elm.val();
+      // Normalize empty string to null
+      if (elm.val() === '') {
+        return null;
+      } else {
+        return elm.val();
+      }
     },
     setValue: function(val) {
       elm.val(val);

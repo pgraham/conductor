@@ -48,7 +48,7 @@
 } (jQuery));
 
 (function ($, CDT, undefined) {
-  var configuration_editor;
+  var configuration_editor, configuration_form;
 
   configuration_editor = function () {
     var that;
@@ -73,6 +73,46 @@
         }
       }
     });
+
+    return that;
+  };
+
+  configuration_form = function (model) {
+    var that = eventuality({}), dialog;
+
+    dialog = $('<div/>')
+      .attr('title', model.name)
+      .addClass('cdt-ConfigEditor')
+      .append(
+        $('<textarea />')
+          .attr('name', 'config_value_' + model.id)
+          .val(model.value)
+      );
+
+    that.close = function () {
+      dialog.dialog('close');
+      that.fire('close');
+    };
+
+    that.show = function () {
+      dialog.dialog({
+        modal: true,
+        buttons: {
+          "Save" : function () {
+            var props = {}, input;
+
+            input = dialog.find('textarea');
+
+            props.id = model.id;
+            props.name = model.name;
+            props.value = input.val() !== '' ? input.val() : null;
+
+            window['conductor_model_ConfigValueCrud'].update(props, that.close);
+          }
+        },
+        width: 505
+      });
+    };
 
     return that;
   };
