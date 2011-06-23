@@ -18,9 +18,7 @@ namespace conductor\admin;
 use \clarinet\model\Model;
 
 use \conductor\generator\CrudServiceGenerator;
-use \conductor\generator\CrudServiceModelDecorator;
-use \conductor\generator\CrudServiceModelDecoratorFactory;
-use \conductor\model\DecoratedModel;
+use \conductor\generator\CrudServiceInfo;
 use \conductor\model\ModelSet;
 use \conductor\script\ServiceProxy;
 use \conductor\Resource;
@@ -60,12 +58,10 @@ class AdminClient extends Composite implements BodyItem {
    *   exist if in DEBUG mode).
    */
   public function __construct(ModelSet $models, WebSitePathInfo $pathInfo) {
-    // Decorate models
-    $models->decorate(new CrudServiceModelDecoratorFactory());
-    $models->decorate(new AdminModelDecoratorFactory());
 
     // Compile the admin client.
-    $templateValues = $this->_compile($models, $pathInfo);
+    $configValueModel = new Model('conductor\model\ConfigValue');
+    $templateValues = $this->_compile($models, $configValueModel, $pathInfo);
 
     $this->initElement(new Div('cdt-Admin'));
     $menu = new Div('menu');
@@ -78,27 +74,20 @@ class AdminClient extends Composite implements BodyItem {
     // Add Client-side model extensions and CRUD service proxies for each of the
     // models.
     foreach ($models AS $model) {
-      if ($model->getClientModel() !== null) {
-        $this->_resources[] = new Resource($model->getClientModel(), $pathInfo);
+      $adminInfo = new AdminModelInfo($model);
+      $crudInfo = new CrudServiceInfo($model);
+      if ($adminInfo->getClientModel() !== null) {
+        $this->_resources[] = new Resource($adminInfo->getClientModel(), $pathInfo);
       }
 
-      $serviceClass = $model->getCrudServiceClass();
+      $serviceClass = $crudInfo->getCrudServiceClass();
       $this->_resources[] = new ServiceProxy($serviceClass, $pathInfo);
     }
 
     // Generate support code for updating configuration values.
-    $configValueModel = new DecoratedModel(
-      new Model('conductor\model\ConfigValue'));
-    $configValueModel->decorate(new CrudServiceModelDecorator());
-
-    if (defined('DEBUG') && DEBUG === true) {
-      $generator = new CrudServiceGenerator($configValueModel);
-      $generator->generate($pathInfo);
-
-    }
-
+    $configValueCrudInfo = new CrudServiceInfo($configValueModel);
     $this->_resources[] = new ServiceProxy(
-      $configValueModel->getCrudServiceClass(), $pathInfo);
+      $configValueCrudInfo->getCrudServiceClass(), $pathInfo);
 
     $this->_resources[] = new Resource('grid.js', $pathInfo);
     $this->_resources[] = new Resource('tabbedDialog.js', $pathInfo);
@@ -111,10 +100,16 @@ class AdminClient extends Composite implements BodyItem {
     return $this->_resources;
   }
 
-  private function _compile(ModelSet $models, WebSitePathInfo $pathInfo) {
+  private function _compile(ModelSet $models, Model $configValueModel,
+    WebSitePathInfo $pathInfo)
+  {
+
     if (!defined('DEBUG') || DEBUG !== true) {
       return null;
     }
+
+    $generator = new CrudServiceGenerator($configValueModel);
+    $generator->generate($pathInfo);
 
     foreach ($models AS $model) {
       // Generate a crud service for each model.

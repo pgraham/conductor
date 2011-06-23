@@ -1,5 +1,7 @@
 var ${model}_editor = function () {
-  var that, cols = ${json:columns};
+  var that, elm, btns, grid, cols;
+
+  cols = ${json:columns};
 
   that = CDT.modelCollectionGrid({
     cols        : cols,
@@ -32,6 +34,18 @@ var ${model}_editor = function () {
       }
     }
   });
+
+  /*
+  btns = $('<div/>');
+  ${each:buttons AS button}
+  
+    btns.append(
+      $('<button/>')
+        .attr('type', 'button')
+        .text(${button[lbl]})
+        .click(${button[fn]}));
+  ${done}
+  */
 
   return that;
 }
@@ -69,7 +83,7 @@ var ${model}_delete = function (models) {
 
           elm.dialog('close');
 
-          window['${crudService}'].delete(toDelete, deleteCb);
+          window['${crudService}']['delete'](toDelete, deleteCb);
         },
         "Cancel" : function () {
           elm.dialog('close');

@@ -16,7 +16,6 @@ namespace conductor\admin;
 
 use \clarinet\model\Property;
 
-use \conductor\model\DecoratedProperty;
 use \conductor\Exception;
 
 use \reed\generator\CodeTemplateLoader;
@@ -34,7 +33,7 @@ class PropertyInputBuilder {
     $this->_templateLoader = CodeTemplateLoader::get(__DIR__);
   }
 
-  public function build(DecoratedProperty $property) {
+  public function build(Property $property) {
     $type = $property->getType();
 
     switch ($type) {
@@ -80,10 +79,12 @@ class PropertyInputBuilder {
   }
 
   private function _getTemplateValues($property) {
+    $adminModelInfo = new AdminModelInfo($property->getModel());
+    $propInfo = $adminModelInfo->getProperty($property->getIdentifier());
     return array(
       'model'    => $property->getModel()->getIdentifier(),
       'property' => $property->getIdentifier(),
-      'label'    => $property->getDisplayName(),
+      'label'    => $propInfo->getDisplayName(),
       'default'  => $property->getDefault()
     );
   }

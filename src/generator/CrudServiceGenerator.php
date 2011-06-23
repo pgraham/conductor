@@ -16,7 +16,7 @@ namespace conductor\generator;
 
 use \SplFileObject;
 
-use \conductor\model\DecoratedModel;
+use \clarinet\model\Model;
 
 use \reed\WebSitePathInfo;
 
@@ -31,13 +31,17 @@ class CrudServiceGenerator {
 
   private $_model;
 
+  private $_crudInfo;
+
   /**
    * Create a new generator for the given model info
    *
    * @param DecoartedModel $model The model for which to generate a service.
    */
-  public function __construct(DecoratedModel $model) {
+  public function __construct(Model $model) {
     $this->_model = $model;
+
+    $this->_crudInfo = new CrudServiceInfo($model);
   }
 
   /**
@@ -50,14 +54,13 @@ class CrudServiceGenerator {
     $template = $builder->build();
 
     // Ensure the output directory exists
-    $serviceRelPath = str_replace('\\', '/',
-      CrudServiceModelDecorator::CRUD_SERVICE_NS);
+    $serviceRelPath = str_replace('\\', '/', CrudServiceInfo::CRUD_SERVICE_NS);
     $outputPath = $pathInfo->getTarget() . '/' . $serviceRelPath;
     if (!file_exists($outputPath)) {
       mkdir($outputPath, 0755, true);
     }
 
-    $serviceFileName = $this->_model->getCrudServiceName() . '.php';
+    $serviceFileName = $this->_crudInfo->getCrudServiceName() . '.php';
     $servicePath = $outputPath . '/' . $serviceFileName;
     $file = new SplFileObject($servicePath, 'w');
     $file->fwrite($template);

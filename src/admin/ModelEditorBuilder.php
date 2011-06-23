@@ -14,7 +14,9 @@
  */
 namespace conductor\admin;
 
-use \conductor\model\DecoratedModel;
+use \clarinet\model\Model;
+
+use \conductor\generator\CrudServiceInfo;
 
 use \reed\generator\CodeTemplateLoader;
 
@@ -31,43 +33,51 @@ class ModelEditorBuilder {
     $this->_templateLoader = CodeTemplateLoader::get(__DIR__);
   }
 
-  public function build(DecoratedModel $model) {
+  public function build(Model $model) {
+    $adminModelInfo = new AdminModelInfo($model);
+
     $columns = array();
+    $buttons = array();
 
     foreach ($model->getProperties() AS $prop) {
-      $propId = strtolower($prop->getIdentifier());
+      $propId = $prop->getIdentifier();
 
       $columns[] = array(
         'id'  => array(
           'field' => $propId,
           'html'  => true
         ),
-        'lbl' => $prop->getDisplayName()
+        'lbl' => $adminModelInfo->getProperty($propId)->getDisplayName()
       );
     }
 
     foreach ($model->getRelationships() AS $rel) {
-      if ($rel->getDisplay() !== AdminModelDecorator::DISPLAY_NONE) {
-        $propId = strtolower($rel->getLhsProperty());
+      $relId = $rel->getIdentifier();
+      $relName = $rel->getLhsProperty();
+      $relInfo = $adminModelInfo->getRelationship($relId);
+
+      if ($relInfo->getDisplay() !== AdminModelInfo::DISPLAY_NONE) {
 
         $columns[] = array(
           'id'  => array(
-            'field' => $propId,
+            'field' => $relName,
             'html'  => true
           ),
-          'lbl' => $rel->getDisplayName()
+          'lbl' => $relInfo->getDisplayName()
         );
       }
     }
 
+    $crudInfo = new CrudServiceInfo($model);
     $templateValues = Array
     (
-      'model'        => $model->getIdentifier(),
-      'idProperty'   => strtolower($model->getId()->getName()),
-      'crudService'  => $model->getCrudServiceName(),
-      'columns'      => $columns,
-      'singular'     => $model->getDisplayName(),
-      'plural'       => $model->getDisplayNamePlural()
+      'model'       => $model->getIdentifier(),
+      'idProperty'  => $model->getId()->getIdentifier(),
+      'crudService' => $crudInfo->getCrudServiceName(),
+      'columns'     => $columns,
+      'singular'    => $adminModelInfo->getDisplayName(),
+      'plural'      => $adminModelInfo->getDisplayNamePlural(),
+      'buttons'     => $buttons
     );
 
     return $this->_templateLoader->load('model-editor.js', $templateValues);

@@ -123,6 +123,15 @@ class LoginForm extends Composite implements item\Body {
   }
 
   /**
+   * Add content to the bottom of the form.
+   *
+   * @param mixed $ctnt
+   */
+  public function add($ctnt) {
+    $this->elm->add($ctnt);
+  }
+
+  /**
    * Set the label for the login button.
    *
    * @param string $label

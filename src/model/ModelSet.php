@@ -33,12 +33,6 @@ class ModelSet implements ArrayAccess, IteratorAggregate {
   /* List of encapsulated models */
   private $_models = array();
 
-  /*
-   * The decorators already attached to the models.  This is used to prevent
-   * attaching an instance of the same decorator twice.
-   */
-  private $_decorators = array();
-
   /**
    * Create a new model set containing decoratable model representations for
    * the given set of classnames.
@@ -48,25 +42,7 @@ class ModelSet implements ArrayAccess, IteratorAggregate {
   public function __construct(array $modelNames) {
     foreach ($modelNames AS $modelName) {
       $model = ModelParser::getModel($modelName);
-      $this->_models[] = new DecoratedModel($model);
-    }
-  }
-
-  /**
-   * Decorated the encapsulated models with an instance of the decorated created
-   * by the given factory.
-   *
-   * @param ModelDecoratorFactory $factory
-   */
-  public function decorate(ModelDecoratorFactory $factory) {
-    $type = get_class($factory);
-    if (array_key_exists($type, $this->_decorators)) {
-      return;
-    }
-    $this->_decorators[$type] = $factory;
-
-    foreach ($this->_models AS $model) {
-      $model->decorate($factory->getDecorator());
+      $this->_models[] = $model;
     }
   }
 
@@ -96,16 +72,10 @@ class ModelSet implements ArrayAccess, IteratorAggregate {
       }
     }
 
-    $decorated = new DecoratedModel($value);
     if ($offset === null) {
-      $this->_models[] = $decorated;
+      $this->_models[] = $value;
     } else {
-      $this->_models[$offset] = $decorated;
-    }
-
-    // Decorate the new model with any attached decorators
-    foreach ($this->_decorators AS $decoratorFactory) {
-      $decorated->decorate($decoratorFactory->getDecorator());
+      $this->_models[$offset] = $value;
     }
   }
 

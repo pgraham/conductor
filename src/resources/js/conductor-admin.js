@@ -55,11 +55,11 @@
 
     that = CDT.modelCollectionGrid({
       cols : [
-        { 'id' : { 'field' : 'name', 'html' : true }, 'lbl' : 'Name' },
-        { 'id' : { 'field' : 'value', 'html' : true }, 'lbl' : 'Value' }
+        { 'id' : { 'field' : 'Name', 'html' : true }, 'lbl' : 'Name' },
+        { 'id' : { 'field' : 'Value', 'html' : true }, 'lbl' : 'Value' }
       ],
       crudService : window.conductor_model_ConfigValueCrud,
-      idProperty  : 'id',
+      idProperty  : 'Id',
       dataitem    : {},
       buttons     : {
         "Edit" : function () {
@@ -81,12 +81,12 @@
     var that = eventuality({}), dialog;
 
     dialog = $('<div/>')
-      .attr('title', model.name)
+      .attr('title', model.Name)
       .addClass('cdt-ConfigEditor')
       .append(
         $('<textarea />')
-          .attr('name', 'config_value_' + model.id)
-          .val(model.value)
+          .attr('name', 'config_value_' + model.Id)
+          .val(model.Value)
       );
 
     that.close = function () {
@@ -103,9 +103,9 @@
 
             input = dialog.find('textarea');
 
-            props.id = model.id;
-            props.name = model.name;
-            props.value = input.val() !== '' ? input.val() : null;
+            props.Id = model.Id;
+            props.Name = model.Name;
+            props.Value = input.val() !== '' ? input.val() : null;
 
             window['conductor_model_ConfigValueCrud'].update(props, that.close);
           }

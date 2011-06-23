@@ -14,6 +14,7 @@
  */
 namespace conductor\admin;
 
+use \conductor\generator\CrudServiceInfo;
 use \conductor\model\ModelSet;
 
 /**
@@ -51,7 +52,7 @@ class AdminBuilder {
       $editors[] = $modelEditorBuilder->build($model);
       $forms[] = $modelFormBuilder->build($model);
 
-      $modelNames[] = strtolower($model->getIdentifier());
+      $modelNames[] = $model->getIdentifier();
     }
 
     $templateValues = Array
@@ -68,18 +69,20 @@ class AdminBuilder {
   /* Build a JSONable array for the encapsulated model set */
   private function _buildModelJsonArray() {
     $jsonable = Array();
-    foreach ($this->_models AS $modelInfo) {
+    foreach ($this->_models AS $model) {
+      $adminInfo = new AdminModelInfo($model);
+      $crudInfo = new CrudServiceInfo($model);
       $modelJson = Array
       (
         'name' => Array
           (
-            'singular' => $modelInfo->getDisplayName(),
-            'plural'   => $modelInfo->getDisplayNamePlural()
+            'singular' => $adminInfo->getDisplayName(),
+            'plural'   => $adminInfo->getDisplayNamePlural()
           ),
-        'crudService' => $modelInfo->getCrudServiceName()
+        'crudService' => $crudInfo->getCrudServiceName()
       );
 
-      $jsonable[$modelInfo->getIdentifier()] = $modelJson;
+      $jsonable[$model->getIdentifier()] = $modelJson;
     }
     return $jsonable;
   }

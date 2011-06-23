@@ -14,9 +14,10 @@
  */
 namespace conductor\admin;
 
+use \clarinet\model\Model;
 use \clarinet\model\Relationship;
 
-use \conductor\model\DecoratedModel;
+use \conductor\generator\CrudServiceInfo;
 
 use \reed\generator\CodeTemplateLoader;
 
@@ -33,8 +34,9 @@ class ModelFormBuilder {
     $this->_templateLoader = CodeTemplateLoader::get(__DIR__);
   }
 
-  public function build(DecoratedModel $model) {
-    $propertyInputBuilder = new PropertyInputBuilder();
+  public function build(Model $model) {
+    $adminModelInfo = new AdminModelInfo($model);
+    $crudInfo = new CrudServiceInfo($model);
 
     $properties = array();
     $inputs = array();
@@ -42,27 +44,31 @@ class ModelFormBuilder {
 
     $relationshipInputBuilder = new RelationshipInputBuilder();
     foreach ($model->getRelationships() AS $rel) {
-      if ($rel->getDisplay() === AdminModelDecorator::DISPLAY_EDIT) {
-        $propId = strtolower($rel->getLhsProperty());
+      $relId = $rel->getIdentifier();
+      $relName = $rel->getLhsProperty();
+      $relInfo = $adminModelInfo->getRelationship($relId);
+
+      if ($relInfo->getDisplay() === AdminModelInfo::DISPLAY_EDIT) {
 
         $inputs[] = $relationshipInputBuilder->build($rel);
 
         if ($rel->getType() === Relationship::TYPE_MANYTOONE) {
           $properties[] = array(
-            'id' => $propId,
+            'id' => $relId,
             'default' => 'null'
           );
         } else {
           $tabs = "inputs.push("
-            . "{$model->getIdentifier()}_{$propId}_input(model));\n"
-            . "tabs['{$rel->getDisplayName()}'] = "
+            . "{$model->getIdentifier()}_{$relName}_input(model));\n"
+            . "tabs['{$relInfo->getDisplayName()}'] = "
             . "inputs[inputs.length - 1].elm;";
         }
       }
     }
 
+    $propertyInputBuilder = new PropertyInputBuilder();
     foreach ($model->getProperties() AS $prop) {
-      $propId = strtolower($prop->getIdentifier());
+      $propId = $prop->getIdentifier();
 
       $properties[] = array(
         'id' => $propId,
@@ -76,13 +82,13 @@ class ModelFormBuilder {
     $templateValues = Array
     (
       'model'          => $model->getIdentifier(),
-      'singular'       => $model->getDisplayName(),
+      'singular'       => $adminModelInfo->getDisplayName(),
       'properties'     => $properties,
       'numProperties'  => count($properties),
       'inputs'         => $inputs,
       'tabs'           => $tabs,
-      'crudServiceVar' => $model->getCrudServiceName(),
-      'idProperty'     => strtolower($model->getId()->getName())
+      'crudServiceVar' => $crudInfo->getCrudServiceName(),
+      'idProperty'     => $model->getId()->getIdentifier()
     );
 
     return $this->_templateLoader->load('model-form.js', $templateValues);

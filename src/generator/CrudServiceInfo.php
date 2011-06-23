@@ -16,27 +16,25 @@ namespace conductor\generator;
 
 use \clarinet\model\Model;
 
-use \conductor\model\DecoratedProperty;
-use \conductor\model\DecoratedRelationship;
-use \conductor\model\ModelDecorator;
+use \conductor\model\ModelView;
 
 /**
  * This class provides information about a model for generating a crud service.
  *
- * TODO - Ensure that the model has been initialized when the decorators getters
- *        are invoked.
- *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class CrudServiceModelDecorator implements ModelDecorator {
+class CrudServiceInfo extends ModelView {
 
   /**
    * The namespace in which generated CRUD services live.
    */
   const CRUD_SERVICE_NS = 'conductor\service\crud';
 
-  /* The decorated model */
-  private $_model;
+
+  /**
+   * The suffix used for identifying model view interfaces parsed by this class.
+   */
+  const VIEW_SUFFIX = 'Crud';
 
   /*
    * The name of the model's CRUD service.  This is used as the basename of the
@@ -45,15 +43,11 @@ class CrudServiceModelDecorator implements ModelDecorator {
    */
   private $_serviceName;
 
-  /**
-   * ModelDecorator implementation, nothing to do here.
-   */
-  public function decorateProperty(DecoratedProperty $property) {}
+  public function __construct(Model $model) {
+    parent::__construct($model, self::VIEW_SUFFIX);
 
-  /**
-   * ModelDecorator implementation, nothing to do here.
-   */
-  public function decorateRelationship(DecoratedRelationship $relationship) {}
+    $this->_serviceName = $model->getActor() . 'Crud';
+  }
 
   /**
    * Getter for the fully qualified name of the mode's CRUD service class.
@@ -74,13 +68,4 @@ class CrudServiceModelDecorator implements ModelDecorator {
     return $this->_serviceName;
   }
 
-  /**
-   * Set the decorated model, can only be called once.
-   *
-   * @param Model $model
-   */
-  public function initModel(Model $model) {
-    $this->_model = $model;
-    $this->_serviceName = $model->getActor() . 'Crud';
-  }
 }

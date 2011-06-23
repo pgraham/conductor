@@ -20,7 +20,6 @@ use \clarinet\Clarinet;
 use \clarinet\Criteria;
 
 use \conductor\config\Parser;
-use \conductor\model\DecoratedModel;
 use \conductor\model\ModelSet;
 use \conductor\script\Client;
 use \conductor\script\ServiceProxy;

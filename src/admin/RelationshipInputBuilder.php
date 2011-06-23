@@ -35,7 +35,7 @@ class RelationshipInputBuilder {
     $this->_templateLoader = CodeTemplateLoader::get(__DIR__);
   }
 
-  public function build(DecoratedRelationship $relationship) {
+  public function build(Relationship $relationship) {
     $type = $relationship->getType();
     switch ($type) {
       case Relationship::TYPE_MANYTOMANY:
@@ -60,36 +60,38 @@ class RelationshipInputBuilder {
   }
 
   private function _getTemplateValues($relationship) {
-    $model = $relationship->getModel();
+    $lhs = $relationship->getLhs();
+    $lhsInfo = new AdminModelInfo($lhs);
 
-    $rhs = new DecoratedModel($relationship->getRhs());
-    $rhs->decorate(new AdminModelDecorator());
+    $rhs = $relationship->getRhs();
+    $rhsInfo = new AdminModelInfo($rhs);
+    //$rhsCrud = new CrudServiceInfo($rhs);
 
     $values = array(
       // The identifier for the model to which the relationship belongs
-      'model'         => $model->getIdentifier(),
+      'model'         => $lhs->getIdentifier(),
 
       // The identifier for the model on the right side of the relationship
       'rhs'           => $rhs->getIdentifier(),
 
       // The name of the relationship as defined by the model's getter
-      'relationship'  => strtolower($relationship->getLhsProperty()),
+      'relationship'  => $relationship->getLhsProperty(),
 
       // The left side's id property
-      'lhsIdProperty' => strtolower($model->getId()->getName()),
+      'lhsIdProperty' => $lhs->getId()->getName(),
 
       // The right side's ID property
-      'rhsIdProperty' => strtolower($rhs->getId()->getName()),
+      'rhsIdProperty' => $rhs->getId()->getName(),
 
       // The right side's Crud service proxy
       'rhsCrudService' => $rhs->getActor() . 'Crud',
 
       // The label to use for the relationship
-      'label'         => $relationship->getDisplayName(),
+      'label'         => $lhsInfo->getDisplayName(),
 
       // The client-side model property to use to label entities on the
       // right side of the relationship
-      'nameProperty'  => $rhs->getNameProperty()
+      'nameProperty'  => $rhsInfo->getNameProperty()
     );
 
     if ($relationship->getType() === Relationship::TYPE_ONETOMANY) {

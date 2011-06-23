@@ -14,7 +14,7 @@
  */
 namespace conductor\generator;
 
-use \conductor\model\DecoratedModel;
+use \clarinet\model\Model;
 
 use \reed\generator\CodeTemplateLoader;
 use \reed\WebSitePathInfo;
@@ -34,7 +34,7 @@ class CrudServiceBuilder {
    *
    * @param ModelInfo $model
    */
-  public function __construct(DecoratedModel $model, WebSitePathInfo $pathInfo)
+  public function __construct(Model $model, WebSitePathInfo $pathInfo)
   {
     $this->_model = $model;
     $this->_pathInfo = $pathInfo;
@@ -50,12 +50,13 @@ class CrudServiceBuilder {
     $autoloaderPath = $this->_pathInfo->getLibPath()
       . '/conductor/src/Autoloader.php';
 
+    $crudInfo = new CrudServiceInfo($this->_model);
     $templateValues = Array(
       'autoloader' => $autoloaderPath,
-      'class'      => $this->_model->getCrudServiceClass(),
-      'className'  => $this->_model->getCrudServiceName(),
+      'class'      => $crudInfo->getCrudServiceClass(),
+      'className'  => $crudInfo->getCrudServiceName(),
       'model'      => $this->_model->getClass(),
-      'ns'         => CrudServiceModelDecorator::CRUD_SERVICE_NS
+      'ns'         => CrudServiceInfo::CRUD_SERVICE_NS
     );
 
     $templateLoader = CodeTemplateLoader::get(__DIR__);

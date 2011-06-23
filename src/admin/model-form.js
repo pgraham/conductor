@@ -43,7 +43,7 @@ var ${model}_form = function (model) {
     btns = {
       "Save" : function () {
         var props = {}, i, len;
-        props.${idProperty} = model.id;
+        props.${idProperty} = model.${idProperty};
 
         for (i = 0, len = inputs.length; i < len; i += 1) {
           props[inputs[i].name] = inputs[i].getValue();
