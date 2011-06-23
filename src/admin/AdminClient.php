@@ -19,7 +19,7 @@ use \clarinet\model\Model;
 
 use \conductor\generator\CrudServiceGenerator;
 use \conductor\generator\CrudServiceInfo;
-use \conductor\model\ModelSet;
+use \conductor\modeling\ModelSet;
 use \conductor\script\ServiceProxy;
 use \conductor\Resource;
 

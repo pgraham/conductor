@@ -12,7 +12,7 @@
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
  */
-namespace conductor\model;
+namespace conductor\modeling;
 
 use \ArrayAccess;
 use \ArrayIterator;

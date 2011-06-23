@@ -18,7 +18,7 @@ use \ReflectionClass;
 
 use \clarinet\model\Model;
 
-use \conductor\model\ModelView;
+use \conductor\modeling\ModelView;
 
 use \reed\String;
 

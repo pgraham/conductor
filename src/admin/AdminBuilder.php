@@ -15,7 +15,7 @@
 namespace conductor\admin;
 
 use \conductor\generator\CrudServiceInfo;
-use \conductor\model\ModelSet;
+use \conductor\modeling\ModelSet;
 
 /**
  * This class populates the conductor-admin.js template with the given model

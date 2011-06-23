@@ -16,7 +16,7 @@ namespace conductor\generator;
 
 use \clarinet\model\Model;
 
-use \conductor\model\ModelView;
+use \conductor\modeling\ModelView;
 
 /**
  * This class provides information about a model for generating a crud service.

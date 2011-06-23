@@ -20,7 +20,7 @@ use \clarinet\Clarinet;
 use \clarinet\Criteria;
 
 use \conductor\config\Parser;
-use \conductor\model\ModelSet;
+use \conductor\modeling\ModelSet;
 use \conductor\script\Client;
 use \conductor\script\ServiceProxy;
 use \conductor\template\PageTemplate;
@@ -94,7 +94,7 @@ class Conductor {
   }
 
   /**
-   * Retrieve a {link ModelSet} for the model classes defined in the conductor
+   * Retrieve a {@link ModelSet} for the model classes defined in the conductor
    * config.
    *
    * @return ModelSet
