@@ -34,6 +34,11 @@ class ModelEditorBuilder {
   }
 
   public function build(Model $model) {
+    $acceptedDisplayStates = array(
+      AdminModelInfo::DISPLAY_BOTH,
+      AdminModelInfo::DISPLAY_LIST
+    );
+
     $adminModelInfo = new AdminModelInfo($model);
 
     $columns = array();
@@ -41,14 +46,18 @@ class ModelEditorBuilder {
 
     foreach ($model->getProperties() AS $prop) {
       $propId = $prop->getIdentifier();
+      $propInfo = $adminModelInfo->getProperty($propId);
 
-      $columns[] = array(
-        'id'  => array(
-          'field' => $propId,
-          'html'  => true
-        ),
-        'lbl' => $adminModelInfo->getProperty($propId)->getDisplayName()
-      );
+      if (in_array($propInfo->getDisplay(), $acceptedDisplayStates)) {
+
+        $columns[] = array(
+          'id'  => array(
+            'field' => $propId,
+            'html'  => true
+          ),
+          'lbl' => $propInfo->getDisplayName()
+        );
+      }
     }
 
     foreach ($model->getRelationships() AS $rel) {
@@ -56,7 +65,7 @@ class ModelEditorBuilder {
       $relName = $rel->getLhsProperty();
       $relInfo = $adminModelInfo->getRelationship($relId);
 
-      if ($relInfo->getDisplay() !== AdminModelInfo::DISPLAY_NONE) {
+      if (in_array($relInfo->getDisplay(), $acceptedDisplayStates)) {
 
         $columns[] = array(
           'id'  => array(

@@ -29,27 +29,34 @@ class ConfigValue {
   private $_id;
   private $_name;
   private $_value;
+  private $_editable;
 
   /**
    * @Id
-   * @Column(name = id)
    */
   public function getId() {
     return $this->_id;
   }
 
   /**
-   * @Column(name = name)
+   * @Column
    */
   public function getName() {
     return $this->_name;
   }
 
   /**
-   * @Column(name = value)
+   * @Column
    */
   public function getValue() {
     return $this->_value;
+  }
+
+  /**
+   * @Column
+   */
+  public function getEditable() {
+    return $this->_editable;
   }
 
   public function setId($id) {
@@ -63,4 +70,9 @@ class ConfigValue {
   public function setValue($value) {
     $this->_value = $value;
   }
+
+  public function setEditable($editable) {
+    $this->_editable = $editable;
+  }
+
 }

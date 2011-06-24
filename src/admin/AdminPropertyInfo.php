@@ -24,6 +24,9 @@ use \reed\reflection\Annotations;
  */
 class AdminPropertyInfo {
 
+  /* This display state of the property */
+  private $_display;
+
   /* The display names for the property */
   private $_displayNames;
 
@@ -36,6 +39,18 @@ class AdminPropertyInfo {
   public function __construct($name, Annotations $annotations) {
     $this->_displayNames = AdminViewParser::parseDisplayNames($name,
       $annotations);
+
+    $this->_display = AdminViewParser::parseDisplayState($name, $annotations,
+      AdminModelInfo::DISPLAY_BOTH);
+  }
+
+  /**
+   * Getter for the property's display state.
+   *
+   * @return string One of the {@link AdminModelInfo}::DISPLAY_* constants.
+   */
+  public function getDisplay() {
+    return $this->_display;
   }
 
   /**

@@ -29,98 +29,100 @@
       );
     ${done}
 
-    // TODO - Only show the configuration link if the site defines configuration
-    //        options
-    menu.append(
-      $('<li/>')
-        .attr('id', 'config-menu-item')
-        .append(
-          $('<a href="#">Configuration</a>')
-            .click(function () {
-              CDT.admin.configuration_editor().appendTo(ctnt.empty());
-            })
-        )
-    );
+    ${if:showConfig}
+      menu.append(
+        $('<li/>')
+          .attr('id', 'config-menu-item')
+          .append(
+            $('<a href="#">Configuration</a>')
+              .click(function () {
+                CDT.admin.configuration_editor().appendTo(ctnt.empty());
+              })
+          )
+      );
+    ${fi}
 
     menu.menu();
     menu.find('li a').first().click();
   });
 } (jQuery));
 
-(function ($, CDT, undefined) {
-  var configuration_editor, configuration_form;
+${if:showConfig}
+  (function ($, CDT, undefined) {
+    var configuration_editor, configuration_form;
 
-  configuration_editor = function () {
-    var that;
+    configuration_editor = function () {
+      var that;
 
-    that = CDT.modelCollectionGrid({
-      cols : [
-        { 'id' : { 'field' : 'Name', 'html' : true }, 'lbl' : 'Name' },
-        { 'id' : { 'field' : 'Value', 'html' : true }, 'lbl' : 'Value' }
-      ],
-      crudService : window.conductor_model_ConfigValueCrud,
-      idProperty  : 'Id',
-      dataitem    : {},
-      buttons     : {
-        "Edit" : function () {
-          var model = that.getSelected().pop();
+      that = CDT.modelCollectionGrid({
+        cols : [
+          { 'id' : { 'field' : 'Name', 'html' : true }, 'lbl' : 'Name' },
+          { 'id' : { 'field' : 'Value', 'html' : true }, 'lbl' : 'Value' }
+        ],
+        crudService : window.conductor_model_ConfigValueCrud,
+        idProperty  : 'Id',
+        dataitem    : {},
+        buttons     : {
+          "Edit" : function () {
+            var model = that.getSelected().pop();
 
-          if (model !== undefined) {
-            configuration_form(model).on('close', function () {
-              that.refresh();
-            }).show();
+            if (model !== undefined) {
+              configuration_form(model).on('close', function () {
+                that.refresh();
+              }).show();
+            }
           }
         }
-      }
-    });
-
-    return that;
-  };
-
-  configuration_form = function (model) {
-    var that = eventuality({}), dialog;
-
-    dialog = $('<div/>')
-      .attr('title', model.Name)
-      .addClass('cdt-ConfigEditor')
-      .append(
-        $('<textarea />')
-          .attr('name', 'config_value_' + model.Id)
-          .val(model.Value)
-      );
-
-    that.close = function () {
-      dialog.dialog('close');
-      that.fire('close');
-    };
-
-    that.show = function () {
-      dialog.dialog({
-        modal: true,
-        buttons: {
-          "Save" : function () {
-            var props = {}, input;
-
-            input = dialog.find('textarea');
-
-            props.Id = model.Id;
-            props.Name = model.Name;
-            props.Value = input.val() !== '' ? input.val() : null;
-
-            window['conductor_model_ConfigValueCrud'].update(props, that.close);
-          }
-        },
-        width: 505
       });
+
+      return that;
     };
 
-    return that;
-  };
+    configuration_form = function (model) {
+      var that = eventuality({}), dialog;
 
-  if (CDT.admin === undefined) {
-    CDT.admin = {};
-  }
+      dialog = $('<div/>')
+        .attr('title', model.Name)
+        .addClass('cdt-ConfigEditor')
+        .append(
+          $('<textarea />')
+            .attr('name', 'config_value_' + model.Id)
+            .val(model.Value)
+        );
 
-  CDT.admin.configuration_editor = configuration_editor;
+      that.close = function () {
+        dialog.dialog('close');
+        that.fire('close');
+      };
 
-})( jQuery, CDT );
+      that.show = function () {
+        dialog.dialog({
+          modal: true,
+          buttons: {
+            "Save" : function () {
+              var props = {}, input;
+
+              input = dialog.find('textarea');
+
+              props.Id = model.Id;
+              props.Name = model.Name;
+              props.Value = input.val() !== '' ? input.val() : null;
+
+              window['conductor_model_ConfigValueCrud'].update(props, that.close);
+            }
+          },
+          width: 505
+        });
+      };
+
+      return that;
+    };
+
+    if (CDT.admin === undefined) {
+      CDT.admin = {};
+    }
+
+    CDT.admin.configuration_editor = configuration_editor;
+
+  })( jQuery, CDT );
+${fi}

@@ -29,7 +29,7 @@ use \conductor\Conductor;
  */
 class SessionManager {
 
-  const DEFAULT_SESSION_TTL = 1209600; //60 * 60 * 24 * 14 -- 14 days in seconds
+  const DEFAULT_SESSION_TTL = 3600; // 60 * 60 = 1 hour in seconds
 
   private static $keyPrefixChars = "abcdefghijklmnopqrstuvwxyz0123456789";
 

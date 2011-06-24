@@ -31,12 +31,23 @@ use \reed\String;
 class AdminModelInfo extends ModelView {
 
   /**
-   * Constant used to display the property or relationship as editable.  This
-   * means that an input for the property/relationship will be generated and
-   * display in the model's grid as a column as well as in the model's edit
-   * form.  This is the default value for properties.
+   * Constant used to display the property in both the model list and the model
+   * edit form.  This is the default for properties.
+   */
+  const DISPLAY_BOTH = 'both';
+
+  /**
+   * Constant used to display the property in the model edit form.
    */
   const DISPLAY_EDIT = 'edit';
+
+  /**
+   * Constant used to display the property or relationship in the admin
+   * interface as read-only.  This means that the property/relationship will
+   * be displayed in the model's grid as a column but will not be displayed in
+   * the model's edit form.
+   */
+  const DISPLAY_LIST = 'list';
 
   /**
    * Constant used to hide the property or relationship in the admin interface.
@@ -45,14 +56,6 @@ class AdminModelInfo extends ModelView {
    * value for relationships.
    */
   const DISPLAY_NONE = 'none';
-
-  /**
-   * Constant used to display the property or relationship in the admin
-   * interface as read-only.  This means that the property/relationship will
-   * be displayed in the model's grid as a column but will not be displayed in
-   * the model's edit form.
-   */
-  const DISPLAY_READONLY = 'read-only';
 
   /**
    * The suffix used for identifying model view interfaces parsed by this class.

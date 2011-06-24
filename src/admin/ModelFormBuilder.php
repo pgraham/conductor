@@ -35,6 +35,11 @@ class ModelFormBuilder {
   }
 
   public function build(Model $model) {
+    $acceptedDisplayStates = array(
+      AdminModelInfo::DISPLAY_BOTH,
+      AdminModelInfo::DISPLAY_EDIT
+    );
+
     $adminModelInfo = new AdminModelInfo($model);
     $crudInfo = new CrudServiceInfo($model);
 
@@ -48,7 +53,7 @@ class ModelFormBuilder {
       $relName = $rel->getLhsProperty();
       $relInfo = $adminModelInfo->getRelationship($relId);
 
-      if ($relInfo->getDisplay() === AdminModelInfo::DISPLAY_EDIT) {
+      if (in_array($relInfo->getDisplay(), $acceptedDisplayStates)) {
 
         $inputs[] = $relationshipInputBuilder->build($rel);
 
@@ -69,14 +74,17 @@ class ModelFormBuilder {
     $propertyInputBuilder = new PropertyInputBuilder();
     foreach ($model->getProperties() AS $prop) {
       $propId = $prop->getIdentifier();
+      $propInfo = $adminModelInfo->getProperty($propId);
 
-      $properties[] = array(
-        'id' => $propId,
-        'default' => $prop->getDefault() !== null
-          ? $prop->getDefault()
-          : 'null'
-      );
-      $inputs[] = $propertyInputBuilder->build($prop);
+      if (in_array($propInfo->getDisplay(), $acceptedDisplayStates)) {
+        $properties[] = array(
+          'id' => $propId,
+          'default' => $prop->getDefault() !== null
+            ? $prop->getDefault()
+            : 'null'
+        );
+        $inputs[] = $propertyInputBuilder->build($prop);
+      }
     }
 
     $templateValues = Array

@@ -14,6 +14,9 @@
  */
 namespace conductor\admin;
 
+use \clarinet\ActorFactory;
+use \clarinet\Criteria;
+
 use \conductor\generator\CrudServiceInfo;
 use \conductor\modeling\ModelSet;
 
@@ -55,12 +58,20 @@ class AdminBuilder {
       $modelNames[] = $model->getIdentifier();
     }
 
+    // Add ability to perform row count query to persister
+    $c = new Criteria();
+    $c->addEquals('editable', true);
+    $persister = ActorFactory::getActor('persister',
+      'conductor\model\ConfigValue');
+    $configValues = $persister->retrieve($c);
+
     $templateValues = Array
     (
       'models'     => $this->_buildModelJsonArray(),
       'modelNames' => $modelNames,
       'editors'    => $editors,
-      'forms'      => $forms
+      'forms'      => $forms,
+      'showConfig' => count($configValues) > 0
     );
 
     return $templateValues;
