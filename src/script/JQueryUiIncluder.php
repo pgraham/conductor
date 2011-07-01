@@ -30,13 +30,15 @@ use \reed\WebSitePathInfo;
  * components.  If debug mode is on then the scripts are copied from the
  * current development repository found at the specified path.
  *
+ * TODO - Rename this class JsLibIncluder and make it much more generic.  It
+ *        should be a single entry point for including 3rd party javascript
+ *        libraries and their themes.
+ *
  * @author Philip Graham <philip@zeptech.ca>
  */
 class JQueryUiIncluder {
 
-  // TODO - Figure out why this isn't working
-  //public static $SRC_PATH = __DIR__ . '/../../../jquery-ui';
-
+  /* List of all jquery-ui scripts that are included by this class */
   public static $scripts = array(
     '/ui/jquery.ui.core.js',
     '/ui/jquery.ui.widget.js',
@@ -52,12 +54,15 @@ class JQueryUiIncluder {
     '/ui/jquery.ui.dialog.js',
     '/ui/jquery.ui.tabs.js',
     '/ui/jquery.ui.spinner.js',
+    '/ui/jquery.ui.datepicker.js',
+    '/ui/jquery.ui.slider.js',
     '/grid-datamodel/dataitem.js',
     '/grid-datamodel/datastore.js',
     '/grid-datamodel/datasource.js',
     '/grid-datamodel/grid.js'
   );
 
+  /* List of all stylesheets that are included by this class */
   public static $styleSheets = array(
     '/themes/base/jquery.ui.base.css',
     '/themes/base/jquery.ui.core.css',
@@ -85,7 +90,7 @@ class JQueryUiIncluder {
   private $_styleSheets = array();
 
   public function __construct(WebSitePathInfo $pathInfo, $theme = null) {
-    $this->_srcPath = realpath(__DIR__ . '/../../../jquery-ui');
+    $this->_srcPath = $pathInfo->getLibPath() . '/jslib/jquery-ui';
 
     $webTarget = $pathInfo->getWebTarget();
 

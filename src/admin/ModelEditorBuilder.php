@@ -42,7 +42,6 @@ class ModelEditorBuilder {
     $adminModelInfo = new AdminModelInfo($model);
 
     $columns = array();
-    $buttons = array();
 
     foreach ($model->getProperties() AS $prop) {
       $propId = $prop->getIdentifier();
@@ -51,11 +50,9 @@ class ModelEditorBuilder {
       if (in_array($propInfo->getDisplay(), $acceptedDisplayStates)) {
 
         $columns[] = array(
-          'id'  => array(
-            'field' => $propId,
-            'html'  => true
-          ),
-          'lbl' => $propInfo->getDisplayName()
+          'id'   => $propId,
+          'type' => $prop->getType(),
+          'lbl'  => $propInfo->getDisplayName()
         );
       }
     }
@@ -68,16 +65,16 @@ class ModelEditorBuilder {
       if (in_array($relInfo->getDisplay(), $acceptedDisplayStates)) {
 
         $columns[] = array(
-          'id'  => array(
-            'field' => $relName,
-            'html'  => true
-          ),
-          'lbl' => $relInfo->getDisplayName()
+          'id'   => $relName,
+          'type' => 'object',
+          'lbl'  => $relInfo->getDisplayName()
         );
       }
     }
 
     $crudInfo = new CrudServiceInfo($model);
+
+    $buttons = array( 'new', 'edit', 'delete' );
     $templateValues = Array
     (
       'model'       => $model->getIdentifier(),

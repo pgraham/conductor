@@ -31,6 +31,10 @@ class Client {
     $working = new Resource('working.gif', $pathInfo);
     $this->_resources[] = $working;
 
+    // Include utility javscript
+    $this->_resources[] = new Resource('utility.js', $pathInfo);
+
+    // Include the conductor client
     $templateValues = null;
     if (defined('DEBUG') && DEBUG === true) {
       // Prepare template values for conductor.js resource

@@ -59,7 +59,7 @@ class ModelFormBuilder {
 
         if ($rel->getType() === Relationship::TYPE_MANYTOONE) {
           $properties[] = array(
-            'id' => $relId,
+            'id' => $relName,
             'default' => 'null'
           );
         } else {

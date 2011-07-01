@@ -18,6 +18,7 @@ namespace conductor;
 use \conductor\admin\AdminClient;
 use \conductor\auth\AuthorizationException;
 use \conductor\script\JQueryUiIncluder;
+use \conductor\script\JsLibIncluder;
 use \conductor\widget\ModelEditor;
 use \conductor\widget\LoginForm;
 
@@ -107,6 +108,7 @@ class PageLoader {
 
       $jQueryUiIncluder = new JQueryUiIncluder($pathInfo, 'admin');
       $jQueryUiIncluder->addToHead();
+      JsLibIncluder::includeLibs(array('jquery-timepicker', 'datejs'));
 
       $adminClient = new AdminClient(Conductor::getModels(), $pathInfo);
       foreach ($adminClient->getResources() AS $resource) {

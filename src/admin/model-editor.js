@@ -1,51 +1,127 @@
 var ${model}_editor = function () {
-  var that, elm, btns, grid, cols;
+  var that, elm, btns, grid, cols, dataitem;
 
-  cols = ${json:columns};
+  if (typeof ${model} === 'function') {
+    dataitem = ${model}();
+  } else {
+    dataitem = {};
+  }
 
-  that = CDT.modelCollectionGrid({
-    cols        : cols,
-    crudService : window.${crudService},
-    idProperty  : '${idProperty}',
-    dataitem    : typeof ${model} === 'function' ? ${model}() : {},
-    buttons     : {
-      "New" : function () {
-        ${model}_form(null).on('close', function () {
-          that.refresh();
-        }).show();
+  cols = [];
+  ${each:columns AS column}
+    cols.push({
+      id: {
+        field: '${column[id]}',
+        type: '${column[type]}',
+        html: true
       },
-      "Edit" : function () {
-        var model = that.getSelected().pop();
+      lbl: '${column[lbl]}'
+    });
 
-        if (model !== undefined) {
-          ${model}_form(model).on('close', function () {
-            that.refresh();
-          }).show();
-        }
-      },
-      "Delete" : function () {
-        var models = that.getSelected();
-
-        if (models.length > 0) {
-          ${model}_delete(models).show(function () {
-            that.refresh();
-          });
-        }
+    ${if:column[type] = timestamp}
+      // Add a wrapper for the field value that converts the time sent from the
+      // server from UTC to local.
+      if (dataitem['${column[id]}'] === undefined) {
+        dataitem['${column[id]}'] = function () {
+          var local = Date.utcToLocal(this.options.data['${column[id]}']);
+          return local.toString('ddd MMMM dS, yyyy @ H:mm');
+        };
+      } else {
+        dataitem['${column[id]}'] = (function (orig) {
+          return function () {
+            this.options.data['${column[id]}'] = Date.utcToLocal(
+              this.options.data['${column[id]}']);
+            return orig.call(this);
+          };
+        }) ( dataitem['${column[id]}'] );
       }
+    ${fi}
+  ${done}
+
+  grid = CDT.modelSelectionGrid({
+    cols     : cols,
+    dataitem : dataitem,
+    source   : function (request, response) {
+      var srvc = window['${crudService}'];
+
+      srvc.retrieve(request, function (data) {
+        var i, len;
+        for (i = 0, len = data.length; i < len; i += 1) {
+          // The grid widget expects the identifier property to be in a
+          // property called guid
+          data[i].guid = data[i]['${idProperty}'];
+        }
+
+        response(data);
+      });
     }
   });
 
-  /*
-  btns = $('<div/>');
-  ${each:buttons AS button}
-  
-    btns.append(
-      $('<button/>')
-        .attr('type', 'button')
-        .text(${button[lbl]})
-        .click(${button[fn]}));
+  btns = $('<div/>').addClass('cdt-ModelEditorBtns');
+  ${each:buttons as button}
+
+    ${if:button = new}
+      btns.append(
+        $('<button/>')
+          .attr('type', 'button')
+          .text("New")
+          .click(function () {
+            ${model}_form(null).on('close', function () {
+              grid.refresh();
+            }).show();
+          })
+      );
+
+    ${elseif:button = edit}
+      btns.append(
+        $('<button/>')
+          .attr('type', 'button')
+          .text("Edit")
+          .click(function () {
+            var model = grid.getSelected().pop();
+
+            if (model !== undefined) {
+              ${model}_form(model).on('close', function () {
+                grid.refresh();
+              }).show();
+            }
+          })
+      );
+
+    ${elseif:button = delete}
+      btns.append(
+        $('<button/>')
+          .attr('type', 'button')
+          .text("Delete")
+          .click(function () {
+            var models = grid.getSelected();
+
+            if (models.length > 0) {
+              ${model}_delete(models).show(function () {
+                grid.refresh();
+              });
+            }
+          })
+      );
+    ${fi}
+
   ${done}
-  */
+  
+  elm = $('<div/>')
+    .addClass('cdt-ModelEditor')
+    .addClass('ui-widget')
+    .append( btns )
+    .append( grid.elm );
+
+  that = {};
+  that.elm = elm;
+
+  that.appendTo = function (jq) {
+    elm.appendTo(jq);
+  };
+
+  that.refresh = grid.refresh;
+  that.getSelected = grid.getSelected;
 
   return that;
 }
