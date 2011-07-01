@@ -85,31 +85,31 @@ abstract class ModelView {
       $this->_modelInfo = new Annotations();
     }
 
-    if ($this->_classInfo !== null) {
-      foreach ($model->getProperties() AS $property) {
-        $propId = $property->getIdentifier();
-        $methodName = 'get' . $property->getName();
+    foreach ($model->getProperties() AS $property) {
+      $propId = $property->getIdentifier();
+      $methodName = 'get' . $property->getName();
 
-        $annotations = null;
-        if ($this->_classInfo->hasMethod($methodName)) {
-          $method = $this->_classInfo->getMethod($methodName);
-          $this->_propertyInfo[$propId] = new Annotations($method);
-        } else {
-          $this->_propertyInfo[$propId] = new Annotations();
-        }
+      if ($this->_classInfo !== null &&
+          $this->_classInfo->hasMethod($methodName))
+      {
+        $method = $this->_classInfo->getMethod($methodName);
+        $this->_propertyInfo[$propId] = new Annotations($method);
+      } else {
+        $this->_propertyInfo[$propId] = new Annotations();
       }
+    }
 
-      foreach ($model->getRelationships() AS $relationship) {
-        $relId = $relationship->getIdentifier();
-        $methodName = 'get' . $relationship->getLhsProperty();
+    foreach ($model->getRelationships() AS $relationship) {
+      $relId = $relationship->getIdentifier();
+      $methodName = 'get' . $relationship->getLhsProperty();
 
-        $annotations = null;
-        if ($this->_classInfo->hasMethod($methodName)) {
-          $method = $this->_classInfo->getMethod($methodName);
-          $this->_relationshipInfo[$relId] = new Annotations($method);
-        } else {
-          $this->_relationshipInfo[$relId] = new Annotations();
-        }
+      if ($this->_classInfo !== null &&
+          $this->_classInfo->hasMethod($methodName))
+      {
+        $method = $this->_classInfo->getMethod($methodName);
+        $this->_relationshipInfo[$relId] = new Annotations($method);
+      } else {
+        $this->_relationshipInfo[$relId] = new Annotations();
       }
     }
   }
