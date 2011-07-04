@@ -24,7 +24,7 @@ var ${model}_editor = function () {
       if (dataitem['${column[id]}'] === undefined) {
         dataitem['${column[id]}'] = function () {
           var local = Date.utcToLocal(this.options.data['${column[id]}']);
-          return local.toString('ddd MMMM dS, yyyy @ H:mm');
+          return local.toString('MMM dS, yyyy @ H:mm');
         };
       } else {
         dataitem['${column[id]}'] = (function (orig) {
