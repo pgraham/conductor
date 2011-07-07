@@ -18,6 +18,7 @@ use \DirectoryIterator;
 use \RecursiveIteratorIterator;
 use \RecursiveDirectoryIterator;
 
+use \conductor\Conductor;
 use \conductor\Exception;
 
 use \oboe\head\Javascript;
@@ -98,7 +99,7 @@ class JQueryUiIncluder {
     $this->_jsOutputPath = $webTarget . '/js';
     $this->_pathInfo = $pathInfo;
 
-    if (defined('DEBUG') && DEBUG === true) {
+    if (Conductor::isDebug()) {
       $this->_compile($pathInfo, $theme);
     }
 

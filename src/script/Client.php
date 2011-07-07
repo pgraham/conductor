@@ -14,6 +14,7 @@
  */
 namespace conductor\script;
 
+use \conductor\Conductor;
 use \conductor\Resource;
 
 use \reed\WebSitePathInfo;
@@ -36,7 +37,7 @@ class Client {
 
     // Include the conductor client
     $templateValues = null;
-    if (defined('DEBUG') && DEBUG === true) {
+    if (Conductor::isDebug()) {
       // Prepare template values for conductor.js resource
       $workingImgInfo = getimagesize($working->getFsPath());
       $templateValues = array(

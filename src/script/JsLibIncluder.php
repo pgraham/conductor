@@ -104,7 +104,7 @@ class JsLibIncluder {
     $cssOutputPath = $webTarget . '/css';
     $jsOutputPath = $webTarget . '/js';
 
-    if (defined('DEBUG') && DEBUG === true) {
+    if (Conductor::isDebug()) {
       $this->_compile($pathInfo, $srcPath, $jsOutputPath, $scripts);
       $this->_compile($pathInfo, $srcPath, $cssOutputPath, $sheets);
     }

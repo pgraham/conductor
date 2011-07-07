@@ -21,6 +21,7 @@ use \conductor\generator\CrudServiceGenerator;
 use \conductor\generator\CrudServiceInfo;
 use \conductor\modeling\ModelSet;
 use \conductor\script\ServiceProxy;
+use \conductor\Conductor;
 use \conductor\Resource;
 
 use \oboe\item\Body as BodyItem;
@@ -104,7 +105,7 @@ class AdminClient extends Composite implements BodyItem {
     WebSitePathInfo $pathInfo)
   {
 
-    if (!defined('DEBUG') || DEBUG !== true) {
+    if (Conductor::isDebug()) {
       return null;
     }
 
