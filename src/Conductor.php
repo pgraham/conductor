@@ -90,7 +90,18 @@ class Conductor {
 
     $persister = ActorFactory::getActor('persister',
       'conductor\model\ConfigValue');
-    return $persister->retrieve($c);
+
+    $values = $persister->retrieve($c);
+    $idxd = array();
+    foreach ($values AS $value) {
+      $valName = $value->getName();
+
+      $valName = substr($valName, strpos($valName, '.') + 1);
+
+      $idxd[$valName] = $value;
+    }
+
+    return $idxd;
   }
 
   /**

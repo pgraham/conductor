@@ -16,6 +16,7 @@
 namespace conductor\admin;
 
 use \clarinet\model\Model;
+use \clarinet\model\Parser as ModelParser;
 
 use \conductor\generator\CrudServiceGenerator;
 use \conductor\generator\CrudServiceInfo;
@@ -61,7 +62,7 @@ class AdminClient extends Composite implements BodyItem {
   public function __construct(ModelSet $models, WebSitePathInfo $pathInfo) {
 
     // Compile the admin client.
-    $configValueModel = new Model('conductor\model\ConfigValue');
+    $configValueModel = ModelParser::getModel('conductor\model\ConfigValue');
     $templateValues = $this->_compile($models, $configValueModel, $pathInfo);
 
     $this->initElement(new Div('cdt-Admin'));
@@ -105,7 +106,7 @@ class AdminClient extends Composite implements BodyItem {
     WebSitePathInfo $pathInfo)
   {
 
-    if (Conductor::isDebug()) {
+    if (!Conductor::isDebug()) {
       return null;
     }
 

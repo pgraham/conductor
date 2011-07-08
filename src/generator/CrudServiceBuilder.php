@@ -56,7 +56,8 @@ class CrudServiceBuilder {
       'class'      => $crudInfo->getCrudServiceClass(),
       'className'  => $crudInfo->getCrudServiceName(),
       'model'      => $this->_model->getClass(),
-      'ns'         => CrudServiceInfo::CRUD_SERVICE_NS
+      'ns'         => CrudServiceInfo::CRUD_SERVICE_NS,
+      'idColumn'   => $this->_model->getId()->getColumn()
     );
 
     $templateLoader = CodeTemplateLoader::get(__DIR__);
