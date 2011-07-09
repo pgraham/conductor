@@ -1,0 +1,93 @@
+html, body {
+  height: 100%;
+}
+body {
+  background-image: -webkit-linear-gradient(top, #DDD, #FFF 100px);
+  background-image: -moz-linear-gradient(top, #DDD, #FFF 100px);
+  background-image: linear-gradient(top, #DDD, #FFF 100px);
+}
+
+#loginWrap {
+  position:relative;
+  width: 460px;
+  margin:200px auto;
+  border: 5px solid #CCC;
+  padding: 0px;
+
+  -webkit-border-radius: 20px;
+  -moz-border-radius: 20px;
+  border-radius: 20px;
+}
+#loginContainer {
+  padding: 15px 30px;
+
+  border: 1px solid #76ACE8;
+
+  -webkit-border-radius: 15px;
+  -moz-border-radius: 15px;
+  border-radius: 15px;
+}
+
+#login .cdt-Caption {
+  text-align: center;
+  margin-bottom: 20px;
+
+  color: #777;
+  font-family: 'OFL Sorts Mill Goudy TT', serif;
+  font-size: 24px;
+}
+
+#login .cdt-FormInputContainer {
+  font-family: 'Varela', sans-serif;
+}
+
+#login .cdt-FormInputContainer .cdt-Label {
+  float: left;
+  width: 110px;
+  line-height: 25px;
+
+  color: #032244;
+  font-size: 18px;
+  text-align: right;
+}
+
+#login .cdt-FormInputContainer .cdt-FormInput {
+  margin-left: 150px;
+}
+
+#login .cdt-FormInputContainer .cdt-FormInput .cdt-TextInput {
+  width: 220px;
+  height: 25px;
+  margin-bottom: 10px;
+  padding-left: 4px;
+  border: 1px solid #1C5493;
+
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+
+  background-color: #F9DFB9;
+
+  color: #1C5493;
+  font-size: 18px;
+}
+
+#login .cdt-FormSubmitContainer {
+  text-align: center;
+}
+#login .cdt-FormSubmitContainer .cdt-Submit {
+  border: 1px solid #1C5493;
+  padding: 4px 25px;
+  margin-top: 20px;
+
+  background-image: -webkit-linear-gradient(top, #B1CBE8, #76ACE8);
+  background-image: -moz-linear-gradient(top, #B1CBE8, #76ACE8);
+  background-image: linear-gradient(top, #B1CBE8, #76ACE8);
+
+  color: #032244;
+  font-size: 16px;
+
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+}

@@ -74,6 +74,7 @@ class JQueryUiIncluder {
     '/themes/base/jquery.ui.datepicker.css',
     '/themes/base/jquery.ui.dialog.css',
     '/themes/base/jquery.ui.menu.css',
+    '/themes/base/jquery.ui.menubar.css',
     '/themes/base/jquery.ui.progressbar.css',
     '/themes/base/jquery.ui.resizable.css',
     '/themes/base/jquery.ui.selectable.css',

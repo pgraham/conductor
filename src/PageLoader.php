@@ -22,6 +22,8 @@ use \conductor\script\JsLibIncluder;
 use \conductor\widget\ModelEditor;
 use \conductor\widget\LoginForm;
 
+use \oboe\head\Stylesheet;
+
 use \reed\FsToWebPathConverter;
 
 /**
@@ -93,15 +95,15 @@ class PageLoader {
   /**
    * Load the admin interface for the models defined in conductor.cfg.xml.
    *
-   * @param boolean $async If this loadPage request is part of an asynchronous
-   *   request. Default: false.
+   * This will not have the desired effect if invoked as part of an
+   * asynchronous request.
    */
-  public static function loadAdmin($async = false) {
+  public static function loadAdmin() {
     try {
       Conductor::init();
 
       if (!Auth::hasPermission('cdt-admin')) {
-        throw new AuthorizationException("Please login.");
+        throw new AuthorizationException("Please login");
       }
 
       $pathInfo = Conductor::$config['pathInfo'];
@@ -117,8 +119,7 @@ class PageLoader {
 
       $adminClient->addToBody();
     } catch (AuthorizationException $e) {
-      $loginForm = self::_buildLoginForm($e, $async);
-      $loginForm->addToBody();
+      self::loadLogin($e->getMessage());
     }
   }
 
@@ -144,5 +145,23 @@ class PageLoader {
   public static function loadLogin($msg = null) {
     $login = new LoginForm($msg);
     $login->addToBody();
+
+    $pathInfo = Conductor::$config['pathInfo'];
+
+    $js = new Resource('login.js', $pathInfo);
+    $js->addToHead();
+
+    $css = new Resource('login.css', $pathInfo);
+    $css->addToHead();
+
+    $fonts = array(
+      'http://fonts.googleapis.com/css?family=OFL+Sorts+Mill+Goudy+TT&v1',
+      'http://fonts.googleapis.com/css?family=Varela&v1'
+    );
+
+    foreach ($fonts AS $font) {
+      $fontCss = new Stylesheet($font);
+      $fontCss->addToHead();
+    }
   }
 }
