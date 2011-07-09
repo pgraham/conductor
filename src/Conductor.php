@@ -123,12 +123,7 @@ class Conductor {
     }
     self::$_initialized = true;
 
-    // TODO - If any of these files don't exist output a better error message
-    $libPath = __DIR__ . '/../../';
-    require_once $libPath . '/reed/src/Autoloader.php';
-    require_once $libPath . '/oboe/src/Autoloader.php';
-    require_once $libPath . '/bassoon/src/Autoloader.php';
-    require_once $libPath . '/clarinet/src/Autoloader.php';
+    Loader::loadDependencies(); 
 
     // Load the site's configuration from the defined/default path
     if ($configPath === null) {
