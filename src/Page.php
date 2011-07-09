@@ -17,6 +17,8 @@ namespace conductor;
 
 use \conductor\template\PageTemplate;
 use \conductor\template\TemplateValidator;
+use \conductor\Conductor;
+
 use \oboe\item;
 
 /**
@@ -192,7 +194,7 @@ class Page extends \oboe\Page {
         'Cannot set the page template more than once');
     }
 
-    if (defined('DEBUG') && DEBUG === true) {
+    if (Conductor::isDebug()) {
       $validator = new TemplateValidator($template);
       $validator->validate();
     }

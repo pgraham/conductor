@@ -47,15 +47,32 @@ class ModelFormBuilder {
     $inputs = array();
     $tabs = array();
 
-    $relationshipInputBuilder = new RelationshipInputBuilder();
+    $relInputs = array();
     foreach ($model->getRelationships() AS $rel) {
+      $modelId = $rel->getLhs()->getIdentifier();
+
       $relId = $rel->getIdentifier();
       $relName = $rel->getLhsProperty();
       $relInfo = $adminModelInfo->getRelationship($relId);
 
+      $lhs = $rel->getLhs();
+      $rhs = $rol->getRhs();
+      $rhsInfo = new AdminModelInfo($rhs);
+
       if (in_array($relInfo->getDisplay(), $acceptedDisplayStates)) {
 
-        $inputs[] = $relationshipInputBuilder->build($rel);
+        $relInputs = array(
+          'type'           => $rel->getType(),
+          'name'           => "{$modelId}_{$relName}_input",
+          'relationship'   => $relName,
+          'label'          => $adminModelInfo->getDisplayName(),
+          'lhsIdProperty'  => $lhs->getId()->getName(),
+          'rhs'            => $rhs->getIdentifier(),
+          'rhsIdProperty'  => $rhs->getId()->getName(),
+          'rhsCrudService' => $rhs->getActor() . 'Crud',
+          'rhsColumn'      => $rel->getRhsColumn(),
+          'nameProperty'   => $rhsInfo->getNameProperty()
+        );
 
         if ($rel->getType() === Relationship::TYPE_MANYTOONE) {
           $properties[] = array(
@@ -63,7 +80,7 @@ class ModelFormBuilder {
             'default' => 'null'
           );
         } else {
-          $tabs = "inputs.push("
+          $tabs[] = "inputs.push("
             . "{$model->getIdentifier()}_{$relName}_input(model));\n"
             . "tabs['{$relInfo->getDisplayName()}'] = "
             . "inputs[inputs.length - 1].elm;";
@@ -71,8 +88,10 @@ class ModelFormBuilder {
       }
     }
 
-    $propertyInputBuilder = new PropertyInputBuilder();
+    $propInputs = array();
     foreach ($model->getProperties() AS $prop) {
+      $modelId = $prop->getModel()->getIdentifier();
+
       $propId = $prop->getIdentifier();
       $propInfo = $adminModelInfo->getProperty($propId);
 
@@ -83,7 +102,14 @@ class ModelFormBuilder {
             ? $prop->getDefault()
             : 'null'
         );
-        $inputs[] = $propertyInputBuilder->build($prop);
+
+        $propInputs[] = array(
+          'type' => $prop->getType(),
+          'name' => "{$modelId}_{$propId}_input",
+          'property' => $propId,
+          'label'    => $propInfo->getDisplayName()
+        );
+
       }
     }
 
@@ -93,7 +119,8 @@ class ModelFormBuilder {
       'singular'       => $adminModelInfo->getDisplayName(),
       'properties'     => $properties,
       'numProperties'  => count($properties),
-      'inputs'         => $inputs,
+      'propInputs'     => $propInputs,
+      'relInputs'      => $relInputs,
       'tabs'           => $tabs,
       'crudServiceVar' => $crudInfo->getCrudServiceName(),
       'idProperty'     => $model->getId()->getIdentifier()

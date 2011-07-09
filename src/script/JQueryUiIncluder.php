@@ -18,6 +18,7 @@ use \DirectoryIterator;
 use \RecursiveIteratorIterator;
 use \RecursiveDirectoryIterator;
 
+use \conductor\Conductor;
 use \conductor\Exception;
 
 use \oboe\head\Javascript;
@@ -73,6 +74,7 @@ class JQueryUiIncluder {
     '/themes/base/jquery.ui.datepicker.css',
     '/themes/base/jquery.ui.dialog.css',
     '/themes/base/jquery.ui.menu.css',
+    '/themes/base/jquery.ui.menubar.css',
     '/themes/base/jquery.ui.progressbar.css',
     '/themes/base/jquery.ui.resizable.css',
     '/themes/base/jquery.ui.selectable.css',
@@ -98,7 +100,7 @@ class JQueryUiIncluder {
     $this->_jsOutputPath = $webTarget . '/js';
     $this->_pathInfo = $pathInfo;
 
-    if (defined('DEBUG') && DEBUG === true) {
+    if (Conductor::isDebug()) {
       $this->_compile($pathInfo, $theme);
     }
 

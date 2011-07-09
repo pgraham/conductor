@@ -102,7 +102,7 @@ class LoginForm extends Composite implements item\Body {
     }
     $loginBtn->setClass('cdt-Submit');
 
-    $submit = new Div(null, 'cdt-FormInputContainer');
+    $submit = new Div(null, 'cdt-FormSubmitContainer');
     $submit->add($loginBtn);
 
     $this->elm->add($username);

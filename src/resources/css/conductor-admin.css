@@ -44,9 +44,11 @@ td, th {
 
 .cdt-TabbedDialog fieldset input,
 .cdt-TabbedDialog fieldset textarea,
-.cdt-TabbedDialog fieldset select {
+.cdt-TabbedDialog fieldset select,
+.cdt-TabbedDialog fieldset .ui-spinner {
   display: block;
   margin:5px 0 5px 150px;
+  padding:2px 3px;
 }
 
 .cdt-TabbedDialog fieldset input {
@@ -56,7 +58,17 @@ td, th {
 .cdt-TabbedDialog fieldset input.text,
 .cdt-TabbedDialog fieldset textarea,
 .cdt-TabbedDialog fieldset select {
-  width: 300px;
+  width: 400px;
+}
+.cdt-TabbedDialog fieldset textarea {
+  height: 200px;
+}
+
+.cdt-TabbedDialog fieldset .ui-spinner {
+  width: 100px;
+}
+.cdt-TabbedDialog fieldset .ui-spinner input {
+  margin:0;
 }
 
 .cdt-ModelDualGrid .cdt-ModelEditorGrid,

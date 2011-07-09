@@ -90,7 +90,18 @@ class Conductor {
 
     $persister = ActorFactory::getActor('persister',
       'conductor\model\ConfigValue');
-    return $persister->retrieve($c);
+
+    $values = $persister->retrieve($c);
+    $idxd = array();
+    foreach ($values AS $value) {
+      $valName = $value->getName();
+
+      $valName = substr($valName, strpos($valName, '.') + 1);
+
+      $idxd[$valName] = $value;
+    }
+
+    return $idxd;
   }
 
   /**
@@ -115,8 +126,8 @@ class Conductor {
    */
   public static function init($configPath = null) {
     if (self::$_initialized) {
-      if (defined('DEBUG') && DEBUG === true) {
-        // TODO - Give a warning if DEBUG is defined and set to true
+      if (self::isDebug()) {
+        // TODO - Give a warning if in debug mode
         // TODO - Add logging interface to Reed that can be used for this
       }
       return;
@@ -140,11 +151,23 @@ class Conductor {
       require_once self::$config['autoloader'];
     }
 
+    // Set options for debug mode.
+    if (self::isDebug()) {
+      ini_set('display_errors', 'on');
+      ini_set('html_errors', 'on');
+
+      assert_options(ASSERT_ACTIVE, 1);
+      assert_options(ASSERT_WARNING, 1);
+      assert_options(ASSERT_BAIL, 0);
+      assert_options(ASSERT_QUIET_EVAL, 0);
+    }
+
     // Initialize clarinet
     Clarinet::init(array
       (
         'pdo'        => self::$config['pdo'],
-        'outputPath' => $pathInfo->getTarget()
+        'outputPath' => $pathInfo->getTarget(),
+        'debug'      => self::$config['debug']
       )
     );
 
@@ -158,7 +181,7 @@ class Conductor {
     //      parser needs to be updated to support specifying global and page
     //      level scripts
     $jQueryName = 'jquery.min.js';
-    if (defined('DEBUG') && DEBUG === true) {
+    if (self::isDebug()) {
       $jQueryName = 'jquery.js';
     }
 
@@ -174,6 +197,15 @@ class Conductor {
 
     $reset = new Resource('reset.css', $pathInfo);
     $reset->addToHead();
+  }
+
+  /**
+   * Getter for whether or not the site is operating in DEBUG mode.
+   *
+   * @return boolean
+   */
+  public static function isDebug() {
+    return self::$config['debug'];
   }
 
   /**

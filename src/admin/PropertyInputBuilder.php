@@ -21,71 +21,25 @@ use \conductor\Exception;
 use \reed\generator\CodeTemplateLoader;
 
 /**
+ * Builds parameter arrays for populating the inputs section of the
+ * model-form.js template
  * Populator for the property-input-*.js templates.
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
 class PropertyInputBuilder {
-  
-  private $_templateLoader;
-
-  public function __construct() {
-    $this->_templateLoader = CodeTemplateLoader::get(__DIR__);
-  }
 
   public function build(Property $property) {
-    $type = $property->getType();
+    $propName = $property->getIdentifier();
 
-    switch ($type) {
-      case Property::TYPE_BOOLEAN:
-      $template = 'property-input-boolean.js';
-      break;
-
-      case Property::TYPE_DATE:
-      $template = 'property-input-date.js';
-      break;
-
-      case Property::TYPE_DECIMAL:
-      $template = 'property-input-decimal.js';
-      break;
-
-      case Property::TYPE_FLOAT:
-      $template = 'property-input-float.js';
-      break;
-
-      case Property::TYPE_INTEGER:
-      $template = 'property-input-integer.js';
-      break;
-
-      case Property::TYPE_STRING:
-      $template = 'property-input-string.js';
-      break;
-
-      case Property::TYPE_TEXT:
-      $template = 'property-input-text.js';
-      break;
-
-      case Property::TYPE_TIMESTAMP:
-      $template = 'property-input-timestamp.js';
-      break;
-
-      default:
-      assert("false /*Unrecognized property type: $type */");
-      return '';
-    }
-
-    return $this->_templateLoader->load($template,
-      $this->_getTemplateValues($property));
-  }
-
-  private function _getTemplateValues($property) {
     $adminModelInfo = new AdminModelInfo($property->getModel());
     $propInfo = $adminModelInfo->getProperty($property->getIdentifier());
+
     return array(
-      'model'    => $property->getModel()->getIdentifier(),
-      'property' => $property->getIdentifier(),
-      'label'    => $propInfo->getDisplayName(),
-      'default'  => $property->getDefault()
+      'type' => $property->getType(),
+      'name' => "{$modelName}_{$propName}_input",
+      'property' => $propName,
+      'label'    => $propInfo->getDisplayName()
     );
   }
 }

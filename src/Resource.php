@@ -68,8 +68,7 @@ class Resource {
     $resourceType = $this->_determineResourceType($resource);
     $this->_fsPath = $this->_determineFsPath($resource, $resourceType);
 
-
-    if (defined('DEBUG') && DEBUG === true) {
+    if (Conductor::isDebug()) {
       $resourceTarget = $pathInfo->getWebTarget();
       if ($resourceType !== null) {
         $resourceTarget .= "/$resourceType";

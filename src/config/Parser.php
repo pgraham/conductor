@@ -45,6 +45,9 @@ class Parser {
     // model files so we need to resolve its 'real' path.
     $pathRoot = realpath(dirname($configPath));
 
+    // Set debug mode
+    $cfg['debug'] = isset($xmlCfg->debug);
+
     // Set the web site's title
     if (isset($xmlCfg->title)) {
       $cfg['title'] = $xmlCfg->title->__toString();

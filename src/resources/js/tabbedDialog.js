@@ -52,7 +52,7 @@ CDT.tabbedDialog = function (spec) {
       modal: true,
       buttons: spec.btns,
       dialogClass: 'cdt-TabbedDialog',
-      width:505
+      width:605
     });
   };
   that.show = show;
