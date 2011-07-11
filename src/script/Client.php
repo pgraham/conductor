@@ -14,6 +14,8 @@
  */
 namespace conductor\script;
 
+use \conductor\compile\ClientCompiler;
+use \conductor\compile\Compilable;
 use \conductor\Conductor;
 use \conductor\Resource;
 
@@ -24,36 +26,34 @@ use \reed\WebSitePathInfo;
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class Client {
+class Client implements Compilable {
 
   private $_resources = array();
 
-  public function __construct(WebSitePathInfo $pathInfo) {
-    $working = new Resource('working.gif', $pathInfo);
-    $this->_resources[] = $working;
-
-    // Include utility javscript
-    $this->_resources[] = new Resource('utility.js', $pathInfo);
-
-    // Include the conductor client
-    $templateValues = null;
-    if (Conductor::isDebug()) {
-      // Prepare template values for conductor.js resource
-      $workingImgInfo = getimagesize($working->getFsPath());
-      $templateValues = array(
-        'rootPath'    => $pathInfo->getWebRoot(),
-        'targetPath'  => $pathInfo->getWebAccessibleTarget(),
-        'imgWidth'    => $workingImgInfo[0],
-        'imgHeight'   => $workingImgInfo[1]
-      );
-    }
-    $this->_resources[] = new Resource('conductor.js', $pathInfo,
-      $templateValues);
+  public function __construct() {
+    // Don't do auto compile here as this class is instantiated by the site
+    // compiler.  Auto compile is instead done in the addToPage method when it
+    // is more certain that we are operating in a Conductor::init environment.
+    $this->_resources['working'] = new Resource('working.gif');
+    $this->_resources['utility'] = new Resource('utility.js');
+    $this->_resources['client'] = new Resource('conductor.js');
   }
 
-  public function addToHead() {
-    foreach ($this->_resources AS $resource) {
-      $resource->addToHead();
+  public function addToPage() {
+    if (Conductor::isDebug()) {
+      $this->_compile(Conductor::$config['pathInfo']);
     }
+
+    $this->_resources['utility']->addToPage();
+    $this->_resources['client']->addToPage();
+  }
+
+  public function compile(WebSitePathInfo $pathInfo, array $values = null) {
+    $compiler = new ClientCompiler($this);
+    $compiler->compile($pathInfo, $values);
+  }
+
+  public function getResources() {
+    return $this->_resources;
   }
 }

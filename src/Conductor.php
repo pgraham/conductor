@@ -176,8 +176,8 @@ class Conductor {
       . self::JQUERY_VERSION . DIRECTORY_SEPARATOR . $jQueryName);
     $jQuery->addToHead();
 
-    $client = new Client($pathInfo);
-    $client->addToHead();
+    $client = new Client();
+    $client->addToPage();
 
     $service = new ServiceProxy('conductor\Service', $pathInfo);
     $service->addToHead();

@@ -14,6 +14,9 @@
  */
 namespace conductor;
 
+use \conductor\compile\Compilable;
+use \conductor\compile\ResourceCompiler;
+
 use \oboe\head\Javascript;
 use \oboe\head\StyleSheet;
 use \oboe\item\Body as BodyItem;
@@ -35,7 +38,7 @@ use \reed\WebSitePathInfo;
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class Resource {
+class Resource implements Compilable {
 
   public static $IMG_TYPES = array(
     'png',
@@ -44,9 +47,66 @@ class Resource {
     'jpeg'
   );
 
+  /**
+   * Determine the file system path for a specified resource within the
+   * resources directory structure.
+   *
+   * @param string $resource
+   * @return string Absolute path to the specified resource, false if the
+   *   resource does not exist.
+   */
+  public static function getResourcePath($resource) {
+    $type = self::getResourceType($resource);
+
+    if (strpos($resource, '/') === false) {
+      // Resource is within the resources directory structure
+      if ($type === null) {
+        return __DIR__ . "/resources/$resource";
+      } else {
+        return __DIR__ . "/resources/$type/$resource";
+      }
+    } else if (substr($resource, 0, 1) === '/') {
+      // Resource is specified as absolute
+      return $resource;
+    } else {
+      // Resource is specified as relative to the resources directory
+      return __DIR__ . "/resources/$resource";
+    }
+  }
+
+  /**
+   * Determine the type of the given resource.  Either js, css, img or null for
+   * unsupported.
+   *
+   * @param string $resource
+   * @return string The type of the given resource or null if unrecognized.
+   */
+  public static function getResourceType($resource) {
+    $resourceParts = explode('.', $resource);
+    $resourceType = array_pop($resourceParts);
+
+    if ($resourceType === 'css' || $resourceType === 'js') {
+      return $resourceType;
+    }
+
+    if (in_array($resourceType, self::$IMG_TYPES)) {
+      return 'img';
+    }
+
+    return null;
+  }
+
+  /*
+   * ===========================================================================
+   * Instance
+   * ===========================================================================
+   */
+
   private $_elm;
 
-  private $_fsPath;
+  private $_name;
+
+  private $_type;
 
   /**
    * Construct a new resource wrapper.  If DEBUG mode is enabled, then the
@@ -55,47 +115,34 @@ class Resource {
    * provided then they are substituted into the source before being output.
    *
    * @param string $resource The name of the resource.
-   * @param WebSitePathInfo $pathInfo Encapsulated path information about the
-   *   web site.
-   * @param array $templateValues Array of substitution values if the identified
-   *   resource is a template.  This only has an effect if DEBUG mode is
-   *   enabled.
    */
-  public function __construct($resource, WebSitePathInfo $pathInfo,
-      array $templateValues = null)
-  {
-    $resourceName = basename($resource);
-    $resourceType = $this->_determineResourceType($resource);
-    $this->_fsPath = $this->_determineFsPath($resource, $resourceType);
+  public function __construct($resource) {
+    $this->_name = basename($resource);
+    $this->_type = self::getResourceType($resource);
+  }
+
+  /** 
+   * Add the encapsulated resource to the page.  If the resource is an image it
+   * will be appended to the page body, otherwise if it is a javascript or
+   * stylesheet it will be added to the page head.  This function does nothing
+   * for unsupported resource types.
+   */
+  public function addToPage() {
+    $pathInfo = Conductor::$config['pathInfo'];
 
     if (Conductor::isDebug()) {
-      $resourceTarget = $pathInfo->getWebTarget();
-      if ($resourceType !== null) {
-        $resourceTarget .= "/$resourceType";
-        if (!file_exists($resourceTarget)) {
-          mkdir($resourceTarget, 0755, true);
-        }
-      }
-
-      if ($templateValues === null) {
-        copy($this->_fsPath, "$resourceTarget/$resourceName");
-      } else {
-        $templateLoader = CodeTemplateLoader::get(dirname($this->_fsPath));
-        $resourceContent = $templateLoader->load($resourceName,
-          $templateValues);
-
-        file_put_contents("$resourceTarget/$resourceName", $resourceContent);
-      }
+      $compiler = new ResourceCompiler($this);
+      $compiler->compile($pathInfo);
     }
 
     $webPath = $pathInfo->getWebAccessibleTarget();
-    if ($resourceType !== null) {
-      $resourcePath = "$webPath/$resourceType/$resourceName";
+    if ($this->_type !== null) {
+      $resourcePath = "$webPath/{$this->_type}/{$this->_name}";
     } else {
-      $resourcePath = "$webPath/$resourceName";
+      $resourcePath = "$webPath/{$this->_name}";
     }
 
-    switch ($resourceType) {
+    switch ($this->_type) {
       case 'css':
       $this->_elm = new StyleSheet($resourcePath);
       break;
@@ -111,61 +158,35 @@ class Resource {
       default:
       $this->_elm = null;
     }
-  }
 
-  /**
-   * If the represented resource is capable of being added to the <head/>
-   * element then add it.  This method does nothing for image and
-   * unrecognized resource types.
-   */
-  public function addToHead() {
     if ($this->_elm === null) {
       return;
     }
 
     if ($this->_elm instanceof HeadItem) {
       $this->_elm->addToHead();
-    }
-
-    // Images are not added to the page in this since it is likely that
-    // the image resource is reference by a stylesheet, but does not get
-    // included in the page an an <img/> element
-  }
-
-  public function getFsPath() {
-    return $this->_fsPath;
-  }
-
-  private function _determineFsPath($resource, $resourceType) {
-    if (strpos($resource, '/') === false) {
-      // Resource is specified as either a supported type or in
-      // the resource directory for unsupported types.
-      if ($resourceType === null) {
-        return __DIR__ . "/resources/$resource";
-      } else {
-        return __DIR__ . "/resources/$resourceType/$resource";
-      }
-    } else if (substr($resource, 0, 1) === '/') {
-      // Resource is specified as absolute
-      return $resource;
-    } else {
-      // Resource is specified as relative to the resources directory
-      return __DIR__ . "/resources/$resource";
+    } else if ($this->_elm instanceof BodyItem) {
+      $this->_elm->addToBody();
     }
   }
 
-  private function _determineResourceType($resource) {
-    $resourceParts = explode('.', $resource);
-    $resourceType = array_pop($resourceParts);
+  /**
+   * Compile this resource by copying it to the site's 
+   *
+   * @param WebSitePathInfo $pathInfo Encapsulated path information about the
+   *   web site.
+   * @param array $values Symbol table for resource compilation.
+   */
+  public function compile(WebSitePathInfo $pathInfo, array $values = null) {
+    $compiler = new ResourceCompiler($this);
+    $compiler->compile($pathInfo, $values);
+  }
 
-    if ($resourceType === 'css' || $resourceType === 'js') {
-      return $resourceType;
-    }
+  public function getName() {
+    return $this->_name;
+  }
 
-    if (in_array($resourceType, self::$IMG_TYPES)) {
-      return 'img';
-    }
-
-    return null;
+  public function getType() {
+    return $this->_type;
   }
 }
