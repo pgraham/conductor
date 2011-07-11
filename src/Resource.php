@@ -102,6 +102,15 @@ class Resource implements Compilable {
    * ===========================================================================
    */
 
+  // TODO Create support code for compilables that handles this
+  /*
+   * Since Resources are often part of composite compilables, this ensures that
+   * each instance of a resource is only compiled once when running in debug
+   * mode where it is likely that the resource will be compiled explicitely by
+   * the composite and implicitely when it is added to the page.
+   */
+  private $_compiled = false;
+
   private $_elm;
 
   private $_name;
@@ -117,7 +126,7 @@ class Resource implements Compilable {
    * @param string $resource The name of the resource.
    */
   public function __construct($resource) {
-    $this->_name = basename($resource);
+    $this->_name = $resource;
     $this->_type = self::getResourceType($resource);
   }
 
@@ -131,15 +140,15 @@ class Resource implements Compilable {
     $pathInfo = Conductor::$config['pathInfo'];
 
     if (Conductor::isDebug()) {
-      $compiler = new ResourceCompiler($this);
-      $compiler->compile($pathInfo);
+      $this->compile($pathInfo);
     }
 
     $webPath = $pathInfo->getWebAccessibleTarget();
+    $name = basename($this->_name);
     if ($this->_type !== null) {
-      $resourcePath = "$webPath/{$this->_type}/{$this->_name}";
+      $resourcePath = "$webPath/{$this->_type}/$name";
     } else {
-      $resourcePath = "$webPath/{$this->_name}";
+      $resourcePath = "$webPath/$name";
     }
 
     switch ($this->_type) {
@@ -178,6 +187,11 @@ class Resource implements Compilable {
    * @param array $values Symbol table for resource compilation.
    */
   public function compile(WebSitePathInfo $pathInfo, array $values = null) {
+    if ($this->_compiled) {
+      return;
+    }
+    $this->_compiled = true;
+
     $compiler = new ResourceCompiler($this);
     $compiler->compile($pathInfo, $values);
   }

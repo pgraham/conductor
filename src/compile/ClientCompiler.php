@@ -37,6 +37,7 @@ class ClientCompiler implements Compiler {
     $resources = $this->_client->getResources();
 
     $resources['working']->compile($pathInfo);
+    $resources['reset']->compile($pathInfo);
     $resources['utility']->compile($pathInfo);
 
     // Prepare template values for conductor.js resource

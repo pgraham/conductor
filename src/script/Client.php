@@ -35,15 +35,17 @@ class Client implements Compilable {
     // compiler.  Auto compile is instead done in the addToPage method when it
     // is more certain that we are operating in a Conductor::init environment.
     $this->_resources['working'] = new Resource('working.gif');
+    $this->_resources['reset']   = new Resource('reset.css');
     $this->_resources['utility'] = new Resource('utility.js');
     $this->_resources['client'] = new Resource('conductor.js');
   }
 
   public function addToPage() {
     if (Conductor::isDebug()) {
-      $this->_compile(Conductor::$config['pathInfo']);
+      $this->compile(Conductor::$config['pathInfo']);
     }
 
+    $this->_resources['reset']->addToPage();
     $this->_resources['utility']->addToPage();
     $this->_resources['client']->addToPage();
   }

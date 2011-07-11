@@ -48,7 +48,7 @@ class ResourceCompiler implements Compiler {
     }
 
     if ($values === null) {
-      copy($path, "$target/$name");
+      copy($path, "$target/" . basename($name));
     } else {
       $templateLoader = CodeTemplateLoader::get(dirname($path));
       $content = $templateLoader->load($name, $values);

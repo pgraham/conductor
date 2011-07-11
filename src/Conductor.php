@@ -181,9 +181,6 @@ class Conductor {
 
     $service = new ServiceProxy('conductor\Service', $pathInfo);
     $service->addToHead();
-
-    $reset = new Resource('reset.css', $pathInfo);
-    $reset->addToHead();
   }
 
   /**

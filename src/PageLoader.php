@@ -86,8 +86,13 @@ class PageLoader {
       return $frag;
 
     } catch (AuthorizationException $e) {
-      $loginForm = self::_buildLoginForm($e, $async);
-      return $loginForm;
+      if ($async) {
+        $loginForm = self::_buildLoginForm($e);
+        return $loginForm;
+      } else {
+        self::loadLogin($e->getMessage());
+        return null;
+      }
     }
   }
 
@@ -120,7 +125,7 @@ class PageLoader {
 
       $adminClient = new AdminClient(Conductor::$config['models'], $pathInfo);
       foreach ($adminClient->getResources() AS $resource) {
-        $resource->addToHead();
+        $resource->addToPage();
       }
 
       $adminClient->addToBody();
@@ -130,13 +135,13 @@ class PageLoader {
   }
 
   /* Create a login form from the given authorization exception. */
-  private static function _buildLoginForm($e, $async) {
+  private static function _buildLoginForm($e) {
     $msg = $e->getMessage();
     if ($msg === null) {
       $msg = 'You must provide credentials with sufficient permissions to'
         . ' perform the requested action.';
     }
-    $loginForm = new LoginForm($msg, $async);
+    $loginForm = new LoginForm($msg, true);
 
     if ($e->getUsernameLabel() !== null) {
       $loginForm->setUsernameLabel($e->getUsernameLabel());
@@ -152,13 +157,11 @@ class PageLoader {
     $login = new LoginForm($msg);
     $login->addToBody();
 
-    $pathInfo = Conductor::$config['pathInfo'];
+    $js = new Resource('login.js');
+    $js->addToPage();
 
-    $js = new Resource('login.js', $pathInfo);
-    $js->addToHead();
-
-    $css = new Resource('login.css', $pathInfo);
-    $css->addToHead();
+    $css = new Resource('login.css');
+    $css->addToPage();
 
     $fonts = array(
       'http://fonts.googleapis.com/css?family=OFL+Sorts+Mill+Goudy+TT&v1',
