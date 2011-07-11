@@ -64,5 +64,7 @@ class CrudServiceGenerator {
     $servicePath = $outputPath . '/' . $serviceFileName;
     $file = new SplFileObject($servicePath, 'w');
     $file->fwrite($template);
+
+    return $servicePath;
   }
 }

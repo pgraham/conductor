@@ -80,7 +80,7 @@ class Loader {
       throw $this->_autoloaderNotFoundException($lib, $autoloader);
     }
 
-    require_once $autolaoder;
+    require_once $autoloader;
 
     return $this;
   }

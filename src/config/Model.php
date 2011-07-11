@@ -11,7 +11,6 @@
  * =============================================================================
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
- * @package conductor/config
  */
 namespace conductor\config;
 
@@ -23,7 +22,6 @@ use \SimpleXMLElement;
  * This class parses the models section of a conduction.cfg.xml file.
  *
  * @author Philip Graham <philip@zeptech.ca>
- * @package conductor/config
  */
 class Model {
 
@@ -89,16 +87,71 @@ class Model {
         }
 
         $fullyQualified = $ns . $subNs;
-        $models[] = $fullyQualified;
+        $models[] = new ModelConfig($fullyQualified);
       }
     }
 
     if (isset($cfg->model)) {
       foreach ($cfg->model AS $model) {
-        $models[] = $model['class']->__toString();
+        $model = self::_parseModelTag($model);
+        if ($model !== null) {
+          $models[] = $model;
+        }
       }
     }
 
     return $models;
+  }
+
+  /* Parse a <model ... /> tag */
+  private static function _parseModelTag($tag) {
+    if (!isset($tag['class'])) {
+      // TODO - Log a warning
+      //$logger->warn("<model /> declaration without a 'class' declaration.");
+      return null;
+    }
+
+    $model = new ModelConfig($tag['class']->__toString());
+
+    $hasAdmin = true;
+    if (isset($tag['admin'])) {
+      $hasAdminVal = $tag['admin']->__toString();
+      if ($hasAdminVal === 'true') {
+        $hasAdmin = true;
+      } else if ($hasAdminVal === 'false') {
+        $hasAdmin = false;
+      } else if (is_numeric($hasAdminVal)) {
+        $hasAdmin = (boolean) ((int) $hasAdminVal);
+      } else {
+        $hasAdmin = (boolean) $hasAdminVal;
+      }
+    }
+    $model->hasAdmin($hasAdmin);
+
+    $hasCrud = true;
+    if (isset($tag['crud'])) {
+      $hasCrudVal = $tag['crud']->__toString();
+      if ($hasCrudVal === 'true') {
+        $hasCrud = true;
+      } else if ($hasCrudVal === 'false') {
+        $hasCrud = false;
+      } else if (is_numeric($hasCrudVal)) {
+        $hasCrud = (boolean) ((int) $hasCrudVal);
+      } else {
+        $hasCrud = (boolean) $hasCrudVal;
+      }
+    }
+
+    if (!$hasAdmin) {
+      // Only allow hasCrud to be set if the admin interface has been
+      // explicitly disabled
+      $model->hasCrud($hasCrud);
+    } else if ($hasAdmin && !$hasCrud) {
+      // TODO - Log a warning
+      // $logger->warn("Invalid model config: Cannot disable CRUD service for"
+      //   . " models included in the admin interface");
+    }
+
+    return $model;
   }
 }

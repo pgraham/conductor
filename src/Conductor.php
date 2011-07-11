@@ -113,7 +113,11 @@ class Conductor {
   public static function getModels() {
     self::_ensureInitialized();
 
-    return new ModelSet(self::$config['models']);
+    $modelNames = array();
+    foreach (self::$config['models'] AS $modelConfig) {
+      $modelNames[] = $modelConfig->getModelName();
+    }
+    return new ModelSet($modelNames);
   }
 
   /**
