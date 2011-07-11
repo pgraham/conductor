@@ -11,13 +11,13 @@
  * =============================================================================
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
- * @package conductor/admin
  */
 namespace conductor\admin;
 
 use \clarinet\model\Model;
 use \clarinet\model\Parser as ModelParser;
 
+use \conductor\compile\AdminCompiler;
 use \conductor\generator\CrudServiceGenerator;
 use \conductor\generator\CrudServiceInfo;
 use \conductor\script\ServiceProxy;
@@ -38,11 +38,12 @@ use \reed\WebSitePathInfo;
  * interface.
  *
  * @author Philip Graham <philip@zeptech.ca>
- * @package conductor/admin
  */
 class AdminClient extends Composite implements BodyItem {
 
   const FONT_PATH = 'http://fonts.googleapis.com/css?family=Allerta';
+
+  private $_models;
 
   private $_resources = array();
 
@@ -59,10 +60,7 @@ class AdminClient extends Composite implements BodyItem {
    *   exist if in DEBUG mode).
    */
   public function __construct(array $models, WebSitePathInfo $pathInfo) {
-
-    // Compile the admin client.
-    $configValueModel = ModelParser::getModel('conductor\model\ConfigValue');
-    $templateValues = $this->_compile($models, $configValueModel, $pathInfo);
+    $this->_models = $models;
 
     $this->initElement(new Div('cdt-Admin'));
     $menu = new Div('menu');
@@ -89,7 +87,7 @@ class AdminClient extends Composite implements BodyItem {
       $adminInfo = new AdminModelInfo($model);
       $crudInfo = new CrudServiceInfo($model);
       if ($adminInfo->getClientModel() !== null) {
-        $this->_resources[] = new Resource($adminInfo->getClientModel(), $pathInfo);
+        $this->_resources[] = new Resource($adminInfo->getClientModel());
       }
 
       $serviceClass = $crudInfo->getCrudServiceClass();
@@ -97,47 +95,60 @@ class AdminClient extends Composite implements BodyItem {
     }
 
     // Generate support code for updating configuration values.
+    $configValueModel = ModelParser::getModel('conductor\model\ConfigValue');
     $configValueCrudInfo = new CrudServiceInfo($configValueModel);
     $this->_resources[] = new ServiceProxy(
       $configValueCrudInfo->getCrudServiceClass(), $pathInfo);
 
-    $this->_resources[] = new Resource('grid.js', $pathInfo);
-    $this->_resources[] = new Resource('tabbedDialog.js', $pathInfo);
-    $this->_resources[] = new Resource('conductor-admin.js', $pathInfo,
-      $templateValues);
-    $this->_resources[] = new Resource('conductor-admin.css', $pathInfo);
+    $this->_resources[] = new Resource('conductor-admin.css');
+    $this->_resources[] = new Resource('grid.js');
+    $this->_resources[] = new Resource('tabbedDialog.js');
+    $this->_resources['admin'] = new Resource('conductor-admin.js');
+  }
+
+  public function addToPage() {
+    if (Conductor::isDebug()) {
+      $pathInfo = Conductor::$config['pathInfo'];
+
+      // TODO CRUD service compilation needs to be restructured so that it isn't
+      //      necessary to do this here
+      // -----------
+
+      // Ensure that CRUD services are compiled.
+      $configValueModel = ModelParser::getModel('conductor\model\ConfigValue');
+      $generator = new CrudServiceGenerator($configValueModel);
+      $generator->generate($pathInfo);
+      foreach ($this->_models AS $modelConfig) {
+        if (!$modelConfig->hasAdmin()) {
+          continue;
+        }
+
+        // Generate a crud service for each model.
+        $model = ModelParser::getModel($modelConfig->getModelName());
+        $generator = new CrudServiceGenerator($model);
+        $generator->generate($pathInfo);
+      }
+
+      // -----------
+
+      $this->compile($pathInfo, array(
+        'models' => $this->_models
+      ));
+    }
+
+    foreach ($this->_resources AS $resource) {
+      $resource->addToPage();
+    }
+
+    $this->addToBody();
+  }
+
+  public function compile(WebSitePathInfo $pathInfo, array $values = null) {
+    $compiler = new AdminCompiler($this);
+    $compiler->compile($pathInfo, $values);
   }
 
   public function getResources() {
     return $this->_resources;
-  }
-
-  private function _compile(array $models, Model $configValueModel,
-    WebSitePathInfo $pathInfo)
-  {
-
-    if (!Conductor::isDebug()) {
-      return null;
-    }
-
-    $generator = new CrudServiceGenerator($configValueModel);
-    $generator->generate($pathInfo);
-
-    foreach ($models AS $modelConfig) {
-      if (!$modelConfig->hasAdmin()) {
-        continue;
-      }
-
-      // Generate a crud service for each model.
-      $model = ModelParser::getModel($modelConfig->getModelName());
-      $generator = new CrudServiceGenerator($model);
-      $generator->generate($pathInfo);
-    }
-
-    // Generate the admin client
-    $builder = new AdminBuilder($models);
-    $templateValues = $builder->build();
-
-    return $templateValues;
   }
 }

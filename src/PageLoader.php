@@ -122,11 +122,7 @@ class PageLoader {
       JsLib::includeLibs($libs, $pathInfo, $libOpts);
 
       $adminClient = new AdminClient(Conductor::$config['models'], $pathInfo);
-      foreach ($adminClient->getResources() AS $resource) {
-        $resource->addToPage();
-      }
-
-      $adminClient->addToBody();
+      $adminClient->addToPage();
     } catch (AuthorizationException $e) {
       self::loadLogin($e->getMessage());
     }
