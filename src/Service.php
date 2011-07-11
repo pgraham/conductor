@@ -54,4 +54,8 @@ class Service {
       return Array('msg' => null);
     }
   }
+
+  public function logout() {
+    setcookie('conductorsessid', '', time() - 3600, '/');
+  }
 }

@@ -72,6 +72,11 @@ class AdminClient extends Composite implements BodyItem {
     $this->elm->add($ctnt);
     $this->elm->add(new Anchor($pathInfo->getWebRoot(), 'View Site'));
 
+    $logout = new Anchor('#', 'Logout');
+    $logout->setId('logout');
+    $logout->setStyle('margin-left', '20px');
+    $this->elm->add($logout);
+
     // Add Client-side model extensions and CRUD service proxies for each of the
     // models.
     foreach ($models AS $modelConfig) {

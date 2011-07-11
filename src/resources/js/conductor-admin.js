@@ -44,6 +44,14 @@
 
     menu.menu();
     menu.find('li a').first().click();
+
+    $('#logout').click(function (e) {
+      e.preventDefault();
+
+      window['ConductorService'].logout(function () {
+        window.location.reload(true);
+      });
+    });
   });
 } (jQuery));
 
