@@ -21,8 +21,6 @@ use \conductor\jslib\JsLib;
 use \conductor\widget\ModelEditor;
 use \conductor\widget\LoginForm;
 
-use \oboe\head\Stylesheet;
-
 use \reed\FsToWebPathConverter;
 
 /**
@@ -155,22 +153,6 @@ class PageLoader {
    */
   public static function loadLogin($msg = null) {
     $login = new LoginForm($msg);
-    $login->addToBody();
-
-    $js = new Resource('login.js');
-    $js->addToPage();
-
-    $css = new Resource('login.css');
-    $css->addToPage();
-
-    $fonts = array(
-      'http://fonts.googleapis.com/css?family=OFL+Sorts+Mill+Goudy+TT&v1',
-      'http://fonts.googleapis.com/css?family=Varela&v1'
-    );
-
-    foreach ($fonts AS $font) {
-      $fontCss = new Stylesheet($font);
-      $fontCss->addToHead();
-    }
+    $login->addToPage();
   }
 }

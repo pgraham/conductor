@@ -15,14 +15,22 @@
  */
 namespace conductor\widget;
 
+use \conductor\compile\Compilable;
+use \conductor\compile\LoginCompiler;
+use \conductor\Conductor;
+use \conductor\Resource;
+
 use \oboe\form\Button;
 use \oboe\form\Div;
 use \oboe\form\TextInput;
 use \oboe\form\Password;
 use \oboe\form\Submit;
-use \oboe\item;
+use \oboe\head\StyleSheet;
+use \oboe\item\Body as BodyItem;
 use \oboe\Composite;
 use \oboe\Form;
+
+use \reed\WebSitePathInfo;
 
 /**
  * This class encapsulates a stylable login form.
@@ -30,7 +38,7 @@ use \oboe\Form;
  * @author Philip Graham <philip@zeptech.ca>
  * @package conductor/widget
  */
-class LoginForm extends Composite implements item\Body {
+class LoginForm extends Composite implements BodyItem, Compilable {
 
   /**
    * Constant to use with constructor to specify that the form should be
@@ -46,6 +54,9 @@ class LoginForm extends Composite implements item\Body {
 
   /* The label for the username box.  Default: 'Username:' */
   private $_usernameLbl;
+  
+  /* Resources required to display the login form in a non-async env. */
+  private $_resources = array();
 
   /**
    * Create a new login form.
@@ -120,6 +131,9 @@ class LoginForm extends Composite implements item\Body {
     $this->_loginBtn = $loginBtn;
     $this->_passwordLbl = $passwordLbl;
     $this->_usernameLbl = $usernameLbl;
+
+    $this->_resources['css'] = new Resource('login.css');
+    $this->_resources['js'] = new Resource('login.js');
   }
 
   /**
@@ -129,6 +143,46 @@ class LoginForm extends Composite implements item\Body {
    */
   public function add($ctnt) {
     $this->elm->add($ctnt);
+  }
+
+  /**
+   * Add the login form and it's resources to the page.
+   */
+  public function addToPage() {
+    if (Conductor::isDebug()) {
+      $this->compile(Conductor::$config['pathInfo']);
+    }
+
+    $fonts = array(
+      'http://fonts.googleapis.com/css?family=OFL+Sorts+Mill+Goudy+TT&v1',
+      'http://fonts.googleapis.com/css?family=Varela&v1'
+    );
+
+    foreach ($fonts AS $font) {
+      $fontCss = new StyleSheet($font);
+      $fontCss->addToHead();
+    }
+
+    $this->_resources['css']->addToPage();
+    $this->_resources['js']->addToPage();
+
+    $this->addToBody();
+  }
+
+  /**
+   * Compile the login form by copying necessary resources to the output
+   * directory specified by the given path info.
+   *
+   * @param WebSitePathInfo $pathInfo
+   * @param array $values The symbol table for compilation.
+   */
+  public function compile(WebSitePathInfo $pathInfo, array $values = null) {
+    $compiler = new LoginCompiler($this);
+    $compiler->compile($pathInfo, $values);
+  }
+
+  public function getResources() {
+    return $this->_resources;
   }
 
   /**

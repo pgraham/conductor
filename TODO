@@ -11,3 +11,5 @@
 
 - Update sql to not use backticks but to use double quotes instead.  This will
   require that MySQL users turn on the ANSI_QUOTES SQL_MODE.
+
+- Create a ResourceCollection class
