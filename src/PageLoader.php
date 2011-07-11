@@ -114,11 +114,11 @@ class PageLoader {
         JsLib::DATE_JS
       );
       $libOpts = array(
-        JsLib::JQUERY_UI => array( 'theme' => 'admin-theme' )
+        JsLib::JQUERY_UI => array( 'theme' => 'admin' )
       );
       JsLib::includeLibs($libs, $pathInfo, $libOpts);
 
-      $adminClient = new AdminClient(Conductor::getModels(), $pathInfo);
+      $adminClient = new AdminClient(Conductor::$config['models'], $pathInfo);
       foreach ($adminClient->getResources() AS $resource) {
         $resource->addToHead();
       }

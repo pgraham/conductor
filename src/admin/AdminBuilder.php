@@ -14,11 +14,11 @@
  */
 namespace conductor\admin;
 
+use \clarinet\model\Parser as ModelParser;
 use \clarinet\ActorFactory;
 use \clarinet\Criteria;
 
 use \conductor\generator\CrudServiceInfo;
-use \conductor\modeling\ModelSet;
 
 /**
  * This class populates the conductor-admin.js template with the given model
@@ -33,9 +33,9 @@ class AdminBuilder {
   /**
    * Create a new builder for the conductor-admin.js template.
    *
-   * @param ModelInfo $modelInfo
+   * @param array $models
    */
-  public function __construct(ModelSet $models) {
+  public function __construct(array $models) {
     $this->_models = $models;
   }
 
@@ -51,7 +51,12 @@ class AdminBuilder {
     $editors = Array();
     $forms = Array();
     $modelNames = Array();
-    foreach ($this->_models AS $model) {
+    foreach ($this->_models AS $modelConfig) {
+      if (!$modelConfig->hasAdmin()) {
+        continue;
+      }
+
+      $model = ModelParser::getModel($modelConfig->getModelName());
       $editors[] = $modelEditorBuilder->build($model);
       $forms[] = $modelFormBuilder->build($model);
 
@@ -80,9 +85,15 @@ class AdminBuilder {
   /* Build a JSONable array for the encapsulated model set */
   private function _buildModelJsonArray() {
     $jsonable = Array();
-    foreach ($this->_models AS $model) {
+    foreach ($this->_models AS $modelConfig) {
+      if (!$modelConfig->hasAdmin()) {
+        continue;
+      }
+
+      $model = ModelParser::getModel($modelConfig->getModelName());
       $adminInfo = new AdminModelInfo($model);
       $crudInfo = new CrudServiceInfo($model);
+
       $modelJson = Array
       (
         'name' => Array

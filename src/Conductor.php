@@ -20,7 +20,6 @@ use \clarinet\Clarinet;
 use \clarinet\Criteria;
 
 use \conductor\config\Parser;
-use \conductor\modeling\ModelSet;
 use \conductor\script\Client;
 use \conductor\script\ServiceProxy;
 use \conductor\template\PageTemplate;
@@ -102,22 +101,6 @@ class Conductor {
     }
 
     return $idxd;
-  }
-
-  /**
-   * Retrieve a {@link ModelSet} for the model classes defined in the conductor
-   * config.
-   *
-   * @return ModelSet
-   */
-  public static function getModels() {
-    self::_ensureInitialized();
-
-    $modelNames = array();
-    foreach (self::$config['models'] AS $modelConfig) {
-      $modelNames[] = $modelConfig->getModelName();
-    }
-    return new ModelSet($modelNames);
   }
 
   /**

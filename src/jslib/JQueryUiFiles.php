@@ -72,6 +72,15 @@ class JQueryUiFiles {
     'themes/base/jquery.ui.tooltip.css'
   );
 
+  public static function getExternal() {
+    return array(
+      array(
+        'type' => 'js',
+        'url'  => 'http://ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.js'
+      )
+    );
+  }
+
   public static function getImages($theme, $pathInfo) {
     $images = array();
 
@@ -137,7 +146,9 @@ class JQueryUiFiles {
     if (file_exists($theme)) {
       $themeDir = $theme;
     } else {
-      $themeDir = "{$pathInfo->getLibPath}/conductor/resources/$theme-theme";
+      $themeDir = $pathInfo->getLibPath()
+        . "/conductor/src/resources/$theme-theme";
+
       if ($themeDir === false) {
         throw new Exception("Specified theme does not exist: $theme.  It was"
           . " expected to be found at $themeDir");

@@ -103,6 +103,7 @@ class JsLib {
     $scripts = array();
     $sheets = array();
     $images = array();
+    $external = array();
 
     switch ($lib) {
       case self::JQUERY_UI:
@@ -110,10 +111,11 @@ class JsLib {
         ? $opts['theme']
         : null;
 
-      $libDir  = 'jquery-ui';
-      $scripts = JQueryUiFiles::getScripts($theme, $pathInfo);
-      $sheets  = JQueryUiFiles::getSheets($theme, $pathInfo);
-      $images  = JQueryUiFiles::getImages($theme, $pathInfo);
+      $libDir   = 'jquery-ui';
+      $scripts  = JQueryUiFiles::getScripts($theme, $pathInfo);
+      $sheets   = JQueryUiFiles::getSheets($theme, $pathInfo);
+      $images   = JQueryUiFiles::getImages($theme, $pathInfo);
+      $external = JQueryUiFiles::getExternal();
       break;
 
       case self::JQUERY_UI_TIMEPICKER:
@@ -132,10 +134,11 @@ class JsLib {
     }
 
     return array(
-      'libDir'  => $libDir,
-      'scripts' => $scripts,
-      'sheets'  => $sheets,
-      'images'  => $images
+      'libDir'   => $libDir,
+      'scripts'  => $scripts,
+      'sheets'   => $sheets,
+      'images'   => $images,
+      'external' => $external
     );
   }
 
@@ -181,7 +184,7 @@ class JsLib {
   ) {
 
     if (Conductor::isDebug()) {
-      self::compile($lib, $pathInfo, $libOpts);
+      self::compile($lib, $pathInfo, $opts);
     }
 
     $files = self::getFiles($lib, $pathInfo, $opts);
@@ -193,6 +196,19 @@ class JsLib {
 
     $basePath = "{$pathInfo->getWebTarget()}/$libDir";
     $baseWeb = $pathInfo->fsToWeb($basePath);
+
+    foreach ($files['external'] AS $ext) {
+      if ($ext['type'] === 'js') {
+        $js = new Javascript($ext['url']);
+        $js->addToHead();
+      } else if ($ext['type'] === 'css') {
+        $css = new StyleSheet($ext['url']);
+        $css->addToHead();
+      } else {
+        assert(
+          "false /* Unrecognized external resource type: {$ext['type']} */;");
+      }
+    }
 
     foreach ($files['scripts'] AS $script) {
       if (is_array($script)) {
