@@ -85,20 +85,10 @@ class AdminClient extends Composite implements BodyItem {
       $model = ModelParser::getModel($modelConfig->getModelName());
 
       $adminInfo = new AdminModelInfo($model);
-      $crudInfo = new CrudServiceInfo($model);
       if ($adminInfo->getClientModel() !== null) {
         $this->_resources[] = new Resource($adminInfo->getClientModel());
       }
-
-      $serviceClass = $crudInfo->getCrudServiceClass();
-      $this->_resources[] = new ServiceProxy($serviceClass, $pathInfo);
     }
-
-    // Generate support code for updating configuration values.
-    $configValueModel = ModelParser::getModel('conductor\model\ConfigValue');
-    $configValueCrudInfo = new CrudServiceInfo($configValueModel);
-    $this->_resources[] = new ServiceProxy(
-      $configValueCrudInfo->getCrudServiceClass(), $pathInfo);
 
     $this->_resources[] = new Resource('conductor-admin.css');
     $this->_resources[] = new Resource('grid.js');
@@ -107,6 +97,8 @@ class AdminClient extends Composite implements BodyItem {
   }
 
   public function addToPage() {
+    $configValueModel = ModelParser::getModel('conductor\model\ConfigValue');
+
     if (Conductor::isDebug()) {
       $pathInfo = Conductor::$config['pathInfo'];
 
@@ -115,7 +107,6 @@ class AdminClient extends Composite implements BodyItem {
       // -----------
 
       // Ensure that CRUD services are compiled.
-      $configValueModel = ModelParser::getModel('conductor\model\ConfigValue');
       $generator = new CrudServiceGenerator($configValueModel);
       $generator->generate($pathInfo);
       foreach ($this->_models AS $modelConfig) {
@@ -135,6 +126,33 @@ class AdminClient extends Composite implements BodyItem {
         'models' => $this->_models
       ));
     }
+
+    // TODO Create a ResourceSet class.  This class can then implement a static
+    ///     method to retrieve a resource set of resources to include when
+    //      performing an explicit compile.  That way there is no concern with
+    //      service proxies interfering
+    // -------------
+
+    // Add CRUD service proxies to the resource list here so that they don't
+    // interfere with explicit compilation
+    foreach ($models AS $modelConfig) {
+      if (!$modelConfig->hasAdmin()) {
+        continue;
+      }
+
+      $model = ModelParser::getModel($modelConfig->getModelName());
+      $crudInfo = new CrudServiceInfo($model);
+
+      $serviceClass = $crudInfo->getCrudServiceClass();
+      $this->_resources[] = new ServiceProxy($serviceClass, $pathInfo);
+    }
+
+    // Generate support code for updating configuration values.
+    $configValueCrudInfo = new CrudServiceInfo($configValueModel);
+    $this->_resources[] = new ServiceProxy(
+      $configValueCrudInfo->getCrudServiceClass(), $pathInfo);
+
+    // -------------
 
     foreach ($this->_resources AS $resource) {
       $resource->addToPage();

@@ -16,6 +16,7 @@ namespace conductor\compile;
 
 use \conductor\admin\AdminBuilder;
 use \conductor\admin\AdminClient;
+use \conductor\jslib\JsLib;
 use \conductor\Resource;
 
 use \reed\WebSitePathInfo;
@@ -45,5 +46,10 @@ class AdminCompiler implements Compiler {
         $resource->compile($pathInfo);
       }
     }
+
+    JsLib::compile(JsLib::JQUERY_UI, $pathInfo, array(
+      'theme-only' => true,
+      'theme'      => 'admin'
+    ));
   }
 }

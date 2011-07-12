@@ -110,12 +110,19 @@ class JsLib {
       $theme = is_array($opts) && isset($opts['theme'])
         ? $opts['theme']
         : null;
+      $themeOnly = is_array($opts) && isset($opts['theme-only'])
+        ? (boolean) $opts['theme-only']
+        : false;
 
       $libDir   = 'jquery-ui';
-      $scripts  = JQueryUiFiles::getScripts($theme, $pathInfo);
+      $scripts  = $themeOnly
+        ? JQueryUiFiles::getScripts($theme, $pathInfo)
+        : array();
       $sheets   = JQueryUiFiles::getSheets($theme, $pathInfo);
       $images   = JQueryUiFiles::getImages($theme, $pathInfo);
-      $external = JQueryUiFiles::getExternal();
+      $external = $themeOnly
+        ?JQueryUiFiles::getExternal()
+        : array();
       break;
 
       case self::JQUERY_UI_TIMEPICKER:

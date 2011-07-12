@@ -66,9 +66,11 @@ class AdminBuilder {
     // Add ability to perform row count query to persister
     $c = new Criteria();
     $c->addEquals('editable', true);
+    /*
     $persister = ActorFactory::getActor('persister',
       'conductor\model\ConfigValue');
     $configValues = $persister->retrieve($c);
+    */
 
     $templateValues = Array
     (
@@ -76,7 +78,7 @@ class AdminBuilder {
       'modelNames' => $modelNames,
       'editors'    => $editors,
       'forms'      => $forms,
-      'showConfig' => count($configValues) > 0
+      'showConfig' => true //count($configValues) > 0
     );
 
     return $templateValues;
