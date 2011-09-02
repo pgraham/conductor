@@ -16,11 +16,14 @@
 namespace conductor;
 
 use \clarinet\Clarinet;
+use \clarinet\Criteria;
+use \clarinet\Persister;
 
 use \conductor\auth\Authenticate;
 use \conductor\auth\Authorize;
 use \conductor\auth\AuthService;
 use \conductor\auth\SessionManager;
+use \conductor\model\Visitor;
 
 /**
  * This class ensures that the requesting user is assigned to a session.  The
@@ -32,6 +35,50 @@ use \conductor\auth\SessionManager;
 class Auth {
 
   public static $session = null;
+
+  private static $_visitor;
+
+  /**
+   * Getter for the visitor instance associated with this request.
+   *
+   * @return Visitor
+   */
+  public static function getVisitor() {
+    if (self::$_visitor === null) {
+      $persister = Persister::get('conductor\model\Visitor');
+
+      $visitor = null;
+      if (isset($_COOKIE['visitor_id'])) {
+        $visitorKey = $_COOKIE['visitor_id'];
+
+        $c = new Criteria();
+        $c->addEquals('key', $visitorKey);
+        
+        $visitor = $persister->retrieveOne($c);
+      }
+
+      if ($visitor === null) {
+        $visitorKey = uniqid('visitor_', true);
+
+        $visitor = new Visitor();
+        $visitor->setKey($visitorKey);
+        $persister->save($visitor);
+
+        // TODO - Support IP addresses
+        $domainParts = explode('.', $_SERVER['SERVER_NAME']);
+        if (count($domainParts) > 2) {
+          $domainParts = array_slice($domainParts, -2);
+        }
+        $domain = implode('.', $domainParts);
+
+        setcookie('visitor_id', $visitorKey, 0, '/', ".$domain");
+      }
+
+      self::$_visitor = $visitor;
+    }
+
+    return self::$_visitor;
+  }
 
   /**
    * Authenticate the user.  The process is as follows.  Check if there is
@@ -51,13 +98,6 @@ class Auth {
       return;
     }
 
-    // The following ternary will always result in the variable being assigned
-    // something.  This is because the loadSession method will return a new
-    // session if the loaded session is invalid
-    $session = isset($_COOKIE['conductorsessid'])
-      ? SessionManager::loadSession($_COOKIE['conductorsessid'])
-      : SessionManager::newSession();
-
     // If crendentials have been provided, attempt to authenticate with them
     if ($username !== null && $password !== null) {
       // To save some headaches around ambiguous results, never preserve an
@@ -65,14 +105,14 @@ class Auth {
       // appear to be successful since the session would still be associated
       // with a user.  Another way to consider this is that a login attempt
       // is an implicit logout, whether the login succeeds or not
-      if ($session->getUser() !== null) {
-        $session = SessionManager::newSession();
-      }
+      $session = SessionManager::newSession();
 
       $user = Authenticate::login($username, $password);
       if ($user !== null) {
         $session->setUser($user);
-        Clarinet::save($session);
+
+        $persister = Persister::get($session);
+        $persister->save($session);
 
         // If this is a synchronous request, redirect to the current page so
         // that a reload doesn't resubmit the login credentials
@@ -88,7 +128,15 @@ class Auth {
           exit;
         }
       }
+    } else {
+      // The following ternary will always result in the variable being assigned
+      // something.  This is because the loadSession method will return a new
+      // session if the loaded session is invalid
+      $session = isset($_COOKIE['conductorsessid'])
+        ? SessionManager::loadSession($_COOKIE['conductorsessid'])
+        : SessionManager::newSession();
     }
+
     self::$session = $session;
   }
 
