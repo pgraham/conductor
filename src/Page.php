@@ -18,8 +18,7 @@ namespace conductor;
 use \conductor\template\PageTemplate;
 use \conductor\template\TemplateValidator;
 use \conductor\Conductor;
-
-use \oboe\item;
+use \oboe\struct\FlowContent;
 
 /**
  * This class is an extension to Oboe_Page that adds some handy features.
@@ -119,7 +118,6 @@ class Page extends \oboe\Page {
   /* If debug capturing is enabled */
   private $_debugCatcher;
 
-  /* This is a singleton afterall */
   protected function __construct() {
     parent::__construct();
   }
@@ -130,7 +128,7 @@ class Page extends \oboe\Page {
    *
    * @param element
    */
-  protected function bodyAdd(item\Body $element) {
+  protected function bodyAdd(FlowContent $element) {
     if ($this->_template !== null) {
       $this->_template->getContentContainer()->add($element);
     } else {

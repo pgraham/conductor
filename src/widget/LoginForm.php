@@ -19,17 +19,9 @@ use \conductor\compile\Compilable;
 use \conductor\compile\LoginCompiler;
 use \conductor\Conductor;
 use \conductor\Resource;
-
-use \oboe\form\Button;
-use \oboe\form\Div;
-use \oboe\form\TextInput;
-use \oboe\form\Password;
-use \oboe\form\Submit;
-use \oboe\head\StyleSheet;
-use \oboe\item\Body as BodyItem;
+use \oboe\attr\CanSubmit;
 use \oboe\Composite;
-use \oboe\Form;
-
+use \oboe\Element;
 use \reed\WebSitePathInfo;
 
 /**
@@ -38,7 +30,7 @@ use \reed\WebSitePathInfo;
  * @author Philip Graham <philip@zeptech.ca>
  * @package conductor/widget
  */
-class LoginForm extends Composite implements BodyItem, Compilable {
+class LoginForm extends Composite implements Compilable {
 
   /**
    * Constant to use with constructor to specify that the form should be
@@ -64,67 +56,76 @@ class LoginForm extends Composite implements BodyItem, Compilable {
    * @param string $caption An optional message to display to the user about why
    *   they are seeing a login form.
    * @param boolean $async Whether or not to perform the login (submit the form)
-   *   asynchronously.  Default: false.  To set to true use the ASYNC_SUMIT
+   *   asynchronously.  Default: false.  To set to true use the ASYNC_SUBMIT
    *   constant, i.e. $form = new LoginForm("LOGIN PLEASE", LoginForm::ASYNC);
    */
   public function __construct($caption = null, $async = false) {
-    $this->initElement(new Form('login'));
-    $this->elm->setClass('cdt-LoginForm');
-    if ($async) {
-      $this->elm->addClass('async');
-    }
+    $this->initElement(
+      Element::form()
+        ->setId('login')
+        ->setMethod(CanSubmit::METHOD_POST)
+        ->setClass('cdt-LoginForm')
+    );
 
     if ($caption !== null) {
-      $captionDiv = new Div(null, 'cdt-Caption');
-      $captionDiv->add($caption);
-      $this->elm->add($captionDiv);
+      $this->elm->add(
+        Element::div()
+          ->addClass('cdt-Caption')
+          ->add($caption)
+      );
     }
 
-    $usernameLbl = new Div(null, 'cdt-Label');
-    $usernameLbl->add("Username:");
+    $usernameLbl = Element::div()
+      ->addClass('cdt-Label')
+      ->add("Username:");
+    $this->elm->add(
+      Element::div()
+        ->addClass('cdt-FormInputContainer')
+        ->add($usernameLbl)
+        ->add(
+          Element::div()
+            ->addClass('cdt-FormInput')
+            ->add(
+              Element::textInput('uname')
+                ->setClass('cdt-TextInput')
+            )
+        )
+    );
 
-    $usernameTxt = new TextInput('uname');
-    $usernameTxt->setClass('cdt-TextInput');
-
-    $usernameInput = new Div(null, 'cdt-FormInput');
-    $usernameInput->add($usernameTxt);
-
-    $username = new Div(null, 'cdt-FormInputContainer');
-    $username->add($usernameLbl);
-    $username->add($usernameInput);
-
-    $passwordLbl = new Div(null, 'cdt-Label');
-    $passwordLbl->add("Password:");
-
-    $passwordTxt = new Password('pw');
-    $passwordTxt->setClass('cdt-TextInput');
-
-    $passwordInput = new Div(null, 'cdt-FormInput');
-    $passwordInput->add($passwordTxt);
-
-    $password = new Div(null, 'cdt-FormInputContainer');
-    $password->add($passwordLbl);
-    $password->add($passwordInput);
+    $passwordLbl = Element::div()
+      ->addClass('cdt-Label')
+      ->add("Password:");
+    $this->elm->add(
+      Element::div()
+        ->addClass('cdt-FormInputContainer')
+        ->add($passwordLbl)
+        ->add(
+          Element::div()
+            ->addClass('cdt-FormInput')
+            ->add(
+              Element::password('pw')
+                ->setClass('cdt-TextInput')
+            )
+        )
+    );
 
     if ($async) {
-      $loginBtn = new Button('Login');
+      $loginBtn = Element::button('Login');
     } else {
-      $loginBtn = new Submit('Login');
+      $loginBtn = Element::submit('Login');
     }
-    $loginBtn->setClass('cdt-Submit');
+    $loginBtn->addClass('cdt-Submit');
 
-    $submit = new Div(null, 'cdt-FormSubmitContainer');
-    $submit->add($loginBtn);
-
-    $this->elm->add($username);
-    $this->elm->add($password);
-    $this->elm->add($submit);
+    $this->elm->add(
+      Element::div()
+        ->addClass('cdt-FormSubmitContainer')
+        ->add($loginBtn)
+    );
 
     // If form will be submitted asynchronously add a placeholder div for error
     // messages.
     if ($async) {
-      $errorDiv = new Div(null, 'cdt-Error');
-      $this->elm->add($errorDiv);
+      $this->elm->add(Element::div()->addClass('cdt-Error'));
     }
 
     // Store elements so that they can be modified
@@ -159,8 +160,7 @@ class LoginForm extends Composite implements BodyItem, Compilable {
     );
 
     foreach ($fonts AS $font) {
-      $fontCss = new StyleSheet($font);
-      $fontCss->addToHead();
+      Element::styleSheet($font)->addToHead();
     }
 
     $this->_resources['css']->addToPage();

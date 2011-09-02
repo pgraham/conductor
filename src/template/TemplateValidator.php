@@ -15,6 +15,8 @@
  */
 namespace conductor\template;
 
+use \conductor\Exception;
+use \oboe\struct\FlowContent;
 use \oboe\ElementComposite;
 use \oboe\item;
 
@@ -45,7 +47,7 @@ class TemplateValidator {
     if ($cc === null) {
       throw new Exception('A template\'s content container can not be null');
     }
-    if (!($cc instanceof ElementComposite) || !($cc instanceof item\Body)) {
+    if (!($cc instanceof ElementComposite) || !($cc instanceof FlowContent)) {
       throw new Exception('A template\'s content container must be'
         . ' an instance of oboe\ElementComposite that implements'
         . ' oboe\item\Body');
@@ -55,7 +57,7 @@ class TemplateValidator {
     // Oboe_ElementBase that implements Oboe_Item_Body
     $dc = $this->_template->getDebugContainer();
     if ($dc !== null) {
-      if (!($dc instanceof ElementComposite) || !($dc instanceof item\Body)) {
+      if (!($dc instanceof ElementComposite) || !($dc instanceof FlowContent)) {
         throw new Exception('A template\'s debug container must be'
           . ' an instance of oboe\ElementComposite that implements'
           . ' oboe\item\Body');

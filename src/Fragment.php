@@ -14,9 +14,8 @@
  */
 namespace conductor;
 
+use \oboe\struct\FlowContent;
 use \Exception;
-
-use \oboe\item\Body as BodyItem;
 
 /**
  * This class pulls an HTML fragment from a file and wraps it as a document
@@ -25,7 +24,7 @@ use \oboe\item\Body as BodyItem;
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class Fragment implements BodyItem {
+class Fragment implements FlowContent {
 
   /* The fragment */
   private $_fragment;

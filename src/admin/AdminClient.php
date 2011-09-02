@@ -24,12 +24,7 @@ use \conductor\script\ServiceProxy;
 use \conductor\Conductor;
 use \conductor\Resource;
 
-use \oboe\item\Body as BodyItem;
-use \oboe\Anchor;
-use \oboe\BaseList;
-use \oboe\Composite;
-use \oboe\Div;
-use \oboe\ListEl;
+use \oboe\Element;
 
 use \reed\WebSitePathInfo;
 
@@ -39,7 +34,7 @@ use \reed\WebSitePathInfo;
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class AdminClient extends Composite implements BodyItem {
+class AdminClient extends Composite {
 
   const FONT_PATH = 'http://fonts.googleapis.com/css?family=Allerta';
 
@@ -62,18 +57,25 @@ class AdminClient extends Composite implements BodyItem {
   public function __construct(array $models, WebSitePathInfo $pathInfo) {
     $this->_models = $models;
 
-    $this->initElement(new Div('cdt-Admin'));
-    $menu = new Div('menu');
-    $menu->add(new ListEl(BaseList::UNORDERED));
-    $this->elm->add($menu);
-    $ctnt = new Div('ctnt');
-    $this->elm->add($ctnt);
-    $this->elm->add(new Anchor($pathInfo->getWebRoot(), 'View Site'));
-
-    $logout = new Anchor('#', 'Logout');
-    $logout->setId('logout');
-    $logout->setStyle('margin-left', '20px');
-    $this->elm->add($logout);
+    $this->initElement(
+      Element::div()
+        ->setId('cdt-Admin')
+        ->add(
+          Element::div()
+            ->setId('menu')
+            ->add(new Element::ul())
+        )
+        ->add(
+          Element::div()
+            ->setId('ctnt')
+        )
+        ->add(Element::a($pathInfo->getWebRoot(), 'View Site'))
+        ->add(
+          Element::a('#', 'Logout')
+            ->setId('logout')
+            ->setStyle('margin-left', '20px')
+        )
+    );
 
     // Add Client-side model extensions and CRUD service proxies for each of the
     // models.
@@ -128,14 +130,14 @@ class AdminClient extends Composite implements BodyItem {
     }
 
     // TODO Create a ResourceSet class.  This class can then implement a static
-    ///     method to retrieve a resource set of resources to include when
+    //      method to retrieve a resource set of resources to include when
     //      performing an explicit compile.  That way there is no concern with
     //      service proxies interfering
     // -------------
 
     // Add CRUD service proxies to the resource list here so that they don't
     // interfere with explicit compilation
-    foreach ($models AS $modelConfig) {
+    foreach ($this->_models AS $modelConfig) {
       if (!$modelConfig->hasAdmin()) {
         continue;
       }

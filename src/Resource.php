@@ -111,8 +111,6 @@ class Resource implements Compilable {
    */
   private $_compiled = false;
 
-  private $_elm;
-
   private $_name;
 
   private $_type;
@@ -153,29 +151,22 @@ class Resource implements Compilable {
 
     switch ($this->_type) {
       case 'css':
-      $this->_elm = new StyleSheet($resourcePath);
+      $elm = new StyleSheet($resourcePath);
+      $elm->addToHead();
       break;
 
       case 'js':
-      $this->_elm = new Javascript($resourcePath);
+      $elm = new Javascript($resourcePath);
+      $elm->addToHead();
       break;
 
       case 'img':
-      $this->_elm = new Image($resourcePath, 'Image Resource');
+      $elm = new Image($resourcePath, 'Image Resource');
+      $elm->addToBody();
       break;
 
       default:
-      $this->_elm = null;
-    }
-
-    if ($this->_elm === null) {
       return;
-    }
-
-    if ($this->_elm instanceof HeadItem) {
-      $this->_elm->addToHead();
-    } else if ($this->_elm instanceof BodyItem) {
-      $this->_elm->addToBody();
     }
   }
 
