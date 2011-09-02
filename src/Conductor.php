@@ -33,7 +33,7 @@ use \oboe\head\Javascript;
  */
 class Conductor {
 
-  const JQUERY_VERSION = '1.5.2';
+  const JQUERY_VERSION = '1.6.2';
 
   /** Conductor configuration values */
   public static $config = null;
@@ -183,12 +183,18 @@ class Conductor {
     $service->addToHead();
   }
 
+  public static function getPathInfo() {
+    self::_ensureInitialized();
+    return self::$config['pathInfo'];
+  }
+
   /**
    * Getter for whether or not the site is operating in DEBUG mode.
    *
    * @return boolean
    */
   public static function isDebug() {
+    self::_ensureInitialized();
     return self::$config['debug'];
   }
 
