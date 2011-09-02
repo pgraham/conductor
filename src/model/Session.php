@@ -11,7 +11,6 @@
  * =============================================================================
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
- * @package conductor/model
  */
 namespace conductor\model;
 
@@ -22,7 +21,6 @@ namespace conductor\model;
  * user.
  *
  * @author Philip Graham <philip@zeptech.ca>
- * @package conductor/model
  *
  * @Entity(table = session)
  */
@@ -34,8 +32,7 @@ class Session {
   private $_lastAccess;
 
   public function __construct() {
-    $this->_created = time();
-    $this->_lastAccess = $this->_created;
+    $this->_lastAccess = time();
   }
 
   /**
