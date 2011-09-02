@@ -30,6 +30,8 @@ use \Exception;
 class JQueryUiFiles {
 
   public static $scripts = array(
+    'external/jquery.tmpl.js',
+    'external/globalize.js',
     'ui/jquery.ui.core.js',
     'ui/jquery.ui.widget.js',
     'ui/jquery.ui.mouse.js',
@@ -73,12 +75,7 @@ class JQueryUiFiles {
   );
 
   public static function getExternal() {
-    return array(
-      array(
-        'type' => 'js',
-        'url'  => 'http://ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.js'
-      )
-    );
+    return array();
   }
 
   public static function getImages($theme, $pathInfo) {

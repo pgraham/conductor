@@ -15,6 +15,8 @@
 namespace conductor\jslib;
 
 use \conductor\Conductor;
+use \conductor\ResourceSet;
+use \conductor\ResourceIncluder;
 use \oboe\head\Javascript;
 use \oboe\head\StyleSheet;
 use \reed\WebSitePathInfo;
@@ -32,6 +34,7 @@ class JsLib {
    * ===========================================================================
    */
 
+  const JQUERY_COOKIE = 'jquery-cookie';
   const JQUERY_UI = 'jquery-ui';
   const JQUERY_UI_TIMEPICKER = 'jquery-ui-timepicker';
   const DATE_JS = 'datejs';
@@ -52,39 +55,8 @@ class JsLib {
   ) {
     $files = self::getFiles($lib, $pathInfo, $opts);
 
-    $libDir = $files['libDir'];
-    if ($libDir === null) {
-      return;
-    }
-
-    $srcPath = "{$pathInfo->getLibPath()}/jslib/$libDir";
-    $outPath = "{$pathInfo->getWebTarget()}/$libDir";
-
-    if (!file_exists($outPath)) {
-      mkdir($outPath, 0755, true);
-    }
-
-    $all = array_merge($files['scripts'], $files['sheets'], $files['images']);
-    foreach ($all AS $file) {
-      if (!is_array($file)) {
-        $file = array( 'src' => $file, 'out' => $file );
-      }
-
-      if (isset($file['base'])) {
-        $fullSrcPath = "{$file['base']}/{$file['src']}";
-      } else {
-        $fullSrcPath = "$srcPath/{$file['src']}";
-      }
-
-      $fullOutPath = "$outPath/{$file['out']}";
-
-      $outDir = dirname($fullOutPath);
-      if (!file_exists($outDir)) {
-        mkdir($outDir, 0755, true);
-      }
-
-      copy($fullSrcPath, $fullOutPath);
-    }
+    $outPath = $pathInfo->getWebTarget() . '/' . basename($files->getSrcPath());
+    ResourceIncluder::compile($files, $outPath);
   }
 
   /**
@@ -106,6 +78,11 @@ class JsLib {
     $external = array();
 
     switch ($lib) {
+      case self::JQUERY_COOKIE:
+      $libDir = 'jquery-cookie';
+      $scripts[] = 'jquery.cookie.js';
+      break;
+
       case self::JQUERY_UI:
       $theme = is_array($opts) && isset($opts['theme'])
         ? $opts['theme']
@@ -113,14 +90,21 @@ class JsLib {
       $themeOnly = is_array($opts) && isset($opts['theme-only'])
         ? (boolean) $opts['theme-only']
         : false;
+      $noTheme = !$themeOnly && is_array($opts) && isset($opts['no-theme'])
+        ? (boolean) $opts['no-theme']
+        : false;
 
       $libDir   = 'jquery-ui';
-      $scripts  = $themeOnly
+      $scripts  = !$themeOnly
         ? JQueryUiFiles::getScripts($theme, $pathInfo)
         : array();
-      $sheets   = JQueryUiFiles::getSheets($theme, $pathInfo);
-      $images   = JQueryUiFiles::getImages($theme, $pathInfo);
-      $external = $themeOnly
+      $sheets   = !$noTheme
+        ? JQueryUiFiles::getSheets($theme, $pathInfo)
+        : array();
+      $images   = !$noTheme
+        ? JQueryUiFiles::getImages($theme, $pathInfo)
+        : array();
+      $external = !$themeOnly
         ?JQueryUiFiles::getExternal()
         : array();
       break;
@@ -140,13 +124,13 @@ class JsLib {
       assert("false; /* Unrecognized library: $lib */");
     }
 
-    return array(
-      'libDir'   => $libDir,
-      'scripts'  => $scripts,
-      'sheets'   => $sheets,
-      'images'   => $images,
-      'external' => $external
-    );
+    $srcPath = $pathInfo->getLibPath() . "/jslib/$libDir";
+    $resources = new ResourceSet($srcPath);
+    $resources->setExternal($external);
+    $resources->setImages($images);
+    $resources->setScripts($scripts);
+    $resources->setSheets($sheets);
+    return $resources;
   }
 
   /**
@@ -196,45 +180,8 @@ class JsLib {
 
     $files = self::getFiles($lib, $pathInfo, $opts);
 
-    $libDir = $files['libDir'];
-    if ($libDir === null) {
-      return;
-    }
-
-    $basePath = "{$pathInfo->getWebTarget()}/$libDir";
-    $baseWeb = $pathInfo->fsToWeb($basePath);
-
-    foreach ($files['external'] AS $ext) {
-      if ($ext['type'] === 'js') {
-        $js = new Javascript($ext['url']);
-        $js->addToHead();
-      } else if ($ext['type'] === 'css') {
-        $css = new StyleSheet($ext['url']);
-        $css->addToHead();
-      } else {
-        assert(
-          "false /* Unrecognized external resource type: {$ext['type']} */;");
-      }
-    }
-
-    foreach ($files['scripts'] AS $script) {
-      if (is_array($script)) {
-        $script = $script['out'];
-      }
-
-      $js = new Javascript("$baseWeb/$script");
-      $js->addToHead();
-    }
-
-    foreach ($files['sheets'] AS $sheet) {
-      if (is_array($sheet)) {
-        $sheet = $sheet['out'];
-      }
-
-      $css = new StyleSheet("$baseWeb/$sheet");
-      $css->addToHead();
-    }
-
+    $outPath = $pathInfo->getWebTarget() . '/' . basename($files->getSrcPath());
+    ResourceIncluder::inc($files, $pathInfo->fsToWeb($outPath));
     self::$_included[] = $lib;
   }
 }

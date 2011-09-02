@@ -108,10 +108,10 @@ class PageLoader {
         throw new AuthorizationException("Please login");
       }
 
-      $pathInfo = Conductor::$config['pathInfo'];
-
+      $pathInfo = Conductor::getPathInfo();
 
       $libs = array(
+        JsLib::JQUERY_COOKIE,
         JsLib::JQUERY_UI,
         JsLib::JQUERY_UI_TIMEPICKER,
         JsLib::DATE_JS
