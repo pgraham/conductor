@@ -55,8 +55,7 @@ class JsLib {
   ) {
     $files = self::getFiles($lib, $pathInfo, $opts);
 
-    $outPath = $pathInfo->getWebTarget() . '/' . basename($files->getSrcPath());
-    ResourceIncluder::compile($files, $outPath);
+    ResourceIncluder::compile($files);
   }
 
   /**
@@ -125,7 +124,7 @@ class JsLib {
     }
 
     $srcPath = $pathInfo->getLibPath() . "/jslib/$libDir";
-    $resources = new ResourceSet($srcPath);
+    $resources = new ResourceSet($srcPath, $libDir);
     $resources->setExternal($external);
     $resources->setImages($images);
     $resources->setScripts($scripts);
@@ -180,8 +179,7 @@ class JsLib {
 
     $files = self::getFiles($lib, $pathInfo, $opts);
 
-    $outPath = $pathInfo->getWebTarget() . '/' . basename($files->getSrcPath());
-    ResourceIncluder::inc($files, $pathInfo->fsToWeb($outPath));
+    ResourceIncluder::inc($files);
     self::$_included[] = $lib;
   }
 }

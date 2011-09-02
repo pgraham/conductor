@@ -22,36 +22,33 @@ use \reed\WebSitePathInfo;
  * file system in a web page.  The class provides two methods:
  *
  * <ul>
- *   <li>compile(ResourceSet, $outputPath);
- *   <li>include(ResourceSet, $webPath);
+ *   <li>compile(ResourceSet);
+ *   <li>include(ResourceSet);
  * </ul>
  *
  * The compile(...) method is used to copy the listed resources into the
- * web-accessible target directory defined by the given path info object while 
- * the include(...) method is used to actually include those resources into a
- * web page.  Note that it is assumed that any images defined by the resource
- * list are required by the defined stylesheets so they will be compiled but
- * not included as they are most likely included through the stylesheets.
+ * web-accessible target directory defined in the resource set and the
+ * include(...) method is used to actually include those resources into a web
+ * page.  Note that it is assumed that any images defined by the resource list
+ * are required by the defined stylesheets so they will be compiled but not
+ * included as they are most likely included through the stylesheets.
  *
- * Generally the compile method will be called conditionally followed by a call
- * to the include method with the same parameters passed to compile(...):
- *
- * <code>
- *   if ($debug) {
- *     ResourceIncluder::compile($resources, $pathInfo);
- *   }
- *   ResourceIncluder::include($resources, $pathInfo);
- * </code>
- *
- * TODO - Move all path information into the resource instances
+ * If the site is in debug mode, the include method wil automatically compile
+ * the resource set before inclusion.
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
 class ResourceIncluder {
 
-  public static function compile(ResourceSet $resources, $outPath) {
+  /**
+   * Copy the resource set's source files to the web path defined in the set.
+   *
+   * @param ResourceSet $resources
+   */
+  public static function compile(ResourceSet $resources) {
 
     $srcPath = $resources->getSrcPath();
+    $outPath = $resources->getWebPath();
 
     if (!file_exists($outPath)) {
       mkdir($outPath, 0755, true);
@@ -66,6 +63,9 @@ class ResourceIncluder {
         $file = array( 'src' => $file, 'out' => $file );
       }
 
+      // For convenience, it is possible to include resources from outside of
+      // the source path by providing an alternate in the 'base' property of
+      // the resource definition
       if (isset($file['base'])) {
         $fullSrcPath = "{$file['base']}/{$file['src']}";
       } else {
@@ -83,17 +83,39 @@ class ResourceIncluder {
     }
   }
 
-  public static function inc(ResourceSet $resources, $baseWeb) {
+  /**
+   * Include the files encapsulated by the given resource set in the page. If
+   * the site is operating in debug mode then the files will be copied from
+   * their source to the web-accessible path defined by the resource set.
+   *
+   * @param ResourceSet $resources The resources to include in the page.
+   * @param string $outPath The output path of the resources.
+   */
+  public static function inc(ResourceSet $resources) {
+
+    if (Conductor::isDebug()) {
+      self::compile($resources);
+    }
+
+    $pathInfo = Conductor::getPathInfo();
+    $baseWeb = $pathInfo->fsToWeb($resources->getWebPath());
+
     foreach ($resources->getExternal() AS $ext) {
-      if ($ext['type'] === 'js') {
-        $js = new Javascript($ext['url']);
-        $js->addToHead();
-      } else if ($ext['type'] === 'css') {
-        $css = new StyleSheet($ext['url']);
-        $css->addToHead();
-      } else {
-        throw new Exception(
-          "Unrecognized external resource type: {$ext['type']}");
+      $type = $ext['type'];
+      $url = $ext['url'];
+
+      switch ($type) {
+        case 'js':
+        Element::javascript($url)->addToPage();
+        break;
+
+        case 'css':
+        Element::styleSheet($url)->addToPage();
+        break;
+
+        default:
+        assert("false /* Unrecognized resource type: $type */;");
+
       }
     }
 
