@@ -272,7 +272,7 @@ ${each:relInputs as input}
 
     that = {
       elm: elm,
-      name: '${input[relationship]}'
+      name: '${input[relationship]}',
       lbl: '${input[label]}'
     };
 

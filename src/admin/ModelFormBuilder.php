@@ -15,6 +15,7 @@
 namespace conductor\admin;
 
 use \clarinet\model\Model;
+use \clarinet\model\OneToMany;
 use \clarinet\model\Relationship;
 
 use \conductor\generator\CrudServiceInfo;
@@ -56,12 +57,12 @@ class ModelFormBuilder {
       $relInfo = $adminModelInfo->getRelationship($relId);
 
       $lhs = $rel->getLhs();
-      $rhs = $rol->getRhs();
+      $rhs = $rel->getRhs();
       $rhsInfo = new AdminModelInfo($rhs);
 
       if (in_array($relInfo->getDisplay(), $acceptedDisplayStates)) {
 
-        $relInputs = array(
+        $relInputs[] = array(
           'type'           => $rel->getType(),
           'name'           => "{$modelId}_{$relName}_input",
           'relationship'   => $relName,
@@ -70,7 +71,9 @@ class ModelFormBuilder {
           'rhs'            => $rhs->getIdentifier(),
           'rhsIdProperty'  => $rhs->getId()->getName(),
           'rhsCrudService' => $rhs->getActor() . 'Crud',
-          'rhsColumn'      => $rel->getRhsColumn(),
+          'rhsColumn'      => $rel instanceof OneToMany
+            ? $rel->getRhsColumn()
+            : '',
           'nameProperty'   => $rhsInfo->getNameProperty()
         );
 
