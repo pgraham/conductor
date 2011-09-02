@@ -90,4 +90,11 @@ body {
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
   border-radius: 5px;
+
+  cursor: pointer;
+}
+#login .cdt-FormSubmitContainer .cdt-Submit:hover {
+  background-image: -webkit-linear-gradient(bottom, #B1CBE8, #76ACE8);
+  background-image: -moz-linear-gradient(bottom, #B1CBE8, #76ACE8);
+  background-image: linear-gradient(bottom, #B1CBE8, #76ACE8);
 }
