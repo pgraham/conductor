@@ -141,7 +141,7 @@ class Resource implements Compilable {
       $this->compile($pathInfo);
     }
 
-    $webPath = $pathInfo->getWebAccessibleTarget();
+    $webPath = $pathInfo->fsToWeb($pathInfo->getWebTarget());
     $name = basename($this->_name);
     if ($this->_type !== null) {
       $resourcePath = "$webPath/{$this->_type}/$name";

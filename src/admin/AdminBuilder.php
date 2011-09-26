@@ -103,7 +103,7 @@ class AdminBuilder {
             'singular' => $adminInfo->getDisplayName(),
             'plural'   => $adminInfo->getDisplayNamePlural()
           ),
-        'crudService' => $crudInfo->getCrudServiceName()
+        'crudService' => $crudInfo->getServiceName()
       );
 
       $jsonable[$model->getIdentifier()] = $modelJson;

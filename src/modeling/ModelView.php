@@ -113,4 +113,13 @@ abstract class ModelView {
       }
     }
   }
+
+  /**
+   * Getter for the model.
+   *
+   * @return Model
+   */
+  public function getModel() {
+    return $this->_model;
+  }
 }

@@ -125,7 +125,7 @@ class JsLib {
 
     $srcPath = $pathInfo->getLibPath() . "/jslib/$libDir";
     $resources = new ResourceSet($srcPath, $libDir);
-    $resources->setExternal($external);
+    $resources->addExternal($external);
     $resources->setImages($images);
     $resources->setScripts($scripts);
     $resources->setSheets($sheets);

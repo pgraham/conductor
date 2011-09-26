@@ -46,7 +46,7 @@ class ClientCompiler implements Compiler {
 
     $values = array(
       'rootPath'    => $pathInfo->getWebRoot(),
-      'targetPath'  => $pathInfo->getWebAccessibleTarget(),
+      'targetPath'  => $pathInfo->fsToWeb($pathInfo->getWebTarget()),
       'imgWidth'    => $workingImgInfo[0],
       'imgHeight'   => $workingImgInfo[1]
     );

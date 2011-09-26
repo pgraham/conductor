@@ -26,6 +26,16 @@ use \Exception;
  */
 class Fragment implements FlowContent {
 
+  public static function load($path, array $values = array()) {
+    return new Fragment($path, $values);
+  }
+
+  /*
+   * ===========================================================================
+   * Instance
+   * ===========================================================================
+   */
+
   /* The fragment */
   private $_fragment;
 

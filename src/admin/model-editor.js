@@ -41,18 +41,20 @@ var ${model}_editor = function () {
   grid = CDT.modelSelectionGrid({
     cols     : cols,
     dataitem : dataitem,
-    source   : function (request, response) {
+    source   : function (request, gridCb) {
       var srvc = window['${crudService}'];
 
-      srvc.retrieve(request, function (data) {
-        var i, len;
+      srvc.retrieve(request, function (response) {
+        var i, len, data;
+
+        data = response.data
         for (i = 0, len = data.length; i < len; i += 1) {
           // The grid widget expects the identifier property to be in a
           // property called guid
           data[i].guid = data[i]['${idProperty}'];
         }
 
-        response(data);
+        gridCb(data);
       });
     }
   });

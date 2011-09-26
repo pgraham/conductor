@@ -37,6 +37,16 @@ class CrudServiceInfo extends ModelView {
   const VIEW_SUFFIX = 'Crud';
 
   /*
+   * This is the name of the javascript variable that is used for the service's
+   * proxy.  This can be specified as the value of this @ProxyName annotation at
+   * the class level of the ModelView interface.
+   *
+   * TODO The proxy name needs to be made configurable in bassoon before this
+   *      can be implemented. 
+   */
+  private $_proxyName;
+
+  /*
    * The name of the model's CRUD service.  This is used as the basename of the
    * service's class name.  The service's class will live in the name space
    * defined by CRUD_SERVICE_NS.
@@ -47,14 +57,32 @@ class CrudServiceInfo extends ModelView {
     parent::__construct($model, self::VIEW_SUFFIX);
 
     $this->_serviceName = $model->getActor() . 'Crud';
+
+    $this->_proxyName = isset($this->_modelInfo['proxyname'])
+      ? $this->_modelInfo['proxyname']
+      : $this->_serviceName;
   }
 
   /**
-   * Getter for the fully qualified name of the mode's CRUD service class.
+   * NOT YET IMPLEMENTED
+   *
+   * Getter for the name of the Javascript variable to use as the proxy.
+   * This variable will be put into the global namespace.  This can be specified
+   * in the a model's CRUD interface using the @ProxyName annotations. If not
+   * specified then this defaults the service name.
    *
    * @return string
    */
-  public function getCrudServiceClass() {
+  public function getProxyName() {
+    return $this->_proxyName;
+  }
+
+  /**
+   * Getter for the fully qualified name of the model's CRUD service class.
+   *
+   * @return string
+   */
+  public function getServiceClass() {
     return self::CRUD_SERVICE_NS . '\\' . $this->_serviceName;
   }
 
@@ -64,7 +92,7 @@ class CrudServiceInfo extends ModelView {
    *
    * @return string
    */
-  public function getCrudServiceName() {
+  public function getServiceName() {
     return $this->_serviceName;
   }
 

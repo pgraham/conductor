@@ -79,7 +79,7 @@ class ModelEditorBuilder {
     (
       'model'       => $model->getIdentifier(),
       'idProperty'  => $model->getId()->getIdentifier(),
-      'crudService' => $crudInfo->getCrudServiceName(),
+      'crudService' => $crudInfo->getServiceName(),
       'columns'     => $columns,
       'singular'    => $adminModelInfo->getDisplayName(),
       'plural'      => $adminModelInfo->getDisplayNamePlural(),

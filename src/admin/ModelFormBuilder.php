@@ -125,7 +125,7 @@ class ModelFormBuilder {
       'propInputs'     => $propInputs,
       'relInputs'      => $relInputs,
       'tabs'           => $tabs,
-      'crudServiceVar' => $crudInfo->getCrudServiceName(),
+      'crudServiceVar' => $crudInfo->getServiceName(),
       'idProperty'     => $model->getId()->getIdentifier()
     );
 

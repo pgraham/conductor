@@ -21,7 +21,7 @@ use \clarinet\Criteria;
 
 use \conductor\config\Parser;
 use \conductor\script\Client;
-use \conductor\script\ServiceProxy;
+use \conductor\ServiceProxy;
 use \conductor\template\PageTemplate;
 
 use \oboe\head\Javascript;
@@ -179,8 +179,7 @@ class Conductor {
     $client = new Client();
     $client->addToPage();
 
-    $service = new ServiceProxy('conductor\Service', $pathInfo);
-    $service->addToHead();
+    ServiceProxy::get('conductor\Service')->addToHead();
   }
 
   public static function getPathInfo() {

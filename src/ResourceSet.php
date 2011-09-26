@@ -66,6 +66,41 @@ class ResourceSet {
     $this->_webPath = $webPath;
   }
 
+  public function addExternal($external) {
+    if (is_array($external)) {
+      foreach ($external AS $url) {
+        $this->addExternal($url);
+      }
+      return;
+    }
+
+    $type = Resource::getResourceType($external);
+    if ($type === null) {
+      throw new Exception("Unable to determine resource type: $external");
+    }
+
+    $this->_external[] = array(
+      'type' => $type,
+      'url' => $external
+    );
+  }
+
+  public function addScripts(array $scripts) {
+    $this->_scripts = array_merge($this->_scripts, $scripts);
+  }
+
+  public function addScript($script) {
+    $this->_scripts[] = $script;
+  }
+
+  public function addSheets(array $sheets) {
+    $this->_sheets = array_merge($this->_sheets, $sheets);
+  }
+
+  public function addSheet($sheet) {
+    $this->_sheets[] = $sheet;
+  }
+
   public function getSrcPath() {
     return $this->_srcPath;
   }
@@ -88,10 +123,6 @@ class ResourceSet {
 
   public function getSheets() {
     return $this->_sheets;
-  }
-
-  public function setExternal(array $external) {
-    $this->_external = $external;
   }
 
   public function setImages(array $images) {

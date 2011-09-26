@@ -27,34 +27,31 @@ use \reed\WebSitePathInfo;
 class CrudServiceBuilder {
 
   private $_model;
-  private $_pathInfo;
 
   /**
    * Create a new service builder.
    *
    * @param ModelInfo $model
    */
-  public function __construct(Model $model, WebSitePathInfo $pathInfo)
-  {
+  public function __construct(Model $model) {
     $this->_model = $model;
-    $this->_pathInfo = $pathInfo;
   }
 
   /**
    * Create the source code for a CRUD service class for the model encapsulated
    * by the instance.
    *
+   * @param string $cdtPath Path to the conductor install that will be used by
+   *   the CRUD service class.
    * @return string
    */
-  public function build() {
-    $autoloaderPath = $this->_pathInfo->getLibPath()
-      . '/conductor/src/Autoloader.php';
+  public function build($cdtAutoloaderPath) {
 
     $crudInfo = new CrudServiceInfo($this->_model);
     $templateValues = Array(
-      'autoloader' => $autoloaderPath,
-      'class'      => $crudInfo->getCrudServiceClass(),
-      'className'  => $crudInfo->getCrudServiceName(),
+      'autoloader' => $cdtAutoloaderPath,
+      'class'      => $crudInfo->getServiceClass(),
+      'className'  => $crudInfo->getServiceName(),
       'model'      => $this->_model->getClass(),
       'ns'         => CrudServiceInfo::CRUD_SERVICE_NS,
       'idColumn'   => $this->_model->getId()->getColumn()

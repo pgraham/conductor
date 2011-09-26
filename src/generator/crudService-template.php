@@ -94,17 +94,21 @@ class ${className} {
     // Retrieve the models that match the given spf
     $persister = ActorFactory::getActor('persister', '${model}');
     $models = $persister->retrieve($c);
+    $total = $persister->count($c);
 
     // Check that current user has access to read the selected models
     foreach ($models AS $model) {
       $this->_gatekeeper->checkCanRead($model);
     }
     
-    $json = array();
+    $data = array();
     foreach ($models AS $model) {
-      $json[] = $transformer->asArray($model);
+      $data[] = $transformer->asArray($model);
     }
-    return $json;
+    return array(
+      'data' => $data,
+      'total' => $total
+    );
   }
 
   /**
