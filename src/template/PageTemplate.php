@@ -11,7 +11,6 @@
  * =============================================================================
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
- * @package conductor/template
  */
 namespace conductor\template;
 
@@ -19,7 +18,6 @@ namespace conductor\template;
  * This interface defines a page template.
  *
  * @author Philip Graham <philip@zeptech.ca>
- * @package conductor/template
  */
 interface PageTemplate { 
   /**
@@ -34,8 +32,8 @@ interface PageTemplate {
   /**
    * This method can optionally define a "base" for the page title.
    * E.g. if the title base is defined as "Reed, get it wet" then a call to
-   * Oboe\Page / conductor\Page::dump("News") would result in the page's title being
-   * "Reed, get it wet - News"
+   * Oboe\Page / conductor\Page::dump("News") would result in the page's title
+   * being "Reed, get it wet - News"
    *
    * @return string can be null
    */
@@ -49,4 +47,28 @@ interface PageTemplate {
    * @return Oboe_ElementComposite must implement Oboe_Item_Body, can be null
    */
   public function getDebugContainer();
+
+  /**
+   * TODO Once support has been added for specifying resources in
+   *      conductor.cfg.xml this function should be deprecated.
+   */
+  public function getJavascripts();
+
+  /**
+   * TODO Once support has been added for specifying resources in
+   *      conductor.cfg.xml this function should be deprecated.
+   */
+  public function getLinks();
+
+  /**
+   * TODO Once support has been added for specifying resources in
+   *      conductor.cfg.xml this function should be deprecated.
+   */
+  public function getMetaData();
+
+  /**
+   * TODO Once support has been added to specifying resources in
+   *      conductor.cfg.xml this function should be deprecated.
+   */
+  public function getJsLibs();
 }

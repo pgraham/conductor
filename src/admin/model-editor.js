@@ -1,110 +1,79 @@
 var ${model}_editor = function () {
-  var that, elm, btns, grid, cols, dataitem;
+  var that, elm, btns, grid, cols, source, selected, refresh;
 
-  if (typeof ${model} === 'function') {
-    dataitem = ${model}();
-  } else {
-    dataitem = {};
-  }
-
-  cols = [];
+  cols = []; 
   ${each:columns AS column}
     cols.push({
-      id: {
-        field: '${column[id]}',
-        type: '${column[type]}',
-        html: true
-      },
-      lbl: '${column[lbl]}'
+      property: '${column[id]}',
+      label: '${column[lbl]}'
     });
-
-    ${if:column[type] = timestamp}
-      // Add a wrapper for the field value that converts the time sent from the
-      // server from UTC to local.
-      if (dataitem['${column[id]}'] === undefined) {
-        dataitem['${column[id]}'] = function () {
-          var local = Date.utcToLocal(this.options.data['${column[id]}']);
-          return local.toString('MMM dS, yyyy @ H:mm');
-        };
-      } else {
-        dataitem['${column[id]}'] = (function (orig) {
-          return function () {
-            this.options.data['${column[id]}'] = Date.utcToLocal(
-              this.options.data['${column[id]}']);
-            return orig.call(this);
-          };
-        }) ( dataitem['${column[id]}'] );
-      }
-    ${fi}
   ${done}
 
-  grid = CDT.modelSelectionGrid({
-    cols     : cols,
-    dataitem : dataitem,
-    source   : function (request, gridCb) {
-      var srvc = window['${crudService}'];
-
-      srvc.retrieve(request, function (response) {
+  source = $.ui.dataview({
+    source: function (request, gridCb) {
+      window['${crudService}'].retrieve(request, function (response) {
         var i, len, data;
 
-        data = response.data
+        data = response.data;
         for (i = 0, len = data.length; i < len; i += 1) {
-          // The grid widget expects the identifier property to be in a
-          // property called guid
-          data[i].guid = data[i]['${idProperty}'];
+          ${each:columns AS column}
+            ${if:column[type] = timestamp}
+              // Add a wrapper for the field value that converts the time sent
+              // from the server from UTC to local.
+              data[i]['${column[id]}'] =
+                Date
+                  .utcToLocal(data[i]['${column[id]}'])
+                  .toString('MMM dS, yyyy @ H:mm');
+            ${fi}
+          ${done}
         }
 
-        gridCb(data);
+        gridCb(data, response.total);
       });
     }
   });
+
+  refresh = function () {
+    source.refresh();
+    selected = [];
+  };
+  refresh();
+
+  grid = dom.table().addClass('cdt-ModelEditorGrid');
+  grid.find('thead').addClass('ui-widget-header');
+  grid.find('tbody').addClass('ui-widget-content');
+  grid.find('tfoot').addClass('ui-widget-content');
 
   btns = $('<div/>').addClass('cdt-ModelEditorBtns');
   ${each:buttons as button}
 
     ${if:button = new}
-      btns.append(
-        $('<button/>')
-          .attr('type', 'button')
-          .text("New")
-          .click(function () {
-            ${model}_form(null).on('close', function () {
-              grid.refresh();
-            }).show();
-          })
-      );
+      btns.append(dom.button("New", function () {
+        ${model}_form(null).on('close', function () {
+          refresh();
+        }).show();
+      }));
 
     ${elseif:button = edit}
-      btns.append(
-        $('<button/>')
-          .attr('type', 'button')
-          .text("Edit")
-          .click(function () {
-            var model = grid.getSelected().pop();
+      btns.append(dom.button("Edit", function () {
+        var model = selected[selected.length - 1];
 
-            if (model !== undefined) {
-              ${model}_form(model).on('close', function () {
-                grid.refresh();
-              }).show();
-            }
-          })
-      );
+        if (model !== undefined) {
+          ${model}_form(model).on('close', function () {
+            refresh();
+          }).show();
+        }
+      }));
 
     ${elseif:button = delete}
-      btns.append(
-        $('<button/>')
-          .attr('type', 'button')
-          .text("Delete")
-          .click(function () {
-            var models = grid.getSelected();
+      btns.append(dom.button("Delete", function () {
+        if (selected.length > 0) {
+          ${model}_delete(selected).show(function () {
+            refresh();
+          });
+        }
+      }));
 
-            if (models.length > 0) {
-              ${model}_delete(models).show(function () {
-                grid.refresh();
-              });
-            }
-          })
-      );
     ${fi}
 
   ${done}
@@ -113,17 +82,28 @@ var ${model}_editor = function () {
     .addClass('cdt-ModelEditor')
     .addClass('ui-widget')
     .append( btns )
-    .append( grid.elm );
+    .append( grid );
 
   that = {};
-  that.elm = elm;
 
   that.appendTo = function (jq) {
     elm.appendTo(jq);
+
+    // Don't initialize the grid until it has been appended to the document
+    // as the jQuery-ui initialization method relies on the element being
+    // in the DOM.
+    grid.grid({
+      columns: cols,
+      source: source.result
+    }).gridSelectable({
+      selected: selected
+    });
   };
 
-  that.refresh = grid.refresh;
-  that.getSelected = grid.getSelected;
+  that.refresh = refresh;
+  that.getSelected = function () {
+    return selected;
+  };
 
   return that;
 }

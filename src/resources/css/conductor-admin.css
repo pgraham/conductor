@@ -84,3 +84,13 @@ td, th {
   width: 470px;
   height: 200px;
 }
+
+.ui-grid .ui-grid-body .ui-selectable td {
+  cursor: pointer;
+}
+.ui-grid .ui-grid-body .ui-selected td {
+  background: #ACD0F5;
+}
+.ui-grid thead td {
+  text-align: center;
+}

@@ -20,11 +20,14 @@ use \clarinet\Clarinet;
 use \clarinet\Criteria;
 
 use \conductor\config\Parser;
+use \conductor\jslib\JsLib;
 use \conductor\script\Client;
 use \conductor\ServiceProxy;
 use \conductor\template\PageTemplate;
 
 use \oboe\head\Javascript;
+use \oboe\head\Link;
+use \oboe\Element;
 
 /**
  * The main interface for Conductor setup.
@@ -157,29 +160,6 @@ class Conductor {
         'debug'      => self::$config['debug']
       )
     );
-
-    // TODO These scripts are included here instead of in load() because
-    //      It is possible that a template constructor includes scripts
-    //      that rely on jquery or this client.  However, the proper spot
-    //      for these includes is in the load function because they are not
-    //      needed for aynchronous requests.  So, either the page template
-    //      interface needs to be updated to include a facility for retrieving
-    //      scripts that are to be added to the page, or the conductor.cfg.xml
-    //      parser needs to be updated to support specifying global and page
-    //      level scripts
-    $jQueryName = 'jquery.min.js';
-    if (self::isDebug()) {
-      $jQueryName = 'jquery.js';
-    }
-
-    $jQuery = new Javascript('http://ajax.googleapis.com/ajax/libs/jquery/'
-      . self::JQUERY_VERSION . DIRECTORY_SEPARATOR . $jQueryName);
-    $jQuery->addToHead();
-
-    $client = new Client();
-    $client->addToPage();
-
-    ServiceProxy::get('conductor\Service')->addToHead();
   }
 
   public static function getPathInfo() {
@@ -210,7 +190,57 @@ class Conductor {
     // client
     Page::init();
 
+    // TODO Specification for template resources should be done in
+    //      conductor.cfg.xml.
+    $jQueryName = 'jquery.min.js';
+    if (self::isDebug()) {
+      $jQueryName = 'jquery.js';
+    }
+
+    $jQuery = new Javascript('http://ajax.googleapis.com/ajax/libs/jquery/'
+      . self::JQUERY_VERSION . DIRECTORY_SEPARATOR . $jQueryName);
+    $jQuery->addToHead();
+
+    $client = new Client();
+    $client->addToPage();
+
+    ServiceProxy::get('conductor\Service')->addToHead();
+
     if ($template !== null) {
+      $metaData = $template->getMetaData();
+      if (is_array($metaData)) {
+        foreach ($metaData AS $data) {
+          $data->addToHead();
+        }
+      }
+
+      $links = $template->getLinks();
+      if (is_array($links)) {
+        foreach ($links AS $link) {
+          if ($link instanceof Link) {
+            $link->addToHead();
+          } else {
+            Element::styleSheet($link)->addToHead();
+          }
+        }
+      }
+
+      $jsLibs = $template->getJsLibs();
+      if (is_array($jsLibs)) {
+        JsLib::includeLibs($jsLibs, self::getPathInfo());
+      }
+
+      $scripts = $template->getJavascripts();
+      if (is_array($scripts)) {
+        foreach ($scripts AS $js) {
+          if ($js instanceof Javascript) {
+            $js->addToPage();
+          } else {
+            Element::js($js)->addToPage();
+          }
+        }
+      }
+
       Page::setTemplate($template);
     }
 

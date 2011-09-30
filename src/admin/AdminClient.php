@@ -93,6 +93,8 @@ class AdminClient extends Composite {
     }
 
     $this->_resources[] = new Resource('conductor-admin.css');
+    $this->_resources[] = new Resource($pathInfo->getLibPath()
+      . '/jslib/jquery-ui/themes/base/jquery.ui.grid.css');
     $this->_resources[] = new Resource('grid.js');
     $this->_resources[] = new Resource('tabbedDialog.js');
     $this->_resources['admin'] = new Resource('conductor-admin.js');

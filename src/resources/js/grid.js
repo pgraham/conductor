@@ -36,19 +36,6 @@
     gridCount += 1;
     type = 'modelGrid-data-' + gridCount;
 
-    $.ui.dataitem.extend(type, spec.dataitem || {});
-
-    $.ui.datasource({
-      type: type,
-      source: spec.source
-    });
-
-    if (spec.onload) {
-      $.ui.datastore.main.items[type].element.bind('dataitemsdata', function () {
-        spec.onload();
-      });
-    }
-
     // Build the grid's structure
     grid = $('<table/>')
       .addClass('cdt-ModelEditorGrid')
@@ -77,7 +64,7 @@
     }
 
     grid.grid({
-      type    : type,
+      source: spec.source,
       columns : cols
     });
 

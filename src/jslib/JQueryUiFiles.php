@@ -40,6 +40,7 @@ class JQueryUiFiles {
     'ui/jquery.ui.resizable.js',
     'ui/jquery.ui.selectable.js',
     'ui/jquery.ui.sortable.js',
+    'ui/jquery.ui.observable.js',
     'ui/jquery.effects.core.js',
     'ui/jquery.ui.button.js',
     'ui/jquery.ui.menu.js',
@@ -48,10 +49,10 @@ class JQueryUiFiles {
     'ui/jquery.ui.spinner.js',
     'ui/jquery.ui.datepicker.js',
     'ui/jquery.ui.slider.js',
-    'grid-datamodel/dataitem.js',
-    'grid-datamodel/datastore.js',
-    'grid-datamodel/datasource.js',
-    'grid-datamodel/grid.js'
+    'ui/jquery.ui.dataview.js',
+    'ui/jquery.ui.grid.js',
+    'grid-spf/pager.js',
+    'grid-editing/grid.selectable.js'
   );
 
   public static $sheets = array(
@@ -63,6 +64,7 @@ class JQueryUiFiles {
     'themes/base/jquery.ui.autocomplete.css',
     'themes/base/jquery.ui.datepicker.css',
     'themes/base/jquery.ui.dialog.css',
+    'themes/base/jquery.ui.grid.css',
     'themes/base/jquery.ui.menu.css',
     'themes/base/jquery.ui.menubar.css',
     'themes/base/jquery.ui.progressbar.css',
