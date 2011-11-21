@@ -42,11 +42,11 @@ class ServiceProxy {
 
     $pathInfo = Conductor::getPathInfo();
     $webTarget = $pathInfo->getWebTarget();
-    $proxyPath = File::joinPaths($webTarget, "js/$srvcName.js");
+    $proxyPath = File::joinPaths($webTarget, 'js', "$srvcName.js");
     $proxyWeb = $pathInfo->fsToWeb($proxyPath);
 
     if (Conductor::isDebug()) {
-      $dispatchPath = File::joinPaths($webTarget, "ajx/$srvcName");
+      $dispatchPath = File::joinPaths($webTarget, 'ajx', "$srvcName");
       $dispatchWeb = $pathInfo->fsToWeb($dispatchPath);
       $srvc->generate($proxyPath, $dispatchPath, $dispatchWeb);
     }
