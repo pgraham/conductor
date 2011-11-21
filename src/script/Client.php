@@ -47,9 +47,9 @@ class Client implements Compilable {
     }
 
     $this->_resources['reset']->addToPage();
+    $this->_resources['dom']->addToPage();
     $this->_resources['utility']->addToPage();
     $this->_resources['client']->addToPage();
-    $this->_resources['dom']->addToPage();
   }
 
   public function compile(WebSitePathInfo $pathInfo, array $values = null) {
