@@ -41,17 +41,10 @@ class Page {
 
     $ns = '';
     if (isset($cfg['nsbase'])) {
-      $ns = $cfg['nsbase'];
-
-      if (substr($ns, 0, 1) == '\\') {
-        // Since model classes are loaded using dynamic functionality the
-        // leading backslash will be implied so remove it for consistency
-        $ns = substr($ns, 1);
-      }
-
-      if (substr($ns, -1) != '\\') {
-        $ns .= '\\';
-      }
+      // Trim any backslashes since model classes are loaded using dynamic
+      // functionality so any leading backslash will be implied and a trailing
+      // backslash is added automatically.
+      $ns = trim($cfg['nsbase'], '\\') . '\\';
     }
 
     foreach ($cfg->page AS $page) {
