@@ -79,8 +79,9 @@ class Page {
       if (!array_key_exists($default, $pages)) {
         throw new Exception("Default page ($default) is not defined");
       }
-    } else  if (count($pages) > 0) {
-      $default = $pages[0]['id'];
+    } else if (count($pages) > 0) {
+      reset($pages);
+      $default = key($pages);
     }
 
     return Array
