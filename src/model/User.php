@@ -28,6 +28,7 @@ class User {
   private $_id;
   private $_username;
   private $_password;
+  private $_openId;
 
   private $_permissions;
 
@@ -54,6 +55,13 @@ class User {
   }
 
   /**
+   * @Column(name = oid_identity)
+   */
+  public function getOpenId() {
+    return $this->_openId;
+  }
+
+  /**
    * @OneToMany(entity = conductor\model\UserPermission)
    */
   public function getPermissions() {
@@ -70,6 +78,10 @@ class User {
 
   public function setPassword($password) {
     $this->_password = $password;
+  }
+
+  public function setOpenId($openId) {
+    $this->_openId = $openId;
   }
 
   public function setPermissions(Array $permissions) {

@@ -42,20 +42,4 @@ class Service {
     return $elm->__toString();
   }
 
-  /**
-   * @requestType post
-   */
-  public function login($username, $password) {
-    Auth::init($username, $password);
-
-    if (Auth::$session->getUser() === null) {
-      return Array('msg' => 'Invalid username or password');
-    } else {
-      return Array('msg' => null);
-    }
-  }
-
-  public function logout() {
-    setcookie('conductorsessid', '', time() - 3600, '/');
-  }
 }
