@@ -35,6 +35,7 @@ class JsLib {
    */
 
   const JQUERY_COOKIE = 'jquery-cookie';
+  const JQUERY_OPENID = 'jquery-openid';
   const JQUERY_UI = 'jquery-ui';
   const JQUERY_UI_TIMEPICKER = 'jquery-ui-timepicker';
   const DATE_JS = 'datejs';
@@ -80,6 +81,29 @@ class JsLib {
       case self::JQUERY_COOKIE:
       $libDir = 'jquery-cookie';
       $scripts[] = 'jquery.cookie.js';
+      break;
+
+      case self::JQUERY_OPENID:
+      $libDir = 'jquery-openid';
+      $scripts[] = 'jquery.openid.js';
+      $sheets[] = 'openid.css';
+
+      // FIXME We can use images for now since they are treated how we want the
+      //       html file to be treated.
+      // TODO Create a dedicated spot for html resources or combine them with
+      //      images by giving images a better name (e.g. static)
+      $images[] = 'login.html';
+
+      $images[] = 'img/yahoo.png';
+      $images[] = 'img/livejournal.png';
+      $images[] = 'img/hyves.png';
+      $images[] = 'img/blogger.png';
+      $images[] = 'img/orange.png';
+      $images[] = 'img/google.png';
+      $images[] = 'img/myspace.png';
+      $images[] = 'img/wordpress.png';
+      $images[] = 'img/aol.png';
+      $images[] = 'img/openid.png';
       break;
 
       case self::JQUERY_UI:
