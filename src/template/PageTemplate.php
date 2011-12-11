@@ -51,24 +51,15 @@ interface PageTemplate {
   /**
    * TODO Once support has been added for specifying resources in
    *      conductor.cfg.xml this function should be deprecated.
+   *
+   * Format ==
+   *
+   *   css: array of stylesheets to include
+   *   js: array of javascripts to include
+   *   fonts: array of fonts to include
+   *
+   * @return array
    */
-  public function getJavascripts();
+  public function getResources();
 
-  /**
-   * TODO Once support has been added for specifying resources in
-   *      conductor.cfg.xml this function should be deprecated.
-   */
-  public function getLinks();
-
-  /**
-   * TODO Once support has been added for specifying resources in
-   *      conductor.cfg.xml this function should be deprecated.
-   */
-  public function getMetaData();
-
-  /**
-   * TODO Once support has been added to specifying resources in
-   *      conductor.cfg.xml this function should be deprecated.
-   */
-  public function getJsLibs();
 }

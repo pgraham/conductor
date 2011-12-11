@@ -207,37 +207,27 @@ class Conductor {
     ServiceProxy::get('conductor\Service')->addToHead();
 
     if ($template !== null) {
-      $metaData = $template->getMetaData();
-      if (is_array($metaData)) {
-        foreach ($metaData AS $data) {
-          $data->addToHead();
+      $resources = $template->getResources();
+      if ($resources === null) {
+        $resources = array();
+      }
+
+      if (isset($resources['fonts'])) {
+        $fonts = implode('|', array_map(function ($font) {
+          return str_replace(' ', '+', $font);
+        }, $resources['fonts']));
+
+        Element::css("http://fonts.googleapis.com/css?family=$fonts")
+          ->addToHead();
+      }
+
+      if (isset($resources['css'])) {
+        // Allow a single stylesheet to be specified as a string
+        if (!is_array($resources['css'])) {
+          $resources['css'] = array($resources['css']);
         }
-      }
-
-      $links = $template->getLinks();
-      if (is_array($links)) {
-        foreach ($links AS $link) {
-          if ($link instanceof Link) {
-            $link->addToHead();
-          } else {
-            Element::styleSheet($link)->addToHead();
-          }
-        }
-      }
-
-      $jsLibs = $template->getJsLibs();
-      if (is_array($jsLibs)) {
-        JsLib::includeLibs($jsLibs, self::getPathInfo());
-      }
-
-      $scripts = $template->getJavascripts();
-      if (is_array($scripts)) {
-        foreach ($scripts AS $js) {
-          if ($js instanceof Javascript) {
-            $js->addToPage();
-          } else {
-            Element::js($js)->addToPage();
-          }
+        foreach ($resources['css'] AS $css) {
+          Element::css($css)->addToHead();
         }
       }
 
