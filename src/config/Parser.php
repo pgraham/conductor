@@ -15,7 +15,7 @@
 namespace conductor\config;
 
 use \conductor\auth\SessionManager;
-
+use \conductor\Exception;
 use \reed\WebSitePathInfo;
 
 /**
@@ -44,11 +44,6 @@ class Parser {
       LIBXML_NOCDATA);
 
     // Check for required items
-    if (!isset($xmlCfg->hostName)) {
-      throw new Exception('Hostname not specified');
-    }
-    $cfg['host'] = $xmlCfg->hostName->__toString();
-
     if (!isset($xmlCfg->db)) {
       throw new Exception('No database configuration found');
     }
