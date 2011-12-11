@@ -72,8 +72,10 @@ class PageLoader {
       }
 
       if (!isset(Conductor::$config['pageCfg']['pages'][$pageId])) {
-        header("HTTP/1.0 404 Not Found");
-        return new Fragment(__DIR__ . '/html/404.html');
+        header("HTTP/1.1 404 Not Found");
+        $notFound = new Fragment(__DIR__ . '/html/404.html');
+        echo $notFound;
+        exit;
       }
 
       $pageInfo = Conductor::$config['pageCfg']['pages'][$pageId];
