@@ -36,6 +36,7 @@ class JsLib {
 
   const JQUERY_COOKIE = 'jquery-cookie';
   const JQUERY_OPENID = 'jquery-openid';
+  const JQUERY_SELECTBOX = 'jquery-selectBox';
   const JQUERY_UI = 'jquery-ui';
   const JQUERY_UI_TIMEPICKER = 'jquery-ui-timepicker';
   const DATE_JS = 'datejs';
@@ -94,16 +95,24 @@ class JsLib {
       //      images by giving images a better name (e.g. static)
       $images[] = 'login.html';
 
-      $images[] = 'img/yahoo.png';
-      $images[] = 'img/livejournal.png';
-      $images[] = 'img/hyves.png';
-      $images[] = 'img/blogger.png';
-      $images[] = 'img/orange.png';
-      $images[] = 'img/google.png';
-      $images[] = 'img/myspace.png';
-      $images[] = 'img/wordpress.png';
-      $images[] = 'img/aol.png';
-      $images[] = 'img/openid.png';
+      $images[] = 'images/fadegrey.png';
+      $images[] = 'images/big/yahoo.png';
+      $images[] = 'images/big/livejournal.png';
+      $images[] = 'images/big/hyves.png';
+      $images[] = 'images/big/blogger.png';
+      $images[] = 'images/big/orange.png';
+      $images[] = 'images/big/google.png';
+      $images[] = 'images/big/myspace.png';
+      $images[] = 'images/big/wordpress.png';
+      $images[] = 'images/big/aol.png';
+      $images[] = 'images/big/openid.png';
+      break;
+
+      case self::JQUERY_SELECTBOX:
+      $libDir = 'jquery-selectBox';
+      $scripts[] = 'jquery.selectBox.min.js';
+      $sheets[] = 'jquery.selectBox.css';
+      $images[] = 'jquery.selectBox-arrow.gif';
       break;
 
       case self::JQUERY_UI:
