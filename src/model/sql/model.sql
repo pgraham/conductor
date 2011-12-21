@@ -13,6 +13,7 @@ CREATE TABLE `permissions` (
   `id`             integer      AUTO_INCREMENT PRIMARY KEY,
   `name`           varchar(256) NOT NULL UNIQUE
 );
+INSERT INTO `permissions` (`name`) VALUES ('cdt-admin');
 
 -- Session
 CREATE TABLE `session` (
@@ -28,6 +29,8 @@ CREATE TABLE `users` (
   `username`       varchar(128) NOT NULL UNIQUE,
   `password`       varchar(32)  NOT NULL
 );
+INSERT INTO `users` (`username`, `password`)
+  VALUES ('pgraham', md5('weedy gumbo smolt implant crotch'));
 
 -- UserPermission
 CREATE TABLE `users_permissions_link` (
@@ -36,3 +39,8 @@ CREATE TABLE `users_permissions_link` (
   `permissions_id` integer      NOT NULL,
   `level`          varchar(8)   NOT NULL
 );
+INSERT INTO `users_permissions_link` (`users_id`, `permissions_id`, `level`)
+  VALUES (
+    (SELECT `id` FROM `users` WHERE `username` = 'pgraham'),
+    (SELECT `id` FROM `permissions` WHERE `name` = 'cdt-admin'),
+    'write');
