@@ -121,6 +121,10 @@ class ResourceIncluder {
     }
 
     foreach ($resources->getScripts() AS $script) {
+      if (is_array($script) && isset($script['static']) && $script['static']) {
+        continue;
+      }
+
       if (is_array($script)) {
         $script = $script['out'];
       }
@@ -130,6 +134,10 @@ class ResourceIncluder {
     }
 
     foreach ($resources->getSheets() AS $sheet) {
+      if (is_array($sheet) && isset($sheet['static']) && $sheet['static']) {
+        continue;
+      }
+
       if (is_array($sheet)) {
         $sheet = $sheet['out'];
       }
