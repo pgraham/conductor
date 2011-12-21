@@ -161,6 +161,9 @@ class Conductor {
         'debug'      => self::$config['debug']
       )
     );
+
+    // Authenticate.
+    Auth::init();
   }
 
   public static function getPathInfo() {
