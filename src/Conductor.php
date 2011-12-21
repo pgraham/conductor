@@ -161,6 +161,9 @@ class Conductor {
         'debug'      => self::$config['debug']
       )
     );
+
+    // Authenticate.
+    Auth::init();
   }
 
   public static function getPathInfo() {
@@ -208,6 +211,8 @@ class Conductor {
     ServiceProxy::get('conductor\Service')->addToHead();
 
     if ($template !== null) {
+      $pathInfo = self::getPathInfo();
+
       $resources = $template->getResources();
       if ($resources === null) {
         $resources = array();
@@ -228,13 +233,15 @@ class Conductor {
           $resources['css'] = array($resources['css']);
         }
         foreach ($resources['css'] AS $css) {
+          if (substr($css, 0, 1) === '/') {
+            $css = $pathInfo->webPath($css);
+          }
           Element::css($css)->addToHead();
         }
       }
-    }
 
-    // Authenticate.
-    Auth::init();
+      Page::setTemplate($template);
+    }
   }
 
   /**

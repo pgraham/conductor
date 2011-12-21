@@ -120,7 +120,11 @@ class AdminClient extends Composite {
     $this->_resources[] = ServiceProxy::getCrud('conductor\model\ConfigValue');
 
     foreach ($this->_resources AS $resource) {
-      $resource->addToPage();
+      if ($resource instanceof \oboe\Javascript) {
+        $resource->addToHead();
+      } else {
+        $resource->addToPage();
+      }
     }
 
     $this->addToBody();

@@ -36,6 +36,7 @@ class Client implements Compilable {
     // is more certain that we are operating in a Conductor::init environment.
     $this->_resources['working'] = new Resource('working.gif');
     $this->_resources['reset']   = new Resource('reset.css');
+    $this->_resources['styles'] = new Resource('cdt.css');
     $this->_resources['utility'] = new Resource('utility.js');
     $this->_resources['client'] = new Resource('conductor.js');
     $this->_resources['dom'] = new Resource('jquery-dom.js');
@@ -47,6 +48,7 @@ class Client implements Compilable {
     }
 
     $this->_resources['reset']->addToPage();
+    $this->_resources['styles']->addToPage();
     $this->_resources['dom']->addToPage();
     $this->_resources['utility']->addToPage();
     $this->_resources['client']->addToPage();
