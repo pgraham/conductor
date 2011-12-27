@@ -12,30 +12,34 @@
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
  */
-namespace conductor\compile;
-
-use \conductor\widget\LoginForm;
-use \conductor\Resource;
-
-use \reed\WebSitePathInfo;
+namespace conductor\config;
 
 /**
- * This Class performs compilation for {@link LoginForm} instances.
+ * This class encapsulates configuration about a remote service class.
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class LoginCompiler implements Compiler {
+class ServiceConfig {
 
-  private $_loginForm;
+  /* The name of the class that defines the service. */
+  private $_className;
 
-  public function __construct(LoginForm $loginForm) {
-    $this->_loginForm = $loginForm;
+  /**
+   * Create a new ServiceConfig object for the service of the given class.
+   *
+   * @param string $className
+   */
+  public function __construct($className) {
+    $this->_className = $className;
   }
 
-  public function compile(WebSitePathInfo $pathInfo, array $values = null) {
-    $resources = $this->_loginForm->getResources();
-
-    $resources['css']->compile($pathInfo);
-    $resources['js']->compile($pathInfo);
+  /**
+   * Getter for the name of the service class represented by this object.
+   *
+   * @return string
+   */
+  public function getClassName() {
+    return $this->_className;
   }
+
 }

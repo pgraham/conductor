@@ -16,6 +16,7 @@ namespace conductor;
 
 use \conductor\compile\Compilable;
 use \conductor\compile\ResourceCompiler;
+use \conductor\Conductor;
 
 use \oboe\head\Javascript;
 use \oboe\head\StyleSheet;
@@ -173,7 +174,7 @@ class Resource implements Compilable {
     $resource = new Resource($path);
 
     if (Conductor::isDebug()) {
-      $resource->compile(Conductor::getPathInfo());
+      $resource->compile();
     }
     return $resource;
   }
@@ -220,7 +221,7 @@ class Resource implements Compilable {
     $pathInfo = Conductor::getPathInfo();
 
     if (Conductor::isDebug()) {
-      $this->compile($pathInfo);
+      $this->compile();
     }
 
     $webPath = $pathInfo->fsToWeb($pathInfo->getWebTarget());
@@ -259,11 +260,13 @@ class Resource implements Compilable {
    *   web site.
    * @param array $values Symbol table for resource compilation.
    */
-  public function compile(WebSitePathInfo $pathInfo, array $values = null) {
+  public function compile(array $values = null) {
     if ($this->_compiled) {
       return;
     }
     $this->_compiled = true;
+
+    if ($pathInfo === null)
 
     $compiler = new ResourceCompiler($this);
     $compiler->compile($pathInfo, $values);

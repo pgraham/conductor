@@ -21,7 +21,7 @@ use \clarinet\Criteria;
 
 use \conductor\config\Parser;
 use \conductor\jslib\JsLib;
-use \conductor\script\Client;
+use \conductor\resources\BaseResources;
 use \conductor\template\PageTemplate;
 
 use \oboe\head\Javascript;
@@ -106,6 +106,35 @@ class Conductor {
   }
 
   /**
+   * Getter for the path info associated with conductor config used to
+   * initialize this session.
+   *
+   * @return \reed\WebSitePathInfo
+   */
+  public static function getPathInfo() {
+    self::_ensureInitialized();
+    return self::$config['pathInfo'];
+  }
+
+  /**
+   * Getter for the web site's model classes.
+   *
+   * @return \conductor\config\ModelConfig[]
+   */
+  public static function getModels() {
+    return self::$config['models'];
+  }
+
+  /**
+   * Get the service classes for the site.
+   *
+   * @return \conductor\config\ServiceConfig[]
+   */
+  public static function getServices() {
+    return self::$config['services'];
+  }
+
+  /**
    * Initialize the framework.  This consists of registering the autoloaders for
    * the libraries, connecting to the database and initializing clarinet.
    *
@@ -166,11 +195,6 @@ class Conductor {
     Auth::init();
   }
 
-  public static function getPathInfo() {
-    self::_ensureInitialized();
-    return self::$config['pathInfo'];
-  }
-
   /**
    * Getter for whether or not the site is operating in DEBUG mode.
    *
@@ -205,8 +229,11 @@ class Conductor {
       . self::JQUERY_VERSION . "/$jQueryName";
     Element::js($jqPath)->addToHead();
 
-    $client = new Client();
-    $client->addToPage();
+    $base = new BaseResources();
+    if (self::isDebug()) {
+      $base->compile();
+    }
+    $base->inc();
 
     ServiceProxy::get('conductor\Service')->addToHead();
 

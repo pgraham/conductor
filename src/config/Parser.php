@@ -73,11 +73,22 @@ class Parser {
     // necessary
     if (isset($xmlCfg->models)) {
       $cfg['models'] = Model::parse($xmlCfg->models, $pathRoot);
+    } else {
+      $cfg['models'] = array();
     }
 
     // Create an array of pages if defined
     if (isset($xmlCfg->pages)) {
       $cfg['pageCfg'] = Page::parse($xmlCfg->pages, $pathRoot);
+    } else {
+      // TODO Should this be an error?
+      $cfg['pageCfg'] = array();
+    }
+
+    if (isset($xmlCfg->services)) {
+      $cfg['services'] = ServiceParser::parse($xmlCfg->services, $pathRoot);
+    } else {
+      $cfg['services'] = array();
     }
 
     // Set the output directory, if not specified use a temporary directory

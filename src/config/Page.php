@@ -11,7 +11,6 @@
  * =============================================================================
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
- * @package conductor/config
  */
 namespace conductor\config;
 
@@ -23,7 +22,6 @@ use \conductor\Exception;
  * This class parses a conductor configuration XML file's <pages> section.
  *
  * @author Philip Graham <philip@zeptech.ca>
- * @package conductor/config
  */
 class Page {
 
