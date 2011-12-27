@@ -68,9 +68,9 @@ class BaseResources {
   }
 
   public function inc() {
-    $this->_cdtJs->addToPage();
     foreach ($this->_toInclude AS $r) {
       $r->addToPage();
     }
+    $this->_cdtJs->addToPage();
   }
 }
