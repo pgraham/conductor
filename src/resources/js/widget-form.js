@@ -16,6 +16,12 @@
     
     elm.find('input').spinner({ step: 1 });
 
+    // the latest version of the spinner widget sets an explicit height on the
+    // element the same as the calculated height to fix an IE6 bug, but since
+    // the spinner isn't attached yet the calculated height is 0.  Since IE6 is
+    // not supported by conductor app the height: 0 is simply cleared
+    elm.children().filter('span').css('height', '');
+
     return {
       name: name,
       elm: elm,
