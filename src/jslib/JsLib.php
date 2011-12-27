@@ -34,10 +34,15 @@ class JsLib {
    * ===========================================================================
    */
 
+  const DATE_JS = 'datejs';
+  const FILE_UPLOADER = 'file-uploader';
+  const GALLERIA = 'galleria';
   const JQUERY_COOKIE = 'jquery-cookie';
+  //const JQUERY_FILE_UPLOADER = 'jquery-file-uploader';
+  const JQUERY_OPENID = 'jquery-openid';
+  const JQUERY_SELECTBOX = 'jquery-selectBox';
   const JQUERY_UI = 'jquery-ui';
   const JQUERY_UI_TIMEPICKER = 'jquery-ui-timepicker';
-  const DATE_JS = 'datejs';
 
   /* Array of libraries that have already been included in the page. */
   private static $_included = array();
@@ -77,9 +82,74 @@ class JsLib {
     $external = array();
 
     switch ($lib) {
+      case self::FILE_UPLOADER:
+      $libDir = 'file-uploader';
+      $scripts[] = array(
+        'src' => 'client/fileuploader.js',
+        'out' => 'fileuploader.js'
+      );
+      $sheets[] = array(
+        'src' => 'client/fileuploader.css',
+        'out' => 'fileuploader.css'
+      );
+      $images[] = array(
+        'src' => 'client/loading.gif',
+        'out' => 'loading.gif'
+      );
+      break;
+
+      case self::GALLERIA:
+      $libDir = 'galleria';
+      $scripts[] = array(
+        'src' => 'src/galleria.js',
+        'out' => 'galleria.js'
+      );
+      $scripts[] = array(
+        'src' => 'src/themes/classic/galleria.classic.js',
+        'out' => 'themes/classic/galleria.classic.js',
+        'static' => true
+      );
+      $sheets[] = array(
+        'src' => 'src/themes/classic/galleria.classic.css',
+        'out' => 'themes/classic/galleria.classic.css',
+        'static' => true
+      );
+      break;
+
       case self::JQUERY_COOKIE:
       $libDir = 'jquery-cookie';
       $scripts[] = 'jquery.cookie.js';
+      break;
+
+      case self::JQUERY_OPENID:
+      $libDir = 'jquery-openid';
+      $scripts[] = 'jquery.openid.js';
+      $sheets[] = 'openid.css';
+
+      // FIXME We can use images for now since they are treated how we want the
+      //       html file to be treated.
+      // TODO Create a dedicated spot for html resources or combine them with
+      //      images by giving images a better name (e.g. static)
+      $images[] = 'login.html';
+
+      $images[] = 'images/fadegrey.png';
+      $images[] = 'images/big/yahoo.png';
+      $images[] = 'images/big/livejournal.png';
+      $images[] = 'images/big/hyves.png';
+      $images[] = 'images/big/blogger.png';
+      $images[] = 'images/big/orange.png';
+      $images[] = 'images/big/google.png';
+      $images[] = 'images/big/myspace.png';
+      $images[] = 'images/big/wordpress.png';
+      $images[] = 'images/big/aol.png';
+      $images[] = 'images/big/openid.png';
+      break;
+
+      case self::JQUERY_SELECTBOX:
+      $libDir = 'jquery-selectBox';
+      $scripts[] = 'jquery.selectBox.min.js';
+      $sheets[] = 'jquery.selectBox.css';
+      $images[] = 'jquery.selectBox-arrow.gif';
       break;
 
       case self::JQUERY_UI:
@@ -173,8 +243,8 @@ class JsLib {
       array $opts = null
   ) {
 
-    if (Conductor::isDebug()) {
-      self::compile($lib, $pathInfo, $opts);
+    if (in_array($lib, self::$_included)) {
+      return;
     }
 
     $files = self::getFiles($lib, $pathInfo, $opts);

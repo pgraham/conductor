@@ -15,6 +15,7 @@
 namespace conductor;
 
 use \oboe\Element;
+use \reed\File;
 use \reed\WebSitePathInfo;
 
 /**
@@ -67,12 +68,12 @@ class ResourceIncluder {
       // the source path by providing an alternate in the 'base' property of
       // the resource definition
       if (isset($file['base'])) {
-        $fullSrcPath = "{$file['base']}/{$file['src']}";
+        $fullSrcPath = File::joinPaths($file['base'], $file['src']);
       } else {
-        $fullSrcPath = "$srcPath/{$file['src']}";
+        $fullSrcPath = File::joinPaths($srcPath, $file['src']);
       }
 
-      $fullOutPath = "$outPath/{$file['out']}";
+      $fullOutPath = File::joinPaths($outPath, $file['out']);
 
       $outDir = dirname($fullOutPath);
       if (!file_exists($outDir)) {
@@ -120,19 +121,29 @@ class ResourceIncluder {
     }
 
     foreach ($resources->getScripts() AS $script) {
+      if (is_array($script) && isset($script['static']) && $script['static']) {
+        continue;
+      }
+
       if (is_array($script)) {
         $script = $script['out'];
       }
 
-      $js = Element::javascript("$baseWeb/$script")->addToHead();
+      $jsPath = File::joinPaths($baseWeb, $script);
+      Element::javascript($jsPath)->addToHead();
     }
 
     foreach ($resources->getSheets() AS $sheet) {
+      if (is_array($sheet) && isset($sheet['static']) && $sheet['static']) {
+        continue;
+      }
+
       if (is_array($sheet)) {
         $sheet = $sheet['out'];
       }
 
-      $css = Element::styleSheet("$baseWeb/$sheet")->addToHead();
+      $cssPath = File::joinPaths($baseWeb, $sheet);
+      Element::styleSheet($cssPath)->addToHead();
     }
   }
 }

@@ -15,31 +15,19 @@
 namespace conductor;
 
 /**
- * This class provides asynchronous login capabilities.
+ * Generic logger.
  *
  * @author Philip Graham <philip@zeptech.ca>
- *
- * @Service( name = ConductorService )
- * @CsrfToken conductorsessid
- * @Requires Autoloader.php
  */
-class Service {
+class Logger {
+  
+  private static $_debugMsgs = array();
 
-  /**
-   * Initiate the service.  This ensures that conductor has been initialized.
-   */
-  public function __construct() {
-    Conductor::init();
+  public static function debug($msg) {
+    self::$_debugMsgs[] = $msg;
   }
 
-  /**
-   * @returnType html
-   * @noCache don't cache, this is temporary until Bassoon supports the use of
-   *   ETags
-   */
-  public function loadPage($pageId) {
-    $elm = PageLoader::loadPage($pageId, true);
-    return $elm->__toString();
+  public static function dump() {
+    return implode("\n", self::$_debugMsgs);
   }
-
 }

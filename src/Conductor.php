@@ -22,7 +22,6 @@ use \clarinet\Criteria;
 use \conductor\config\Parser;
 use \conductor\jslib\JsLib;
 use \conductor\script\Client;
-use \conductor\ServiceProxy;
 use \conductor\template\PageTemplate;
 
 use \oboe\head\Javascript;
@@ -159,6 +158,8 @@ class Conductor {
     if ($configPath === null) {
       // The default assumes that conductor is at the following path:
       //   <website-root>/lib/conductor/src/Conductor.php
+      // and that the conductor configuration is found in a file at the
+      // site root named conductor.cfg.xml
       $configPath = __DIR__ . '/../../../conductor.cfg.xml';
     }
     self::$config = Parser::parse($configPath);
@@ -189,6 +190,9 @@ class Conductor {
         'debug'      => self::$config['debug']
       )
     );
+
+    // Authenticate.
+    Auth::init();
   }
 
   /**
@@ -221,9 +225,9 @@ class Conductor {
       $jQueryName = 'jquery.js';
     }
 
-    $jQuery = new Javascript('http://ajax.googleapis.com/ajax/libs/jquery/'
-      . self::JQUERY_VERSION . DIRECTORY_SEPARATOR . $jQueryName);
-    $jQuery->addToHead();
+    $jqPath = 'http://ajax.googleapis.com/ajax/libs/jquery/'
+      . self::JQUERY_VERSION . "/$jQueryName";
+    Element::js($jqPath)->addToHead();
 
     $client = new Client();
     $client->addToPage();
@@ -231,49 +235,60 @@ class Conductor {
     ServiceProxy::get('conductor\Service')->addToHead();
 
     if ($template !== null) {
-      $metaData = $template->getMetaData();
-      if (is_array($metaData)) {
-        foreach ($metaData AS $data) {
-          $data->addToHead();
+      $pathInfo = self::getPathInfo();
+
+      $resources = $template->getResources();
+      if ($resources === null) {
+        $resources = array();
+      }
+
+      if (isset($resources['fonts'])) {
+        $fonts = implode('|', array_map(function ($font) {
+          return str_replace(' ', '+', $font);
+        }, $resources['fonts']));
+
+        Element::css("http://fonts.googleapis.com/css?family=$fonts")
+          ->addToHead();
+      }
+
+      if (isset($resources['css'])) {
+        // Allow a single stylesheet to be specified as a string
+        if (!is_array($resources['css'])) {
+          $resources['css'] = array($resources['css']);
         }
-      }
-
-      $links = $template->getLinks();
-      if (is_array($links)) {
-        foreach ($links AS $link) {
-          if ($link instanceof Link) {
-            $link->addToHead();
-          } else {
-            Element::styleSheet($link)->addToHead();
+        foreach ($resources['css'] AS $css) {
+          if (substr($css, 0, 1) === '/') {
+            $css = $pathInfo->webPath($css);
           }
-        }
-      }
-
-      $jsLibs = $template->getJsLibs();
-      if (is_array($jsLibs)) {
-        JsLib::includeLibs($jsLibs, self::getPathInfo());
-      }
-
-      $scripts = $template->getJavascripts();
-      if (is_array($scripts)) {
-        foreach ($scripts AS $js) {
-          if ($js instanceof Javascript) {
-            $js->addToPage();
-          } else {
-            Element::js($js)->addToPage();
-          }
+          Element::css($css)->addToHead();
         }
       }
 
       Page::setTemplate($template);
     }
+  }
 
-    // Authenticate.
-    if (isset($_POST['uname']) && isset($_POST['pw'])) {
-      Auth::init($_POST['uname'], $_POST['pw']);
-    } else {
-      Auth::init();
-    }
+  /**
+   * This function loads the default page and dumps it.
+   *
+   * This function should only be called while processing a synchronous request.
+   * See {@link PageLoader::loadPage} for loading page content in response to
+   * an asynchronous request.
+   */
+  public static function loadDefaultPage() {
+    self::loadPage();
+  }
+
+  /**
+   * This function loads the page with the given name and dumps it.
+   *
+   * This function should only be called while processing a synchronous request.
+   * See {@link PageLoader::loadPage} for loading page content in response to
+   * an asynchronous request.
+   */
+  public static function loadPage($page = null) {
+    PageLoader::loadPage($page)->addToBody();
+    Page::dump(PageLoader::getPageTitle($page));
   }
 
   private static function _ensureInitialized() {

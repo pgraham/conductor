@@ -21,6 +21,7 @@ use \oboe\head\Javascript;
 use \oboe\head\StyleSheet;
 use \oboe\item\Body as BodyItem;
 use \oboe\item\Head as HeadItem;
+use \oboe\Element;
 use \oboe\Image;
 
 use \reed\generator\CodeTemplateLoader;
@@ -36,6 +37,13 @@ use \reed\WebSitePathInfo;
  *       resources from different paths with the same basename will result
  *       in a conflict.
  *
+ * TODO Encapsulate distinction between an imported resource and a local
+ *      resource.  Imported resources can be any file necessary for the
+ *      functionality of the website that live outside of the document root.
+ *      Local resources are files that live inside the document root and can
+ *      be included in the page as external resources.  These include and are
+ *      currently limitted to javascripts and stylesheets.
+ * 
  * @author Philip Graham <philip@zeptech.ca>
  */
 class Resource implements Compilable {
@@ -96,6 +104,80 @@ class Resource implements Compilable {
     return null;
   }
 
+  /**
+   * Load the specified resource.  Relative paths are treated as imported
+   * resources relative to the conductor resource directory while absolute paths
+   * are treated as local resources relative to the document root
+   * (i.e., Absolute paths are treated as web paths relative to the web root.)
+   *
+   * Imported resources:
+   * -------------------
+   * Imported resources will be copied into the document root if in dev mode and
+   * javascripts and stylesheet will be included in document head.  While not
+   * in dev mode any imported resources that are not javascripts or stylesheets
+   * will be ignored as they should already be present in the document root
+   * due to a compile.
+   *
+   * Local resources:
+   * ----------------
+   * Local resources that are javascripts and stylesheets will be automatically
+   * included in the document head.  Other resource types are ignored but no
+   * error is presented.  This is to allow for cases where the path of a
+   * resource (e.g. an image) could be either local or imported as would be the
+   * case when a page or component will allow an imported resource to be
+   * overridden by the presence of an equivalent local resource.
+   *
+   * NOTE: To include resources that are neither local or in the conductor
+   *       resources directory use the Resource::import(...) static method with
+   *       an absolute path.  This will compile the resource into the document
+   *       root so that it can then be loaded as a local resource using this
+   *       method.
+   *
+   * NOTE:  To compile imported resources in the conductor directory without
+   *        including them in the document head, use the Resource::import(...)
+   *        static method with a relative path.
+   *
+   * TODO: Write the Resource::import(...) method.
+   *
+   * @param string $path The path to the resource.
+   */
+  public static function load($path) {
+    if (substr($path, 0, 1) === '/') {
+      $pathInfo = Conductor::getPathInfo();
+      $path = $pathInfo->webPath($path);
+
+      switch (self::getResourceType($path)) {
+        case 'js':
+        Element::js($path)->addToHead();
+        break;
+
+        case 'css':
+        Element::css($path)->addToHead();
+      }
+    } else {
+      self::import($path)->addToPage();
+    }
+  }
+
+  /**
+   * Import a resource into the document root.  A single file name with no path
+   * component will have its type auto-detected and be treated as living in the
+   * appropriate directory inside the conductor resource directory.  A  relative
+   * path will be treated as relative to the conductor resource directory and
+   * an absolute path will be treated as an absolute file system path.
+   *
+   * @param string $path
+   * @return Resource
+   */
+  public static function import($path) {
+    $resource = new Resource($path);
+
+    if (Conductor::isDebug()) {
+      $resource->compile(Conductor::getPathInfo());
+    }
+    return $resource;
+  }
+
   /*
    * ===========================================================================
    * Instance
@@ -135,7 +217,7 @@ class Resource implements Compilable {
    * for unsupported resource types.
    */
   public function addToPage() {
-    $pathInfo = Conductor::$config['pathInfo'];
+    $pathInfo = Conductor::getPathInfo();
 
     if (Conductor::isDebug()) {
       $this->compile($pathInfo);

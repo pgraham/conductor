@@ -35,7 +35,7 @@ class Autoloader {
    * @param {string} The name of the class to load.
    */
   public static function loadClass($className) {
-    if (substr($className, 0, 10) != 'conductor\\') {
+    if (substr($className, 0, 10) !== 'conductor\\') {
       return;
     }
 

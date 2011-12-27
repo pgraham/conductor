@@ -15,7 +15,7 @@
 namespace conductor\config;
 
 use \conductor\auth\SessionManager;
-
+use \conductor\Exception;
 use \reed\WebSitePathInfo;
 
 /**
@@ -35,13 +35,19 @@ class Parser {
   public static function parse($configPath) {
     $cfg = Array();
 
-    $xmlCfg = simplexml_load_file($configPath, 'SimpleXMLElement',
-      LIBXML_NOCDATA);
-
     // Any paths defined in the configuration file will be evaluated as relative
     // to the file.  This path is used to determine namespaces while scanning
     // model files so we need to resolve its 'real' path.
     $pathRoot = realpath(dirname($configPath));
+
+    $xmlCfg = simplexml_load_file($configPath, 'SimpleXMLElement',
+      LIBXML_NOCDATA);
+
+    // Check for required items
+    if (!isset($xmlCfg->db)) {
+      throw new Exception('No database configuration found');
+    }
+    $cfg['pdo'] = Db::parse($xmlCfg->db, $pathRoot);
 
     // Set debug mode
     $cfg['debug'] = isset($xmlCfg->debug);
@@ -53,6 +59,7 @@ class Parser {
       $cfg['title'] = 'Powered by Conductor';
     }
 
+
     // Parse the website's custom Autoloader
     if (isset($xmlCfg->autoloader)) {
       $autoloader = $xmlCfg->autoloader->__toString();
@@ -61,12 +68,6 @@ class Parser {
       }
       $cfg['autoloader'] = $autoloader;
     }
-
-    // Create a connection to the database
-    if (!isset($xmlCfg->db)) {
-      throw new Exception('No database configuration found');
-    }
-    $cfg['pdo'] = Db::parse($xmlCfg->db, $pathRoot);
 
     // Create an array of model files.  No parsing is actually done until
     // necessary

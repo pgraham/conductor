@@ -39,13 +39,10 @@ class Page {
 
     $ns = '';
     if (isset($cfg['nsbase'])) {
-      // Since model classes are loaded using dynamic functionality the
-      // leading backslash will be implied so remove it for consistency
-      $ns = ltrim($cfg['nsbase'], '\\');
-
-      if (substr($ns, -1) != '\\') {
-        $ns .= '\\';
-      }
+      // Trim any backslashes since model classes are loaded using dynamic
+      // functionality so any leading backslash will be implied and a trailing
+      // backslash is added automatically.
+      $ns = trim($cfg['nsbase'], '\\') . '\\';
     }
 
     foreach ($cfg->page AS $page) {
@@ -80,8 +77,9 @@ class Page {
       if (!array_key_exists($default, $pages)) {
         throw new Exception("Default page ($default) is not defined");
       }
-    } else  if (count($pages) > 0) {
-      $default = $pages[0]['id'];
+    } else if (count($pages) > 0) {
+      reset($pages);
+      $default = key($pages);
     }
 
     return Array

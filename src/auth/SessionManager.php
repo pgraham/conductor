@@ -29,8 +29,20 @@ use \conductor\Conductor;
  */
 class SessionManager {
 
+  /**
+   * The default amount of time for which an inactive session remains valid.
+   */
   const DEFAULT_SESSION_TTL = 3600; // 60 * 60 = 1 hour in seconds
 
+  /**
+   * Constant which when passed to loadSession will cause a loaded session to
+   * be discarded if it has already been authenticated.  This is used when an
+   * authentication attempt is successful in order to reuse an existing,
+   * unauthenticated session.
+   */
+  const NEW_IF_AUTHENTICATED = true;
+
+  /* Characters from which a session id prefix will be randomly generated */
   private static $keyPrefixChars = "abcdefghijklmnopqrstuvwxyz0123456789";
 
   /**
@@ -41,9 +53,9 @@ class SessionManager {
    * @return conductor\model\Session|null Return the session with the given key
    *   or null the session has expired or does not exist.
    */
-  public static function loadSession($sessionKey) {
+  public static function loadSession($sessionKey, $newIfAuthenticated = false) {
     if ($sessionKey === null) {
-      return null;
+      return self::newSession();
     }
 
     $c = new Criteria();
@@ -55,6 +67,10 @@ class SessionManager {
     }
 
     if ($session->isExpired(Conductor::$config['sessionTtl'])) {
+      return self::newSession();
+    }
+
+    if ($newIfAuthenticated && $session->getUser() !== null) {
       return self::newSession();
     }
 
