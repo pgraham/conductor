@@ -15,6 +15,7 @@
 namespace conductor\resources;
 
 use \conductor\Conductor;
+use \conductor\Resource;
 
 /**
  * This class encapsulates a the base set of resources for the platform.
@@ -29,13 +30,13 @@ class BaseResources {
 
   public function __construct() {
     $img = array(
-      new Resource('working.gif');
+      new Resource('working.gif')
     );
 
     $css = array(
       new Resource('reset.css'),
       new Resource('cdt.css'),
-      new Resource('login.css');
+      new Resource('login.css')
     );
 
     $js = array(

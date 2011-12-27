@@ -266,10 +266,8 @@ class Resource implements Compilable {
     }
     $this->_compiled = true;
 
-    if ($pathInfo === null)
-
     $compiler = new ResourceCompiler($this);
-    $compiler->compile($pathInfo, $values);
+    $compiler->compile(Conductor::getPathInfo(), $values);
   }
 
   public function getName() {
