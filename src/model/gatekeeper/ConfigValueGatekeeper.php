@@ -12,7 +12,7 @@
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
  */
-namespace conductor\model;
+namespace conductor\model\gatekeeper;
 
 use \conductor\crud\DefaultGatekeeper;
 
