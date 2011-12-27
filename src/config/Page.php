@@ -11,7 +11,6 @@
  * =============================================================================
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
- * @package conductor/config
  */
 namespace conductor\config;
 
@@ -23,7 +22,6 @@ use \conductor\Exception;
  * This class parses a conductor configuration XML file's <pages> section.
  *
  * @author Philip Graham <philip@zeptech.ca>
- * @package conductor/config
  */
 class Page {
 
@@ -41,13 +39,9 @@ class Page {
 
     $ns = '';
     if (isset($cfg['nsbase'])) {
-      $ns = $cfg['nsbase'];
-
-      if (substr($ns, 0, 1) == '\\') {
-        // Since model classes are loaded using dynamic functionality the
-        // leading backslash will be implied so remove it for consistency
-        $ns = substr($ns, 1);
-      }
+      // Since model classes are loaded using dynamic functionality the
+      // leading backslash will be implied so remove it for consistency
+      $ns = ltrim($cfg['nsbase'], '\\');
 
       if (substr($ns, -1) != '\\') {
         $ns .= '\\';

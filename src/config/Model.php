@@ -14,6 +14,7 @@
  */
 namespace conductor\config;
 
+use \reed\File;
 use \RecursiveDirectoryIterator;
 use \RecursiveIteratorIterator;
 use \SimpleXMLElement;
@@ -37,27 +38,23 @@ class Model {
   public static function parse(SimpleXMLElement $cfg, $pathRoot) {
     $models = Array();
     if (isset($cfg['scandir'])) {
-      if (substr($cfg['scandir'], 0, 1) == '/') {
+      if (substr($cfg['scandir'], 0, 1) === '/') {
         $scanDir = $cfg['scandir'];
       } else {
-        $scanDir = $pathRoot . '/' . $cfg['scandir'];
+        $scanDir = File::joinPaths($pathRoot, $cfg['scandir']);
       }
 
-      if (substr($scanDir, -1) == '/') {
-        $scanDir = substr($scanDir, 0, -1);
-      }
+      $scanDir = File::rtrim($scanDir);
 
       $ns = '';
       if (isset($cfg['nsbase'])) {
         $ns = $cfg['nsbase'];
 
-        if (substr($ns, 0, 1) == '\\') {
-          // Since model classes are loaded using dynamic functionality the
-          // leading backslash will be implied so remove it for consistency
-          $ns = substr($ns, 1);
-        }
+        // Since model classes are loaded using dynamic functionality the
+        // leading backslash will be implied so remove it for consistency
+        $ns = ltrim($ns, '\\');
 
-        if (substr($ns, -1) != '\\') {
+        if (substr($ns, -1) !== '\\') {
           $ns .= '\\';
         }
       }
@@ -72,7 +69,7 @@ class Model {
         }
 
         $realPath = $file->getRealPath();
-        if (substr($realPath, -4) != '.php') {
+        if (substr($realPath, -4) !== '.php') {
           continue;
         }
 
@@ -81,11 +78,8 @@ class Model {
         // Transform the path into a relative namespace by replacing directory
         // separators with backslashes and removing the extension
         $subNs = str_replace('/', '\\', substr($relPath, 0, -4));
-
-        if (substr($subNs, 0, 1) == '\\') {
-          $subNs = substr($subNs, 1);
-        }
-
+        $subNs = ltrim($subNs, '\\');
+      
         $fullyQualified = $ns . $subNs;
         $models[] = new ModelConfig($fullyQualified);
       }
@@ -111,11 +105,11 @@ class Model {
       return null;
     }
 
-    $model = new ModelConfig($tag['class']->__toString());
+    $model = new ModelConfig((string) $tag['class']);
 
     $hasAdmin = true;
     if (isset($tag['admin'])) {
-      $hasAdminVal = $tag['admin']->__toString();
+      $hasAdminVal = (string) $tag['admin'];
       if ($hasAdminVal === 'true') {
         $hasAdmin = true;
       } else if ($hasAdminVal === 'false') {
@@ -130,7 +124,7 @@ class Model {
 
     $hasCrud = true;
     if (isset($tag['crud'])) {
-      $hasCrudVal = $tag['crud']->__toString();
+      $hasCrudVal = (string) $tag['crud'];
       if ($hasCrudVal === 'true') {
         $hasCrud = true;
       } else if ($hasCrudVal === 'false') {
