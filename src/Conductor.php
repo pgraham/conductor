@@ -21,7 +21,7 @@ use \clarinet\Criteria;
 
 use \conductor\config\Parser;
 use \conductor\jslib\JsLib;
-use \conductor\script\Client;
+use \conductor\resources\BaseResources;
 use \conductor\template\PageTemplate;
 
 use \oboe\head\Javascript;
@@ -229,8 +229,11 @@ class Conductor {
       . self::JQUERY_VERSION . "/$jQueryName";
     Element::js($jqPath)->addToHead();
 
-    $client = new Client();
-    $client->addToPage();
+    $base = new BaseResources();
+    if (self::isDebug()) {
+      $base->compile();
+    }
+    $base->inc();
 
     ServiceProxy::get('conductor\Service')->addToHead();
 

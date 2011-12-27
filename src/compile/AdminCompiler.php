@@ -40,10 +40,10 @@ class AdminCompiler implements Compiler {
       if ($key === 'admin') {
         $builder = new AdminBuilder($values['models']);
         $adminValues = $builder->build();
-        $resource->compile($pathInfo, $adminValues);
+        $resource->compile($adminValues);
 
       } else if ($resource instanceof Resource) {
-        $resource->compile($pathInfo);
+        $resource->compile();
       }
     }
 
