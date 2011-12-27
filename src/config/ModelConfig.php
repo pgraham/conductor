@@ -63,6 +63,8 @@ class ModelConfig {
    * @param boolean Optional.
    * @return boolean If no parameter is given then the current value, otherwise
    *   the given parameter is echoed.
+   * @deprecated Generated admin interface should no longer be used, use
+   *   support provided by conductor app instead
    */
   public function hasAdmin($hasAdmin = null) {
     if ($hasAdmin !== null) {

@@ -34,8 +34,6 @@ class ServiceProxy {
     return Element::js($srvc->getWebPath());
   }
 
-  // TODO Update Conductor::load to use this method to include the
-  //      Conductor Service.
   public static function get($srvcClass) {
     $srvc = new RemoteService($srvcClass);
     $srvcName = $srvc->getName();
