@@ -13,6 +13,8 @@
     tbody = $('<tbody/>');
     elm = $('<div/>')
       .addClass('cdt-list')
+      .addClass('ui-widget-content')
+      .addClass('ui-corner-all')
       .append($('<table/>')
         .append(thead.append($('<tr/>')))
         .append(tbody)
