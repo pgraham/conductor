@@ -104,8 +104,7 @@ class PageLoader {
    */
   public static function loadAdmin() {
     try {
-      Conductor::init();
-
+      error_log('Loading admin');
       if (!Auth::hasPermission('cdt-admin')) {
         throw new AuthorizationException("Please login");
       }

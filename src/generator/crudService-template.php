@@ -2,10 +2,11 @@
 namespace ${ns};
 
 use \clarinet\ActorFactory;
+use \clarinet\Persister;
 use \clarinet\Criteria;
 
 ${if:gatekeeper ISSET}
-  use \${gatekeeper} aS Gatekeeper;
+  use \${gatekeeper} as Gatekeeper;
 ${else}
   use \conductor\crud\DefaultGatekeeper as Gatekeeper;
 ${fi}
@@ -29,11 +30,7 @@ class ${className} {
     // Ensure that conductor is initialized
     Conductor::init();
 
-    ${if:gatekeeper ISSET}
-      $this->_gatekeeper = new Gatekeeper();
-    ${else}
-      $this->_gatekeeper = new Gatekeeper('${model}');
-    ${fi}
+    $this->_gatekeeper = new Gatekeeper('${model}');
   }
 
   /**
@@ -46,7 +43,7 @@ class ${className} {
 
     $this->_gatekeeper->checkCanCreate($model);
 
-    $persister = ActorFactory::getActor('persister', '${model}');
+    $persister = Persister::get($model);
     $persister->create($model);
   }
 
@@ -60,7 +57,7 @@ class ${className} {
       $spf = (array) $spf;
     }
 
-    $persister = ActorFactory::getActor('persister', '${model}');
+    $persister = Persister::get('${model}');
     $transformer = ActorFactory::getActor('transformer', '${model}');
 
     $c = new Criteria();
@@ -97,6 +94,8 @@ class ${className} {
     $total = $persister->count($c);
 
     // Check that current user has access to read the selected models
+    // TODO Should this always throw an exception?  Could simply ignore models
+    //      the user isn't allowed to read
     foreach ($models AS $model) {
       $this->_gatekeeper->checkCanRead($model);
     }
@@ -118,9 +117,11 @@ class ${className} {
     $transformer = ActorFactory::getActor('transformer', '${model}');
     $model = $transformer->fromArray($params);
 
-    $this->_gatekeeper->checkCanWrite($model);
+    $persister = Persister::get('${model}');
+    $original = $persister->getById($model->get${idColumn}());
+    
+    $this->_gatekeeper->checkCanWrite($original);
 
-    $persister = ActorFactory::getActor('persister', '${model}');
     $persister->update($model);
   }
 
@@ -128,7 +129,7 @@ class ${className} {
    * @RequestType post
    */
   public function delete(array $ids) {
-    $persister = ActorFactory::getActor('persister', '${model}');
+    $persister = Persister::get('${model}');
 
     $c = new Criteria();
     $c->addIn('${idColumn}', $ids);

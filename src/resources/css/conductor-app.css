@@ -1,0 +1,50 @@
+body > .ui-tabs > .ui-tabs-panel {
+  position: absolute;
+  top: 50px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  overflow: auto;
+  overflow-x: hidden;
+}
+
+.cdt-list th.ui-widget-header {
+  padding: 10px;
+}
+
+.cdt-list td.ui-widget-content {
+  padding: 5px;
+  vertical-align: top;
+}
+
+.cdt-form label {
+  float: left;
+  height: 25px;
+}
+
+.cdt-form input,
+.cdt-form textarea,
+.cdt-form select,
+.cdt-form .ui-spinner {
+  display: block;
+  margin: 5px 0 5px 150px;
+  padding: 2px 3px;
+}
+
+.cdt-form input.text,
+.cdt-form textarea,
+.cdt-form select {
+  width: 400px;
+}
+
+.cdt-form input {
+  height: 20px;
+}
+
+.cdt-form .ui-spinner {
+  width: 100px;
+}
+
+.cdt-form .ui-spinner input {
+  margin: 0;
+}

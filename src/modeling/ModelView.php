@@ -30,6 +30,9 @@ use \reed\reflection\Annotations;
  * relationship getter.
  *
  * @author Philip Graham <philip@zeptech.ca>
+ * @deprecated It's much easier to just annotate the model itself, and since
+ *   annotations are just comments there is no need to worry about dependencies.
+ *   If an annotation is not consumed it doesn't hurt anything.
  */
 abstract class ModelView {
 

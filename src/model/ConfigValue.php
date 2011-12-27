@@ -11,7 +11,6 @@
  * =============================================================================
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
- * @package clarinet/model
  */
 namespace conductor\model;
 
@@ -23,6 +22,7 @@ namespace conductor\model;
  * @package clarinet/model
  *
  * @Entity(table = config_values)
+ * @Gatekeeper conductor\model\ConfigValueGatekeeper
  */
 class ConfigValue {
 
