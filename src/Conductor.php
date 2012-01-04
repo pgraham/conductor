@@ -29,6 +29,8 @@ use \oboe\head\Javascript;
 use \oboe\head\Link;
 use \oboe\Element;
 
+use \reed\ClassLoader;
+
 /**
  * The main interface for Conductor setup.
  *
@@ -170,6 +172,12 @@ class Conductor {
     // If a custom autoloader was defined in the configuration, load it now
     if (isset(self::$config['autoloader'])) {
       require_once self::$config['autoloader'];
+    }
+
+    // If a source base namespace was specified register a classloader for it
+    // now
+    if (isset(self::$config['basens'])) {
+      ClassLoader::register($pathInfo->getSrcPath(), self::$config['basens']);
     }
 
     // Set options for debug mode.

@@ -91,6 +91,21 @@ class Parser {
       $cfg['services'] = array();
     }
 
+    if (isset($xmlCfg->sourcePath)) {
+      $sourceRoot = $xmlCfg->sourcePath->__toString();
+
+      if (substr($sourceRoot, 0, 1) !== '/') {
+        $target = $pathRoot . '/' . $sourceRoot;
+      }
+
+      if (isset($xmlCfg->sourcePath['nsbase'])) {
+        $sourceNs = $xmlCfg->sourcePath['nsbase'];
+      }
+    } else {
+      $sourceRoot = $pathRoot . '/src';
+    }
+
+
     // Set the output directory, if not specified use a temporary directory
     if (isset($xmlCfg->targetPath)) {
       $target = $xmlCfg->targetPath->__toString();
@@ -133,9 +148,12 @@ class Parser {
       $webRoot = '/';
     }
 
-    $pathInfo = new WebSitePathInfo($pathRoot, $webRoot, $docRoot, null, null,
-      $target, $webWrite);
+    $pathInfo = new WebSitePathInfo($pathRoot, $webRoot, $docRoot, null,
+      $sourceRoot, $target, $webWrite);
     $cfg['pathInfo'] = $pathInfo;
+    if (isset($sourceNs)) {
+      $cfg['basens'] = $sourceNs;
+    }
 
     // Parse session time-to-live value
     if (isset($xmlCfg->sessionTimeToLive)) {
