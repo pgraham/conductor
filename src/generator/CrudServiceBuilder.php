@@ -46,6 +46,8 @@ class CrudServiceBuilder {
    * @return string
    */
   public function build($cdtAutoloaderPath) {
+    $displayName = explode('_', $this->_model->getActor());
+    $displayName = strtolower(array_pop($displayName));
 
     $crudInfo = new CrudServiceInfo($this->_model);
     $templateValues = Array(
@@ -55,7 +57,8 @@ class CrudServiceBuilder {
       'model'      => $this->_model->getClass(),
       'ns'         => CrudServiceInfo::CRUD_SERVICE_NS,
       'idColumn'   => $this->_model->getId()->getColumn(),
-      'gatekeeper' => $this->_model->getGatekeeper()
+      'gatekeeper' => $this->_model->getGatekeeper(),
+      'display'    => $displayName
     );
 
     $templateLoader = CodeTemplateLoader::get(__DIR__);
