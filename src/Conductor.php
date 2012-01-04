@@ -282,6 +282,31 @@ class Conductor {
         }
       }
 
+      if (isset($resources['jslib'])) {
+        foreach ($resources['jslib'] AS $jslib) {
+          JsLib::includeLib($jslib, Conductor::getPathInfo());
+        }
+      }
+
+      if (isset($resources['srvc'])) {
+        foreach ($resources['srvc'] AS $srvc) {
+          ServiceProxy::get($srvc)->addToHead();
+        }
+      }
+
+      if (isset($resources['js'])) {
+        // Allow a single javascript to be specified as a string
+        if (!is_array($resources['js'])) {
+          $resources['js'] = array($resources['js']);
+        }
+        foreach ($resources['js'] AS $js) {
+          if (substr($css, 0, 1) === '/') {
+            $js = $pathInfo->webPath($js);
+          }
+          Element::js($js)->addToHead();
+        }
+      }
+
       Page::setTemplate($template);
     }
   }
