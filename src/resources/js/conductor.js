@@ -77,6 +77,19 @@ var CDT = {};
   }
   CDT.resourcePath = resourcePath;
 
+  CDT.checkResponse = function (response) {
+    if (response.msg === undefined) {
+      return true;
+    }
+
+    if ($.isPlainObject(response.msg)) {
+      return response.msg.type !== 'error';
+    }
+
+    // A message without a type is by default an error message.
+    return false;
+  };
+
   setPageId = function (curPageId, sel) {
     if (curPageId === undefined) {
       return;

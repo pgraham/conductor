@@ -29,6 +29,9 @@ use \oboe\head\Javascript;
 use \oboe\head\Link;
 use \oboe\Element;
 
+use \reed\ClassLoader;
+use \reed\File;
+
 /**
  * The main interface for Conductor setup.
  *
@@ -174,10 +177,19 @@ class Conductor {
       require_once self::$config['autoloader'];
     }
 
+    // If a source base namespace was specified register a classloader for it
+    // now
+    if (isset(self::$config['basens'])) {
+      ClassLoader::register($pathInfo->getSrcPath(), self::$config['basens']);
+    }
+
     // Set options for debug mode.
     if (self::isDebug()) {
       ini_set('display_errors', 'on');
       ini_set('html_errors', 'on');
+
+      $errorLog = File::joinPaths($pathInfo->getTarget(), '/php.error');
+      ini_set('error_log', $errorLog);
 
       assert_options(ASSERT_ACTIVE, 1);
       assert_options(ASSERT_WARNING, 1);
@@ -241,6 +253,8 @@ class Conductor {
     $base->inc();
 
     ServiceProxy::get('conductor\Service')->addToHead();
+    ServiceProxy::get('conductor\LoginService')->addToHead();
+    ServiceProxy::get('conductor\ContentService')->addToHead();
 
     if ($template !== null) {
       $pathInfo = self::getPathInfo();
@@ -269,6 +283,31 @@ class Conductor {
             $css = $pathInfo->webPath($css);
           }
           Element::css($css)->addToHead();
+        }
+      }
+
+      if (isset($resources['jslib'])) {
+        foreach ($resources['jslib'] AS $jslib) {
+          JsLib::includeLib($jslib, Conductor::getPathInfo());
+        }
+      }
+
+      if (isset($resources['srvc'])) {
+        foreach ($resources['srvc'] AS $srvc) {
+          ServiceProxy::get($srvc)->addToHead();
+        }
+      }
+
+      if (isset($resources['js'])) {
+        // Allow a single javascript to be specified as a string
+        if (!is_array($resources['js'])) {
+          $resources['js'] = array($resources['js']);
+        }
+        foreach ($resources['js'] AS $js) {
+          if (substr($css, 0, 1) === '/') {
+            $js = $pathInfo->webPath($js);
+          }
+          Element::js($js)->addToHead();
         }
       }
 

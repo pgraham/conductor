@@ -58,6 +58,26 @@ var eventuality = function (that) {
     return this;
   };
 
+  that.one = function (type, method, parameters) {
+    that.on(type, function (e) {
+      method.apply(this, [e]);
+      that.off(type, method);
+    }, parameters);
+  };
+
+  that.off = function (type, method) {
+    var i, len;
+    if (registry.hasOwnProperty(type)) {
+      for (i = 0, len = registry[type].length; i < len; i++) {
+        if (registry[type][i].method === method) {
+          registry[type].splice(i, 1);
+          break;
+        }
+      }
+    }
+    return this;
+  };
+
   return that;
 };
 

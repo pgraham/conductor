@@ -1,3 +1,7 @@
+body > .ui-tabs {
+  padding: 0;
+  border: none;
+}
 body > .ui-tabs > .ui-tabs-panel {
   position: absolute;
   top: 50px;
@@ -6,6 +10,24 @@ body > .ui-tabs > .ui-tabs-panel {
   right: 0;
   overflow: auto;
   overflow-x: hidden;
+}
+
+.cdt-app-msg {
+  position: absolute;
+  bottom: 0;
+  height: 20px;
+  left: 13px;
+  right: 13px;
+  padding: 3px 0;
+
+  font-family: 'Lato', sans-serif;
+  font-weight: 300;
+  text-align: center;
+  color: #DDD;
+}
+
+.cdt-app-msg.error {
+  background-color: #AA0000;
 }
 
 .cdt-list th.ui-widget-header {
@@ -47,4 +69,47 @@ body > .ui-tabs > .ui-tabs-panel {
 
 .cdt-form .ui-spinner input {
   margin: 0;
+}
+
+.cdt-section,
+.cdt-section .cdt-section-head,
+.cdt-section .cdt-section-body {
+  padding: 3px;
+}
+
+.cdt-section .cdt-section-head .header-text {
+  margin: 0 10px;
+}
+
+.cdt-section .cdt-section-body {
+  margin-top: 7px;
+}
+
+.separator {
+  border: 1px inset #999;
+  display: inline-block;
+  vertical-align: middle;
+  width: 0px;
+  height: 1.4em;
+  margin: 0 11px;
+}
+
+.ui-widget .input-label {
+  margin-right: 20px;
+}
+
+.ui-widget select {
+  padding: .4em 1em;
+  line-height: 1.4;
+  width: 250px;
+}
+.ui-widget input.text {
+  padding: 2px 3px;
+  width: 300px;
+  height: 24px;
+}
+
+.ui-button-small.ui-button-text-only .ui-button-text {
+  padding: .1em 1em;
+  font-size: .8em;
 }

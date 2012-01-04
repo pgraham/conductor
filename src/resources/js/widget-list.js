@@ -81,6 +81,8 @@
         }
         list.addRow(rowData);
       });
+
+      list.fire('load');
     };
 
     return list;

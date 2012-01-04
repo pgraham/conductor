@@ -43,6 +43,7 @@ class JsLib {
   const JQUERY_SELECTBOX = 'jquery-selectBox';
   const JQUERY_UI = 'jquery-ui';
   const JQUERY_UI_TIMEPICKER = 'jquery-ui-timepicker';
+  const jWYSIWYG = 'jwysiwyg';
 
   /* Array of libraries that have already been included in the page. */
   private static $_included = array();
@@ -113,6 +114,14 @@ class JsLib {
         'src' => 'src/themes/classic/galleria.classic.css',
         'out' => 'themes/classic/galleria.classic.css',
         'static' => true
+      );
+      $images[] = array(
+        'src' => 'src/themes/classic/classic-loader.gif',
+        'out' => 'themes/classic/classic-loader.gif'
+      );
+      $images[] = array(
+        'src' => 'src/themes/classic/classic-map.png',
+        'out' => 'themes/classic/classic-map.png'
       );
       break;
 
@@ -189,6 +198,14 @@ class JsLib {
       $scripts[] = array( 'src' => 'build/date.js', 'out' => 'date.js' );
       break;
 
+      case self::jWYSIWYG:
+      $libDir = 'jwysiwyg';
+      $scripts[] = 'jquery.wysiwyg.js';
+      $sheets[] = 'jquery.wysiwyg.css';
+      $images[] = 'jquery.wysiwyg.bg.png';
+      $images[] = 'jquery.wysiwyg.gif';
+      break;
+
       default:
       assert("false; /* Unrecognized library: $lib */");
     }
@@ -239,9 +256,18 @@ class JsLib {
    * @param WebSitePathInfo $pathInfo
    * @param array $opts Optional array of library specific options.
    */
-  public static function includeLib($lib, WebSitePathInfo $pathInfo,
+  public static function includeLib($lib, $pathInfo = null,
       array $opts = null
   ) {
+
+    if (is_array($pathInfo)) {
+      $opts = $pathInfo;
+      $pathInfo = null;
+    }
+
+    if ($pathInfo === null) {
+      $pathInfo = Conductor::getPathInfo();
+    }
 
     if (in_array($lib, self::$_included)) {
       return;

@@ -22,8 +22,7 @@ use \conductor\Conductor;
  * @CsrfToken conductorsessid
  * @Requires ${autoloader}
  */
-class ${className} {
-
+class ${className} { 
   private $_gatekeeper;
 
   public function __construct() {
@@ -38,13 +37,18 @@ class ${className} {
    */
   public function create(array $params) {
 
-    $transformer = ActorFactory::getActor('transformer', '${model}');
-    $model = $transformer->fromArray($params);
+    try {
+      $transformer = ActorFactory::getActor('transformer', '${model}');
+      $model = $transformer->fromArray($params);
 
-    $this->_gatekeeper->checkCanCreate($model);
+      $this->_gatekeeper->checkCanCreate($model);
 
-    $persister = Persister::get($model);
-    $persister->create($model);
+      $persister = Persister::get($model);
+      $persister->create($model);
+    } catch (\clarinet\Exception $e) {
+      throw new \Exception($this->_parseExceptionMessage($e->getMessage()));
+    }
+
   }
 
   /**
@@ -53,94 +57,126 @@ class ${className} {
    * @param array $spf
    */
   public function retrieve($spf) {
-    if (is_object($spf)) {
-      $spf = (array) $spf;
-    }
-
-    $persister = Persister::get('${model}');
-    $transformer = ActorFactory::getActor('transformer', '${model}');
-
-    $c = new Criteria();
-
-    // Apply paging, sorting and filters to the criteria
-    if (isset($spf['filter'])) {
-      foreach ($spf['filter'] AS $column => $value) {
-        $c->addEquals($column, $value);
+    try {
+      if (is_object($spf)) {
+        $spf = (array) $spf;
       }
-    }
 
-    if (isset($spf['sort'])) {
-      foreach ($spf['sort'] AS $column => $direction) {
-        if ($direction === Criteria::SORT_DESC) {
-          $c->addSort($column, Criteria::SORT_DESC);
-        } else {
-          $c->addSort($column);
+      $persister = Persister::get('${model}');
+      $transformer = ActorFactory::getActor('transformer', '${model}');
+
+      $c = new Criteria();
+
+      // Apply paging, sorting and filters to the criteria
+      if (isset($spf['filter'])) {
+        foreach ($spf['filter'] AS $column => $value) {
+          $c->addEquals($column, $value);
         }
       }
-    }
 
-    if (isset($spf['page'])) {
-      $limit = $spf['page']['limit'];
-      $offset = isset($spf['page']['offset'])
-        ? $spf['page']['offset']
-        : null;
+      if (isset($spf['sort'])) {
+        foreach ($spf['sort'] AS $column => $direction) {
+          if ($direction === Criteria::SORT_DESC) {
+            $c->addSort($column, Criteria::SORT_DESC);
+          } else {
+            $c->addSort($column);
+          }
+        }
+      }
 
-      $c->setLimit($limit, $offset);
-    }
+      if (isset($spf['page'])) {
+        $limit = $spf['page']['limit'];
+        $offset = isset($spf['page']['offset'])
+          ? $spf['page']['offset']
+          : null;
 
-    // Retrieve the models that match the given spf
-    $persister = ActorFactory::getActor('persister', '${model}');
-    $models = $persister->retrieve($c);
-    $total = $persister->count($c);
+        $c->setLimit($limit, $offset);
+      }
 
-    // Check that current user has access to read the selected models
-    // TODO Should this always throw an exception?  Could simply ignore models
-    //      the user isn't allowed to read
-    foreach ($models AS $model) {
-      $this->_gatekeeper->checkCanRead($model);
+      // Retrieve the models that match the given spf
+      $persister = ActorFactory::getActor('persister', '${model}');
+      $models = $persister->retrieve($c);
+      $total = $persister->count($c);
+
+      $data = array();
+      foreach ($models AS $model) {
+        if ($this->_gatekeeper->canRead($model)) {
+          $data[] = $transformer->asArray($model);
+        }
+      }
+
+      return array(
+        'data' => $data,
+        'total' => $total
+      );
+    } catch (\clarinet\Exception $e) {
+      throw new \Exception($this->_parseExceptionMessage($e->getMessage()));
     }
-    
-    $data = array();
-    foreach ($models AS $model) {
-      $data[] = $transformer->asArray($model);
-    }
-    return array(
-      'data' => $data,
-      'total' => $total
-    );
   }
 
   /**
    * @RequestType post
    */
   public function update(array $params) {
-    $transformer = ActorFactory::getActor('transformer', '${model}');
-    $model = $transformer->fromArray($params);
+    try {
+      $transformer = ActorFactory::getActor('transformer', '${model}');
+      $model = $transformer->fromArray($params);
 
-    $persister = Persister::get('${model}');
-    $original = $persister->getById($model->get${idColumn}());
-    
-    $this->_gatekeeper->checkCanWrite($original);
+      $persister = Persister::get('${model}');
+      $original = $persister->getById($model->get${idColumn}());
+      
+      $this->_gatekeeper->checkCanWrite($original);
 
-    $persister->update($model);
+      $persister->update($model);
+    } catch (\clarinet\Exception $e) {
+      throw new \Exception($this->_parseExceptionMessage($e->getMessage()));
+    }
   }
 
   /**
    * @RequestType post
    */
   public function delete(array $ids) {
-    $persister = Persister::get('${model}');
+    try {
+      $persister = Persister::get('${model}');
 
-    $c = new Criteria();
-    $c->addIn('${idColumn}', $ids);
-    $models = $persister->retrieve($c);
+      $c = new Criteria();
+      $c->addIn('${idColumn}', $ids);
+      $models = $persister->retrieve($c);
 
-    foreach ($models AS $model) {
-      $this->_gatekeeper->checkCanDelete($model);
+      foreach ($models AS $model) {
+        $this->_gatekeeper->checkCanDelete($model);
+      }
+
+      foreach ($models AS $model) {
+        $persister->delete($model);
+      }
+    } catch (\clarinet\Exception $e) {
+      throw new \Exception($this->_parseExceptionMessage($e->getMessage()));
     }
+  }
 
-    foreach ($models AS $model) {
-      $persister->delete($model);
+  private function _parseExceptionMessage($msg) {
+    // TODO Move this into it's own class -- maybe in clarinet
+    $sqlstateRe = '/SQLSTATE\[(\d+)\]:\s*(.*)$/';
+    $errMsgRe = '/.+:\s*\d+\s*(.+)$/';
+    $dupEntryRe = '/1062 Duplicate entry \'(.+)\' for key \'(.+)\'/';
+
+    if (preg_match($sqlstateRe, $msg, $matches)) {
+      switch ((int) $matches[1]) {
+        case 23000:
+        if (preg_match($dupEntryRe, $matches[2], $msgMatches)) {
+          return "A ${display} with {$msgMatches[2]} '{$msgMatches[1]}' already exists";
+        }
+        break;
+
+      }
+
+      if (preg_match($errMsgRe, $matches[2], $msgMatches)) {
+        return $msgMatches[1];
+      }
+      return $matches[2];
     }
+    return $msg;
   }
 }
