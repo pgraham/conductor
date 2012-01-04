@@ -15,6 +15,7 @@
 namespace conductor\resources;
 
 use \conductor\Resource;
+use \oboe\Element;
 
 /**
  * This class encapsulates resource inclusion and compilation for javascript
@@ -26,14 +27,18 @@ class JsAppResources {
 
   private $_toCompile;
   private $_toInclude;
+  private $_fonts;
 
   public function __construct() {
+    $this->_fonts = 'http://fonts.googleapis.com/css?family=Lato:300';
     $css = array(
       new Resource('conductor-app.css')
     );
 
     $js = array(
       new Resource('layout-fill.js'),
+      new Resource('widget-section.js'),
+      new Resource('widget-collapsible.js'),
       new Resource('widget-form.js'),
       new Resource('widget-list.js'),
       new Resource('component-configurationEditor.js'),
@@ -51,6 +56,7 @@ class JsAppResources {
   }
 
   public function inc() {
+    Element::css($this->_fonts)->addToHead();
     foreach ($this->_toInclude AS $r) {
       $r->addToPage();
     }
