@@ -30,6 +30,7 @@ use \oboe\head\Link;
 use \oboe\Element;
 
 use \reed\ClassLoader;
+use \reed\File;
 
 /**
  * The main interface for Conductor setup.
@@ -184,6 +185,9 @@ class Conductor {
     if (self::isDebug()) {
       ini_set('display_errors', 'on');
       ini_set('html_errors', 'on');
+
+      $errorLog = File::joinPaths($pathInfo->getTarget(), '/php.error');
+      ini_set('error_log', $errorLog);
 
       assert_options(ASSERT_ACTIVE, 1);
       assert_options(ASSERT_WARNING, 1);
