@@ -1,3 +1,7 @@
+body > .ui-tabs {
+  padding: 0;
+  border: none;
+}
 body > .ui-tabs > .ui-tabs-panel {
   position: absolute;
   top: 50px;

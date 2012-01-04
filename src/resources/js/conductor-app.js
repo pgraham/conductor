@@ -40,14 +40,40 @@
   }
 
   $(document).ready(function () {
+    var options, logout, viewSite, previewWnd;
+
+    // Initialize the options menu for the app
+    logout = $('<button>Logout</button>').button()
+      .addClass('ui-button-small')
+      .click(function () {
+        window['LoginService'].logout(function () {
+          window.location.href = CDT.resourcePath('/index.php');
+        });
+      });
+    viewSite = $('<button>View Site</button>').button()
+      .addClass('ui-button-small')
+      .click(function () {
+        if (previewWnd === undefined || previewWnd.closed) {
+          previewWnd = window.open(CDT.resourcePath('/index.php'), 'preview');
+        } else {
+          previewWnd.location.reload();
+          previewWnd.focus();
+        }
+      });
+
+    options = $('<div class="ui-widget-header"/>')
+      .append(logout)
+      .append(viewSite)
+      .appendTo('body');
+
     // Initialize the tab panel that will contain the app
-    tabs = $('<div><ul/></div>')
+    tabs = $('<div id="cdt-app-container"><ul/></div>')
       .css({
         'position': 'absolute',
-        'top': '10px',
-        'bottom': '10px',
-        'left': '10px',
-        'right': '10px'
+        'top': options.outerHeight(),
+        'bottom': 0,
+        'left': 0,
+        'right': 0
       })
       .appendTo($('body'))
       .tabs();
@@ -58,6 +84,10 @@
         id: ui.panel.id,
         ui: ui
       });
+
+    // TODO Why isn't this working?  The class is removed as expected but is
+    //      added back later
+    tabs.children().filter('.ui-widget-header').removeClass('ui-corner-all');
     });
   });
 
