@@ -142,8 +142,10 @@ class Conductor {
    * @param string $configPath Optional path to a conductor.cfg.xml file.  If
    *   not provided then a default path is used by assume a common directory
    *   structure.
+   * @param boolean $authenticate Whether or not to authenticate a session,
+   *   default true.  The only time this is false is during compilation.
    */
-  public static function init($configPath = null) {
+  public static function init($configPath = null, $authenticate = true) {
     if (self::$_initialized) {
       if (self::isDebug()) {
         // TODO - Give a warning if in debug mode
@@ -193,7 +195,9 @@ class Conductor {
     );
 
     // Authenticate.
-    Auth::init();
+    if ($authenticate) {
+      Auth::init();
+    }
   }
 
   /**
