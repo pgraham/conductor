@@ -114,6 +114,14 @@ class JsLib {
         'out' => 'themes/classic/galleria.classic.css',
         'static' => true
       );
+      $images[] = array(
+        'src' => 'src/themes/classic/classic-loader.gif',
+        'out' => 'themes/classic/classic-loader.gif'
+      );
+      $images[] = array(
+        'src' => 'src/themes/classic/classic-map.png',
+        'out' => 'themes/classic/classic-map.png'
+      );
       break;
 
       case self::JQUERY_COOKIE:
