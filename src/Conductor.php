@@ -249,6 +249,7 @@ class Conductor {
     $base->inc();
 
     ServiceProxy::get('conductor\Service')->addToHead();
+    ServiceProxy::get('conductor\LoginService')->addToHead();
 
     if ($template !== null) {
       $pathInfo = self::getPathInfo();
