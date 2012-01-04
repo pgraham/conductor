@@ -239,9 +239,18 @@ class JsLib {
    * @param WebSitePathInfo $pathInfo
    * @param array $opts Optional array of library specific options.
    */
-  public static function includeLib($lib, WebSitePathInfo $pathInfo,
+  public static function includeLib($lib, $pathInfo = null,
       array $opts = null
   ) {
+
+    if (is_array($pathInfo)) {
+      $opts = $pathInfo;
+      $pathInfo = null;
+    }
+
+    if ($pathInfo === null) {
+      $pathInfo = Conductor::getPathInfo();
+    }
 
     if (in_array($lib, self::$_included)) {
       return;
