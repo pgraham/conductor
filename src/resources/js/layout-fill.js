@@ -1,14 +1,20 @@
 (function ($, CDT, undefined) {
   "use strict";
 
-  var layouts = [];
+  var cache = [], layouts = [];
 
   if (CDT.layout === undefined) {
     CDT.layout = {};
   }
 
   CDT.layout.fill = function (container) {
-    var layout = {}, sel, apply;
+    var layout = {}, sel, apply, i, len;
+
+    for (i = 0, len = cache.length; i < len; i++) {
+      if (cache[i].container == container) {
+        return cache[i].layout;
+      }
+    }
 
     apply = function () {
       var toFill = container.children(sel),
@@ -52,16 +58,25 @@
       apply();
     }
 
+    cache.push({
+      container: container,
+      layout: layout
+    });
+
     return layout;
+  };
+
+  CDT.layout.doLayout = function () {
+    $.each(layouts, function (idx, fn) {
+      fn();
+    });
   };
 
   // Add a resize handler to the window which applies all layout functions
   // TODO Move this into a generic location so that other layout types can
   //      make use of this functionality
   $(window).resize(function () {
-    $.each(layouts, function (idx, fn) {
-      fn();
-    });
+    CDT.layout.doLayout();
   });
 
 } (jQuery, CDT));
