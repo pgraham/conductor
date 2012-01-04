@@ -43,6 +43,7 @@ class JsLib {
   const JQUERY_SELECTBOX = 'jquery-selectBox';
   const JQUERY_UI = 'jquery-ui';
   const JQUERY_UI_TIMEPICKER = 'jquery-ui-timepicker';
+  const jWYSIWYG = 'jwysiwyg';
 
   /* Array of libraries that have already been included in the page. */
   private static $_included = array();
@@ -195,6 +196,14 @@ class JsLib {
       case self::DATE_JS:
       $libDir    = 'datejs';
       $scripts[] = array( 'src' => 'build/date.js', 'out' => 'date.js' );
+      break;
+
+      case self::jWYSIWYG:
+      $libDir = 'jwysiwyg';
+      $scripts[] = 'jquery.wysiwyg.js';
+      $sheets[] = 'jquery.wysiwyg.css';
+      $images[] = 'jquery.wysiwyg.bg.png';
+      $images[] = 'jquery.wysiwyg.gif';
       break;
 
       default:
