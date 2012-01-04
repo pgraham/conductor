@@ -12,6 +12,24 @@ body > .ui-tabs > .ui-tabs-panel {
   overflow-x: hidden;
 }
 
+.cdt-app-msg {
+  position: absolute;
+  bottom: 0;
+  height: 20px;
+  left: 13px;
+  right: 13px;
+  padding: 3px 0;
+
+  font-family: 'Lato', sans-serif;
+  font-weight: 300;
+  text-align: center;
+  color: #DDD;
+}
+
+.cdt-app-msg.error {
+  background-color: #AA0000;
+}
+
 .cdt-list th.ui-widget-header {
   padding: 10px;
 }

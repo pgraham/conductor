@@ -39,6 +39,22 @@
     });
   }
 
+  CDT.app.addMessage = function (message, type) {
+    $('<div class="cdt-app-msg ui-corner-top"/>')
+      .addClass(type)
+      .text(message)
+      .appendTo($('body'))
+      .css('opacity', 0.8)
+      .hide()
+      .slideDown();
+  };
+
+  CDT.app.clearMessages = function () {
+    $('.cdt-app-msg').slideUp('fast', function () {
+      $(this).remove();
+    });
+  };
+
   $(document).ready(function () {
     var options, logout, viewSite, previewWnd;
 
@@ -76,18 +92,69 @@
         'right': 0
       })
       .appendTo($('body'))
-      .tabs();
-
-    tabs.bind('tabsshow', function (event, ui) {
-      CDT.app.fire({
-        type: 'view-change',
-        id: ui.panel.id,
-        ui: ui
+      .tabs()
+      .bind('tabsshow', function (event, ui) {
+        CDT.layout.doLayout();
+        CDT.app.fire({
+          type: 'view-change',
+          id: ui.panel.id,
+          ui: ui
+        });
+      })
+      .bind('tabsselect', function (event, ui) {
+        CDT.app.clearMessages();
       });
 
     // TODO Why isn't this working?  The class is removed as expected but is
     //      added back later
     tabs.children().filter('.ui-widget-header').removeClass('ui-corner-all');
+
+    // Add global ajax handler to remove any messages before a new AJAX request
+    // is made
+    $('body').ajaxSend(function (e, xhr, opts) {
+      CDT.app.clearMessages();
+    });
+
+    // Add global ajax handlers to display any messages.
+    $('body').ajaxSuccess(function (e, xhr, opts) {
+      var response, msg, msgType, elm;
+      
+      if (opts.dataType === 'json') {
+        // TODO Allow types to be specified, default will be error
+        response = $.parseJSON(xhr.responseText);
+        if (!response || !response.msg) {
+          return; 
+        }
+
+        if ($.isPlainObject(response.msg)) {
+          msg = response.msg.text;
+          msgType = response.msg.type;
+        } else {
+          msg = response.msg;
+          msgType = 'error';
+        }
+
+        CDT.app.addMessage(msg, msgType);
+      }
+
+    });
+
+    $('body').ajaxError(function (e, xhr, opts, err) {
+      var response, msg, elm;
+
+      if (opts.dataType === 'json') {
+        response = $.parseJSON(xhr.responseText);
+
+        if (response.msg) {
+          msg = response.msg;
+        }
+      }
+
+      if (msg === undefined) {
+        msg = response.status + ": " + response.statusText;
+      }
+
+      CDT.app.addMessage(msg, 'error');
     });
   });
 
