@@ -150,6 +150,14 @@ class Parser {
 
     $pathInfo = new WebSitePathInfo($pathRoot, $webRoot, $docRoot, null,
       $sourceRoot, $target, $webWrite);
+
+    // Check if the site supports user generated content.  Due to the way
+    // compilation is structured this needs to be hard-coded, otherwise staging
+    // and production sites will not have the proper permissions.
+    if (isset($xmlCfg->supportUserContent)) {
+      $pathInfo->setUserContentDir('usr');
+    }
+
     $cfg['pathInfo'] = $pathInfo;
     if (isset($sourceNs)) {
       $cfg['basens'] = $sourceNs;
