@@ -78,7 +78,7 @@ var CDT = {};
   CDT.resourcePath = resourcePath;
 
   CDT.checkResponse = function (response) {
-    if (response.msg === undefined) {
+    if (!response || response.msg === undefined) {
       return true;
     }
 
