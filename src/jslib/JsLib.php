@@ -42,7 +42,7 @@ class JsLib {
   const JQUERY_OPENID = 'jquery-openid';
   const JQUERY_SELECTBOX = 'jquery-selectBox';
   const JQUERY_UI = 'jquery-ui';
-  const JQUERY_UI_TIMEPICKER = 'jquery-ui-timepicker';
+  const JQUERY_UI_TIMEPICKER = 'jQuery-Timepicker';
   const jWYSIWYG = 'jwysiwyg';
 
   /* Array of libraries that have already been included in the page. */
