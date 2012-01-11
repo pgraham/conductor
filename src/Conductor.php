@@ -246,6 +246,8 @@ class Conductor {
       . self::JQUERY_VERSION . "/$jQueryName";
     Element::js($jqPath)->addToHead();
 
+    JsLib::includeLib(JsLib::JQUERY_COOKIE);
+
     $base = new BaseResources();
     if (self::isDebug()) {
       $base->compile();
@@ -319,6 +321,8 @@ class Conductor {
    * Include resources that provide support for building a javascript app.
    */
   public static function loadJsAppSupport() {
+    JsLib::includeLib(JsLib::JQUERY_UI);
+
     $appSupport = new JsAppResources();
     if (self::isDebug()) {
       $appSupport->compile();
