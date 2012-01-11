@@ -223,15 +223,23 @@ class JsLib {
    * Include the files for the given libraries.  Any that have already been
    * included will be silently ignored.
    *
+   * TODO Remove the pathInfo argument
+   *
    * @param mixed $libs Either the name of a single library to include or an
    *   array of library names.
    * @param WebSitePathInfo $pathInfo
    * @param array $opts Optional array of library specific options for each of
    *   the included libs.  The array is expected to be index by lib name.
    */
-  public static function includeLibs($libs, WebSitePathInfo $pathInfo,
+  public static function includeLibs($libs, $pathInfo = null,
       array $opts = null
   ) {
+
+    // If options have been specified but no path info then shift the arguments
+    if (is_array($pathInfo)) {
+      $opts = $pathInfo;
+      $pathInfo = null;
+    }
 
     if (!is_array($libs)) {
       $libs = array($libs);
@@ -260,11 +268,14 @@ class JsLib {
       array $opts = null
   ) {
 
+    // If options have been specified but no path info then shift the arguments
     if (is_array($pathInfo)) {
       $opts = $pathInfo;
       $pathInfo = null;
     }
 
+    // If no path info is specified then use the path info specified in
+    // conductor
     if ($pathInfo === null) {
       $pathInfo = Conductor::getPathInfo();
     }
