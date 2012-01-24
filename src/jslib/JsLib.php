@@ -15,10 +15,12 @@
 namespace conductor\jslib;
 
 use \conductor\Conductor;
+use \conductor\Library;
 use \conductor\ResourceSet;
 use \conductor\ResourceIncluder;
 use \oboe\head\Javascript;
 use \oboe\head\StyleSheet;
+use \reed\File;
 use \reed\WebSitePathInfo;
 
 /**
@@ -61,7 +63,12 @@ class JsLib {
   ) {
     $files = self::getFiles($lib, $opts);
 
-    ResourceIncluder::compile($files);
+    if ($files instanceof Library) {
+      $files->link($opts);
+      $files->compile($opts);
+    } else {
+      ResourceIncluder::compile($files);
+    }
   }
 
   /**
@@ -100,30 +107,10 @@ class JsLib {
       break;
 
       case self::GALLERIA:
-      $libDir = 'galleria';
-      $scripts[] = array(
-        'src' => 'src/galleria.js',
-        'out' => 'galleria.js'
-      );
-      $scripts[] = array(
-        'src' => 'src/themes/classic/galleria.classic.js',
-        'out' => 'themes/classic/galleria.classic.js',
-        'static' => true
-      );
-      $sheets[] = array(
-        'src' => 'src/themes/classic/galleria.classic.css',
-        'out' => 'themes/classic/galleria.classic.css',
-        'static' => true
-      );
-      $images[] = array(
-        'src' => 'src/themes/classic/classic-loader.gif',
-        'out' => 'themes/classic/classic-loader.gif'
-      );
-      $images[] = array(
-        'src' => 'src/themes/classic/classic-map.png',
-        'out' => 'themes/classic/classic-map.png'
-      );
-      break;
+      $srcPath = File::joinPaths($pathInfo->getLibPath(), 'jslib', $lib);
+      $outPath = File::joinPaths($pathInfo->getWebTarget(), $lib);
+
+      return new Galleria($srcPath, $outPath, $pathInfo->fsToWeb($outPath));
 
       case self::JQUERY_COOKIE:
       $libDir = 'jquery-cookie';
@@ -262,9 +249,16 @@ class JsLib {
       return;
     }
 
-    $files = self::getFiles($lib, $pathInfo, $opts);
+    $files = self::getFiles($lib, $opts);
+    if ($files instanceof Library) {
+      if (Conductor::isDebug()) {
+        $files->link($opts);
+      }
+      $files->inc($opts);
+    } else {
+      ResourceIncluder::inc($files);
+    }
 
-    ResourceIncluder::inc($files);
     self::$_included[] = $lib;
   }
 }
