@@ -1,9 +1,9 @@
 <?php
 namespace ${ns};
 
-use \clarinet\ActorFactory;
-use \clarinet\Persister;
 use \clarinet\Criteria;
+use \clarinet\Persister;
+use \clarinet\Transformer;
 
 ${if:gatekeeper ISSET}
   use \${gatekeeper} as Gatekeeper;
@@ -38,7 +38,7 @@ class ${className} {
   public function create(array $params) {
 
     try {
-      $transformer = ActorFactory::getActor('transformer', '${model}');
+      $transformer = Transformer::get('${model}');
       $model = $transformer->fromArray($params);
 
       $this->_gatekeeper->checkCanCreate($model);
@@ -58,24 +58,21 @@ class ${className} {
    */
   public function retrieve($spf) {
     try {
-      if (is_object($spf)) {
-        $spf = (array) $spf;
-      }
 
       $persister = Persister::get('${model}');
-      $transformer = ActorFactory::getActor('transformer', '${model}');
+      $transformer = Transformer::get('${model}');
 
       $c = new Criteria();
 
       // Apply paging, sorting and filters to the criteria
-      if (isset($spf['filter'])) {
-        foreach ($spf['filter'] AS $column => $value) {
+      if (isset($spf->filter)) {
+        foreach ($spf->filter AS $column => $value) {
           $c->addEquals($column, $value);
         }
       }
 
-      if (isset($spf['sort'])) {
-        foreach ($spf['sort'] AS $column => $direction) {
+      if (isset($spf->sort)) {
+        foreach ($spf->sort AS $column => $direction) {
           if ($direction === Criteria::SORT_DESC) {
             $c->addSort($column, Criteria::SORT_DESC);
           } else {
@@ -84,17 +81,16 @@ class ${className} {
         }
       }
 
-      if (isset($spf['page'])) {
-        $limit = $spf['page']['limit'];
-        $offset = isset($spf['page']['offset'])
-          ? $spf['page']['offset']
+      if (isset($spf->page)) {
+        $limit = $spf->page->limit;
+        $offset = isset($spf->page->offset)
+          ? $spf->page->offset
           : null;
 
         $c->setLimit($limit, $offset);
       }
 
       // Retrieve the models that match the given spf
-      $persister = ActorFactory::getActor('persister', '${model}');
       $models = $persister->retrieve($c);
       $total = $persister->count($c);
 
@@ -119,7 +115,7 @@ class ${className} {
    */
   public function update(array $params) {
     try {
-      $transformer = ActorFactory::getActor('transformer', '${model}');
+      $transformer = Transformer::get('${model}');
       $model = $transformer->fromArray($params);
 
       $persister = Persister::get('${model}');
