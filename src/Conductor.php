@@ -39,7 +39,7 @@ use \reed\File;
  */
 class Conductor {
 
-  const JQUERY_VERSION = '1.6.2';
+  const JQUERY_VERSION = '1.7.1';
 
   /** Conductor configuration values */
   public static $config = null;
