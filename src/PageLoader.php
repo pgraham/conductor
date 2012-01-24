@@ -120,7 +120,7 @@ class PageLoader {
       $libOpts = array(
         JsLib::JQUERY_UI => array( 'theme' => 'admin' )
       );
-      JsLib::includeLibs($libs, $pathInfo, $libOpts);
+      JsLib::includeLibs($libs, $libOpts);
 
       $adminClient = new AdminClient(Conductor::$config['models'], $pathInfo);
       $adminClient->addToPage();
