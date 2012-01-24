@@ -50,22 +50,7 @@ class JQueryUiFiles {
 
   public static $sheets = array(
     'themes/base/jquery.ui.base.css',
-    'themes/base/jquery.ui.core.css',
-    'themes/base/jquery.ui.theme.css',
-    'themes/base/jquery.ui.accordion.css',
-    'themes/base/jquery.ui.button.css',
-    'themes/base/jquery.ui.autocomplete.css',
-    'themes/base/jquery.ui.datepicker.css',
-    'themes/base/jquery.ui.dialog.css',
-    'themes/base/jquery.ui.menu.css',
-    'themes/base/jquery.ui.menubar.css',
-    'themes/base/jquery.ui.progressbar.css',
-    'themes/base/jquery.ui.resizable.css',
-    'themes/base/jquery.ui.selectable.css',
-    'themes/base/jquery.ui.slider.css',
-    'themes/base/jquery.ui.spinner.css',
-    'themes/base/jquery.ui.tabs.css',
-    'themes/base/jquery.ui.tooltip.css'
+    'themes/base/jquery.ui.theme.css'
   );
 
   public static function getExternal() {
@@ -87,6 +72,10 @@ class JQueryUiFiles {
         }
         $images[] = "$imgRel/{$img->getBasename()}";
       }
+
+    // If theme is specified as false then the user is using their own theme
+    } else if ($theme === false) {
+      return array();
     } else {
       $themeDir  = self::_getThemeDir($theme, $pathInfo);
       $themeName = self::_getThemeName($theme);
@@ -117,6 +106,11 @@ class JQueryUiFiles {
   public static function getSheets($theme, $pathInfo) {
     if ($theme === null) {
       return self::$sheets;
+    } else if ($theme === false) {
+      // Specifying theme to false
+      return array(
+        'themes/base/jquery.ui.base.css',
+      );
     } else {
       $sheets = array();
 

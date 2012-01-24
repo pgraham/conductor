@@ -59,7 +59,7 @@ class JsLib {
   public static function compile($lib, WebSitePathInfo $pathInfo,
       array $opts = null
   ) {
-    $files = self::getFiles($lib, $pathInfo, $opts);
+    $files = self::getFiles($lib, $opts);
 
     ResourceIncluder::compile($files);
   }
@@ -73,9 +73,9 @@ class JsLib {
    * @param array $opts Array of library specific options
    * @return array Containing three indexed, 'scripts', 'sheets' and 'images'.
    */
-  public static function getFiles($lib, WebSitePathInfo $pathInfo,
-      array $opts = null
-  ) {
+  public static function getFiles($lib, array $opts = null) {
+    $pathInfo = Conductor::getPathInfo();
+
     $libDir = null;
     $scripts = array();
     $sheets = array();
@@ -231,15 +231,7 @@ class JsLib {
    * @param array $opts Optional array of library specific options for each of
    *   the included libs.  The array is expected to be index by lib name.
    */
-  public static function includeLibs($libs, $pathInfo = null,
-      array $opts = null
-  ) {
-
-    // If options have been specified but no path info then shift the arguments
-    if (is_array($pathInfo)) {
-      $opts = $pathInfo;
-      $pathInfo = null;
-    }
+  public static function includeLibs($libs, array $opts = null) {
 
     if (!is_array($libs)) {
       $libs = array($libs);
@@ -252,7 +244,7 @@ class JsLib {
         ? $opts[$lib]
         : null;
 
-      self::includeLib($lib, $pathInfo, $libOpts);
+      self::includeLib($lib, $libOpts);
     }
   }
 
@@ -264,21 +256,7 @@ class JsLib {
    * @param WebSitePathInfo $pathInfo
    * @param array $opts Optional array of library specific options.
    */
-  public static function includeLib($lib, $pathInfo = null,
-      array $opts = null
-  ) {
-
-    // If options have been specified but no path info then shift the arguments
-    if (is_array($pathInfo)) {
-      $opts = $pathInfo;
-      $pathInfo = null;
-    }
-
-    // If no path info is specified then use the path info specified in
-    // conductor
-    if ($pathInfo === null) {
-      $pathInfo = Conductor::getPathInfo();
-    }
+  public static function includeLib($lib, array $opts = null) {
 
     if (in_array($lib, self::$_included)) {
       return;

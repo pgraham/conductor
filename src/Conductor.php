@@ -281,7 +281,11 @@ class Conductor {
 
       if (isset($resources['jslib'])) {
         foreach ($resources['jslib'] AS $jslib) {
-          JsLib::includeLib($jslib, Conductor::getPathInfo());
+          if (is_array($jslib)) {
+            JsLib::includeLib($jslib[0], $jslib[1]);
+          } else {
+            JsLib::includeLib($jslib);
+          }
         }
       }
 
@@ -311,8 +315,12 @@ class Conductor {
   /**
    * Include resources that provide support for building a javascript app.
    */
-  public static function loadJsAppSupport() {
-    JsLib::includeLib(JsLib::JQUERY_UI);
+  public static function loadJsAppSupport($theme = null) {
+    $opts = null;
+    if ($theme !== null) {
+      $opts = array('theme' => $theme);
+    }
+    JsLib::includeLib(JsLib::JQUERY_UI, $opts);
 
     $appSupport = new JsAppResources();
     if (self::isDebug()) {
