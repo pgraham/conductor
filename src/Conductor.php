@@ -48,6 +48,15 @@ class Conductor {
   private static $_initialized = false;
 
   /**
+   * Retrieve the {@link ConductorConfiguration} object for the site.
+   *
+   * @return ConductorConfiguration
+   */
+  public static function getConfig() {
+    return self::$config;
+  }
+
+  /**
    * Retrieve the configuration value with the given name.  In order for this to
    * work the database must be setup to handle configuration values.
    *
@@ -118,24 +127,6 @@ class Conductor {
   public static function getPathInfo() {
     self::_ensureInitialized();
     return self::$config['pathInfo'];
-  }
-
-  /**
-   * Getter for the web site's model classes.
-   *
-   * @return \conductor\config\ModelConfig[]
-   */
-  public static function getModels() {
-    return self::$config['models'];
-  }
-
-  /**
-   * Get the service classes for the site.
-   *
-   * @return \conductor\config\ServiceConfig[]
-   */
-  public static function getServices() {
-    return self::$config['services'];
   }
 
   /**
