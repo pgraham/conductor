@@ -1,11 +1,7 @@
 (function ($, CDT, undefined) {
   "use strict";
 
-  var cache = [], layouts = [];
-
-  if (CDT.layout === undefined) {
-    CDT.layout = {};
-  }
+  var cache = [];
 
   CDT.layout.fill = function (container) {
     var layout = {}, sel, apply, i, len;
@@ -49,9 +45,9 @@
         .css('overflow-x', 'hidden');
     };
 
-    // Push the apply function onto the list of actions to perform when the
-    // window is resized
-    layouts.push(apply);
+    // Register the layout with the layout manager so that it is reapplied when
+    // the window is resized.
+    CDT.layout.register(apply);
 
     layout.with = function (selector) {
       sel = selector;
@@ -65,18 +61,5 @@
 
     return layout;
   };
-
-  CDT.layout.doLayout = function () {
-    $.each(layouts, function (idx, fn) {
-      fn();
-    });
-  };
-
-  // Add a resize handler to the window which applies all layout functions
-  // TODO Move this into a generic location so that other layout types can
-  //      make use of this functionality
-  $(window).resize(function () {
-    CDT.layout.doLayout();
-  });
 
 } (jQuery, CDT));

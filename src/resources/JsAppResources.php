@@ -36,6 +36,7 @@ class JsAppResources {
     );
 
     $js = array(
+      new Resource('layout.js'),
       new Resource('layout-fill.js'),
       new Resource('widget-section.js'),
       new Resource('widget-collapsible.js'),
