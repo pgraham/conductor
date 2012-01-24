@@ -60,7 +60,12 @@ abstract class AbstractGatekeeper implements Gatekeeper {
 
   protected function msg($model, $action) {
     $id = $this->_transformer->getId($model);
-    $msg = "Unable to $action {$this->_modelClass} with id $id: "
-      . "Permission Denied";
+    $msg = "Unable to $action {$this->_modelClass}";
+    if ($id) {
+      $msg .= " with id $id";
+    }
+
+    $msg .= ": Permission Denied";
+    return $msg;
   }
 }
