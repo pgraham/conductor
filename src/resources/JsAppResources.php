@@ -42,6 +42,7 @@ class JsAppResources {
       new Resource('widget-section.js'),
       new Resource('widget-collapsible.js'),
       new Resource('widget-form.js'),
+      new Resource('widget-pager.js'),
       new Resource('widget-list.js'),
       new Resource('component-configurationEditor.js'),
       new Resource('conductor-app.js')

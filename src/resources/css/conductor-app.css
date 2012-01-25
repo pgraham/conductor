@@ -39,6 +39,21 @@ body > .ui-tabs > .ui-tabs-panel {
   vertical-align: top;
 }
 
+.cdt-list .cdt-pager {
+  height: 50px;
+  padding-left: 40px;
+  padding-right: 20px;
+  line-height: 50px;
+}
+
+.cdt-list .cdt-pager span.page-lbl {
+  margin-left: 20px;
+}
+.cdt-list .cdt-pager input[type="text"] {
+  width: 50px;
+  margin-right: 20px;
+}
+
 .cdt-form label {
   float: left;
   height: 25px;
