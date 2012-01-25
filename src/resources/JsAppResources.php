@@ -36,6 +36,7 @@ class JsAppResources {
     );
 
     $js = array(
+      new Resource('data-store.js'),
       new Resource('layout.js'),
       new Resource('layout-fill.js'),
       new Resource('widget-section.js'),
