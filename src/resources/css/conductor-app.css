@@ -4,10 +4,11 @@ body > .ui-tabs {
 }
 body > .ui-tabs > .ui-tabs-panel {
   position: absolute;
-  top: 50px;
+  /* Top is calculated by the app. */
   bottom: 0;
   left: 0;
   right: 0;
+  padding: 10px;
   overflow: auto;
   overflow-x: hidden;
 }

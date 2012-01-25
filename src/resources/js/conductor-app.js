@@ -12,31 +12,21 @@
   eventuality(CDT.app);
 
   CDT.app.addView = function (id, lbl, elm) {
-    var view, paddingTop, paddingBottom, paddingLeft, paddingRight;
-
     if (tabs === undefined) {
       // TODO Queue the view to be added once the document is ready
       return;
     }
 
-    view = $('<div/>')
-        .attr('id', id)
-        .append(elm)
-        .appendTo(tabs);
+    elm
+      .attr('id', id)
+      .addClass('cdt-app-view')
+      .appendTo(tabs);
     tabs.tabs('add', '#' + id, lbl);
 
-    paddingTop = view.css('padding-top');
-    paddingBottom = view.css('padding-bottom');
-    paddingLeft = view.css('padding-left');
-    paddingRight = view.css('padding-right');
-
-    elm.css({
-      'position': 'absolute',
-      'top': paddingTop,
-      'bottom': paddingBottom,
-      'left': paddingLeft,
-      'right': paddingRight
-    });
+    // Now that the tab has been added, it is guaranteed that there is a tab
+    // nav element.  Only top needs to be set programtically, the rest of the
+    // edges are set in css
+    elm.css('top', tabs.find('.ui-tabs-nav').outerHeight());
   }
 
   CDT.app.addMessage = function (message, type) {
