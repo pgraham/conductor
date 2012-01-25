@@ -12,26 +12,27 @@
    * Create a new list widget
    */
   CDT.widget.list = function () {
-    var list, elm, thead, cols, tbody;
+    var list, elm, tbl, thead, headers, selAll, cols, tbody;
 
     cols = [];
-    thead = $('<thead/>');
+    headers = $('<tr/>');
+    thead = $('<thead/>').append(headers);
     tbody = $('<tbody/>');
-    elm = $('<div/>')
-      .addClass('cdt-list')
-      .addClass('ui-widget-content')
-      .addClass('ui-corner-all')
-      .append($('<table/>')
-        .append(thead.append($('<tr/>')))
-        .append(tbody)
-      );
-  
-    thead.find('tr').append(
-      $('<th/>').addClass('ui-widget-header').text(' ')
-    );
+    tbl = $('<table/>').append(thead).append(tbody);
+
+    elm = $('<div/>').addClass('cdt-list').append(tbl);
 
     list = { elm: elm };
     eventuality(list);
+  
+    selAll = $('<input type="checkbox"/>')
+      .click(function () {
+        tbody.find('.cdt-list-row-selector')
+          .prop('checked', $(this).is(':checked'));
+
+        list.fire('selection-change');
+      });
+    headers.append($('<th/>').addClass('ui-widget-header').append(selAll));
 
     list.addColumn = function (lbl, renderer, autoExpand) {
       var dataIndex, elm;
@@ -57,14 +58,18 @@
       row = $('<tr/>');
 
       chk = $('<input type="checkbox"/>')
+        .addClass('cdt-list-row-selector')
         .data('row-attributes', rowData)
         .click(function () {
+          selAll.prop(
+            'checked',
+            tbody.find('.cdt-list-row-selector:not(:checked)').length ===  0
+          );
+
           list.fire('selection-change');
         });
-      row.append($('<td/>')
-        .addClass('ui-widget-content')
-        .append(chk)
-      );
+
+      row.append( $('<td/>').addClass('ui-widget-content').append(chk) );
 
       $.each(cols, function (idx, col) {
         row.append(
@@ -83,6 +88,7 @@
 
     list.populate = function (data, mapper) {
       tbody.empty();
+      selAll.prop('checked', false);
 
       $.each(data, function (idx, rowData) {
         if (mapper !== undefined) {
