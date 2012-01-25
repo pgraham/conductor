@@ -31,6 +31,10 @@ body > .ui-tabs > .ui-tabs-panel {
   background-color: #AA0000;
 }
 
+.cdt-list table {
+  display: block;
+}
+
 .cdt-list th.ui-widget-header {
   padding: 10px;
 }
