@@ -98,7 +98,7 @@ var CDT = {};
     curPageSel = sel;
 
     CDT.fire({
-      type   : 'pageLoad',
+      type   : 'page-load',
       pageId : curPageId
     });
   };

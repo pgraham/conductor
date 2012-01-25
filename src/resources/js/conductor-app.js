@@ -141,7 +141,7 @@
       }
 
       if (msg === undefined) {
-        msg = response.status + ": " + response.statusText;
+        msg = xhr.status + ": " + xhr.statusText;
       }
 
       CDT.app.addMessage(msg, 'error');
