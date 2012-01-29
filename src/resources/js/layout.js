@@ -14,6 +14,16 @@
     layouts.push(layoutFn);
   };
 
+  CDT.layout.unregister = function (layoutFn) {
+    var i, len;
+    for (i = 0, len = layouts.length; i < len; i++) {
+      if (layouts[i] === layoutFn) {
+        layouts.splice(i, 1);
+        break;
+      }
+    }
+  };
+
   CDT.layout.doLayout = function () {
     $.each(layouts, function (idx, fn) {
       fn();

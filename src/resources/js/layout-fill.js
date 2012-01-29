@@ -51,6 +51,10 @@
       apply();
     }
 
+    layout.remove = function () {
+      CDT.layout.unregister(apply);
+    };
+
     cache.push({
       container: container,
       layout: layout
