@@ -20,8 +20,14 @@
           fill;
 
       container.children().each(function () {
-        if (!$(this).is(sel)) {
-          allocated += $(this).outerHeight(true);
+        var $this = $(this);
+        if (!$this.is(sel)) {
+          if (( $this.css('position') === 'static' ||
+                $this.css('position') === 'relative') &&
+              $this.css('float') === 'none')
+          {
+            allocated += $(this).outerHeight(true);
+          }
         }
       });
 
