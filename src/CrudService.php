@@ -28,7 +28,6 @@ use \reed\File;
  */
 class CrudService {
 
-  private $_proxyPath;
   private $_srvcInfo;
   private $_webPath;
 
@@ -40,8 +39,8 @@ class CrudService {
 
     $srvcName = $this->_srvcInfo->getServiceName();
     $webTarget = $pathInfo->getWebTarget();
-    $this->_proxyPath = File::joinPaths($webTarget, "js/$srvcName.js");
-    $this->_webPath = $pathInfo->fsToWeb($this->_proxyPath);
+    $proxyPath = File::joinPaths($webTarget, "js/$srvcName.js");
+    $this->_webPath = $pathInfo->fsToWeb($proxyPath);
   }
 
   public function generate() {
@@ -52,12 +51,8 @@ class CrudService {
     $generator->generate($pathInfo->getTarget(), $cdtPath);
 
     // Generate the Bassoon service proxy for the CRUD service class.
-    $srvc = new RemoteService($this->_srvcInfo->getServiceClass());
-    $srvcName = $this->_srvcInfo->getServiceName();
-
-    $dispatchPath = File::joinPaths($pathInfo->getWebTarget(), "ajx/$srvcName");
-    $dispatchWeb = $pathInfo->fsToWeb($dispatchPath);
-    $srvc->generate($this->_proxyPath, $dispatchPath, $dispatchWeb);
+    $srvc = new RemoteService($this->_srvcInfo->getServiceClass(), $pathInfo);
+    $srvc->generate();
   }
 
   public function getWebPath() {

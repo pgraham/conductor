@@ -35,18 +35,18 @@ class ServiceProxy {
   }
 
   public static function get($srvcClass) {
-    $srvc = new RemoteService($srvcClass);
+    $pathInfo = Conductor::getPathInfo();
+
+    $srvc = new RemoteService($srvcClass, $pathInfo);
     $srvcName = $srvc->getName();
 
-    $pathInfo = Conductor::getPathInfo();
+    // TODO Get proxy web from the RemoteService class
     $webTarget = $pathInfo->getWebTarget();
     $proxyPath = File::joinPaths($webTarget, 'js', "$srvcName.js");
     $proxyWeb = $pathInfo->fsToWeb($proxyPath);
 
     if (Conductor::isDebug()) {
-      $dispatchPath = File::joinPaths($webTarget, 'ajx', "$srvcName");
-      $dispatchWeb = $pathInfo->fsToWeb($dispatchPath);
-      $srvc->generate($proxyPath, $dispatchPath, $dispatchWeb);
+      $srvc->generate();
     }
 
     return Element::js($proxyWeb);
