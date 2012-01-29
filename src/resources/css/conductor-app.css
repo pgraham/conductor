@@ -52,11 +52,16 @@ body > .ui-tabs > .ui-tabs-panel {
 }
 
 .cdt-list .cdt-pager span.page-lbl {
-  margin-left: 20px;
+  margin: 0 10px 0 20px;
 }
-.cdt-list .cdt-pager input[type="text"] {
-  width: 50px;
-  margin-right: 20px;
+.cdt-list .cdt-pager .current-page {
+  width: 35px;
+  border: 1px solid #555;
+  padding-left: 5px;
+  text-align: center;
+}
+.cdt-list .cdt-pager .num-pages {
+  margin: 0 20px 0 10px;
 }
 
 .cdt-form label {
