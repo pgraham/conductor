@@ -13,7 +13,7 @@
     }
 
     apply = function () {
-      var toFill = container.children(sel),
+      var toFill = typeof sel === 'string' ? container.children(sel) : sel,
           height = container.height(),
           allocated = 0,
           remaining,
