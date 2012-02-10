@@ -11,7 +11,6 @@
  * =============================================================================
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
- * @package conductor/model
  */
 namespace conductor\model;
 
@@ -19,7 +18,6 @@ namespace conductor\model;
  * Model class for a user.
  *
  * @author Philip Graham <philip@zeptech.ca>
- * @package conductor/model
  *
  * @Entity(table = users)
  */

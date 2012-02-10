@@ -134,7 +134,7 @@ class JQueryUiFiles {
       $themeDir = $pathInfo->getLibPath()
         . "/conductor/src/resources/$theme-theme";
 
-      if ($themeDir === false) {
+      if (!file_exists($theme) {
         throw new Exception("Specified theme does not exist: $theme.  It was"
           . " expected to be found at $themeDir");
       }

@@ -14,11 +14,42 @@
  */
 namespace conductor\compile;
 
+use \reed\WebSitePathInfo;
+
 /**
- * Marker interface for classes that are compilable.  Classes that implement
- * this interface should have a matching Compiler implementation in this
- * package.
+ * Marker interface for class that respresent a compilable resource.
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-interface Compilable {}
+interface Compilable {
+
+  /**
+   * This function is responsible for compressing a resource's source files in
+   * order to improve performance.  Compilation should happen in-place and will
+   * generally only be invoked durring a dedicated step of site deployment.
+   *
+   * @param WebSitePathInfo $pathInfo Path info for the site into which the
+   *   library is being linked.
+   */
+  public function compile(WebSitePathInfo $pathInfo);
+
+  /**
+   * This function is responsible for including the resource in a document.
+   *
+   * @param WebSitePathInfo $pathInfo Path info for the site into which the
+   *   library is being linked.
+   * @param boolean $devMode Whether or not the site is operating in dev mode.
+   */
+  public function inc(WebSitePathInfo $pathInfo, $devMode);
+
+  /**
+   * This function is responsible for making a resource's files available within
+   * a site's document root.
+   *
+   * @param WebSitePathInfo $pathInfo Path info for the site into which the
+   *   library is being linked.
+   * @param boolean $devMode Whether or not the site is operating in dev mode.
+   */
+  public function link(WebSitePathInfo $pathInfo, $devMode);
+
+}

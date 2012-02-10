@@ -194,9 +194,8 @@ class Auth {
    * @param $identity OpenId identity
    */
   public static function openIdLogin($identity, $returnUrl = null) {
-    echo "Open ID Login";
     require_once dirname(__FILE__) . '/../../lightopenid/openid.php';
-    $openId = new LightOpenId(Conductor::$config['host']);
+    $openId = new LightOpenId(Conductor::getHostName());
 
 
     if (!$openId->mode) {
@@ -215,10 +214,8 @@ class Auth {
       $session = self::_getSession();
 
     } else {
-        echo "OpenID Assertion<br/>";
       
       if ($openId->validate()) {
-        echo "OpenID Positive Assertion";
 
         // This is a positive assertion.
         // To save some headaches around ambiguous results, never preserve an

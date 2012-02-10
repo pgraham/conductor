@@ -42,16 +42,19 @@ class PageLoader {
     // it will be now or will throw an exception if there is a problem
     Conductor::init();
 
-    if ($pageId === null) {
-      $pageId = Conductor::$config['pageCfg']['default'];
-    }
-
-    if (!isset(Conductor::$config['pageCfg']['pages'][$pageId])) {
-      // TODO This is an error, but what is the appropriate behaviour?
+    $page = Conductor::getPage($pageId);
+    if ($page === null) {
       return null;
     }
+    return $page->getTitle();
+  }
 
-    return Conductor::$config['pageCfg']['pages'][$pageId]['title'];
+  /**
+   * Load the login form.  
+   */
+  public static function loadLogin($msg = null) {
+    $login = new LoginForm($msg);
+    $login->addToPage();
   }
 
   /**
@@ -67,20 +70,15 @@ class PageLoader {
     try {
       Conductor::init();
 
-      if ($pageId === null) {
-        $pageId = Conductor::$config['pageCfg']['default'];
-      }
-
-      if (!isset(Conductor::$config['pageCfg']['pages'][$pageId])) {
+      $page = Conductor::getPage($pageId);
+      if ($page === null) {
         header("HTTP/1.1 404 Not Found");
         $notFound = new Fragment(__DIR__ . '/html/404.html');
         echo $notFound;
         exit;
       }
 
-      $pageInfo = Conductor::$config['pageCfg']['pages'][$pageId];
-      $className = $pageInfo['class'];
-
+      $className = $page->getClassName();
       $page = new $className();
       $frag = $page->getFragment();
       return $frag;
@@ -93,39 +91,6 @@ class PageLoader {
         self::loadLogin($e->getMessage());
         return null;
       }
-    }
-  }
-
-  /**
-   * Load the admin interface for the models defined in conductor.cfg.xml.
-   *
-   * This will not have the desired effect if invoked as part of an
-   * asynchronous request.
-   */
-  public static function loadAdmin() {
-    try {
-      error_log('Loading admin');
-      if (!Auth::hasPermission('cdt-admin')) {
-        throw new AuthorizationException("Please login");
-      }
-
-      $pathInfo = Conductor::getPathInfo();
-
-      $libs = array(
-        JsLib::JQUERY_COOKIE,
-        JsLib::JQUERY_UI,
-        JsLib::JQUERY_UI_TIMEPICKER,
-        JsLib::DATE_JS
-      );
-      $libOpts = array(
-        JsLib::JQUERY_UI => array( 'theme' => 'admin' )
-      );
-      JsLib::includeLibs($libs, $libOpts);
-
-      $adminClient = new AdminClient(Conductor::$config['models'], $pathInfo);
-      $adminClient->addToPage();
-    } catch (AuthorizationException $e) {
-      self::loadLogin($e->getMessage());
     }
   }
 
@@ -143,13 +108,5 @@ class PageLoader {
       $loginForm->setPasswordLabel($e->getPasswordLabel());
     }
     return $loginForm;
-  }
-
-  /**
-   * Load the login form.  
-   */
-  public static function loadLogin($msg = null) {
-    $login = new LoginForm($msg);
-    $login->addToPage();
   }
 }

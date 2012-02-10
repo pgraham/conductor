@@ -15,18 +15,16 @@
 namespace conductor\jslib;
 
 use \conductor\Exception;
-use \conductor\Library;
 use \oboe\Element;
 use \reed\File;
+use \reed\WebSitePathInfo;
 
 /**
  * This class encapsulates the file lists for different Galleria themes.
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class Galleria implements Library {
-
-  const LIBNAME = 'galleria';
+class Galleria extends BaseLibrary {
 
   private static $_themeFiles;
   
@@ -74,27 +72,12 @@ class Galleria implements Library {
    * ===========================================================================
    */
 
-  private $_srcPath;
-  private $_outPath;
-  private $_webOut;
-
-  public function __construct($srcPath, $outPath, $webOut) {
+  public function __construct(array $opts = null) {
     self::_initThemeFiles();
-
-    $this->_srcPath = $srcPath;
-    $this->_outPath = $outPath;
-    $this->_webOut = $webOut;
+    $this->init(JsLib::GALLERIA, $opts);
   }
 
-  public function link(array $opts = null) {
-    if ($opts === null) {
-      $opts = array();
-    }
-
-    if (!file_exists($this->_outPath)) {
-      mkdir($this->_outPath, 0755, true);
-    }
-
+  protected function getLinked($pathInfo, $devMode) {
     $files = array(
       array(
         'src' => File::joinPaths('src', 'galleria.js'),
@@ -103,8 +86,8 @@ class Galleria implements Library {
     );
 
     $theme = 'classic';
-    if (isset($opts['theme'])) {
-      $theme = $opts['theme'];
+    if (isset($this->opts['theme'])) {
+      $theme = $this->opts['theme'];
     }
 
     if (!array_key_exists($theme, self::$_themeFiles)) {
@@ -112,24 +95,10 @@ class Galleria implements Library {
     }
 
     $files = array_merge($files, self::$_themeFiles[$theme]);
-
-    foreach ($files AS $file) {
-      $fileSrc = File::joinPaths($this->_srcPath, $file['src']);
-      $fileOut = File::joinPaths($this->_outPath, $file['out']);
-
-      $fileOutDir = dirname($fileOut);
-      if (!file_exists($fileOutDir)) {
-        mkdir($fileOutDir, 0755, true);
-      }
-
-      copy($fileSrc, $fileOut);
-    }
+    return $files;
   }
 
-  public function compile(array $opts = null) {
-  }
-
-  public function inc(array $opts = null) {
-    Element::js("$this->_webOut/galleria.js")->addToHead();
+  protected function getIncluded($pathInfo, $devMode) {
+    return array( 'galleria.js' );
   }
 }

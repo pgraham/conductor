@@ -14,7 +14,6 @@
  */
 namespace conductor;
 
-use \conductor\compile\Compilable;
 use \conductor\compile\ResourceCompiler;
 use \conductor\Conductor;
 
@@ -47,7 +46,7 @@ use \reed\WebSitePathInfo;
  * 
  * @author Philip Graham <philip@zeptech.ca>
  */
-class Resource implements Compilable {
+class Resource {
 
   public static $IMG_TYPES = array(
     'png',
@@ -173,7 +172,7 @@ class Resource implements Compilable {
   public static function import($path) {
     $resource = new Resource($path);
 
-    if (Conductor::isDebug()) {
+    if (Conductor::isDevMode()) {
       $resource->compile();
     }
     return $resource;
@@ -220,7 +219,7 @@ class Resource implements Compilable {
   public function addToPage() {
     $pathInfo = Conductor::getPathInfo();
 
-    if (Conductor::isDebug()) {
+    if (Conductor::isDevMode()) {
       $this->compile();
     }
 

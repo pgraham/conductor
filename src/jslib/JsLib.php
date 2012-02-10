@@ -15,7 +15,6 @@
 namespace conductor\jslib;
 
 use \conductor\Conductor;
-use \conductor\Library;
 use \conductor\ResourceSet;
 use \conductor\ResourceIncluder;
 use \oboe\head\Javascript;
@@ -107,10 +106,7 @@ class JsLib {
       break;
 
       case self::GALLERIA:
-      $srcPath = File::joinPaths($pathInfo->getLibPath(), 'jslib', $lib);
-      $outPath = File::joinPaths($pathInfo->getWebTarget(), $lib);
-
-      return new Galleria($srcPath, $outPath, $pathInfo->fsToWeb($outPath));
+      return new Galleria($pathInfo, $lib);
 
       case self::JQUERY_COOKIE:
       $libDir = 'jquery-cookie';
@@ -149,6 +145,7 @@ class JsLib {
       break;
 
       case self::JQUERY_UI:
+      return new JQueryUi($pathInfo, $lib);
       $theme = is_array($opts) && isset($opts['theme'])
         ? $opts['theme']
         : null;
@@ -251,7 +248,7 @@ class JsLib {
 
     $files = self::getFiles($lib, $opts);
     if ($files instanceof Library) {
-      if (Conductor::isDebug()) {
+      if (Conductor::isDevMode()) {
         $files->link($opts);
       }
       $files->inc($opts);

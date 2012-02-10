@@ -94,7 +94,7 @@ class ResourceIncluder {
    */
   public static function inc(ResourceSet $resources) {
 
-    if (Conductor::isDebug()) {
+    if (Conductor::isDevMode()) {
       self::compile($resources);
     }
 

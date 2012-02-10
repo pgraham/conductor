@@ -14,63 +14,55 @@
  */
 namespace conductor\resources;
 
+use \conductor\jslib\JQuery;
+use \conductor\jslib\JQueryCookie;
+use \conductor\jslib\JQueryUi;
 use \conductor\Conductor;
 use \conductor\Resource;
+use \conductor\ResourceSet;
 
 /**
  * This class encapsulates a the base set of resources for the platform.
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class BaseResources {
+class BaseResources extends ResourceSet {
 
-  private $_cdtJs;
-  private $_toCompile;
-  private $_toInclude;
+  public function __construct($theme) {
+    // Stylesheets
+    // -------------------------------------------------------------------------
+    $this->addSheets(array(
+      'reset.css',
+      'cdt.css',
+      'login.css'
+    ));
 
-  public function __construct() {
-    $img = array(
-      new Resource('working.gif')
-    );
+    // JQuery and plugins
+    // -------------------------------------------------------------------------
 
-    $css = array(
-      new Resource('reset.css'),
-      new Resource('cdt.css'),
-      new Resource('login.css')
-    );
+    $this->addJsLib(new JQuery());
+    $this->addJsLib(new JQueryCookie());
+    $this->addJsLib(new JQueryUi(array('theme' => $theme)));
 
-    $js = array(
-      new Resource('utility.js'),
-      new Resource('jquery-dom.js'),
-      new Resource('login.js')
-    );
+    // jquery.working.js
+    $this->addScript('jquery.working.js');
+    $this->addImage('working.gif');
 
-    $this->_cdtJs = new Resource('conductor.js');
-    $this->_toCompile = array_merge($img, $css, $js);
-    $this->_toInclude = array_merge($css, $js);
-  }
+    // JavaScripts
+    // -------------------------------------------------------------------------
+    $this->addScripts(array(
+      'utility.js',
+      'jquery-dom.js',
+      'login.js',
+      'conductor.js'
+    ));
 
-  public function compile() {
-    $pathInfo = Conductor::getPathInfo();
-    $workingPath = Resource::getResourcePath('working.gif');
-    $workingImgInfo = getimagesize($workingPath);
-    $values = array(
-      'rootPath'    => $pathInfo->getWebRoot(),
-      'targetPath'  => $pathInfo->fsToWeb($pathInfo->getWebTarget()),
-      'imgWidth'    => $workingImgInfo[0],
-      'imgHeight'   => $workingImgInfo[1]
-    );
-    $this->_cdtJs->compile($values);
-    
-    foreach ($this->_toCompile AS $r) {
-      $r->compile();
-    }
-  }
-
-  public function inc() {
-    foreach ($this->_toInclude AS $r) {
-      $r->addToPage();
-    }
-    $this->_cdtJs->addToPage();
+    // Services
+    // -------------------------------------------------------------------------
+    $this->addServices(array(
+      'conductor\Service',
+      'conductor\LoginService',
+      'conductor\ContentService'
+    ));
   }
 }

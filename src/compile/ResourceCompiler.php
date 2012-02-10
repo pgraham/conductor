@@ -16,7 +16,7 @@ namespace conductor\compile;
 
 use \conductor\Resource;
 
-use \reed\generator\CodeTemplateLoader;
+use \reed\generator\CodeTemplate;
 use \reed\WebSitePathInfo;
 
 /**
@@ -50,10 +50,7 @@ class ResourceCompiler implements Compiler {
     if ($values === null) {
       copy($path, "$target/" . basename($name));
     } else {
-      $templateLoader = CodeTemplateLoader::get(dirname($path));
-      $content = $templateLoader->load($name, $values);
-
-      file_put_contents("$target/$name", $content);
+      CodeTemplate::compile($path, "$target/$name", $values);
     }
   }
 }

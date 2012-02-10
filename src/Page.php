@@ -192,7 +192,7 @@ class Page extends \oboe\Page {
         'Cannot set the page template more than once');
     }
 
-    if (Conductor::isDebug()) {
+    if (Conductor::isDevMode()) {
       $validator = new TemplateValidator($template);
       $validator->validate();
     }

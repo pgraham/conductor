@@ -59,16 +59,6 @@ class Parser {
       $cfg['title'] = 'Powered by Conductor';
     }
 
-
-    // Parse the website's custom Autoloader
-    if (isset($xmlCfg->autoloader)) {
-      $autoloader = $xmlCfg->autoloader->__toString();
-      if (substr($autoloader, 0, 1) !== '/') {
-        $autoloader = $pathRoot . '/'. $autoloader;
-      }
-      $cfg['autoloader'] = $autoloader;
-    }
-
     // Create an array of model files.  No parsing is actually done until
     // necessary
     if (isset($xmlCfg->models)) {
@@ -91,71 +81,10 @@ class Parser {
       $cfg['services'] = array();
     }
 
-    if (isset($xmlCfg->sourcePath)) {
-      $sourceRoot = $xmlCfg->sourcePath->__toString();
-
-      if (substr($sourceRoot, 0, 1) !== '/') {
-        $target = $pathRoot . '/' . $sourceRoot;
-      }
-
-      if (isset($xmlCfg->sourcePath['nsbase'])) {
-        $sourceNs = $xmlCfg->sourcePath['nsbase'];
-      }
+    if (isset($xmlCfg->pathInfo)) {
+      $pathInfo = WebSitePathInfo::parse($xmlCfg->pathInfo, $pathRoot);
     } else {
-      $sourceRoot = $pathRoot . '/src';
-    }
-
-
-    // Set the output directory, if not specified use a temporary directory
-    if (isset($xmlCfg->targetPath)) {
-      $target = $xmlCfg->targetPath->__toString();
-
-      if (substr($target, 0, 1) != '/') {
-        $target = $pathRoot . '/' . $target;
-      }
-    } else {
-      $target = sys_get_temp_dir() . '/conductor';
-    }
-
-    // Parse the document root
-    if (isset($xmlCfg->documentRoot)) {
-      $docRoot = $xmlCfg->documentRoot->__toString();
-
-      if (substr($docRoot, 0, 1) != '/') {
-        $docRoot = $pathRoot . '/' . $docRoot;
-      }
-    } else {
-      $docRoot = $pathRoot . '/public_html';
-    }
-
-    // Parse the file system path to the web-accessible folder that is writable
-    // by the web server
-    if (isset($xmlCfg->webWritable)) {
-      $webWrite = $xmlCfg->webWritable->__toString();
-
-      if (substr($webWrite, 0, 1) != '/') {
-        $webWrite = $pathRoot . '/' . $webWrite;
-      }
-    } else {
-      $webWrite = $docRoot . '/gen';
-    }
-
-    // Parse the root of the website relative to the domain on which it is
-    // hosted
-    if (isset($xmlCfg->webRoot)) {
-      $webRoot = $xmlCfg->webRoot->__toString();
-    } else {
-      $webRoot = '/';
-    }
-
-    $pathInfo = new WebSitePathInfo($pathRoot, $webRoot, $docRoot, null,
-      $sourceRoot, $target, $webWrite);
-
-    // Check if the site supports user generated content.  Due to the way
-    // compilation is structured this needs to be hard-coded, otherwise staging
-    // and production sites will not have the proper permissions.
-    if (isset($xmlCfg->supportUserContent)) {
-      $pathInfo->setUserContentDir('usr');
+      $pathInfo = WebSitPathInfo::parse($xmlCfg, $pathRoot);
     }
 
     $cfg['pathInfo'] = $pathInfo;
@@ -168,6 +97,13 @@ class Parser {
       $cfg['sessionTtl'] = (int) $xmlCfg->sessionTimeToLive->__toString();
     } else {
       $cfg['sessionTtl'] = SessionManager::DEFAULT_SESSION_TTL;
+    }
+
+    // Parse website hostName, required for openId login
+    if (isset($xmlCfg->hostName)) {
+      $cfg['host'] = $xmlCfg->hostName->__toString();
+    } else {
+      $cfg['host'] = $_SERVER['SERVER_NAME'];
     }
 
     return $cfg;

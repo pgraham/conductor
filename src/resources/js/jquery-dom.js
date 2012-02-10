@@ -5,8 +5,6 @@
  */
 if (window['dom'] === undefined) {
   var dom = {};
-} else {
-  throw { msg: 'DOM namespace is already defined' };
 }
 (function ($, dom, undefined) {
 
@@ -23,4 +21,5 @@ if (window['dom'] === undefined) {
       .append($('<tbody />'))
       .append($('<tfoot />'))
   };
+
 } (jQuery, dom));

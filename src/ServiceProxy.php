@@ -27,7 +27,7 @@ class ServiceProxy {
 
   public static function getCrud($modelClass) {
     $srvc = new CrudService($modelClass);
-    if (Conductor::isDebug()) {
+    if (Conductor::isDevMode()) {
       $srvc->generate();
     }
 
@@ -45,7 +45,7 @@ class ServiceProxy {
     $proxyPath = File::joinPaths($webTarget, 'js', "$srvcName.js");
     $proxyWeb = $pathInfo->fsToWeb($proxyPath);
 
-    if (Conductor::isDebug()) {
+    if (Conductor::isDevMode()) {
       $srvc->generate();
     }
 

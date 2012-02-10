@@ -19,7 +19,6 @@ use \clarinet\ActorFactory;
 use \clarinet\Clarinet;
 use \clarinet\Criteria;
 
-use \conductor\config\Parser;
 use \conductor\jslib\JsLib;
 use \conductor\resources\BaseResources;
 use \conductor\resources\JsAppResources;
@@ -29,6 +28,7 @@ use \oboe\head\Javascript;
 use \oboe\head\Link;
 use \oboe\Element;
 
+use \reed\Generator\CodeTemplate;
 use \reed\ClassLoader;
 use \reed\File;
 
@@ -41,19 +41,22 @@ class Conductor {
 
   const JQUERY_VERSION = '1.7.1';
 
-  /** Conductor configuration values */
+  /** @deprecated Conductor configuration values */
   public static $config = null;
+
+  /* Conductor configuration */
+  private static $_config;
 
   /* Whether or not conductor has been initialized */
   private static $_initialized = false;
 
   /**
-   * Retrieve the {@link ConductorConfiguration} object for the site.
+   * Retrieve the {@link Configuration} object for the site.
    *
-   * @return ConductorConfiguration
+   * @return Configuration
    */
   public static function getConfig() {
-    return self::$config;
+    return self::$_config;
   }
 
   /**
@@ -119,6 +122,26 @@ class Conductor {
   }
 
   /**
+   * Getter for the hostname on which the website is running.
+   *
+   * @return string
+   */
+  public static function getHostName() {
+    return self::$_config->getHostName();
+  }
+
+  /**
+   * Return the page configuration for the page with the given id or the default
+   * page if no id is provided.
+   *
+   * @return config\PageConfiguration
+   */
+  public static function getPage($pageId = null) {
+    return self::$_config->getPage($pageId);
+  }
+
+
+  /**
    * Getter for the path info associated with conductor config used to
    * initialize this session.
    *
@@ -126,7 +149,16 @@ class Conductor {
    */
   public static function getPathInfo() {
     self::_ensureInitialized();
-    return self::$config['pathInfo'];
+    return self::$_config->getPathInfo();
+  }
+
+  /**
+   * Getter for the configured time that an inactive session remains valid.
+   *
+   * @return integer
+   */
+  public static function getSessionTtl() {
+    return self::$_config->getAuthConfiguration()->getSessionTtl();
   }
 
   /**
@@ -141,7 +173,7 @@ class Conductor {
    */
   public static function init($configPath = null, $authenticate = true) {
     if (self::$_initialized) {
-      if (self::isDebug()) {
+      if (self::isDevMode()) {
         // TODO - Give a warning if in debug mode
         // TODO - Add logging interface to Reed that can be used for this
       }
@@ -159,23 +191,20 @@ class Conductor {
       // site root named conductor.cfg.xml
       $configPath = __DIR__ . '/../../../conductor.cfg.xml';
     }
-    self::$config = Parser::parse($configPath);
-    $pathInfo = self::$config['pathInfo'];
+    self::$_config = Configuration::parse($configPath);
+
+    $pathInfo = self::$_config->getPathInfo();
     Autoloader::$genBasePath = $pathInfo->getTarget() . '/conductor';
 
-    // If a custom autoloader was defined in the configuration, load it now
-    if (isset(self::$config['autoloader'])) {
-      require_once self::$config['autoloader'];
-    }
-
-    // If a source base namespace was specified register a classloader for it
-    // now
-    if (isset(self::$config['basens'])) {
-      ClassLoader::register($pathInfo->getSrcPath(), self::$config['basens']);
+    // If a site specific namespace was specified register a classloader for
+    // site source classes.
+    if (self::$_config->getSiteNamespace() !== null) {
+      ClassLoader::register($pathInfo->getSrcPath(),
+        self::$_config->getSiteNamespace());
     }
 
     // Set options for debug mode.
-    if (self::isDebug()) {
+    if (self::isDevMode()) {
       ini_set('display_errors', 'on');
       ini_set('html_errors', 'on');
 
@@ -189,13 +218,7 @@ class Conductor {
     }
 
     // Initialize clarinet
-    Clarinet::init(array
-      (
-        'pdo'        => self::$config['pdo'],
-        'outputPath' => $pathInfo->getTarget(),
-        'debug'      => self::$config['debug']
-      )
-    );
+    Clarinet::init(self::$_config->getClarinetConfiguration());
 
     // Authenticate.
     if ($authenticate) {
@@ -204,13 +227,13 @@ class Conductor {
   }
 
   /**
-   * Getter for whether or not the site is operating in DEBUG mode.
+   * Getter for whether or not the site is operating in DEV mode.
    *
    * @return boolean
    */
-  public static function isDebug() {
+  public static function isDevMode() {
     self::_ensureInitialized();
-    return self::$config['debug'];
+    return self::$_config->isDevMode();
   }
 
   /**
@@ -219,97 +242,52 @@ class Conductor {
    *
    * @param PageTemplate $template The PageTemplate for the response.
    */
-  public static function load(PageTemplate $template = null) {
+  public static function load($page = null, $template = null) {
     self::_ensureInitialized();
+    $pathInfo = Conductor::getPathInfo();
 
-    // Initialize conductor's extensions to oboe\Page and include the conductor
-    // client
+    // Initialize conductor's extensions to oboe\Page
     Page::init();
 
-    // TODO Specification for template resources should be done in
-    //      conductor.cfg.xml.
-    $jQueryName = 'jquery.min.js';
-    if (self::isDebug()) {
-      $jQueryName = 'jquery.js';
+    // Get the configuration for the requested (or default) page
+    $pageCfg = self::$_config->getPage($page);
+
+    // All pages contain a script which declares necessary namespaces and
+    // provides functions which give access to path into.  This script is
+    // built here - TODO - Make this a template so it can be compiled when the
+    // site is deployed
+    // -------------------------------------------------------------------------
+    $baseJsOutPath = $pathInfo->getTarget() . '/base.js';
+    if (self::isDevMode()) {
+      $jsParams = array(
+        'rootPath' => $pathInfo->getWebRoot()
+      );
+
+      // If the site's javascript is encapsulated in a module, add a script
+      // which
+      // deplares the module
+      $jsNs = $pageCfg->getJsNs();
+      if ($jsNs !== null) {
+        $jsParams['jsns'] = $jsNs;
+      }
+
+      $baseJsSrcPath = $pathInfo->getLibPath() .
+        '/conductor/src/resources/js/base.tmpl.js';
+      CodeTemplate::compile($baseJsSrcPath, $baseJsOutPath, $jsParams);
     }
+    Element::js()->add(file_get_contents($baseJsOutPath))->addToHead();
 
-    $jqPath = 'http://ajax.googleapis.com/ajax/libs/jquery/'
-      . self::JQUERY_VERSION . "/$jQueryName";
-    Element::js($jqPath)->addToHead();
-
-    JsLib::includeLib(JsLib::JQUERY_COOKIE);
-
-    $base = new BaseResources();
-    if (self::isDebug()) {
-      $base->compile();
-    }
-    $base->inc();
-
-    ServiceProxy::get('conductor\Service')->addToHead();
-    ServiceProxy::get('conductor\LoginService')->addToHead();
-    ServiceProxy::get('conductor\ContentService')->addToHead();
-
+    // Include resources
+    // -------------------------------------------------------------------------
+    $resources = new BaseResources($pageCfg->getTheme());
     if ($template !== null) {
-      $pathInfo = self::getPathInfo();
-
-      $resources = $template->getResources();
-      if ($resources === null) {
-        $resources = array();
-      }
-
-      if (isset($resources['fonts'])) {
-        $fonts = implode('|', array_map(function ($font) {
-          return str_replace(' ', '+', $font);
-        }, $resources['fonts']));
-
-        Element::css("http://fonts.googleapis.com/css?family=$fonts")
-          ->addToHead();
-      }
-
-      if (isset($resources['css'])) {
-        // Allow a single stylesheet to be specified as a string
-        if (!is_array($resources['css'])) {
-          $resources['css'] = array($resources['css']);
-        }
-        foreach ($resources['css'] AS $css) {
-          if (substr($css, 0, 1) === '/') {
-            $css = $pathInfo->webPath($css);
-          }
-          Element::css($css)->addToHead();
-        }
-      }
-
-      if (isset($resources['jslib'])) {
-        foreach ($resources['jslib'] AS $jslib) {
-          if (is_array($jslib)) {
-            JsLib::includeLib($jslib[0], $jslib[1]);
-          } else {
-            JsLib::includeLib($jslib);
-          }
-        }
-      }
-
-      if (isset($resources['srvc'])) {
-        foreach ($resources['srvc'] AS $srvc) {
-          ServiceProxy::get($srvc)->addToHead();
-        }
-      }
-
-      if (isset($resources['js'])) {
-        // Allow a single javascript to be specified as a string
-        if (!is_array($resources['js'])) {
-          $resources['js'] = array($resources['js']);
-        }
-        foreach ($resources['js'] AS $js) {
-          if (substr($css, 0, 1) === '/') {
-            $js = $pathInfo->webPath($js);
-          }
-          Element::js($js)->addToHead();
-        }
-      }
-
+      $resources = $resources->merge(
+        self::$_config->getTemplate($template)->getResources());
       Page::setTemplate($template);
     }
+    $resources = $resources->merge($pageCfg->getResources());
+
+    $resources->inc($pathInfo, self::$_config->isDevMode());
   }
 
   /**
@@ -323,7 +301,7 @@ class Conductor {
     JsLib::includeLib(JsLib::JQUERY_UI, $opts);
 
     $appSupport = new JsAppResources();
-    if (self::isDebug()) {
+    if (self::isDevMode()) {
       $appSupport->compile();
     }
     $appSupport->inc();

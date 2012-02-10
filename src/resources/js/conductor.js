@@ -64,19 +64,6 @@ var CDT = {};
     }
   });
 
-  /*
-   * Function for creating a path to a resource. This path will append the
-   * site root to the given path.
-   */
-  resourcePath = function (path) {
-    ${if:rootPath = /}
-      return path;    
-    ${else}
-      return '${rootPath}' + path;
-    ${fi}
-  }
-  CDT.resourcePath = resourcePath;
-
   CDT.checkResponse = function (response) {
     if (!response || response.msg === undefined) {
       return true;
@@ -141,85 +128,6 @@ $(document).ready(function () {
   CDT.init();
 });
 
-// A jQuery extension for adding a load mask to any element
-(function ( $ ) {
-
-  $.fn.working = function () {
-
-    return this.each(function () {
-      var ctx = $(this), mask = ctx.data('working-mask');
-
-      if (mask === undefined) {
-        mask = $('<div/>')
-          .addClass('ui-widget-overlay')
-          .css('opacity', '0.65')
-          .append(
-            $('<img/>')
-              .css('position', 'absolute')
-              .css('opacity', '1')
-              .offset({
-                top: (ctx.height() / 2) - (${imgHeight} / 2),
-                left: (ctx.width() / 2) - (${imgWidth} / 2)
-              })
-              .width(${imgWidth})
-              .height(${imgHeight})
-              .attr('src', '${targetPath}/img/working.gif'));
-
-        ctx.data('working-mask', mask);
-      }
-
-      mask.appendTo(ctx);
-    });
-  };
-
-  $.fn.done = function () {
-
-    return this.each(function () {
-      var ctx = $(this), mask = ctx.data('working-mask');
-
-      if (mask !== undefined) {
-        mask.detach();
-      }
-    });
-  };
-
-})( jQuery );
-
-// A jQuery extension that adds a helpful bar for internet explorer users.
-//
-// Usage:
-// ------
-//
-// $(document).ieBar();
-(function ( $ ) {
-
-  $.fn.ieBar = function () {
-
-    if (!$.browser.msie) {
-      return this;
-    }
-
-    return this.each(function () {
-      var ctx = $(this), bar = ctx.data('ieBar');  
-
-      if (bar === undefined) {
-        bar = $('<div/>')
-          .addClass('ieBar')
-          .css({
-            "position" : 'fixed',
-            "left"     : '0',
-            "right"    : '0',
-            "bottom"   : '0',
-            "height"   : '35px',
-            "background-color" : '#AAA'
-          });
-
-        ctx.data('ieBar', bar);
-      }
-
-      bar.appendTo(ctx).fadeIn('slow');
-    });
-  };
-
-})( jQuery );
-
+// Override the jquery.working plugin's path for the loading image to account
+// for the site's configured web root
+jQuery.working.imgPath = _p(jQuery.working.imgPath);

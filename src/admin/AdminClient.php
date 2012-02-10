@@ -101,7 +101,7 @@ class AdminClient extends Composite {
   }
 
   public function addToPage() {
-    if (Conductor::isDebug()) {
+    if (Conductor::isDevMode()) {
       $this->compile(array(
         'models' => $this->_models
       ));
