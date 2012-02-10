@@ -32,6 +32,8 @@ use \reed\Generator\CodeTemplate;
 use \reed\ClassLoader;
 use \reed\File;
 
+use \Exception;
+
 /**
  * The main interface for Conductor setup.
  *
@@ -165,13 +167,11 @@ class Conductor {
    * Initialize the framework.  This consists of registering the autoloaders for
    * the libraries, connecting to the database and initializing clarinet.
    *
-   * @param string $configPath Optional path to a conductor.cfg.xml file.  If
-   *   not provided then a default path is used by assume a common directory
-   *   structure.
+   * @param string $configPath Optional path to a conductor.cfg.xml file.
    * @param boolean $authenticate Whether or not to authenticate a session,
    *   default true.  The only time this is false is during compilation.
    */
-  public static function init($configPath = null, $authenticate = true) {
+  public static function init($configPath, $authenticate = true) {
     if (self::$_initialized) {
       if (self::isDevMode()) {
         // TODO - Give a warning if in debug mode
@@ -184,12 +184,8 @@ class Conductor {
     Loader::loadDependencies(); 
 
     // Load the site's configuration from the defined/default path
-    if ($configPath === null) {
-      // The default assumes that conductor is at the following path:
-      //   <website-root>/lib/conductor/src/Conductor.php
-      // and that the conductor configuration is found in a file at the
-      // site root named conductor.cfg.xml
-      $configPath = __DIR__ . '/../../../conductor.cfg.xml';
+    if ($configPath === null || !file_exists($configPath)) {
+      throw new Exception("No config file specified");
     }
     self::$_config = Configuration::parse($configPath);
 
