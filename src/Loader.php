@@ -14,9 +14,14 @@
  */
 namespace conductor;
 
+use \Exception;
+
 /**
  * This class is responsible for loading any PHP libraries installed along side
  * Conductor.
+ *
+ * TODO Update dependency directory structures to comply with PSR-0
+ *      https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-0.md
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
@@ -35,66 +40,33 @@ class Loader {
     }
     self::$_loaded = true;
 
-    $libPath = __DIR__ . '/../..';
-    $loader = new Loader($libPath);
-    $loader
-      ->load('reed')
-      ->load('oboe')
-      ->load('clarinet')
-      ->load('bassoon');
-  }
+    $libPaths = array(
+      'pct' => realpath(__DIR__ . '/../lib/php-code-templates/src/'),
+      'reed' => realpath(__DIR__ . '/../../reed/src/'),
+      'oboe' => realpath(__DIR__ . '/../../oboe/src/'),
+      'clarinet' => realpath(__DIR__ . '/../../clarinet/src/'),
+      'bassoon' => realpath(__DIR__ . '/../../bassoon/src/')
+    );
 
-  /*
-   * ===========================================================================
-   * Instance
-   * ===========================================================================
-   */
-
-  /* The base path for requested libraries. */
-  private $_libPath;
-
-  /**
-   * Create a new loader instance for the given library path.
-   *
-   * @param string $libPath Base path from which to load libraries.
-   */
-  protected function __construct($libPath) {
-    $this->_libPath = $libPath;
-  }
-
-  /**
-   * Load the library with the given name.
-   *
-   * @param string $lib The name of the library to load.
-   * @throws conductor\Exception If the requested library is not found.
-   */
-  public function load($lib) {
-    $libPath = "{$this->_libPath}/$lib";
-
-    if (!file_exists($libPath) || !is_dir($libPath)) {
-      throw $this->_libraryNotFoundException($lib);
+    foreach ($libPaths AS $libName => $libPath) {
+      if (!file_exists($libPath)) {
+        throw new Exception("Unable to find required library $libName." .
+          " Expected to find it at: $libPath");
+      }
     }
 
-    $autoloader = "$libPath/src/Autoloader.php";
-    if (!file_exists($autoloader)) {
-      throw $this->_autoloaderNotFoundException($lib, $autoloader);
-    }
+    spl_autoload_register(function ($classname) {
+      $parts = explode("\\", $classname);
+      $lib = array_shift($parts);
 
-    require_once $autoloader;
+      if (!isset($libPaths[$lib])) {
+        return;
+      }
 
-    return $this;
+      $path = $libPaths[$lib] . implode('/', $parts);
+      require $path;
+    });
+    
   }
 
-  /* Create a LibraryNotFoundException */
-  private function _libraryNotFoundException($lib) {
-    $msg = "The requested library ($lib) is not installed at {$this->_libpath}";
-    return new Exception($msg);
-  }
-
-  /* Create an AutoloaderNotFoundException */
-  private function _autoloaderNotFoundException($lib, $autoloader) {
-    $msg = "Could not find autoloader for ($lib) is was expected to be found"
-      . " at: $autoloader";
-    return new Exception($msg);
-  }
 }
