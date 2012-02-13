@@ -13,12 +13,12 @@ ${fi}
 use \conductor\Conductor;
 
 /**
- * This is CRUD service class for a ${modelName} class.
+ * This is CRUD service class for a ${model} class.
  *
  * This class is generated.  Do NOT modify this file.  Instead, modify the
  * model class used for generation then regenerate this class.
  *
- * @Service( name = ${className} )
+ * @Service( name = ${proxyName} )
  * @CsrfToken conductorsessid
  * @Requires ${autoloader}
  */

@@ -16,7 +16,6 @@ namespace conductor\generator;
 
 use \SplFileObject;
 
-use \clarinet\model\Model;
 use \reed\File;
 use \reed\WebSitePathInfo;
 
@@ -29,8 +28,6 @@ use \reed\WebSitePathInfo;
  */
 class CrudServiceGenerator {
 
-  private $_model;
-
   private $_crudInfo;
 
   /**
@@ -38,14 +35,8 @@ class CrudServiceGenerator {
    *
    * @param DecoartedModel $model The model for which to generate a service.
    */
-  public function __construct($modelInfo) {
-    if ($modelInfo instanceof Model) {
-      $this->_model = $modelInfo;
-      $this->_crudInfo = new CrudServiceInfo($modelInfo);
-    } else if ($modelInfo instanceof CrudServiceInfo) {
-      $this->_model = $modelInfo->getModel();
-      $this->_crudInfo = $modelInfo;
-    }
+  public function __construct(CrudServiceInfo $modelInfo) {
+    $this->_crudInfo = $modelInfo;
   }
 
   /**
@@ -57,19 +48,18 @@ class CrudServiceGenerator {
    * @param string $cdtPath The path to the conductor install which will
    *   be used 
    */
-  public function generate($outPath, $cdtPath) {
-    $cdtAutoloaderPath = File::joinPaths($cdtPath, 'src/Autoloader.php');
-    $builder = new CrudServiceBuilder($this->_model);
-    $template = $builder->build($cdtAutoloaderPath);
+  public function generate(WebSitePathInfo $pathInfo) {
+    $builder = new CrudServiceBuilder($this->_crudInfo);
+    $template = $builder->build($pathInfo);
 
     // Ensure the output directory exists
     $serviceRelPath = str_replace('\\', '/', CrudServiceInfo::CRUD_SERVICE_NS);
-    $outDir = File::joinPaths($outPath, $serviceRelPath);
+    $outDir = $pathInfo->getTarget() . "/$serviceRelPath";
     if (!file_exists($outDir)) {
       mkdir($outDir, 0755, true);
     }
 
-    $serviceFileName = $this->_crudInfo->getServiceName() . '.php';
+    $serviceFileName = $this->_crudInfo->getModel()->getActor() . '.php';
     $servicePath = "$outDir/$serviceFileName";
     $file = new SplFileObject($servicePath, 'w');
     $file->fwrite($template);
