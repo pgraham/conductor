@@ -15,14 +15,9 @@
  */
 namespace conductor\widget;
 
-use \conductor\compile\Compilable;
-use \conductor\compile\LoginCompiler;
-use \conductor\Conductor;
-use \conductor\Resource;
 use \oboe\attr\CanSubmit;
 use \oboe\Composite;
 use \oboe\Element;
-use \reed\WebSitePathInfo;
 
 /**
  * This class encapsulates a stylable login form.
@@ -30,7 +25,7 @@ use \reed\WebSitePathInfo;
  * @author Philip Graham <philip@zeptech.ca>
  * @package conductor/widget
  */
-class LoginForm extends Composite implements Compilable {
+class LoginForm extends Composite {
 
   /**
    * Constant to use with constructor to specify that the form should be
