@@ -173,11 +173,6 @@ class Conductor {
    */
   public static function init($configPath, $authenticate = true) {
     if (self::$_initialized) {
-      if (self::isDevMode()) {
-        // TODO - Give a warning if in debug mode
-        // TODO - Add logging interface to Reed that can be used for this
-      }
-      return;
     }
     self::$_initialized = true;
 
