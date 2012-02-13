@@ -84,7 +84,7 @@ class Parser {
     if (isset($xmlCfg->pathInfo)) {
       $pathInfo = WebSitePathInfo::parse($xmlCfg->pathInfo, $pathRoot);
     } else {
-      $pathInfo = WebSitPathInfo::parse($xmlCfg, $pathRoot);
+      $pathInfo = WebSitePathInfo::parse($xmlCfg, $pathRoot);
     }
 
     $cfg['pathInfo'] = $pathInfo;

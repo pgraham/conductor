@@ -53,14 +53,14 @@
       .addClass('ui-button-small')
       .click(function () {
         window['LoginService'].logout(function () {
-          window.location.href = CDT.resourcePath('/index.php');
+          window.location.href = _p('/index.php');
         });
       });
     viewSite = $('<button>View Site</button>').button()
       .addClass('ui-button-small')
       .click(function () {
         if (previewWnd === undefined || previewWnd.closed) {
-          previewWnd = window.open(CDT.resourcePath('/index.php'), 'preview');
+          previewWnd = window.open(_p('/index.php'), 'preview');
         } else {
           previewWnd.location.reload();
           previewWnd.focus();

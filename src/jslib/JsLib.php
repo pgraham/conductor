@@ -145,31 +145,7 @@ class JsLib {
       break;
 
       case self::JQUERY_UI:
-      return new JQueryUi($pathInfo, $lib);
-      $theme = is_array($opts) && isset($opts['theme'])
-        ? $opts['theme']
-        : null;
-      $themeOnly = is_array($opts) && isset($opts['theme-only'])
-        ? (boolean) $opts['theme-only']
-        : false;
-      $noTheme = !$themeOnly && is_array($opts) && isset($opts['no-theme'])
-        ? (boolean) $opts['no-theme']
-        : false;
-
-      $libDir   = 'jquery-ui';
-      $scripts  = !$themeOnly
-        ? JQueryUiFiles::getScripts($theme, $pathInfo)
-        : array();
-      $sheets   = !$noTheme
-        ? JQueryUiFiles::getSheets($theme, $pathInfo)
-        : array();
-      $images   = !$noTheme
-        ? JQueryUiFiles::getImages($theme, $pathInfo)
-        : array();
-      $external = !$themeOnly
-        ?JQueryUiFiles::getExternal()
-        : array();
-      break;
+      return new JQueryUi($opts);
 
       case self::JQUERY_UI_TIMEPICKER:
       $libDir    = 'jQuery-Timepicker';
@@ -241,17 +217,14 @@ class JsLib {
    * @param array $opts Optional array of library specific options.
    */
   public static function includeLib($lib, array $opts = null) {
-
     if (in_array($lib, self::$_included)) {
       return;
     }
 
     $files = self::getFiles($lib, $opts);
     if ($files instanceof Library) {
-      if (Conductor::isDevMode()) {
-        $files->link($opts);
-      }
-      $files->inc($opts);
+      $files->link(Conductor::getPathInfo(), Conductor::isDevMode());
+      $files->inc(Conductor::getPathInfo(), Conductor::isDevMode());
     } else {
       ResourceIncluder::inc($files);
     }

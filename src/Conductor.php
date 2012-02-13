@@ -285,11 +285,7 @@ class Conductor {
    * Include resources that provide support for building a javascript app.
    */
   public static function loadJsAppSupport($theme = null) {
-    $opts = null;
-    if ($theme !== null) {
-      $opts = array('theme' => $theme);
-    }
-    JsLib::includeLib(JsLib::JQUERY_UI, $opts);
+    JsLib::includeLib(JsLib::JQUERY_UI, array('theme' => $theme));
 
     $appSupport = new JsAppResources();
     if (self::isDevMode()) {

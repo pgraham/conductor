@@ -74,7 +74,7 @@ abstract class BaseLibrary implements Library {
     $files = $this->getLinked($pathInfo, $devMode);
     foreach ($files AS $file) {
       if (is_array($file)) {
-        if (substr(0, 1, $file['src']) === '/') {
+        if (substr($file['src'], 0, 1) === '/') {
           $fileSrc = $file['src'];
         } else {
           $fileSrc = File::joinPaths($srcPath, $file['src']);

@@ -17,6 +17,7 @@ namespace conductor\jslib;
 use \conductor\Resource;
 use \reed\File;
 use \reed\WebSitePathInfo;
+use \DirectoryIterator;
 
 /**
  * This class encapsulates the files required for jQuery UI.
@@ -71,10 +72,10 @@ class JQueryUi extends BaseLibrary {
       if (Resource::getResourceType($theme) === null) {
         // This is the name of a pre-defined theme, links it's files in
         $themeDir = $pathInfo->getLibPath() .
-          "/conductor/src/resources/$theme-theme";
+          "/conductor/src/resources/themes/$theme-theme";
 
-        if (!file_exists($theme)) {
-          throw new Exception("Specified theme does not exist: $theme.  It was"
+        if (!file_exists($themeDir)) {
+          throw new \Exception("Specified theme does not exist: $theme.  It was"
             . " expected to be found at $themeDir");
         }
 
