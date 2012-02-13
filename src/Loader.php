@@ -41,21 +41,21 @@ class Loader {
     self::$_loaded = true;
 
     $libPaths = array(
-      'pct' => realpath(__DIR__ . '/../lib/php-code-templates/src/'),
-      'reed' => realpath(__DIR__ . '/../../reed/src/'),
-      'oboe' => realpath(__DIR__ . '/../../oboe/src/'),
-      'clarinet' => realpath(__DIR__ . '/../../clarinet/src/'),
-      'bassoon' => realpath(__DIR__ . '/../../bassoon/src/')
+      'pct' => realpath(__DIR__ . '/../lib/php-code-templates/src'),
+      'reed' => realpath(__DIR__ . '/../../reed/src'),
+      'oboe' => realpath(__DIR__ . '/../../oboe/src'),
+      'clarinet' => realpath(__DIR__ . '/../../clarinet/src'),
+      'bassoon' => realpath(__DIR__ . '/../../bassoon/src')
     );
 
-    foreach ($libPaths AS $libName => $libPath) {
+    foreach ($libPaths as $libName => $libPath) {
       if (!file_exists($libPath)) {
         throw new Exception("Unable to find required library $libName." .
           " Expected to find it at: $libPath");
       }
     }
 
-    spl_autoload_register(function ($classname) {
+    spl_autoload_register(function ($classname) use ($libPaths) {
       $parts = explode("\\", $classname);
       $lib = array_shift($parts);
 
@@ -63,8 +63,10 @@ class Loader {
         return;
       }
 
-      $path = $libPaths[$lib] . implode('/', $parts);
-      require $path;
+      $path = $libPaths[$lib] . '/' . implode('/', $parts) . '.php';
+      if (file_exists($path)) {
+        require $path;
+      }
     });
     
   }
