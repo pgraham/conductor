@@ -30,7 +30,7 @@ class JsAppResources {
   private $_fonts;
 
   public function __construct() {
-    $this->_fonts = 'http://fonts.googleapis.com/css?family=Lato:300';
+    $this->_fonts = 'http://fonts.googleapis.com/css?family=Open+Sans';
     $css = array(
       new Resource('conductor-app.css')
     );

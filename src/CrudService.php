@@ -36,10 +36,10 @@ class CrudService {
     $model = ModelParser::getModel($modelClass);
 
     $this->_srvcInfo = new CrudServiceInfo($model);
+    $proxyName = $this->_srvcInfo->getProxyName();
 
-    $srvcName = $this->_srvcInfo->getServiceName();
     $webTarget = $pathInfo->getWebTarget();
-    $proxyPath = File::joinPaths($webTarget, "js/$srvcName.js");
+    $proxyPath = File::joinPaths($webTarget, "js/$proxyName.js");
     $this->_webPath = $pathInfo->fsToWeb($proxyPath);
   }
 
@@ -51,7 +51,9 @@ class CrudService {
     $generator->generate($pathInfo->getTarget(), $cdtPath);
 
     // Generate the Bassoon service proxy for the CRUD service class.
-    $srvc = new RemoteService($this->_srvcInfo->getServiceClass(), $pathInfo);
+    $actor = $this->_srvcInfo->getModel()->getActor();
+    $className = CrudServiceInfo::CRUD_SERVICE_NS . '\\' . $actor;
+    $srvc = new RemoteService($className, $pathInfo);
     $srvc->generate();
   }
 

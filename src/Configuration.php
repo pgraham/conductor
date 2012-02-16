@@ -78,9 +78,17 @@ class Configuration {
 
   public function getPage($pageId = null) {
     if ($pageId === null) {
+      if (!isset($this->_pages['default'])) {
+        return null;
+      }
+
       $pageId = $this->_pages['default'];
     }
-    return $this->_pages['pages'][$pageId];
+
+    if (isset($this->_pages['pages'][$pageId])) {
+      return $this->_pages['pages'][$pageId];
+    }
+    return null;
   }
 
   public function getPathInfo() {

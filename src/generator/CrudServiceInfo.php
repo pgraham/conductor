@@ -15,85 +15,74 @@
 namespace conductor\generator;
 
 use \clarinet\model\Model;
-
-use \conductor\modeling\ModelView;
+use \reed\reflection\Annotations;
+use \ReflectionClass;
 
 /**
  * This class provides information about a model for generating a crud service.
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class CrudServiceInfo extends ModelView {
+class CrudServiceInfo {
 
   /**
    * The namespace in which generated CRUD services live.
    */
   const CRUD_SERVICE_NS = 'conductor\service\crud';
 
-
-  /**
-   * The suffix used for identifying model view interfaces parsed by this class.
-   */
-  const VIEW_SUFFIX = 'Crud';
+  /* The model for which this class provides information. */
+  private $_model;
 
   /*
    * This is the name of the javascript variable that is used for the service's
    * proxy.  This can be specified as the value of this @ProxyName annotation at
-   * the class level of the ModelView interface.
-   *
-   * TODO The proxy name needs to be made configurable in bassoon before this
-   *      can be implemented. 
+   * the class level of the Model interface.
    */
   private $_proxyName;
 
-  /*
-   * The name of the model's CRUD service.  This is used as the basename of the
-   * service's class name.  The service's class will live in the name space
-   * defined by CRUD_SERVICE_NS.
-   */
-  private $_serviceName;
-
   public function __construct(Model $model) {
-    parent::__construct($model, self::VIEW_SUFFIX);
+    $this->_model = $model;
 
-    $this->_serviceName = $model->getActor() . 'Crud';
+    $this->_proxyName = $model->getProxyName();
+    if ($this->_proxyName === null) {
+      $this->_proxyName = $model->getActor();
+    }
 
-    $this->_proxyName = isset($this->_modelInfo['proxyname'])
-      ? $this->_modelInfo['proxyname']
-      : $this->_serviceName;
+    $this->_displayName = $model->getDisplayName();
+    if ($this->_displayName === null) {
+      $this->_displayName = $model->getActor();
+    }
+  }
+
+  /** 
+   * Getter for the display name of the model on which this crud service will
+   * act.
+   *
+   * @return string
+   */
+  public function getDisplayName() {
+    return $this->_displayName;
   }
 
   /**
-   * NOT YET IMPLEMENTED
+   * Getter for the model for which this class provides information.
    *
+   * @return Model $model
+   */
+  public function getModel() {
+    return $this->_model;
+  }
+
+  /**
    * Getter for the name of the Javascript variable to use as the proxy.
    * This variable will be put into the global namespace.  This can be specified
-   * in the a model's CRUD interface using the @ProxyName annotations. If not
+   * in the model using the @ProxyName annotation at the class level. If not
    * specified then this defaults the service name.
    *
    * @return string
    */
   public function getProxyName() {
     return $this->_proxyName;
-  }
-
-  /**
-   * Getter for the fully qualified name of the model's CRUD service class.
-   *
-   * @return string
-   */
-  public function getServiceClass() {
-    return self::CRUD_SERVICE_NS . '\\' . $this->_serviceName;
-  }
-
-  /**
-   * Getter for the model's CRUD service name.  The service's class will live in
-   * the name space defined by {@link #CRUD_SERVICE_NS}.
-   *
-   * @return string
-   */
-  public function getServiceName() {
-    return $this->_serviceName;
   }
 
 }

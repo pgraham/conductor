@@ -173,11 +173,6 @@ class Conductor {
    */
   public static function init($configPath, $authenticate = true) {
     if (self::$_initialized) {
-      if (self::isDevMode()) {
-        // TODO - Give a warning if in debug mode
-        // TODO - Add logging interface to Reed that can be used for this
-      }
-      return;
     }
     self::$_initialized = true;
 
@@ -262,9 +257,11 @@ class Conductor {
       // If the site's javascript is encapsulated in a module, add a script
       // which
       // deplares the module
-      $jsNs = $pageCfg->getJsNs();
-      if ($jsNs !== null) {
-        $jsParams['jsns'] = $jsNs;
+      if ($pageCfg !== null) {
+        $jsNs = $pageCfg->getJsNs();
+        if ($jsNs !== null) {
+          $jsParams['jsns'] = $jsNs;
+        }
       }
 
       $baseJsSrcPath = $pathInfo->getLibPath() .
@@ -275,13 +272,19 @@ class Conductor {
 
     // Include resources
     // -------------------------------------------------------------------------
-    $resources = new BaseResources($pageCfg->getTheme());
+    $theme = $pageCfg !== null
+      ? $pageCfg->getTheme()
+      : null;
+    $resources = new BaseResources($theme);
     if ($template !== null) {
       $resources = $resources->merge(
         self::$_config->getTemplate($template)->getResources());
       Page::setTemplate($template);
     }
-    $resources = $resources->merge($pageCfg->getResources());
+
+    if ($pageCfg !== null) {
+      $resources = $resources->merge($pageCfg->getResources());
+    }
 
     $resources->inc($pathInfo, self::$_config->isDevMode());
   }
@@ -290,11 +293,7 @@ class Conductor {
    * Include resources that provide support for building a javascript app.
    */
   public static function loadJsAppSupport($theme = null) {
-    $opts = null;
-    if ($theme !== null) {
-      $opts = array('theme' => $theme);
-    }
-    JsLib::includeLib(JsLib::JQUERY_UI, $opts);
+    JsLib::includeLib(JsLib::JQUERY_UI, array('theme' => $theme));
 
     $appSupport = new JsAppResources();
     if (self::isDevMode()) {

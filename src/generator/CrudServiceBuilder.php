@@ -14,8 +14,6 @@
  */
 namespace conductor\generator;
 
-use \clarinet\model\Model;
-
 use \reed\generator\CodeTemplateLoader;
 use \reed\WebSitePathInfo;
 
@@ -26,15 +24,15 @@ use \reed\WebSitePathInfo;
  */
 class CrudServiceBuilder {
 
-  private $_model;
+  private $_srvcInfo;
 
   /**
    * Create a new service builder.
    *
    * @param ModelInfo $model
    */
-  public function __construct(Model $model) {
-    $this->_model = $model;
+  public function __construct(CrudServiceInfo $srvcInfo) {
+    $this->_srvcInfo = $srvcInfo;
   }
 
   /**
@@ -46,19 +44,15 @@ class CrudServiceBuilder {
    * @return string
    */
   public function build($cdtAutoloaderPath) {
-    $displayName = explode('_', $this->_model->getActor());
-    $displayName = strtolower(array_pop($displayName));
-
-    $crudInfo = new CrudServiceInfo($this->_model);
     $templateValues = Array(
       'autoloader' => $cdtAutoloaderPath,
-      'class'      => $crudInfo->getServiceClass(),
-      'className'  => $crudInfo->getServiceName(),
-      'model'      => $this->_model->getClass(),
+      'className'  => $this->_srvcInfo->getModel()->getActor(),
+      'gatekeeper' => $this->_srvcInfo->getModel()->getGatekeeper(),
+      'display'    => $this->_srvcInfo->getDisplayName(),
+      'idColumn'   => $this->_srvcInfo->getModel()->getId()->getColumn(),
+      'model'      => $this->_srvcInfo->getModel()->getClass(),
       'ns'         => CrudServiceInfo::CRUD_SERVICE_NS,
-      'idColumn'   => $this->_model->getId()->getColumn(),
-      'gatekeeper' => $this->_model->getGatekeeper(),
-      'display'    => $displayName
+      'proxyName'  => $this->_srvcInfo->getProxyName()
     );
 
     $templateLoader = CodeTemplateLoader::get(__DIR__);
@@ -71,6 +65,6 @@ class CrudServiceBuilder {
    * @return clarinet\model\Property[]
    */
   public function getProperties() {
-    return $this->_model->getProperties();
+    return $this->_srvcInfo->getModel()->getProperties();
   }
 }
