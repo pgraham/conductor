@@ -11,25 +11,22 @@
  * =============================================================================
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
- * @package conductor
  */
 namespace conductor;
 
-use \conductor\Fragment;
-
 /**
- * Interface for classes that encapulate a page.
+ * Interface for classes that encapsulate a view.
  *
  * @author Philip Graham <philip@zeptech.ca>
- * @package conductor
  */
-interface ConductorPage {
+interface View {
 
   /**
-   * This method is responsible for returning a conductor\widget\Fragment
-   * element that will return the content of the page.
+   * This method is responsible for returning a string or stringable object
+   * representing the HTML content of the page.
    *
-   * @return Fragment
+   * @return string|stringable
    */
-  public function getFragment();
+  public function getContent();
+
 }
