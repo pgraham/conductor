@@ -20,6 +20,7 @@ use \conductor\auth\AuthorizationException;
 use \conductor\jslib\JsLib;
 use \conductor\widget\ModelEditor;
 use \conductor\widget\LoginForm;
+use \conductor\Resource;
 
 use \reed\FsToWebPathConverter;
 
@@ -53,6 +54,9 @@ class PageLoader {
    * Load the login form.  
    */
   public static function loadLogin($msg = null) {
+    Resource::load('login.js');
+    Resource::load('login.css');
+
     $login = new LoginForm($msg);
     $login->addToPage();
   }

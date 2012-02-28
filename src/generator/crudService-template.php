@@ -4,6 +4,7 @@ namespace ${ns};
 use \clarinet\Criteria;
 use \clarinet\Persister;
 use \clarinet\Transformer;
+use \conductor\Loader;
 
 ${if:gatekeeper ISSET}
   use \${gatekeeper} as Gatekeeper;
@@ -20,14 +21,31 @@ use \conductor\Conductor;
  *
  * @Service( name = ${proxyName} )
  * @CsrfToken conductorsessid
- * @Requires ${autoloader}
  */
 class ${className} { 
   private $_gatekeeper;
 
   public function __construct() {
     // Ensure that conductor is initialized
-    Conductor::init();
+    spl_autoload_register(function ($classname) {
+      if (substr($classname, 0, 10) !== 'conductor\\') {
+        return;
+      }
+
+      $basePath = '${cdtPath}';
+      $relPath = str_replace('\\', '/', substr($classname, 10));
+      $fullPath = "$basePath/$relPath.php";
+      if (file_exists($fullPath)) {
+        require $fullPath;
+      }
+    });
+
+    // Before the conductor config object can be unserialized a loader for
+    // WebSitePathInfo is necessary so load dependencies now
+    Loader::loadDependencies();
+
+    // Initialize conductor with an unserialized configuration array.
+    Conductor::init(unserialize('${cdtConfig}'));
 
     $this->_gatekeeper = new Gatekeeper('${model}');
   }

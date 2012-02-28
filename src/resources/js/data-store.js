@@ -14,6 +14,8 @@
   CDT.data.createStore = function (srvc, idProperty) {
     var that, loaded, items, addHandler;
 
+    idProperty = idProperty || 'id';
+
     that = {};
     eventuality(that);
 

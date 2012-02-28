@@ -47,7 +47,7 @@ class Parser {
     if (!isset($xmlCfg->db)) {
       throw new Exception('No database configuration found');
     }
-    $cfg['pdo'] = Db::parse($xmlCfg->db, $pathRoot);
+    $cfg['dbConfig'] = Db::parse($xmlCfg->db, $pathRoot);
 
     // Set debug mode
     $cfg['debug'] = isset($xmlCfg->debug);

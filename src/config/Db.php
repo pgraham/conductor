@@ -43,31 +43,28 @@ class Db {
     if (!isset($cfg->username)) {
       throw new Exception('No database username specified');
     }
-    $user = $cfg->username;
+    $user = (string) $cfg->username;
 
     if (!isset($cfg->password)) {
       throw new Exception('No database password specified');
     }
-    $pass = $cfg->password;
+    $pass = (string) $cfg->password;
 
     if (!isset($cfg->schema)) {
       throw new Exception('No database schema specified');
     }
-    $db = $cfg->schema;
+    $schema = (string) $cfg->schema;
 
     // Extract options values if set or use a default
-    $driver = (isset($cfg->driver)) ? $cfg->driver : 'mysql';
-    $host   = (isset($cfg->host))   ? $cfg->host   : 'localhost';
+    $driver = (isset($cfg->driver)) ? (string) $cfg->driver : 'mysql';
+    $host   = (isset($cfg->host))   ? (string) $cfg->host   : 'localhost';
 
-    // Connect to the database
-    try {
-      $dsn = "$driver:dbname=$db;host=$host";
-      $pdo = new PDO($dsn, $user, $pass);
-      $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-      return $pdo;
-
-    } catch (PDOException $e) {
-      throw new Exception('Failed to connect to database', $e);
-    }
+    return array(
+      'db_driver' => $driver,
+      'db_host' => $host,
+      'db_schema' => $schema,
+      'db_user' => $user,
+      'db_pass' => $pass
+    );
   }
 }

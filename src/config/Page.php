@@ -67,6 +67,12 @@ class Page {
       }
       $page->_className = $className;
 
+      if (isset($pageXml['jsAppSupport'])) {
+        $jsAppSupport = (string) $pageXml['jsAppSupport'];
+
+        $page->_requiresJsAppSupport = (bool) $jsAppSupport;
+      }
+
       if (isset($pageXml['theme'])) {
         $page->_theme = (string) $pageXml['theme'];
       }
@@ -177,6 +183,9 @@ class Page {
    */
   private $_jsNs;
 
+  /* If the page requires jsApp support to be loaded. */
+  private $_requiresJsAppSupport;
+
   /* The declared resources required by the page. */
   private $_resources;
 
@@ -219,4 +228,9 @@ class Page {
   public function getTitle() {
     return $this->_title;
   }
+
+  public function requiresJsAppSupport() {
+    return $this->_requiresJsAppSupport;
+  }
+
 }

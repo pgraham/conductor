@@ -48,7 +48,7 @@ class CrudService {
     $cdtPath = File::joinPaths($pathInfo->getLibPath(), 'conductor');
 
     $generator = new CrudServiceGenerator($this->_srvcInfo);
-    $generator->generate($pathInfo->getTarget(), $cdtPath);
+    $generator->generate($pathInfo);
 
     // Generate the Bassoon service proxy for the CRUD service class.
     $actor = $this->_srvcInfo->getModel()->getActor();

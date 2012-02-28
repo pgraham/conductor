@@ -14,10 +14,9 @@
  */
 namespace conductor;
 
-use \clarinet\model\Parser as ModelParser;
-use \clarinet\ActorFactory;
-use \clarinet\Clarinet;
-use \clarinet\Criteria;
+use \zeptech\orm\runtime\Clarinet;
+use \zeptech\orm\runtime\Criteria;
+use \zeptech\orm\runtime\Persister;
 
 use \conductor\jslib\JsLib;
 use \conductor\resources\BaseResources;
@@ -28,11 +27,12 @@ use \oboe\head\Javascript;
 use \oboe\head\Link;
 use \oboe\Element;
 
-use \reed\Generator\CodeTemplate;
+use \reed\generator\CodeTemplate;
 use \reed\ClassLoader;
 use \reed\File;
 
 use \Exception;
+use \PDO;
 
 /**
  * The main interface for Conductor setup.
@@ -73,8 +73,7 @@ class Conductor {
     $c = new Criteria();
     $c->addEquals('name', $name);
 
-    $persister = ActorFactory::getActor('persister',
-      'conductor\model\ConfigValue');
+    $persister = Persister::get('conductor\model\ConfigValue');
     $rows = $persister->retrieve($c);
     if (count($rows) == 0) {
       return null;
@@ -107,9 +106,8 @@ class Conductor {
     $c = new Criteria();
     $c->addLike('name', $groupConditions);
 
-    $persister = ActorFactory::getActor('persister',
-      'conductor\model\ConfigValue');
-
+  
+    $persister = Persister::get('conductor\model\ConfigValue');
     $values = $persister->retrieve($c);
     $idxd = array();
     foreach ($values AS $value) {
@@ -167,49 +165,66 @@ class Conductor {
    * Initialize the framework.  This consists of registering the autoloaders for
    * the libraries, connecting to the database and initializing clarinet.
    *
-   * @param string $configPath Optional path to a conductor.cfg.xml file.
+   * @param string $config Either a {@link Configuration} object or the path to
+   *   a conductor.cfg.xml file.
    * @param boolean $authenticate Whether or not to authenticate a session,
    *   default true.  The only time this is false is during compilation.
    */
-  public static function init($configPath, $authenticate = true) {
+  public static function init($config, $authenticate = true) {
     if (self::$_initialized) {
+      return;
     }
     self::$_initialized = true;
 
-    Loader::loadDependencies(); 
-
     // Load the site's configuration from the defined/default path
-    if ($configPath === null || !file_exists($configPath)) {
+    if (is_array($config)) {
+      self::$_config = $config;
+    } else if (is_string($config) && file_exists($config)) {
+      self::$_config = Configuration::parse($config);
+    } else {
       throw new Exception("No config file specified");
     }
-    self::$_config = Configuration::parse($configPath);
 
-    $pathInfo = self::$_config->getPathInfo();
-    Autoloader::$genBasePath = $pathInfo->getTarget() . '/conductor';
+    $pathInfo = self::$_config['pathInfo'];
+    $namespace = self::$_config['namespace'];
 
-    // If a site specific namespace was specified register a classloader for
-    // site source classes.
-    if (self::$_config->getSiteNamespace() !== null) {
-      ClassLoader::register($pathInfo->getSrcPath(),
-        self::$_config->getSiteNamespace());
+    // Register class loaders for conductor's dependencies
+    Loader::loadDependencies($pathInfo['root'], $namespace);
+
+    try {
+      $dbConfig = self::$_config['db_config'];
+
+      $driver = $dbConfig['db_driver'];
+      $schema = $dbConfig['db_schema'];
+      $host = $dbConfig['db_host'];
+      $user = $dbConfig['db_user'];
+      $pass = $dbConfig['db_pass'];
+
+      $dsn = "$driver:dbname=$schema;host=$host";
+      $pdo = new PDO($dsn, $user, $pass);
+      $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    } catch (PDOException $e) {
+      throw new Exception("Unable to connect to database");
     }
 
     // Set options for debug mode.
     if (self::isDevMode()) {
       ini_set('display_errors', 'on');
       ini_set('html_errors', 'on');
-
-      $errorLog = File::joinPaths($pathInfo->getTarget(), '/php.error');
-      ini_set('error_log', $errorLog);
+      ini_set('error_log', "$pathInfo[target]/php.error");
 
       assert_options(ASSERT_ACTIVE, 1);
       assert_options(ASSERT_WARNING, 1);
       assert_options(ASSERT_BAIL, 0);
       assert_options(ASSERT_QUIET_EVAL, 0);
+
+      // Do a site compile
+      Compiler::compile($pathInfo, $namespace);
     }
 
     // Initialize clarinet
-    Clarinet::init(self::$_config->getClarinetConfiguration());
+    Clarinet::init($pdo);
 
     // Authenticate.
     if ($authenticate) {
@@ -224,7 +239,7 @@ class Conductor {
    */
   public static function isDevMode() {
     self::_ensureInitialized();
-    return self::$_config->isDevMode();
+    return self::$_config['devMode'];
   }
 
   /**
@@ -250,6 +265,7 @@ class Conductor {
     // -------------------------------------------------------------------------
     $baseJsOutPath = $pathInfo->getTarget() . '/base.js';
     if (self::isDevMode()) {
+      // Move into Compiler
       $jsParams = array(
         'rootPath' => $pathInfo->getWebRoot()
       );
@@ -266,6 +282,7 @@ class Conductor {
 
       $baseJsSrcPath = $pathInfo->getLibPath() .
         '/conductor/src/resources/js/base.tmpl.js';
+      // TODO Move this method into php-code-templates
       CodeTemplate::compile($baseJsSrcPath, $baseJsOutPath, $jsParams);
     }
     Element::js()->add(file_get_contents($baseJsOutPath))->addToHead();
@@ -275,7 +292,13 @@ class Conductor {
     $theme = $pageCfg !== null
       ? $pageCfg->getTheme()
       : null;
+
     $resources = new BaseResources($theme);
+
+    if ($pageCfg->requiresJsAppSupport()) {
+      $resources->merge(new JsAppResources());
+    }
+
     if ($template !== null) {
       $resources = $resources->merge(
         self::$_config->getTemplate($template)->getResources());
@@ -291,6 +314,9 @@ class Conductor {
 
   /**
    * Include resources that provide support for building a javascript app.
+   *
+   * @deprecated Page resources should be specified in config and jsAppSupport
+   *   specified there
    */
   public static function loadJsAppSupport($theme = null) {
     JsLib::includeLib(JsLib::JQUERY_UI, array('theme' => $theme));

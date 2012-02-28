@@ -14,8 +14,8 @@
  */
 namespace conductor;
 
-use \conductor\config\ConfigurationValues;
-use \conductor\config\Parser;
+use \reed\WebsitePathInfo as PathInfo;
+use \Exception;
 
 /**
  * This class encapsulates the configuration for a conductor site.
@@ -28,79 +28,82 @@ class Configuration {
    * Parse configuration from a given XML path.
    */
   public static function parse($configPath) {
-    $parsed = Parser::parse($configPath);
+    $cfg = array();
 
-    $config = new Configuration();
+    $xmlCfg = simplexml_load_file($configPath, 'SimpleXMLElement',
+      LIBXML_NOCDATA);
 
-    $config->_pathInfo = $parsed['pathInfo'];
-    $config->_db = $parsed['pdo'];
-    $config->_dev = $parsed['debug'];
-    $config->_host = $parsed['host'];
-    $config->_pages = $parsed['pageCfg'];
+    // Set the web site's title
+    // ------------------------
+    if (isset($xmlCfg->title)) {
+      $cfg['title'] = (string) $xmlCfg->title;
+    } else {
+      $cfg['title'] = 'Powered by Conductor';
+    }
 
-    $config->_auth = new ConfigurationValues(array(
-      'sessionTtl' => $parsed['sessionTtl']
-    ));
+    if (isset($xmlCfg->namespace)) {
+      $cfg['namespace'] = (string) $xmlCfg->namespace;
+    }
 
-    return $config;
-  }
+    // Parse database configuration
+    // ----------------------------
+    if (!isset($xmlCfg->db)) {
+      throw new Exception('No database configuration found');
+    }
+    $dbConfig = array();
 
-  /*
-   * ===========================================================================
-   * Instance
-   * ===========================================================================
-   */
+    if (!isset($xmlCfg->db->username)) {
+      throw new Exception('No database username specified');
+    }
+    $dbConfig['db_user'] = (string) $xmlCfg->db->username;
 
-  private $_db;
-  private $_dev;
-  private $_host;
-  private $_pages;
-  private $_pathInfo;
-  private $_auth;
+    if (!isset($xmlCfg->db->password)) {
+      throw new Exception('No database password specified');
+    }
+    $dbConfig['db_pass'] = (string) $xmlCfg->db->password;
 
-  protected function __construct() {}
+    if (!isset($xmlCfg->db->schema)) {
+      throw new Exception('No database schema specified');
+    }
+    $dbConfig['db_schema'] = (string) $xmlCfg->db->schema;
 
-  public function getAuthConfiguration() {
-    return $this->_auth;
-  }
+    $dbConfig['db_driver'] = (isset($xmlCfg->db->driver))
+      ? (string) $xmlCfg->db->driver
+      : 'mysql';
 
-  public function getClarinetConfiguration() {
-    return array(
-      'pdo' => $this->_db,
-      'outputPath' => $this->_pathInfo->getTarget(),
-      'debug' => $this->_dev
+    $dbConfig['db_host'] = (isset($xmlCfg->db->host))
+      ? (string) $xmlCfg->db->host
+      : 'localhost';
+
+    $cfg['db_config'] = $dbConfig;
+
+    // 
+    // Build path info
+    // ---------------
+
+    // Website config is found at the root of the website
+    $root = realpath(dirname($configPath));
+    $webRoot = isset($xmlCfg->webRoot)
+      ? (string) $xmlCfg->webRoot
+      : '/';
+    $docRoot = "$root/htdocs";
+    $lib = "$root/lib";
+    $src = "$root/src";
+    $target = "$root/target";
+
+    $pathInfo = array(
+      'root' => $root,
+      'webRoot' => $webRoot,
+      'docRoot' => $docRoot,
+      'lib' => $lib,
+      'src' => $src,
+      'target' => $target,
     );
-  }
+    $cfg['pathInfo'] = $pathInfo;
 
-  public function getHostName() {
-    return $this->_host;
-  }
+    $cfg['devMode'] = is_writeable($target);
 
-  public function getPage($pageId = null) {
-    if ($pageId === null) {
-      if (!isset($this->_pages['default'])) {
-        return null;
-      }
-
-      $pageId = $this->_pages['default'];
-    }
-
-    if (isset($this->_pages['pages'][$pageId])) {
-      return $this->_pages['pages'][$pageId];
-    }
-    return null;
-  }
-
-  public function getPathInfo() {
-    return $this->_pathInfo;
-  }
-
-  public function getSiteNamespace() {
-    return $this->_pathInfo->getSrcNs();
-  }
-
-  public function isDevMode() {
-    return $this->_dev;
+    return $cfg;
   }
 
 }

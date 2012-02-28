@@ -15,6 +15,7 @@
 namespace conductor;
 
 use \Exception;
+use \SplClassLoader;
 
 /**
  * This class is responsible for loading any PHP libraries installed along side
@@ -33,19 +34,26 @@ class Loader {
   /**
    * Verify that conductor dependencies are installed and register their
    * autoloaders.
+   *
+   * @param string $root Root path for the website
+   * @param string $namespace Site source namespace
    */
-  public static function loadDependencies() {
+  public static function loadDependencies($root, $namespace) {
     if (self::$_loaded) {
       return;
     }
     self::$_loaded = true;
 
+    $lib = "$root/lib";
+    $src = "$root/src";
+    $cdtLib = "$lib/conductor/lib";
+    $target = "$root/target";
+
     $libPaths = array(
-      'pct' => realpath(__DIR__ . '/../lib/php-code-templates/src'),
-      'reed' => realpath(__DIR__ . '/../../reed/src'),
-      'oboe' => realpath(__DIR__ . '/../../oboe/src'),
-      'clarinet' => realpath(__DIR__ . '/../../clarinet/src'),
-      'bassoon' => realpath(__DIR__ . '/../../bassoon/src')
+      'pct' => "$cdtLib/php-code-templates/src",
+      'reed' => "$lib/reed/src",
+      'oboe' => "$lib/oboe/src",
+      'bassoon' => "$lib/bassoon/src"
     );
 
     foreach ($libPaths as $libName => $libPath) {
@@ -68,7 +76,21 @@ class Loader {
         require $path;
       }
     });
-    
-  }
 
+    // Class loader for php-annotations, clarinet and generated classes
+    require_once 'SplClassLoader.php';
+    
+    $annoLdr = new SplClassLoader('zeptech\anno', "$cdtLib/php-annotations");
+    $annoLdr->register();
+
+    $ormLdr = new SplClassLoader('zeptech\orm', "$cdtLib/clarinet");
+    $ormLdr->register();
+
+    $dynLdr = new SplClassLoader('zeptech\dynamic', $target);
+    $dynLdr->register();
+
+    // Class loader for site classes
+    $siteLdr = new SplClassLoader($namespace, $src);
+    $siteLdr->register();
+  }
 }

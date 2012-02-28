@@ -19,13 +19,16 @@
     pager.getPaging = function () {
       return {
         limit: this.pageSize,
-        offset: (this.curPage - 1) * this.pageSize
+        offset: Math.max((this.curPage - 1) * this.pageSize, 0)
       };
     };
 
     pager.setTotal = function (t) {
       this.total = t;
-      if (this.curPage > this.getNumPages()) {
+
+      if (this.total === 0) {
+        this.curPage = 0;
+      } else if (this.curPage > this.getNumPages()) {
         this.curPage = this.getNumPages();
         this.fire('page-change');
       }
@@ -56,7 +59,8 @@
       this.pageNum.val(this.curPage);
       this.numPages.text('of ' + numPages);
 
-      firstIdx = Math.min(((this.curPage - 1) * this.pageSize) + 1, this.total);
+      firstIdx = Math.max(0,
+        Math.min(((this.curPage - 1) * this.pageSize) + 1, this.total));
       lastIdx = Math.min(firstIdx + this.pageSize - 1, this.total);
 
       //this.lbl.text(lblTmpl.format([firstIdx, lastIdx, this.total]);

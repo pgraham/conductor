@@ -14,6 +14,7 @@
  */
 namespace conductor\generator;
 
+use \conductor\Configuration;
 use \reed\generator\CodeTemplateLoader;
 use \reed\WebSitePathInfo;
 
@@ -39,13 +40,14 @@ class CrudServiceBuilder {
    * Create the source code for a CRUD service class for the model encapsulated
    * by the instance.
    *
-   * @param string $cdtPath Path to the conductor install that will be used by
-   *   the CRUD service class.
+   * @param WebSitePathInfo $pathInfo
+   * @param Configuration $config
    * @return string
    */
-  public function build($cdtAutoloaderPath) {
+  public function build(Configuration $config) {
     $templateValues = Array(
-      'autoloader' => $cdtAutoloaderPath,
+      'cdtPath'    => $config->getPathInfo()->getLibPath() . '/conductor/src',
+      'cdtConfig'  => serialize($config),
       'className'  => $this->_srvcInfo->getModel()->getActor(),
       'gatekeeper' => $this->_srvcInfo->getModel()->getGatekeeper(),
       'display'    => $this->_srvcInfo->getDisplayName(),

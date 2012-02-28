@@ -15,11 +15,11 @@
  */
 namespace conductor\auth;
 
-use \clarinet\Clarinet;
-use \clarinet\Criteria;
 use \conductor\model\Session;
 use \conductor\model\User;
 use \conductor\Conductor;
+use \zeptech\orm\runtime\Clarinet;
+use \zeptech\orm\runtime\Criteria;
 
 /**
  * This class manages session objects.

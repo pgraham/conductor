@@ -14,10 +14,10 @@
  */
 namespace conductor\generator;
 
-use \SplFileObject;
-
+use \conductor\Conductor;
 use \reed\File;
 use \reed\WebSitePathInfo;
+use \SplFileObject;
 
 /**
  * This class generates a service class for a specified model. This class can
@@ -45,12 +45,10 @@ class CrudServiceGenerator {
    * @param string $outPath The path for where to write the generated files.
    *   generated files will be placed in a subdirectory of given path which
    *   corresponds to the generated service class's namespace.
-   * @param string $cdtPath The path to the conductor install which will
-   *   be used 
    */
   public function generate(WebSitePathInfo $pathInfo) {
     $builder = new CrudServiceBuilder($this->_crudInfo);
-    $template = $builder->build($pathInfo);
+    $template = $builder->build(Conductor::getConfig());
 
     // Ensure the output directory exists
     $serviceRelPath = str_replace('\\', '/', CrudServiceInfo::CRUD_SERVICE_NS);
