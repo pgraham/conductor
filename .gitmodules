@@ -4,3 +4,6 @@
 [submodule "lib/php-annotations"]
 	path = lib/php-annotations
 	url = /home/pgraham/repos/php-annotations/
+[submodule "lib/clarinet"]
+	path = lib/clarinet
+	url = /home/pgraham/repos/clarinet/
