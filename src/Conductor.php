@@ -149,16 +149,7 @@ class Conductor {
    */
   public static function getPathInfo() {
     self::_ensureInitialized();
-    return self::$_config->getPathInfo();
-  }
-
-  /**
-   * Getter for the configured time that an inactive session remains valid.
-   *
-   * @return integer
-   */
-  public static function getSessionTtl() {
-    return self::$_config->getAuthConfiguration()->getSessionTtl();
+    return self::$_config['pathInfo'];
   }
 
   /**

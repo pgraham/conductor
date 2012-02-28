@@ -66,7 +66,7 @@ class SessionManager {
       return self::newSession();
     }
 
-    if ($session->isExpired(Conductor::getSessionTtl())) {
+    if ($session->isExpired(self::DEFAULT_SESSION_TTL)) {
       return self::newSession();
     }
 
