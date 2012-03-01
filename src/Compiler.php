@@ -14,6 +14,7 @@
  */
 namespace conductor;
 
+use \pct\CodeTemplateParser;
 use \zeptech\orm\generator\PersisterGenerator;
 use \zeptech\orm\generator\TransformerGenerator;
 use \zeptech\orm\generator\ValidatorGenerator;
@@ -26,17 +27,32 @@ use \DirectoryIterator;
  */
 class Compiler {
 
-  public static function compile($pathInfo, $ns) {
+  private $_tmplParser;
+  
+  public function __construct() {
+    $this->_tmplParser = new CodeTemplateParser();
+  }
+
+  public function compile($pathInfo, $ns) {
     // Compile Conductor models
     $cdtModelDir = "$pathInfo[lib]/conductor/src/model";
-    self::_compileModels($cdtModelDir, 'conductor\\model', $pathInfo['target']);
+    $this->_compileModels($cdtModelDir, 'conductor\\model', $pathInfo['target']);
 
     // Compile Site models
     $modelDir = "$pathInfo[src]/$ns/model";
-    self::_compileModels($modelDir, "$ns\\model", $pathInfo['target']);
+    $this->_compileModels($modelDir, "$ns\\model", $pathInfo['target']);
+
+    // Compile base javascript
+    $this->_compileResource(
+      __DIR__ . '/resources/js/base.tmpl.js',
+      "$pathInfo[target]/htdocs/js/base.js",
+      array(
+        'rootPath' => $pathInfo['webRoot'],
+        'jsns' => $ns
+      ));
   }
 
-  private static function _compileModels($models, $ns, $target) {
+  private function _compileModels($models, $ns, $target) {
     $persisterGen = new PersisterGenerator($target);
     $transformerGen = new TransformerGenerator($target);
     $validatorGen = new ValidatorGenerator($target);
@@ -59,5 +75,10 @@ class Compiler {
       $transformerGen->generate($modelClass);
       $validatorGen->generate($modelClass);
     }
+  }
+
+  private function _compileResource($srcPath, $outPath, $values = null) {
+    $tmpl = $this->_tmplParser->parse(file_get_contents($srcPath));
+    $tmpl->save($outPath, $values);
   }
 }

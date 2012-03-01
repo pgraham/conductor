@@ -14,8 +14,8 @@
  */
 namespace conductor;
 
-use \reed\WebsitePathInfo as PathInfo;
 use \Exception;
+use \ArrayObject;
 
 /**
  * This class encapsulates the configuration for a conductor site.
@@ -91,14 +91,31 @@ class Configuration {
     $src = "$root/src";
     $target = "$root/target";
 
-    $pathInfo = array(
+    $pathInfo = new ArrayObject(array(
       'root' => $root,
       'webRoot' => $webRoot,
       'docRoot' => $docRoot,
       'lib' => $lib,
       'src' => $src,
       'target' => $target,
-    );
+    ));
+
+    // Add a closure for appending the web root to absolute web paths if
+    // necessary
+    if ($webRoot === '/') {
+      $pathInfo->asWebPath = function ($path) {
+        return $path;
+      };
+    } else {
+      $pathInfo->asWebPath = function ($path) use ($webRoot) {
+        return $webRoot . $path;
+      };
+    }
+    // FIXME - Once it is possible to invoke functions assigned as object
+    // properties, e.g. $pathInfo->asWebPath(...), make this global go away.
+    global $asWebPath;
+    $asWebPath = $pathInfo->asWebPath;
+
     $cfg['pathInfo'] = $pathInfo;
 
     $cfg['devMode'] = is_writeable($target);

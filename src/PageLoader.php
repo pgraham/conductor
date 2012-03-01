@@ -20,8 +20,7 @@ use \conductor\auth\AuthorizationException;
 use \conductor\jslib\JsLib;
 use \conductor\widget\ModelEditor;
 use \conductor\widget\LoginForm;
-use \conductor\Resource;
-
+use \oboe\Element;
 use \reed\FsToWebPathConverter;
 
 /**
@@ -54,11 +53,16 @@ class PageLoader {
    * Load the login form.  
    */
   public static function loadLogin($msg = null) {
-    Resource::load('login.js');
-    Resource::load('login.css');
+    global $asWebPath;
+
+    $pathInfo = Conductor::getPathInfo();
+    Element::js($asWebPath('/gen/js/login.js'))->addToHead();
+    Element::js($asWebPath('/gen/js/login.css'))->addToHead();
 
     $login = new LoginForm($msg);
     $login->addToPage();
+    Page::dump();
+    exit;
   }
 
   /**

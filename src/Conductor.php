@@ -211,7 +211,8 @@ class Conductor {
       assert_options(ASSERT_QUIET_EVAL, 0);
 
       // Do a site compile
-      Compiler::compile($pathInfo, $namespace);
+      $compiler = new Compiler();
+      $compiler->compile($pathInfo, $namespace);
     }
 
     // Initialize clarinet
@@ -254,29 +255,7 @@ class Conductor {
     // built here - TODO - Make this a template so it can be compiled when the
     // site is deployed
     // -------------------------------------------------------------------------
-    $baseJsOutPath = $pathInfo->getTarget() . '/base.js';
-    if (self::isDevMode()) {
-      // Move into Compiler
-      $jsParams = array(
-        'rootPath' => $pathInfo->getWebRoot()
-      );
-
-      // If the site's javascript is encapsulated in a module, add a script
-      // which
-      // deplares the module
-      if ($pageCfg !== null) {
-        $jsNs = $pageCfg->getJsNs();
-        if ($jsNs !== null) {
-          $jsParams['jsns'] = $jsNs;
-        }
-      }
-
-      $baseJsSrcPath = $pathInfo->getLibPath() .
-        '/conductor/src/resources/js/base.tmpl.js';
-      // TODO Move this method into php-code-templates
-      CodeTemplate::compile($baseJsSrcPath, $baseJsOutPath, $jsParams);
-    }
-    Element::js()->add(file_get_contents($baseJsOutPath))->addToHead();
+    Element::js($pathInfo->asWebPath('/gen/js/base.js'))->addToHead();
 
     // Include resources
     // -------------------------------------------------------------------------
