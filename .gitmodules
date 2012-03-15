@@ -7,3 +7,6 @@
 [submodule "lib/clarinet"]
 	path = lib/clarinet
 	url = /home/pgraham/repos/clarinet/
+[submodule "lib/php-rest-server"]
+	path = lib/php-rest-server
+	url = /home/pgraham/repos/php-rest-server/
