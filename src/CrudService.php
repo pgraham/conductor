@@ -44,14 +44,19 @@ class CrudService {
 
   public function generate() {
     $pathInfo = Conductor::getPathInfo();
+    $asWebPath = $pathInfo->asWebPath;
 
     $generator = new CrudServiceGenerator($this->_srvcInfo);
     $generator->generate($pathInfo);
 
     // Generate the Bassoon service proxy for the CRUD service class.
     $actor = $this->_srvcInfo->getModel()->getActor();
-    $className = CrudServiceInfo::CRUD_SERVICE_NS . '\\' . $actor;
+
+    $className = $this->_srvcInfo->getClassName();
     $srvc = new RemoteService($className, $pathInfo);
-    $srvc->generate();
+    $srvc->generate(
+      "$pathInfo[target]/htdocs/js",
+      "$pathInfo[target]/htdocs/ajx",
+      $asWebPath('/ajx'));
   }
 }

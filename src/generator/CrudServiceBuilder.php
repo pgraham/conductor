@@ -51,7 +51,6 @@ class CrudServiceBuilder {
       'display'    => $this->_srvcInfo->getDisplayName(),
       'idColumn'   => $this->_srvcInfo->getModel()->getId()->getColumn(),
       'model'      => $this->_srvcInfo->getModel()->getClass(),
-      'ns'         => CrudServiceInfo::CRUD_SERVICE_NS,
       'proxyName'  => $this->_srvcInfo->getProxyName()
     );
 

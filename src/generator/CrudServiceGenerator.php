@@ -16,7 +16,6 @@ namespace conductor\generator;
 
 use \conductor\Conductor;
 use \reed\File;
-use \SplFileObject;
 
 /**
  * This class generates a service class for a specified model. This class can
@@ -50,17 +49,16 @@ class CrudServiceGenerator {
     $template = $builder->build(Conductor::getConfig());
 
     // Ensure the output directory exists
-    $serviceRelPath = str_replace('\\', '/', CrudServiceInfo::CRUD_SERVICE_NS);
-    $outDir = "$pathInfo[target]/$serviceRelPath";
+    $className = $this->_crudInfo->getClassName();
+    $serviceRelPath = str_replace(array('\\', '_'), '/', $className) . '.php';
+    $serviceRelDir = dirname($serviceRelPath);
+    $outDir = "$pathInfo[target]/$serviceRelDir";
     if (!file_exists($outDir)) {
       mkdir($outDir, 0755, true);
     }
 
-    $serviceFileName = $this->_crudInfo->getModel()->getActor() . '.php';
-    $servicePath = "$outDir/$serviceFileName";
-    $file = new SplFileObject($servicePath, 'w');
-    $file->fwrite($template);
-
+    $servicePath = "$pathInfo[target]/$serviceRelPath";
+    file_put_contents($servicePath, $template);
     return $servicePath;
   }
 

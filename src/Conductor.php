@@ -17,7 +17,6 @@ namespace conductor;
 use \conductor\jslib\JsLib;
 use \conductor\resources\BaseResources;
 use \conductor\resources\JsAppResources;
-use \conductor\rest\RestServer;
 use \conductor\template\PageTemplate;
 
 use \oboe\head\Javascript;
@@ -32,6 +31,7 @@ use \zeptech\dynamic\ServerConfigurator;
 use \zeptech\orm\runtime\Clarinet;
 use \zeptech\orm\runtime\Criteria;
 use \zeptech\orm\runtime\Persister;
+use \zeptech\rest\RestServer;
 
 use \Exception;
 use \PDO;

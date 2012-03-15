@@ -43,10 +43,10 @@ class Compiler {
   public function compile($pathInfo, $ns) {
     // Compile server dispatcher
     copy(
-      "$pathInfo[lib]/conductor/src/rest/.htaccess",
+      "$pathInfo[lib]/conductor/src/resources/rest/.htaccess",
       "$pathInfo[target]/htdocs/.htaccess");
     copy(
-      "$pathInfo[lib]/conductor/src/rest/srvr.php",
+      "$pathInfo[lib]/conductor/src/resources/rest/srvr.php",
       "$pathInfo[target]/htdocs/srvr.php");
 
     // Compile site
@@ -132,7 +132,7 @@ class Compiler {
 
       $pageId = $pageDef->getBasename('.php');
 
-      $hdlr = '\conductor\rest\HtmlRequestHandler';
+      $hdlr = '\conductor\HtmlRequestHandler';
       $args = array( "'$ns\\html\\$pageId'" );
       $tmpls = array( String::fromCamelCase($pageId) . '.html' );
       if ($pageId === 'Index') {

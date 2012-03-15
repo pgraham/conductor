@@ -1,10 +1,10 @@
 <?php
 namespace zeptech\dynamic\crud;
 
-use \clarinet\Criteria;
-use \clarinet\Persister;
-use \clarinet\Transformer;
 use \conductor\Loader;
+use \zeptech\orm\runtime\Criteria;
+use \zeptech\orm\runtime\Persister;
+use \zeptech\orm\runtime\Transformer;
 use \Exception;
 use \PDOException;
 

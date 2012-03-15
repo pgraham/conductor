@@ -5,7 +5,7 @@
  */
 namespace zeptech\dynamic;
 
-use \conductor\rest\RestServer;
+use \zeptech\rest\RestServer;
 
 class ServerConfigurator {
 

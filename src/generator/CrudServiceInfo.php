@@ -25,10 +25,8 @@ use \zeptech\orm\generator\model\Model;
  */
 class CrudServiceInfo {
 
-  /**
-   * The namespace in which generated CRUD services live.
-   */
-  const CRUD_SERVICE_NS = 'conductor\service\crud';
+  /* The name of the generated service class. */
+  private $_className;
 
   /* The model for which this class provides information. */
   private $_model;
@@ -43,15 +41,31 @@ class CrudServiceInfo {
   public function __construct(Model $model) {
     $this->_model = $model;
 
+    $actor = $model->getActor();
+    $this->_className = "zeptech\\dynamic\\crud\\$actor";
+
     $this->_proxyName = $model->getProxyName();
     if ($this->_proxyName === null) {
-      $this->_proxyName = $model->getActor();
+      // For the default, strip any namespace component from the actor and
+      // append 'Crud' to the result
+      $actor = $model->getActor();
+      $proxy = substr($actor, strrpos($actor, '_') + 1) . 'Crud';
+      $this->_proxyName = $proxy;
     }
 
     $this->_displayName = $model->getDisplayName();
     if ($this->_displayName === null) {
       $this->_displayName = $model->getActor();
     }
+  }
+
+  /**
+   * Getter for the name of the generated service class.
+   *
+   * @return string
+   */
+  public function getClassName() {
+    return $this->_className;
   }
 
   /** 

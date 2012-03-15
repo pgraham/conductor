@@ -77,9 +77,13 @@ class Loader {
       }
     });
 
-    // Class loader for php-annotations, clarinet and generated classes
+    // Class loader for php-annotations, php-rest-server, clarinet and generated
+    // classes
     $annoLdr = new SplClassLoader('zeptech\anno', "$cdtLib/php-annotations");
     $annoLdr->register();
+
+    $restLdr = new SplClassLoader('zeptech\rest', "$cdtLib/php-rest-server");
+    $restLdr->register();
 
     $ormLdr = new SplClassLoader('zeptech\orm', "$cdtLib/clarinet");
     $ormLdr->register();

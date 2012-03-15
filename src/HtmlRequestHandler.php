@@ -12,20 +12,18 @@
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
  */
-namespace conductor\rest;
+namespace conductor;
 
-use \conductor\Auth;
-use \conductor\Conductor;
-use \conductor\PageLoader;
-use \conductor\Page;
 use \oboe\Element;
 use \zeptech\anno\Annotations;
+use \zeptech\rest\BaseRequestHandler;
+use \zeptech\rest\RequestHandler;
+use \zeptech\rest\Request;
+use \zeptech\rest\Response;
 use \Exception;
 use \ReflectionClass;
 
-class HtmlRequestHandler extends BaseResourceRequestHandler
-  implements ResourceRequestHandler
-{
+class HtmlRequestHandler extends BaseRequestHandler implements RequestHandler {
 
   private $_pageDef;
 
@@ -41,7 +39,7 @@ class HtmlRequestHandler extends BaseResourceRequestHandler
   /**
    * @Override
    */
-  public function get(ResourceRequest $request, ResourceResponse $response) {
+  public function get(Request $request, Response $response) {
     $page = Page::getInstance();
     $this->_parsePage($page);
 
@@ -108,7 +106,9 @@ class HtmlRequestHandler extends BaseResourceRequestHandler
         $services = array($services);
       }
 
-      // TODO
+      foreach ($services as $srvc) {
+        Element::js($asWebPath("/js/$srvc.js"))->addToHead();
+      }
     }
 
     if (isset($anno['css'])) {
