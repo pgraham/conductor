@@ -14,9 +14,9 @@
  */
 namespace conductor\generator;
 
-use \clarinet\model\Model;
 use \reed\reflection\Annotations;
 use \ReflectionClass;
+use \zeptech\orm\generator\model\Model;
 
 /**
  * This class provides information about a model for generating a crud service.

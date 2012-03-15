@@ -44,10 +44,8 @@ class CrudServiceBuilder {
    * @param Configuration $config
    * @return string
    */
-  public function build(Configuration $config) {
+  public function build() {
     $templateValues = Array(
-      'cdtPath'    => $config->getPathInfo()->getLibPath() . '/conductor/src',
-      'cdtConfig'  => serialize($config),
       'className'  => $this->_srvcInfo->getModel()->getActor(),
       'gatekeeper' => $this->_srvcInfo->getModel()->getGatekeeper(),
       'display'    => $this->_srvcInfo->getDisplayName(),

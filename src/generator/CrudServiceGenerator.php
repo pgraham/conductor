@@ -16,7 +16,6 @@ namespace conductor\generator;
 
 use \conductor\Conductor;
 use \reed\File;
-use \reed\WebSitePathInfo;
 use \SplFileObject;
 
 /**
@@ -46,13 +45,13 @@ class CrudServiceGenerator {
    *   generated files will be placed in a subdirectory of given path which
    *   corresponds to the generated service class's namespace.
    */
-  public function generate(WebSitePathInfo $pathInfo) {
+  public function generate($pathInfo) {
     $builder = new CrudServiceBuilder($this->_crudInfo);
     $template = $builder->build(Conductor::getConfig());
 
     // Ensure the output directory exists
     $serviceRelPath = str_replace('\\', '/', CrudServiceInfo::CRUD_SERVICE_NS);
-    $outDir = $pathInfo->getTarget() . "/$serviceRelPath";
+    $outDir = "$pathInfo[target]/$serviceRelPath";
     if (!file_exists($outDir)) {
       mkdir($outDir, 0755, true);
     }
@@ -64,4 +63,5 @@ class CrudServiceGenerator {
 
     return $servicePath;
   }
+
 }

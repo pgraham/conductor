@@ -131,9 +131,13 @@ class RestServer {
    * @param string $uri
    */
   public function handleRequest($action, $uri) {
+    $debug = false;
+    if (substr($uri, -3) === '.js') {
+      $debug = true;
+    }
     $handler = null;
     foreach ($this->_mappings AS $mapping) {
-      $preg = '/^' . preg_quote($mapping['template'], '/') . '/';
+      $preg = '/^' . preg_quote($mapping['template'], '/') . '$/';
       if (preg_match($preg, $uri)) {
         $handler = $mapping['handler'];
         break;

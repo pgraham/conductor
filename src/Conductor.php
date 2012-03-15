@@ -14,13 +14,10 @@
  */
 namespace conductor;
 
-use \zeptech\orm\runtime\Clarinet;
-use \zeptech\orm\runtime\Criteria;
-use \zeptech\orm\runtime\Persister;
-
 use \conductor\jslib\JsLib;
 use \conductor\resources\BaseResources;
 use \conductor\resources\JsAppResources;
+use \conductor\rest\RestServer;
 use \conductor\template\PageTemplate;
 
 use \oboe\head\Javascript;
@@ -30,6 +27,11 @@ use \oboe\Element;
 use \reed\generator\CodeTemplate;
 use \reed\ClassLoader;
 use \reed\File;
+
+use \zeptech\dynamic\ServerConfigurator;
+use \zeptech\orm\runtime\Clarinet;
+use \zeptech\orm\runtime\Criteria;
+use \zeptech\orm\runtime\Persister;
 
 use \Exception;
 use \PDO;
@@ -42,9 +44,6 @@ use \PDO;
 class Conductor {
 
   const JQUERY_VERSION = '1.7.1';
-
-  /** @deprecated Conductor configuration values */
-  public static $config = null;
 
   /* Conductor configuration */
   private static $_config;
@@ -120,26 +119,6 @@ class Conductor {
 
     return $idxd;
   }
-
-  /**
-   * Getter for the hostname on which the website is running.
-   *
-   * @return string
-   */
-  public static function getHostName() {
-    return self::$_config->getHostName();
-  }
-
-  /**
-   * Return the page configuration for the page with the given id or the default
-   * page if no id is provided.
-   *
-   * @return config\PageConfiguration
-   */
-  public static function getPage($pageId = null) {
-    return self::$_config->getPage($pageId);
-  }
-
 
   /**
    * Getter for the path info associated with conductor config used to
@@ -222,6 +201,9 @@ class Conductor {
     if ($authenticate) {
       Auth::init();
     }
+
+    // Now that initialization is finished the request can be processed
+    self::processRequest();
   }
 
   /**
@@ -240,22 +222,16 @@ class Conductor {
    *
    * @param PageTemplate $template The PageTemplate for the response.
    */
-  public static function load($page = null, $template = null) {
+  public static function load() {
+    global $asWebPath;
+
     self::_ensureInitialized();
-    $pathInfo = Conductor::getPathInfo();
-
-    // Initialize conductor's extensions to oboe\Page
-    Page::init();
-
-    // Get the configuration for the requested (or default) page
-    $pageCfg = self::$_config->getPage($page);
-
     // All pages contain a script which declares necessary namespaces and
     // provides functions which give access to path into.  This script is
     // built here - TODO - Make this a template so it can be compiled when the
     // site is deployed
     // -------------------------------------------------------------------------
-    Element::js($pathInfo->asWebPath('/gen/js/base.js'))->addToHead();
+    Element::js($pathInfo->asWebPath('/js/base.js'))->addToHead();
 
     // Include resources
     // -------------------------------------------------------------------------
@@ -283,42 +259,48 @@ class Conductor {
   }
 
   /**
-   * Include resources that provide support for building a javascript app.
-   *
-   * @deprecated Page resources should be specified in config and jsAppSupport
-   *   specified there
+   * Process the request.
    */
-  public static function loadJsAppSupport($theme = null) {
-    JsLib::includeLib(JsLib::JQUERY_UI, array('theme' => $theme));
+  public static function processRequest() {
+    // Make sure that a generated mapping configurator exists
+    $pathInfo = self::getPathInfo();
 
-    $appSupport = new JsAppResources();
-    if (self::isDevMode()) {
-      $appSupport->compile();
+    try {
+      $server = new RestServer();
+      $configurator = new ServerConfigurator();
+      $configurator->configure($server);
+
+      global $asAbsWebPath;
+      $resource = $asAbsWebPath($_SERVER['REQUEST_URI']);
+      $action = $_SERVER['REQUEST_METHOD'];
+
+      if (!empty($_GET)) {
+        $server->setQuery($_GET);
+      }
+      if (!empty($_POST)) {
+        $server->setData($_POST);
+      }
+
+      $server->setAcceptType($_SERVER['HTTP_ACCEPT']);
+
+      // Process the request
+      $server->handleRequest($action, $resource);
+
+      // Get the response before setting the headers as retrieving the response
+      // may add additional headers to the response, e.g. if a Content-Type
+      // header is added it will be added at this time.
+      $response = $server->getResponse();
+      foreach ($server->getResponseHeaders() AS $header) {
+        header($header);
+      }
+      echo $response;
+
+    } catch (Exception $e) {
+      error_log($e->getMessage());
+      error_log($e->getTraceAsString());
+      header('HTTP/1.1 500 Internal Server Error');
+      echo $e->getMessage();
     }
-    $appSupport->inc();
-  }
-
-  /**
-   * This function loads the default page and dumps it.
-   *
-   * This function should only be called while processing a synchronous request.
-   * See {@link PageLoader::loadPage} for loading page content in response to
-   * an asynchronous request.
-   */
-  public static function loadDefaultPage() {
-    self::loadPage();
-  }
-
-  /**
-   * This function loads the page with the given name and dumps it.
-   *
-   * This function should only be called while processing a synchronous request.
-   * See {@link PageLoader::loadPage} for loading page content in response to
-   * an asynchronous request.
-   */
-  public static function loadPage($page = null) {
-    PageLoader::loadPage($page)->addToBody();
-    Page::dump(PageLoader::getPageTitle($page));
   }
 
   private static function _ensureInitialized() {

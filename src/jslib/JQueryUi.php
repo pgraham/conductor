@@ -24,13 +24,13 @@ use \DirectoryIterator;
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class JQueryUi extends BaseLibrary {
+class JQueryUi {
 
   public function __construct(array $opts = null) {
     $this->init(JsLib::JQUERY_UI, $opts);
   }
 
-  protected function getLinked($pathInfo, $devMode) {
+  public function getFiles() {
     $linked = array(
       'ui/jquery.ui.core.js',
       'ui/jquery.ui.widget.js',
@@ -120,7 +120,7 @@ class JQueryUi extends BaseLibrary {
     return $linked;
   }
 
-  protected function getIncluded($pathInfo, $devMode) {
+  public function getIncluded($pathInfo, $devMode) {
     $included = array(
       'ui/jquery.ui.core.js',
       'ui/jquery.ui.widget.js',

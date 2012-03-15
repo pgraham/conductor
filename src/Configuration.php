@@ -111,10 +111,26 @@ class Configuration {
         return $webRoot . $path;
       };
     }
+
+    // Add a closure to strip the web root from web paths if necessary
+    if ($webRoot === '/') {
+      $pathInfo->asAbsWebPath = function ($path) {
+        return $path;
+      };
+    } else {
+      $pathInfo->asAbsWebPath = function ($path) use ($webRoot) {
+        if (strpos($path, $webRoot) === 0) {
+          $path = substr($path, strlen($webRoot));
+        }
+        return $path;
+      };
+    }
+
     // FIXME - Once it is possible to invoke functions assigned as object
-    // properties, e.g. $pathInfo->asWebPath(...), make this global go away.
-    global $asWebPath;
+    // properties, e.g. $pathInfo->asWebPath(...), make these globals go away.
+    global $asWebPath, $asAbsWebPath;
     $asWebPath = $pathInfo->asWebPath;
+    $asAbsWebPath = $pathInfo->asAbsWebPath;
 
     $cfg['pathInfo'] = $pathInfo;
 

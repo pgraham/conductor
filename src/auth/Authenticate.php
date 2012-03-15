@@ -11,20 +11,18 @@
  * =============================================================================
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
- * @package conductor/auth
  */
 namespace conductor\auth;
 
-use \clarinet\Clarinet;
-use \clarinet\Criteria;
 use \conductor\Conductor;
-use \conductor\Exception;
+use \zeptech\orm\runtime\Persister;
+use \zeptech\orm\runtime\Criteria;
+use \Exception;
 
 /**
  * This class provides authentication capabilities.
  *
  * @author Philip Graham <philip@zeptech.ca>
- * @package conductor/auth
  */
 class Authenticate {
 
@@ -41,7 +39,9 @@ class Authenticate {
     $c = new Criteria();
     $c->addEquals('username', $username);
     $c->addEquals('password', $pwHash);
-    $user = Clarinet::getOne('conductor\model\User', $c);
+
+    $persister = Persister::get('conductor\model\User');
+    $user = $persister->retrieveOne($c);
 
     return $user;
   }

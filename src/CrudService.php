@@ -15,10 +15,10 @@
 namespace conductor;
 
 use \bassoon\RemoteService;
-use \clarinet\model\Parser as ModelParser;
 use \conductor\generator\CrudServiceGenerator;
 use \conductor\generator\CrudServiceInfo;
 use \reed\File;
+use \zeptech\orm\generator\model\Parser as ModelParser;
 
 /**
  * This class encapsulates information about a CRUD remote service for a model
@@ -38,14 +38,12 @@ class CrudService {
     $this->_srvcInfo = new CrudServiceInfo($model);
     $proxyName = $this->_srvcInfo->getProxyName();
 
-    $webTarget = $pathInfo->getWebTarget();
+    $webTarget = "$pathInfo[target]/htdocs";
     $proxyPath = File::joinPaths($webTarget, "js/$proxyName.js");
-    $this->_webPath = $pathInfo->fsToWeb($proxyPath);
   }
 
   public function generate() {
     $pathInfo = Conductor::getPathInfo();
-    $cdtPath = File::joinPaths($pathInfo->getLibPath(), 'conductor');
 
     $generator = new CrudServiceGenerator($this->_srvcInfo);
     $generator->generate($pathInfo);
@@ -55,9 +53,5 @@ class CrudService {
     $className = CrudServiceInfo::CRUD_SERVICE_NS . '\\' . $actor;
     $srvc = new RemoteService($className, $pathInfo);
     $srvc->generate();
-  }
-
-  public function getWebPath() {
-    return $this->_webPath;
   }
 }

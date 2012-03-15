@@ -78,8 +78,6 @@ class Loader {
     });
 
     // Class loader for php-annotations, clarinet and generated classes
-    require_once 'SplClassLoader.php';
-    
     $annoLdr = new SplClassLoader('zeptech\anno', "$cdtLib/php-annotations");
     $annoLdr->register();
 

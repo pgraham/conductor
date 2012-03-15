@@ -1,10 +1,12 @@
 <?php
-namespace ${ns};
+namespace zeptech\dynamic\crud;
 
 use \clarinet\Criteria;
 use \clarinet\Persister;
 use \clarinet\Transformer;
 use \conductor\Loader;
+use \Exception;
+use \PDOException;
 
 ${if:gatekeeper ISSET}
   use \${gatekeeper} as Gatekeeper;
@@ -14,7 +16,7 @@ ${fi}
 use \conductor\Conductor;
 
 /**
- * This is CRUD service class for a ${model} class.
+ * This is a CRUD service class for a ${model} class.
  *
  * This class is generated.  Do NOT modify this file.  Instead, modify the
  * model class used for generation then regenerate this class.
@@ -23,30 +25,10 @@ use \conductor\Conductor;
  * @CsrfToken conductorsessid
  */
 class ${className} { 
+
   private $_gatekeeper;
 
   public function __construct() {
-    // Ensure that conductor is initialized
-    spl_autoload_register(function ($classname) {
-      if (substr($classname, 0, 10) !== 'conductor\\') {
-        return;
-      }
-
-      $basePath = '${cdtPath}';
-      $relPath = str_replace('\\', '/', substr($classname, 10));
-      $fullPath = "$basePath/$relPath.php";
-      if (file_exists($fullPath)) {
-        require $fullPath;
-      }
-    });
-
-    // Before the conductor config object can be unserialized a loader for
-    // WebSitePathInfo is necessary so load dependencies now
-    Loader::loadDependencies();
-
-    // Initialize conductor with an unserialized configuration array.
-    Conductor::init(unserialize('${cdtConfig}'));
-
     $this->_gatekeeper = new Gatekeeper('${model}');
   }
 
@@ -63,8 +45,8 @@ class ${className} {
 
       $persister = Persister::get($model);
       $persister->create($model);
-    } catch (\clarinet\Exception $e) {
-      throw new \Exception($this->_parseExceptionMessage($e->getMessage()));
+    } catch (PDOException $e) {
+      throw new Exception($this->_parseExceptionMessage($e->getMessage()));
     }
 
   }
@@ -123,8 +105,8 @@ class ${className} {
         'data' => $data,
         'total' => $total
       );
-    } catch (\clarinet\Exception $e) {
-      throw new \Exception($this->_parseExceptionMessage($e->getMessage()));
+    } catch (PDOException $e) {
+      throw new Exception($this->_parseExceptionMessage($e->getMessage()));
     }
   }
 
@@ -142,8 +124,8 @@ class ${className} {
       $this->_gatekeeper->checkCanWrite($original);
 
       $persister->update($model);
-    } catch (\clarinet\Exception $e) {
-      throw new \Exception($this->_parseExceptionMessage($e->getMessage()));
+    } catch (PDOException $e) {
+      throw new Exception($this->_parseExceptionMessage($e->getMessage()));
     }
   }
 
@@ -165,8 +147,8 @@ class ${className} {
       foreach ($models AS $model) {
         $persister->delete($model);
       }
-    } catch (\clarinet\Exception $e) {
-      throw new \Exception($this->_parseExceptionMessage($e->getMessage()));
+    } catch (PDOException $e) {
+      throw new Exception($this->_parseExceptionMessage($e->getMessage()));
     }
   }
 

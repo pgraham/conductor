@@ -219,7 +219,7 @@ class Page extends \oboe\Page {
    *
    * @param string title
    */
-  protected function setPageTitle($title) {
+  public function setPageTitle($title) {
     if ($this->_template !== null) {
       $baseTitle = $this->_template->getBaseTitle();
       if ($baseTitle !== null) {
@@ -229,9 +229,3 @@ class Page extends \oboe\Page {
     parent::setPageTitle($title);
   }
 }
-
-/*
- * Static initializer -- This lines means that it is unnessary to explicitly
- * initialize a conductor page.
- */ 
-Page::init();

@@ -50,71 +50,81 @@ class PageLoader {
   }
 
   /**
-   * Load the login form.  
+   * Add jQuery to the page.
+   */
+  public static function loadJQuery() {
+    $jQueryName = 'jquery.min.js';
+    if (Conductor::isDevMode()) {
+      $jQueryName = 'jquery.js';
+    }
+    $jqPath = 'http://ajax.googleapis.com/ajax/libs/jquery/' .
+      Conductor::JQUERY_VERSION . "/$jQueryName";
+    Element::js($jqPath)->addToHead();
+  }
+
+  /**
+   * Add jQuery Cookie to the page.
+   */
+  public static function loadJQueryCookie() {
+    global $asWebPath;
+
+    Element::js($asWebPath('/jslib/jquery-cookie/jquery.cookie.js'))
+      ->addToHead();
+  }
+
+  /**
+   * Add jQuery UI to the page.
+   */
+  public static function loadJQueryUi($theme = null) {
+    global $asWebPath;
+
+    if ($theme === null) {
+      $theme = 'base';
+    }
+    Element::css($asWebPath('/jslib/jquery-ui/jquery.ui.css'))->addToHead();
+    Element::css($asWebPath(
+      "/jslib/jquery-ui/themes/$theme/jquery.ui.theme.css"))->addToHead();
+
+    Element::js($asWebPath('/jslib/jquery-ui/jquery.ui.js'))->addToHead();
+
+  }
+
+  public static function loadJsAppSupport() {
+    global $asWebPath;
+
+    Element::css($asWebPath('/css/conductor-app.css'))->addToHead();
+
+    $scripts = array(
+      '/js/data-store.js',
+      '/js/layout.js',
+      '/js/layout-fill.js',
+      '/js/widget-section.js',
+      '/js/widget-collapsible.js',
+      '/js/widget-form.js',
+      '/js/widget-pager.js',
+      '/js/widget-list.js',
+      '/js/component-configurationEditor.js',
+      '/js/conductor-app.js'
+    );
+    foreach ($scripts as $js) {
+      Element::js($asWebPath($js))->addToHead();
+    }
+  }
+
+  /**
+   * Load the login form.  This method should not be used in conjuction with
+   * any other load*(...) methods provided by this class.
    */
   public static function loadLogin($msg = null) {
     global $asWebPath;
 
-    $pathInfo = Conductor::getPathInfo();
-    Element::js($asWebPath('/gen/js/login.js'))->addToHead();
-    Element::js($asWebPath('/gen/js/login.css'))->addToHead();
+    self::loadJQuery();
+    Element::js($asWebPath('/js/login.js'))->addToHead();
+    Element::css($asWebPath('/css/login.css'))->addToHead();
 
     $login = new LoginForm($msg);
     $login->addToPage();
     Page::dump();
     exit;
-  }
-
-  /**
-   * Load a page defined in conductor.cfg.xml.
-   *
-   * @param string $pageId The id given to the page in the config file. If null
-   *   (default) then the default page is loaded.
-   * @param boolean $async If this loadPage request is part of an asynchronous
-   *   request. Default: false.
-   * @return Fragment containing the page content.
-   */
-  public static function loadPage($pageId = null, $async = false) {
-    try {
-      Conductor::init();
-
-      $page = Conductor::getPage($pageId);
-      if ($page === null) {
-        header("HTTP/1.1 404 Not Found");
-        $notFound = new Fragment(__DIR__ . '/html/404.html');
-        echo $notFound;
-        exit;
-      }
-
-      $className = $page->getClassName();
-      $page = new $className();
-      $frag = $page->getFragment();
-      return $frag;
-
-    } catch (AuthorizationException $e) {
-      if ($async) {
-        $loginForm = self::_buildLoginForm($e);
-        return $loginForm;
-      } else {
-        self::loadLogin($e->getMessage());
-        return null;
-      }
-    }
-  }
-
-  /* Create a login form from the given authorization exception. */
-  private static function _buildLoginForm($e) {
-    $msg = $e->getMessage();
-    if ($msg === null) {
-      $msg = 'You must provide credentials with sufficient permissions to'
-        . ' perform the requested action.';
-    }
-    $loginForm = new LoginForm($msg, true);
-
-    if ($e->getUsernameLabel() !== null) {
-      $loginForm->setUsernameLabel($e->getUsernameLabel());
-      $loginForm->setPasswordLabel($e->getPasswordLabel());
-    }
-    return $loginForm;
   }
 }

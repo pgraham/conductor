@@ -62,9 +62,7 @@ class EncoderFactory {
 
   protected function __construct() {
     $this->_encoders = array(
-      // Add encoders in type priority.  The first encoder will be used for
-      // media type */*
-
+      new HtmlEncoder(),
       new TextEncoder(),
       new JsonEncoder()
     );
