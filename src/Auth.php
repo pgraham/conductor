@@ -15,16 +15,14 @@
  */
 namespace conductor;
 
-use \clarinet\Clarinet;
-use \clarinet\Criteria;
-use \clarinet\Persister;
-
 use \conductor\auth\Authenticate;
 use \conductor\auth\Authorize;
 use \conductor\auth\AuthService;
 use \conductor\auth\SessionManager;
 use \conductor\model\User;
 use \conductor\model\Visitor;
+use \zeptech\orm\runtime\Criteria;
+use \zeptech\orm\runtime\Persister;
 
 use \LightOpenId;
 
@@ -265,7 +263,7 @@ class Auth {
   }
 
   /*
-   * Redirect to the given URL (or PHP_SELF if not provided) if the current
+   * Redirect to the given URL (or REQUEST_URI if not provided) if the current
    * request is not asynchronous.
    */
   private static function _redirectIf($url = null) {
@@ -278,7 +276,7 @@ class Auth {
     }
     if (!$asyncRequest) {
       if ($url === null) {
-        $url = $_SERVER['PHP_SELF'];
+        $url = $_SERVER['REQUEST_URI'];
       }
 
       header("Location: $url");
