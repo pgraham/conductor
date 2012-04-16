@@ -50,7 +50,6 @@ class Loader {
     $target = "$root/target";
 
     $libPaths = array(
-      'pct' => "$cdtLib/php-code-templates/src",
       'reed' => "$lib/reed/src",
       'oboe' => "$lib/oboe/src",
       'bassoon' => "$lib/bassoon/src"
@@ -77,10 +76,13 @@ class Loader {
       }
     });
 
-    // Class loader for php-annotations, php-rest-server, clarinet and generated
-    // classes
+    // Class loader for php-annotations, php-code-templates, php-rest-server,
+    // clarinet and generated classes
     $annoLdr = new SplClassLoader('zeptech\anno', "$cdtLib/php-annotations");
     $annoLdr->register();
+
+    $pctLdr = new SplClassLoader('zpt\pct', "$cdtLib/php-code-templates");
+    $pctLdr->register();
 
     $restLdr = new SplClassLoader('zeptech\rest', "$cdtLib/php-rest-server");
     $restLdr->register();
