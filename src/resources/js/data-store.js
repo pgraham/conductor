@@ -1,5 +1,5 @@
 /**
- * Widget which interfaces with a CRUD service to provide a local store of
+ * Object which interfaces with a CDT.data.CrudProxy to provide a local store of
  * model instances.
  *
  * @author Philip Graham <philip@zeptech.ca>
@@ -37,13 +37,10 @@
     that.load = function (spf) {
       spf = spf || {};
 
-      items = {};
       loaded = false;
 
       srvc.retrieve(spf, function (response) {
-        $.each(response.data, function (idx, item) {
-          items[item[idProperty]] = item;
-        });
+        items = response.data;
 
         loaded = true;
         that.fire({
@@ -58,7 +55,13 @@
       if (id === undefined) {
         return items;
       }
-      return items[id];
+
+      $.each(items, function (idx, item) {
+        if (item[idProperty] === id) {
+          return item;
+        }
+      });
+      return null;
     };
 
     that.isLoaded = function () {
