@@ -14,7 +14,7 @@
  */
 namespace conductor\crud;
 
-use \clarinet\ActorFactory;
+use \zeptech\orm\runtime\ActorFactory;
 
 use \conductor\auth\AuthorizationException;
 

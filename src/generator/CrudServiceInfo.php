@@ -28,6 +28,12 @@ class CrudServiceInfo {
   /* The name of the generated service class. */
   private $_className;
 
+  /* The display name of the model. */
+  private $_displayName;
+
+  /* The plural display name of the model. */
+  private $_displayNamePlural;
+
   /* The model for which this class provides information. */
   private $_model;
 
@@ -55,7 +61,13 @@ class CrudServiceInfo {
 
     $this->_displayName = $model->getDisplayName();
     if ($this->_displayName === null) {
-      $this->_displayName = $model->getActor();
+      $actorParts = explode('_', $model->getActor());
+      $this->_displayName = array_pop($actorParts);
+    }
+
+    $this->_displayNamePlural = $model->getDisplayNamePlural();
+    if ($this->_displayNamePlural === null) {
+      $this->_displayNamePlural = $this->_displayName . 's';
     }
   }
 
@@ -76,6 +88,16 @@ class CrudServiceInfo {
    */
   public function getDisplayName() {
     return $this->_displayName;
+  }
+
+  /**
+   * Getter for the display name of the model to use in situations where a
+   * plurality is necessary.
+   *
+   * @return string
+   */
+  public function getDisplayNamePlural() {
+    return $this->_displayNamePlural;
   }
 
   /**

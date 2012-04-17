@@ -14,7 +14,6 @@
  */
 namespace conductor;
 
-use \bassoon\RemoteService;
 use \conductor\generator\CrudServiceGenerator;
 use \conductor\generator\CrudServiceInfo;
 use \reed\File;
@@ -36,10 +35,6 @@ class CrudService {
     $model = ModelParser::getModel($modelClass);
 
     $this->_srvcInfo = new CrudServiceInfo($model);
-    $proxyName = $this->_srvcInfo->getProxyName();
-
-    $webTarget = "$pathInfo[target]/htdocs";
-    $proxyPath = File::joinPaths($webTarget, "js/$proxyName.js");
   }
 
   public function generate() {
@@ -48,15 +43,10 @@ class CrudService {
 
     $generator = new CrudServiceGenerator($this->_srvcInfo);
     $generator->generate($pathInfo);
-
-    // Generate the Bassoon service proxy for the CRUD service class.
-    $actor = $this->_srvcInfo->getModel()->getActor();
-
-    $className = $this->_srvcInfo->getClassName();
-    $srvc = new RemoteService($className, $pathInfo);
-    $srvc->generate(
-      "$pathInfo[target]/htdocs/js",
-      "$pathInfo[target]/htdocs/ajx",
-      $asWebPath('/ajx'));
   }
+
+  public function getInfo() {
+    return $this->_srvcInfo;
+  }
+
 }

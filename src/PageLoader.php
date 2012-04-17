@@ -96,8 +96,8 @@ class PageLoader {
 
     $scripts = array(
       '/js/data-store.js',
+      '/js/data-crudProxy.js',
       '/js/layout.js',
-      '/js/layout-fill.js',
       '/js/widget-section.js',
       '/js/widget-collapsible.js',
       '/js/widget-form.js',

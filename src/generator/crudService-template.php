@@ -1,12 +1,15 @@
 <?php
 namespace zeptech\dynamic\crud;
 
+use \conductor\crud\CrudException;
 use \conductor\Loader;
+use \reed\String;
 use \zeptech\orm\runtime\Criteria;
+use \zeptech\orm\runtime\PdoExceptionWrapper;
 use \zeptech\orm\runtime\Persister;
 use \zeptech\orm\runtime\Transformer;
-use \Exception;
-use \PDOException;
+use \zeptech\orm\runtime\ValidationException;
+use \zeptech\orm\QueryBuilder;
 
 ${if:gatekeeper ISSET}
   use \${gatekeeper} as Gatekeeper;
@@ -24,7 +27,7 @@ use \conductor\Conductor;
  * @Service( name = ${proxyName} )
  * @CsrfToken conductorsessid
  */
-class ${className} { 
+class ${modelName}Crud { 
 
   private $_gatekeeper;
 
@@ -36,19 +39,19 @@ class ${className} {
    * @RequestType post
    */
   public function create(array $params) {
+    $transformer = Transformer::get('${model}');
+    $model = $transformer->fromArray($params);
+
+    $this->_gatekeeper->checkCanCreate($model);
 
     try {
-      $transformer = Transformer::get('${model}');
-      $model = $transformer->fromArray($params);
-
-      $this->_gatekeeper->checkCanCreate($model);
-
       $persister = Persister::get($model);
       $persister->create($model);
-    } catch (PDOException $e) {
-      throw new Exception($this->_parseExceptionMessage($e->getMessage()));
+    } catch (PdoExceptionWrapper $e) {
+      throw new CrudException($e);
+    } catch (ValidationException $e) {
+      throw new CrudException($e);
     }
-
   }
 
   /**
@@ -57,40 +60,37 @@ class ${className} {
    * @param array $spf
    */
   public function retrieve($spf) {
+    $persister = Persister::get('${model}');
+    $transformer = Transformer::get('${model}');
+
+    $qb = QueryBuilder::get('${model}');
+
+    // Apply paging, sorting and filters to the criteria
+    if (isset($spf->filter)) {
+      foreach ($spf->filter AS $column => $value) {
+        $qb->addFilter($column, $value);
+      }
+    }
+
+    if (isset($spf->sort)) {
+      foreach ($spf->sort AS $sort) {
+        
+        $qb->addSort($sort->field, $sort->dir);
+      }
+    }
+
+    if (isset($spf->page)) {
+      $limit = $spf->page->limit;
+      $offset = isset($spf->page->offset)
+        ? $spf->page->offset
+        : null;
+
+      $qb->setLimit($limit, $offset);
+    }
+
+    // Retrieve the models that match the given spf
     try {
-
-      $persister = Persister::get('${model}');
-      $transformer = Transformer::get('${model}');
-
-      $c = new Criteria();
-
-      // Apply paging, sorting and filters to the criteria
-      if (isset($spf->filter)) {
-        foreach ($spf->filter AS $column => $value) {
-          $c->addEquals($column, $value);
-        }
-      }
-
-      if (isset($spf->sort)) {
-        foreach ($spf->sort AS $column => $direction) {
-          if ($direction === Criteria::SORT_DESC) {
-            $c->addSort($column, Criteria::SORT_DESC);
-          } else {
-            $c->addSort($column);
-          }
-        }
-      }
-
-      if (isset($spf->page)) {
-        $limit = $spf->page->limit;
-        $offset = isset($spf->page->offset)
-          ? $spf->page->offset
-          : null;
-
-        $c->setLimit($limit, $offset);
-      }
-
-      // Retrieve the models that match the given spf
+      $c = $qb->getCriteria();
       $models = $persister->retrieve($c);
       $total = $persister->count($c);
 
@@ -105,27 +105,63 @@ class ${className} {
         'data' => $data,
         'total' => $total
       );
-    } catch (PDOException $e) {
-      throw new Exception($this->_parseExceptionMessage($e->getMessage()));
+    } catch (PdoExceptionWrapper $e) {
+      throw new CrudException($e);
+    } catch (ValidationException $e) {
+      throw new CrudException($e);
+    }
+  }
+
+  /**
+   * Retrieve a single instance with the given ID.
+   *
+   * @param $id
+   */
+  public function retrieveOne($id) {
+
+    try {
+      $persister = Persister::get('${model}');
+      $model = $persister->getById($id);
+
+      if ($model === null) {
+        // TODO This needs to changed so that the CrudException has a
+        // isNotFound() method and the message is built using a ModelInfo actor.
+        throw new CrudException('404 Not Found', 'The requested ${display} does not exist');
+      }
+
+      $this->_gatekeeper->checkCanRead($model);
+
+      $transformer = Transformer::get('${model}');
+      return $transformer->asArray($model);
+
+    } catch (PdoExceptionWrapper $e) {
+      throw new CrudException($e);
+    } catch (ValidationException $e) {
+      throw new CrudException($e);
     }
   }
 
   /**
    * @RequestType post
    */
-  public function update(array $params) {
+  public function update($id, array $params) {
     try {
-      $transformer = Transformer::get('${model}');
-      $model = $transformer->fromArray($params);
-
       $persister = Persister::get('${model}');
-      $original = $persister->getById($model->get${idColumn}());
+      $model = $persister->getById($id);
+
+      if ($model === null) {
+      }
       
-      $this->_gatekeeper->checkCanWrite($original);
+      $this->_gatekeeper->checkCanWrite($model);
+
+      $transformer = Transformer::get('${model}');
+      $transformer->fromArray($params, $model);
 
       $persister->update($model);
-    } catch (PDOException $e) {
-      throw new Exception($this->_parseExceptionMessage($e->getMessage()));
+    } catch (PdoExceptionWrapper $e) {
+      throw new CrudException($e);
+    } catch (ValidationException $e) {
+      throw new CrudException($e);
     }
   }
 
@@ -133,46 +169,25 @@ class ${className} {
    * @RequestType post
    */
   public function delete(array $ids) {
+    $persister = Persister::get('${model}');
+
+    $c = new Criteria();
+    $c->addIn('${idColumn}', $ids);
+    $models = $persister->retrieve($c);
+
+    foreach ($models AS $model) {
+      $this->_gatekeeper->checkCanDelete($model);
+    }
+
     try {
-      $persister = Persister::get('${model}');
-
-      $c = new Criteria();
-      $c->addIn('${idColumn}', $ids);
-      $models = $persister->retrieve($c);
-
-      foreach ($models AS $model) {
-        $this->_gatekeeper->checkCanDelete($model);
-      }
-
       foreach ($models AS $model) {
         $persister->delete($model);
       }
-    } catch (PDOException $e) {
-      throw new Exception($this->_parseExceptionMessage($e->getMessage()));
+    } catch (PdoExceptionWrapper $e) {
+      throw new CrudException($e);
+    } catch (ValidationException $e) {
+      throw new CrudException($e);
     }
   }
 
-  private function _parseExceptionMessage($msg) {
-    // TODO Move this into it's own class -- maybe in clarinet
-    $sqlstateRe = '/SQLSTATE\[(\d+)\]:\s*(.*)$/';
-    $errMsgRe = '/.+:\s*\d+\s*(.+)$/';
-    $dupEntryRe = '/1062 Duplicate entry \'(.+)\' for key \'(.+)\'/';
-
-    if (preg_match($sqlstateRe, $msg, $matches)) {
-      switch ((int) $matches[1]) {
-        case 23000:
-        if (preg_match($dupEntryRe, $matches[2], $msgMatches)) {
-          return "A ${display} with {$msgMatches[2]} '{$msgMatches[1]}' already exists";
-        }
-        break;
-
-      }
-
-      if (preg_match($errMsgRe, $matches[2], $msgMatches)) {
-        return $msgMatches[1];
-      }
-      return $matches[2];
-    }
-    return $msg;
-  }
 }

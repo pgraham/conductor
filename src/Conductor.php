@@ -271,7 +271,8 @@ class Conductor {
       $configurator->configure($server);
 
       global $asAbsWebPath;
-      $resource = $asAbsWebPath($_SERVER['REQUEST_URI']);
+      $urlInfo = parse_url($_SERVER['REQUEST_URI']);
+      $resource = $asAbsWebPath($urlInfo['path']);
       $action = $_SERVER['REQUEST_METHOD'];
 
       if (!empty($_GET)) {

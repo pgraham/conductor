@@ -46,9 +46,10 @@ class CrudServiceBuilder {
    */
   public function build() {
     $templateValues = Array(
-      'className'  => $this->_srvcInfo->getModel()->getActor(),
+      'modelName'  => $this->_srvcInfo->getModel()->getActor(),
       'gatekeeper' => $this->_srvcInfo->getModel()->getGatekeeper(),
       'display'    => $this->_srvcInfo->getDisplayName(),
+      'plural'     => $this->_srvcInfo->getDisplayNamePlural(),
       'idColumn'   => $this->_srvcInfo->getModel()->getId()->getColumn(),
       'model'      => $this->_srvcInfo->getModel()->getClass(),
       'proxyName'  => $this->_srvcInfo->getProxyName()

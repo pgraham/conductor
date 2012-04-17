@@ -50,7 +50,7 @@ class CrudServiceGenerator {
 
     // Ensure the output directory exists
     $className = $this->_crudInfo->getClassName();
-    $serviceRelPath = str_replace(array('\\', '_'), '/', $className) . '.php';
+    $serviceRelPath = str_replace(array('\\', '_'), '/', $className) . 'Crud.php';
     $serviceRelDir = dirname($serviceRelPath);
     $outDir = "$pathInfo[target]/$serviceRelDir";
     if (!file_exists($outDir)) {

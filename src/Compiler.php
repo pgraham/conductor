@@ -15,10 +15,12 @@
 namespace conductor;
 
 use \conductor\CrudService;
+use \conductor\modeling\ModelInfo;
 use \reed\String;
 use \zeptech\orm\generator\PersisterGenerator;
 use \zeptech\orm\generator\TransformerGenerator;
 use \zeptech\orm\generator\ValidatorGenerator;
+use \zeptech\orm\QueryBuilder;
 use \zpt\pct\CodeTemplateParser;
 use \DirectoryIterator;
 
@@ -32,6 +34,10 @@ class Compiler {
   private $_compressed;
   private $_tmplParser;
   private $_jslibCompiler;
+
+  // Array of mappings for the REST server configurator that gets generated at
+  // the end of compilation
+  private $_mappings = array();
   
   public function __construct($compressed = false) {
     $this->_compressed = $compressed;
@@ -116,8 +122,7 @@ class Compiler {
     $tmplSrc = __DIR__ . '/resources/tmpl/ServerConfigurator.php';
     $tmplOut = "$pathInfo[target]/zeptech/dynamic/ServerConfigurator.php";
 
-    $mappings = array();
-
+    // Build html mappers
     $htmlDir = "$pathInfo[src]/$ns/html";
     $dir = new DirectoryIterator($htmlDir);
     foreach ($dir as $pageDef) {
@@ -134,7 +139,8 @@ class Compiler {
 
       $hdlr = '\conductor\HtmlRequestHandler';
       $args = array( "'$ns\\html\\$pageId'" );
-      $tmpls = array( String::fromCamelCase($pageId) . '.html' );
+      $tmpl = '/' . String::fromCamelCase($pageId) . '.html';
+      $tmpls[] = $tmpl;
       if ($pageId === 'Index') {
         $tmpls[] = '/';
       }
@@ -145,10 +151,11 @@ class Compiler {
         'tmpls' => $tmpls
       );
 
-      $mappings[] = $mapping;
+      $this->_mappings[] = $mapping;
     }
-    $values = array( 'mappings' => $mappings );
 
+    // Generator the Configurator
+    $values = array( 'mappings' => $this->_mappings );
     $this->_compileResource($tmplSrc, $tmplOut, $values);
   }
 
@@ -160,6 +167,8 @@ class Compiler {
     $persisterGen = new PersisterGenerator($target);
     $transformerGen = new TransformerGenerator($target);
     $validatorGen = new ValidatorGenerator($target);
+    $infoGen = new ModelInfo($target);
+    $queryBuilderGen = new QueryBuilder($target);
 
     $dir = new DirectoryIterator($models);
     foreach ($dir as $model) {
@@ -179,10 +188,38 @@ class Compiler {
       $persisterGen->generate($modelClass);
       $transformerGen->generate($modelClass);
       $validatorGen->generate($modelClass);
+      $infoGen->generate($modelClass);
+      $queryBuilderGen->generate($modelClass);
 
-      // TODO - Generate CRUD service for the model
+      /* TODO - Implement this interface
+      $crudInfo = new ModelCrudInfo($modelClass);
+      if ($crudInfo->hasCrudService()) {
+        $crudGen = new CrudService($crudInfo);
+        $crudGen->generate();
+
+        $urlBase = ...
+        // ...
+      }
+      */
+      // Generate a crud service for the model
       $crudGen = new CrudService($modelClass);
       $crudGen->generate();
+
+      // Create a mapping for the REST server that maps to the CrudService
+      $crudInfo = $crudGen->getInfo();
+      $urlBase = '/' . strtolower($crudInfo->getDisplayNamePlural());
+
+      $this->_mappings[] = array(
+        'hdlr' => '\\conductor\\crud\\CrudRequestHandler',
+        'hdlrArgs' => array(
+          "'$modelClass'",
+          "'$urlBase'"
+        ),
+        'tmpls' => array (
+          $urlBase,
+          $urlBase . '/{id}'
+        )
+      );
     }
   }
 
