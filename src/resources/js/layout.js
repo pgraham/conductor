@@ -3,36 +3,81 @@
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-(function ($, CDT, undefined) {
+(function ( $ ) {
   "use strict";
 
-  var layouts = [];
+  function fillWith (container, sel) {
+    var toFill = typeof sel === 'string' ? container.children(sel) : sel,
+        height = container.height(),
+        allocated = 0,
+        remaining,
+        fill;
 
-  CDT.layout = {};
+    container.children().each(function () {
+      var $this = $(this);
 
-  CDT.layout.register = function (layoutFn) {
-    layouts.push(layoutFn);
-  };
-
-  CDT.layout.unregister = function (layoutFn) {
-    var i, len;
-    for (i = 0, len = layouts.length; i < len; i++) {
-      if (layouts[i] === layoutFn) {
-        layouts.splice(i, 1);
-        break;
+      if ($this.is(sel)) {
+        return;
       }
-    }
+      
+      if (( $this.css('position') === 'static' ||
+            $this.css('position') === 'relative') &&
+          $this.css('float') === 'none')
+      {
+        allocated += $this.outerHeight(true);
+      }
+    });
+
+    remaining = height - allocated;
+    fill = remaining / toFill.length;
+    toFill.each(function () {
+      $(this).outerHeight(fill, true);
+    });
+
+    toFill
+      .css('overflow', 'auto')
+      .css('overflow-x', 'hidden');
+  }
+
+  $.layouts = {
+    fillWith: fillWith
   };
 
-  CDT.layout.doLayout = function () {
-    $.each(layouts, function (idx, fn) {
-      fn();
+  $.fn.layout = function (type, params) {
+
+    if (type === null) {
+      return this.each(function () {
+        $(this).removeData('layout-fn');
+      });
+    }
+
+    if (type) {
+      return this.each(function () {
+        var ctx = $(this);
+
+        ctx.data('layout-fn', function () {
+          $.layouts[type](ctx, params);
+        });
+      });
+    }
+
+    return this.each(function () {
+      var ctx = $(this), fn = ctx.data('layout-fn');
+
+      if (fn) {
+        fn();
+      }
+
+      // Layout all children elements that also have a layout defined
+      ctx.children().each(function () {
+        $(this).layout();
+      });
     });
   };
 
   // Add a resize handler to the window which applies all layout functions
   $(window).resize(function () {
-    CDT.layout.doLayout();
+    $(document).layout();
   });
 
-} (jQuery, CDT));
+} ( jQuery ));
