@@ -1,10 +1,35 @@
-body > .ui-tabs {
+#cdt-app-menu {
+  position: absolute;
+  top: 0;
+  right: 6px;
+  z-index: 1;
+}
+
+#cdt-app-container {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
   padding: 0;
   border: none;
 }
-body > .ui-tabs > .ui-tabs-panel {
+#cdt-app-container > .ui-tabs-nav {
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border-radius: 0;
+
+  border-top: none;
+  border-left: none;
+  border-right: none;
+}
+#cdt-app-container > .cdt-app-view {
   position: absolute;
-  /* Top is calculated by the app. */
+  /*
+   * Top is calculated by the app since the height of the tabs header is not
+   * guaranteed to be a constant value.
+   */
   bottom: 0;
   left: 0;
   right: 0;
@@ -16,51 +41,97 @@ body > .ui-tabs > .ui-tabs-panel {
 .cdt-app-msg {
   position: absolute;
   bottom: 0;
-  height: 20px;
   left: 13px;
   right: 13px;
-  padding: 3px 0;
+  padding: 5px 0;
 
   font-family: 'Lato', sans-serif;
   font-weight: 300;
   text-align: center;
   color: #DDD;
+
+  cursor: pointer;
 }
 
 .cdt-app-msg.error {
   background-color: #AA0000;
 }
 
-.cdt-list table {
+.cdt-app-msg.info {
+  background-color: #00AA00;
+}
+
+.cdt-list {
+  position: relative;
+}
+
+.cdt-list table, .cdt-list tbody, .cdt-list thead {
   display: block;
 }
 
-.cdt-list th.ui-widget-header {
-  padding: 10px;
+.cdt-list table {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  
+  border-collapse: separate;
 }
 
-.cdt-list td.ui-widget-content {
+.cdt-list tbody {
+  position: absolute;
+  /* Top is set programatically */
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  border-top: none;
+  border-bottom: none;
+}
+
+.cdt-list th, .cdt-list td {
+  border-right: none;
+}
+
+.cdt-list th {
+  padding: 10px;
+  border-top: none;
+  border-bottom: none;
+}
+
+.cdt-list td {
   padding: 5px;
+  border-top: none;
   vertical-align: top;
 }
 
-.cdt-list .cdt-pager {
+.cdt-list td.left-col, .cdt-list th.left-col {
+  border-left: none;
+}
+
+.cdt-list td.no-data {
+  text-align: center;
+  color: #333;
+}
+
+.cdt-pager {
   height: 50px;
   padding-left: 40px;
   padding-right: 20px;
   line-height: 50px;
 }
 
-.cdt-list .cdt-pager span.page-lbl {
+.cdt-pager span.page-lbl {
   margin: 0 10px 0 20px;
 }
-.cdt-list .cdt-pager .current-page {
+.cdt-pager .current-page {
   width: 35px;
   border: 1px solid #555;
   padding-left: 5px;
   text-align: center;
 }
-.cdt-list .cdt-pager .num-pages {
+.cdt-pager .num-pages {
   margin: 0 20px 0 10px;
 }
 
@@ -110,8 +181,8 @@ body > .ui-tabs > .ui-tabs-panel {
   margin-top: 7px;
 }
 
-.separator {
-  border: 1px inset #999;
+.cdt-toolbar .separator {
+  border: 1px solid #AAA;
   display: inline-block;
   vertical-align: middle;
   width: 0px;

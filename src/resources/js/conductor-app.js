@@ -17,26 +17,35 @@
       return;
     }
 
-    elm
-      .attr('id', id)
-      .addClass('cdt-app-view')
-      .appendTo(tabs);
+    elm.attr('id', id).addClass('cdt-app-view').appendTo(tabs);
     tabs.tabs('add', '#' + id, lbl);
 
     // Now that the tab has been added, it is guaranteed that there is a tab
     // nav element.  Only top needs to be set programtically, the rest of the
     // edges are set in css
-    elm.css('top', tabs.find('.ui-tabs-nav').outerHeight());
+    elm.css('top', tabs.find('.ui-tabs-nav').outerHeight(true)).layout();
   }
 
-  CDT.app.addMessage = function (message, type) {
+  CDT.app.addMessage = function (message, type, details) {
+    if (details) {
+      message += '<ul>';
+      $.each(details, function (idx, val) {
+        message += '<li>' + val;
+      });
+      message += '</ul>';
+    }
+
     $('<div class="cdt-app-msg ui-corner-top"/>')
       .addClass(type)
-      .text(message)
+      .html(message)
       .appendTo($('body'))
       .css('opacity', 0.8)
+      .css('zIndex', 1002)
       .hide()
-      .slideDown();
+      .slideDown()
+      .click(function () {
+        $(this).slideUp('fast', function () { $(this).remove(); });
+      });
   };
 
   CDT.app.clearMessages = function () {
@@ -67,24 +76,17 @@
         }
       });
 
-    options = $('<div class="ui-widget-header"/>')
-      .append(logout)
+    options = $('<div id="cdt-app-menu" />')
       .append(viewSite)
+      .append(logout)
       .appendTo('body');
 
     // Initialize the tab panel that will contain the app
     tabs = $('<div id="cdt-app-container"><ul/></div>')
-      .css({
-        'position': 'absolute',
-        'top': options.outerHeight(),
-        'bottom': 0,
-        'left': 0,
-        'right': 0
-      })
       .appendTo($('body'))
       .tabs()
       .bind('tabsshow', function (event, ui) {
-        CDT.layout.doLayout();
+        $(ui.panel).layout();
         CDT.app.fire({
           type: 'view-change',
           id: ui.panel.id,
@@ -94,10 +96,6 @@
       .bind('tabsselect', function (event, ui) {
         CDT.app.clearMessages();
       });
-
-    // TODO Why isn't this working?  The class is removed as expected but is
-    //      added back later
-    tabs.children().filter('.ui-widget-header').removeClass('ui-corner-all');
 
     // Add global ajax handler to remove any messages before a new AJAX request
     // is made
@@ -110,7 +108,6 @@
       var response, msg, msgType, elm;
       
       if (opts.dataType === 'json') {
-        // TODO Allow types to be specified, default will be error
         response = $.parseJSON(xhr.responseText);
         if (!response || !response.msg) {
           return; 
@@ -130,21 +127,31 @@
     });
 
     $('body').ajaxError(function (e, xhr, opts, err) {
-      var response, msg, elm;
+      var response, msg, msgs;
 
       if (opts.dataType === 'json') {
         response = $.parseJSON(xhr.responseText);
 
-        if (response.msg) {
-          msg = response.msg;
+        if ($.isPlainObject(response)) {
+          if (response.msg) {
+            msg = response.msg;
+          }
+
+          if (response.msgs) {
+            msgs = response.msgs;
+          }
+
+        } else if (typeof response === 'string') {
+          msg = response;
         }
+
       }
 
       if (msg === undefined) {
         msg = xhr.status + ": " + xhr.statusText;
       }
 
-      CDT.app.addMessage(msg, 'error');
+      CDT.app.addMessage(msg, 'error', msgs);
     });
   });
 
