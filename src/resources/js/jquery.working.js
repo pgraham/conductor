@@ -31,9 +31,10 @@
 
       mask.appendTo(ctx);
       img = mask.find('img');
-      img.offset({
-        top: (mask.height() / 2) - (img.height() / 2),
-        left: (mask.width() / 2) - (img.width() / 2)
+      img.position({
+        my: 'center',
+        at: 'center',
+        of: mask
       });
     });
   };
