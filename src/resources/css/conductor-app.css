@@ -205,6 +205,11 @@
   height: 24px;
 }
 
+.ui-widget input.text.invalid,
+.ui-widget .ui-spinner.invalid {
+  border: 1px solid #C50000;
+}
+
 .ui-button-small.ui-button-text-only .ui-button-text {
   padding: .1em 1em;
   font-size: .8em;
