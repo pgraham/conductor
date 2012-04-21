@@ -242,6 +242,9 @@ class Compiler {
       if ($resource->isDot() || $resource->isDir()) {
         continue;
       }
+      if (substr($resource->getFilename(), 0, 1) === '.') {
+        continue;
+      }
       copy($resource->getPathname(), "$outDir/" . $resource->getFilename());
     }
   }
