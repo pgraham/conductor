@@ -8,19 +8,36 @@
     CDT.widget = {};
   }
 
+  function basicRenderer(dataIndex) {
+    return function (rowData) {
+      return rowData[dataIndex];
+    }
+  }
+
   $.layouts.listLayout = function (list) {
     var toFill = list.find('th.auto-expand'),
+        hdrs = list.find('th'),
+        rows = list.find('tbody tr'),
         width = list.width(),
         allocated = 0,
         remaining,
         fill;
 
-    list.find('th').each(function () {
+    // Remove any set widths so that columns that have had their content changed
+    // can be adjusted by the browser
+    toFill.width('');
+    list.find('tbody td').width('');
+
+    // Determine the amount of width allocated to non auto-expanding columns
+    hdrs.each(function () {
       if (!$(this).is('.auto-expand')) {
         allocated += $(this).outerWidth(true);
       }
     });
 
+    // Divide the remaining width amongst the auto-expand columns. Add any
+    // remainder due to integer division truncation to the right most
+    // auto-expand column
     remaining = width - allocated;
     fill = Math.floor(remaining / toFill.length);
     toFill.each(function () {
@@ -32,11 +49,14 @@
     list.find('tbody').css('top', list.find('thead').outerHeight(true) + 'px');
   };
 
-  function buildBasicRenderer(dataIndex) {
-    return function (rowData) {
-      return rowData[dataIndex];
-    }
-  }
+  $.layouts.listRowLayout = function (row) {
+    var tbl = row.closest('table'),
+        hdrs = tbl.find('thead th');
+
+    row.children().each(function (idx) {
+      $(this).outerWidth(hdrs.eq(idx).outerWidth(true), true);
+    });
+  };
 
   /**
    * Create a new list widget
@@ -51,20 +71,42 @@
     headers = $('<tr/>').appendTo(thead);
 
     function addColumn(lbl, renderer, autoExpand) {
-      if (typeof renderer === 'string') {
-        renderer = buildBasicRenderer(renderer);
+      var config, hdr;
+      if (!$.isPlainObject(lbl)) {
+        // Old style parameters were passed, use them to create a config object
+        config = {
+          lbl: lbl,
+          autoExpand: autoExpand || false
+        };
+        
+        if (typeof renderer === 'string') {
+          config.dataIdx = renderer;
+        } else {
+          config.renderer = renderer;
+        }
+      } else {
+        config = lbl;
       }
-      cols.push(renderer);
 
-      $('<th/>')
+      if (config.dataIdx && !config.renderer) {
+        config.renderer = basicRenderer(config.dataIdx);
+      }
+      cols.push(config.renderer);
+
+      hdr = $('<th/>')
         .addClass('ui-widget-header')
-        .addClass(autoExpand ? 'auto-expand' : '')
-        .append(lbl)
+        .addClass(config.autoExpand ? 'auto-expand' : '')
+        .append(config.lbl)
         .appendTo(headers);
+
+      // NOTE: autoExpand will override width
+      if (config.width) {
+        hdr.width(config.width);
+      }
     }
 
     function addRow(rowData) {
-      var row = $('<tr/>').appendTo(tbody);
+      var row = $('<tr/>').layout('listRowLayout').appendTo(tbody);
 
       $('<input type="checkbox"/>')
         .addClass('cdt-list-row-selector')
@@ -88,11 +130,11 @@
             .append(col(rowData))
         );
       });
+      row.layout();
+    }
 
-      row.children().each(function (idx) {
-        var hdrWidth = headers.children().eq(idx).outerWidth(true)
-        $(this).outerWidth(hdrWidth, true);
-      });
+    function clearSelected() {
+      setAllSelected(false);
     }
 
     function getSelected() {
@@ -124,22 +166,31 @@
         addRow(rowData);
       });
 
+      elm.layout();
       list.fire('load');
+    }
+
+    function selectAll() {
+      setAllSelected(true);
+    }
+
+    function setAllSelected(selected) {
+      tbody.find('.cdt-list-row-selector').prop('checked', selected);
+      list.fire('selection-change');
     }
 
     list = {
       elm: elm,
       addColumn: addColumn,
+      clearSelected: clearSelected,
       getSelected: getSelected,
-      populate: populate
+      populate: populate,
+      selectAll: selectAll
     };
     eventuality(list);
   
     selAll = $('<input type="checkbox"/>').click(function () {
-      tbody.find('.cdt-list-row-selector')
-        .prop('checked', $(this).is(':checked'));
-
-      list.fire('selection-change');
+      setAllSelected($(this).is(':checked'));
     });
     headers.append($('<th/>').addClass('ui-widget-header left-col').append(selAll));
 
