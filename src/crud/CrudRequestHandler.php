@@ -106,10 +106,10 @@ class CrudRequestHandler extends BaseRequestHandler implements RequestHandler {
       $id = $request->getParameter('id');
       if ($id !== null) {
         $this->_crud->update($id, (array) $params);
-        $msg = $this->_info->updateSuccessMsg('name', $params->name);
+        $msg = $this->_info->updateSuccessMsg();
       } else {
         $this->_crud->create((array) $params);
-        $msg = $this->_info->createSuccessMsg('name', $params->name);
+        $msg = $this->_info->createSuccessMsg();
       }
       $response->setData(array( 'msg' => array(
         'text' => $msg,

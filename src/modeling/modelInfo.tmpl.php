@@ -9,8 +9,8 @@ namespace zeptech\dynamic\info;
  */
 class ${actor} {
 
-  public function createSuccessMsg($field, $value) {
-    return ucfirst($this->_successMsg('created', '${article}', $field, $value));
+  public function createSuccessMsg() {
+    return ucfirst($this->_successMsg('created', '${article}')) . '.';
   }
 
   public function duplicateMsg($dupField, $dupValue) {
@@ -60,12 +60,12 @@ class ${actor} {
     return ucfirst($msg) . '.';
   }
 
-  public function updateSuccessMsg($field, $value) {
-    return ucfirst($this->_successMsg('updated', 'the', $field, $value)) . '.';
+  public function updateSuccessMsg() {
+    return ucfirst($this->_successMsg('updated', 'the')) . '.';
   }
 
-  public function _successMsg($action, $article, $field, $value) {
-    return "successfully $action $article ${display} with $field '$value'";
+  public function _successMsg($action, $article) {
+    return "successfully $action $article ${display}";
   }
 
 }
