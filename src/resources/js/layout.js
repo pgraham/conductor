@@ -48,6 +48,9 @@
     if (type === null) {
       return this.each(function () {
         $(this).removeData('layout-fn');
+
+        // Clear the layout on all descendants recursively
+        $(this).children().layout(null);
       });
     }
 
@@ -69,9 +72,7 @@
       }
 
       // Layout all children elements that also have a layout defined
-      ctx.children().each(function () {
-        $(this).layout();
-      });
+      ctx.children().layout();
     });
   };
 
