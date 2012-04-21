@@ -12,7 +12,7 @@
   }
 
   CDT.data.crudProxy = function (colName) {
-    var baseUrl = _p('/' + colName);
+    var baseUrl = _p('/' + colName), cache = {};
 
     return {
       create: function (params, cb) {
@@ -30,6 +30,7 @@
           type: 'DELETE',
           dataType: 'json',
           success: function () {
+            delete cache[id];
             cb({ success: true });
           },
           error: function (jqXHR, textStatus, errorThrown) {
@@ -43,15 +44,29 @@
           type: 'GET',
           data: { 'spf' : JSON.stringify(spf) },
           dataType: 'json',
-          success: cb
+          success: function (response) {
+            $.each(response.data, function (idx, entity) {
+              cache[entity.id] = entity;
+            });
+            cb(response);
+          }
         });
       },
       retrieveOne: function (id, cb) {
+        if (cache[id]) {
+          setTimeout(function () {
+            cb(cache[id]);
+          }, 10);
+          return;
+        }
         $.ajax({
           url: baseUrl + '/' + id,
           type: 'GET',
           dataType: 'json',
-          success: cb
+          success: function (response) {
+            cache[response.id] = response;
+            cb(response);
+          }
         });
       },
       update: function (id, params, cb) {
@@ -60,7 +75,10 @@
           type: 'POST',
           data: { 'params': JSON.stringify(params) },
           dataType: 'json',
-          success: cb
+          success: function (response) {
+            delete cache[id];
+            cb(response);
+          }
         });
       }
     };
