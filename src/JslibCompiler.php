@@ -70,6 +70,16 @@ class JslibCompiler {
       mkdir($jslibOut, 0755, true);
     }
 
+    // Copy external dependencies into output dir
+    $extSrc = "$jslibSrc/external";
+    $extOut = "$jslibOut/external";
+
+    if (!file_exists($extOut)) {
+      mkdir($extOut, 0755, true);
+    }
+
+    copy("$extSrc/globalize.js", "$extOut/globalize.js");
+
     // Collect the javascript source into a single file
     $jsAll = array();
     $scripts = array(

@@ -85,6 +85,8 @@ class PageLoader {
     Element::css($asWebPath(
       "/jslib/jquery-ui/themes/$theme/jquery.ui.theme.css"))->addToHead();
 
+    Element::js($asWebPath('/jslib/jquery-ui/external/globalize.js'))
+      ->addToHead();
     Element::js($asWebPath('/jslib/jquery-ui/jquery.ui.js'))->addToHead();
 
   }
