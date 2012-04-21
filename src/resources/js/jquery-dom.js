@@ -3,23 +3,34 @@
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-if (window['dom'] === undefined) {
-  var dom = {};
+if (window['CDT'] === undefined) {
+  var CDT = {};
 }
-(function ($, dom, undefined) {
+if (CDT.DOM === undefined) {
+  CDT.DOM = {};
+}
 
-  dom.button = function (text, click) {
+(function ($, DOM, undefined) {
+  "use strict";
+
+  DOM.button = function (text, click) {
     return $('<button />')
       .attr('type', 'button')
       .text(text)
       .click(click);
   };
 
-  dom.table = function () {
+  DOM.table = function () {
     return $('<table />')
       .append($('<thead />'))
       .append($('<tbody />'))
       .append($('<tfoot />'))
   };
 
-} (jQuery, dom));
+  DOM.textInput = function (name) {
+    return $('<input/>')
+      .attr('type', 'text')
+      .attr('name', name);
+  }
+
+} (jQuery, CDT.DOM));
