@@ -97,6 +97,7 @@ class PageLoader {
     Element::css($asWebPath('/css/conductor-app.css'))->addToHead();
 
     $scripts = array(
+      '/js/jquery-dom.js',
       '/js/data-store.js',
       '/js/data-crudProxy.js',
       '/js/layout.js',
