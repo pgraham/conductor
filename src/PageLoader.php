@@ -100,6 +100,7 @@ class PageLoader {
       '/js/data-store.js',
       '/js/data-crudProxy.js',
       '/js/layout.js',
+      '/js/layout-hblock.js',
       '/js/widget-section.js',
       '/js/widget-collapsible.js',
       '/js/widget-form.js',
