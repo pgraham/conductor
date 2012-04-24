@@ -45,11 +45,28 @@ class JslibCompiler {
       $this->compileJQueryUi($pathInfo);
       break;
 
+      case 'file-uploader':
+      $this->compileFileUploader($pathInfo);
+      break;
+
       // Default, simply copy the library's source file to the target
       default:
       // TODO
       break;
     }
+  }
+
+  protected function compileFileUploader($pathInfo) {
+    $jslibSrc = "$pathInfo[lib]/jslib/file-uploader";
+    $jslibOut = "$pathInfo[target]/htdocs/jslib/file-uploader";
+
+    if (!file_exists($jslibOut)) {
+      mkdir($jslibOut, 0755, true);
+    }
+
+    copy("$jslibSrc/client/fileuploader.js", "$jslibOut/fileuploader.js");
+    copy("$jslibSrc/client/fileuploader.css", "$jslibOut/fileuploader.css");
+    copy("$jslibSrc/client/loading.gif", "$jslibOut/loading.gif");
   }
 
   protected function compileJQueryCookie($pathInfo) {
