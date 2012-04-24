@@ -11,8 +11,8 @@
     CDT.data = {};
   }
 
-  CDT.data.crudProxy = function (colName) {
-    var baseUrl = _p('/' + colName), cache = {};
+  CDT.data.crudProxy = function (baseUrl) {
+    var baseUrl = _p(baseUrl), cache = {};
 
     return {
       create: function (params, cb) {
