@@ -62,7 +62,7 @@
    * Create a new list widget
    */
   CDT.widget.list = function () {
-    var list, elm, tbl, thead, tbody, headers, selAll, cols = [];
+    var elm, tbl, thead, tbody, headers, selAll, cols = [];
 
     elm = $('<div/>').addClass('cdt-list');
     tbl = $('<table/>').appendTo(elm);
@@ -117,7 +117,7 @@
             tbody.find('.cdt-list-row-selector:not(:checked)').length ===  0
           );
 
-          list.fire('selection-change');
+          elm.trigger('selection-change');
         })
         .appendTo(
           $('<td/>').addClass('ui-widget-content left-col').appendTo(row)
@@ -166,8 +166,7 @@
         addRow(rowData);
       });
 
-      elm.layout();
-      list.fire('load');
+      elm.layout().trigger('load');
     }
 
     function selectAll() {
@@ -176,19 +175,9 @@
 
     function setAllSelected(selected) {
       tbody.find('.cdt-list-row-selector').prop('checked', selected);
-      list.fire('selection-change');
+      elm.trigger('selection-change');
     }
 
-    list = {
-      elm: elm,
-      addColumn: addColumn,
-      clearSelected: clearSelected,
-      getSelected: getSelected,
-      populate: populate,
-      selectAll: selectAll
-    };
-    eventuality(list);
-  
     selAll = $('<input type="checkbox"/>').click(function () {
       setAllSelected($(this).is(':checked'));
     });
@@ -197,7 +186,13 @@
     // Apply list layout
     elm.layout('listLayout');
 
-    return list;
+    return $.extend(elm, {
+      addColumn: addColumn,
+      clearSelected: clearSelected,
+      getSelected: getSelected,
+      populate: populate,
+      selectAll: selectAll
+    });
   };
 
 } (jQuery, CDT));

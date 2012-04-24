@@ -1,76 +1,51 @@
+CDT.ns('CDT.widget');
+
 (function ($, CDT, undefined) {
   "use strict";
 
-  var DEFAULT_PAGE_SIZE  = 10,
-      //lblTmpl = stringTemplate('Displaying {0} - {1} of {2}'),
-      pagerize;
-
-  if (CDT.widget === undefined) {
-    CDT.widget = {};
-  }
-
-  pagerize = function (pager) {
-    eventuality(pager);
-
-    pager.getNumPages = function () {
-      return Math.ceil(this.total / this.pageSize);
-    };
-
-    pager.getPaging = function () {
-      return {
-        limit: this.pageSize,
-        offset: Math.max((this.curPage - 1) * this.pageSize, 0)
-      };
-    };
-
-    pager.setTotal = function (t) {
-      this.total = t;
-
-      if (this.total === 0) {
-        this.curPage = 0;
-      } else if (this.curPage > this.getNumPages()) {
-        this.curPage = this.getNumPages();
-        this.fire('page-change');
-      }
-      this.update();
-    };
-
-    pager.update = function () {
-      var firstIdx, lastIdx, numPages;
-
-      numPages = this.getNumPages();
-
-      if (this.curPage <= 1) {
-        this.prev.button('option', 'disabled', true);
-        this.first.button('option', 'disabled', true);
-      } else {
-        this.prev.button('option', 'disabled', false);
-        this.first.button('option', 'disabled', false);
-      }
-
-      if (this.curPage >= numPages) {
-        this.next.button('option', 'disabled', true);
-        this.last.button('option', 'disabled', true);
-      } else {
-        this.next.button('option', 'disabled', false);
-        this.last.button('option', 'disabled', false);
-      }
-
-      this.pageNum.val(this.curPage);
-      this.numPages.text('of ' + numPages);
-
-      firstIdx = Math.max(0,
-        Math.min(((this.curPage - 1) * this.pageSize) + 1, this.total));
-      lastIdx = Math.min(firstIdx + this.pageSize - 1, this.total);
-
-      //this.lbl.text(lblTmpl.format([firstIdx, lastIdx, this.total]);
-      this.lbl.text('Displaying ' + firstIdx + ' - ' + lastIdx + ' of ' + this.total);
-    };
-  };
+  var DEFAULT_PAGE_SIZE  = 10;
+      //lblTmpl = stringTemplate('Displaying {0} - {1} of {2}');
 
   CDT.widget.pager = function (pageSize) {
-    var pager, elm, first, prev, next, last, pageNum, lbl, update,
-        curPage = 1, total, numPages;
+    var elm, first, prev, next, last, pageNum, numPages, lbl,
+        curPage = 1,
+        total;
+
+    function getNumPages() {
+      return Math.ceil(total / pageSize);
+    }
+
+    function update() {
+      var firstIdx, lastIdx, pages;
+
+      pages = getNumPages();
+
+      if (curPage <= 1) {
+        prev.button('option', 'disabled', true);
+        first.button('option', 'disabled', true);
+      } else {
+        prev.button('option', 'disabled', false);
+        first.button('option', 'disabled', false);
+      }
+
+      if (curPage >= numPages) {
+        next.button('option', 'disabled', true);
+        last.button('option', 'disabled', true);
+      } else {
+        next.button('option', 'disabled', false);
+        last.button('option', 'disabled', false);
+      }
+
+      pageNum.val(curPage);
+      numPages.text('of ' + pages);
+
+      firstIdx = Math.max(0,
+        Math.min(((curPage - 1) * pageSize) + 1, total));
+      lastIdx = Math.min(firstIdx + pageSize - 1, total);
+
+      //this.lbl.text(lblTmpl.format([firstIdx, lastIdx, this.total]));
+      lbl.text('Displaying ' + firstIdx + ' - ' + lastIdx + ' of ' + total);
+    }
 
     first = $('<button/>').text('<<').button({
       icons: { primary: 'ui-icon-arrowthickstop-1-w' },
@@ -106,54 +81,60 @@
       .append(last)
       .append(lbl);
 
-    pager = { 
-      elm: elm,
-      first: first,
-      prev: prev,
-      next: next,
-      last: last,
-      pageNum: pageNum,
-      numPages: numPages,
-      lbl: lbl,
-      pageSize: pageSize || DEFAULT_PAGE_SIZE,
-      curPage: 1,
-    };
-    pagerize(pager);
-
     first.click(function () {
-      pager.curPage = 1;
-      pager.update();
-      pager.fire('page-change');
+      curPage = 1;
+      update();
+      elm.trigger('page-change');
     });
     prev.click(function () {
-      pager.curPage -= 1;
-      pager.update();
-      pager.fire('page-change');
+      curPage -= 1;
+      update();
+      elm.trigger('page-change');
     });
     next.click(function () {
-      pager.curPage += 1;
-      pager.update();
-      pager.fire('page-change');
+      curPage += 1;
+      update();
+      elm.trigger('page-change');
     });
     last.click(function () {
-      pager.curPage = pager.getNumPages();
-      pager.update();
-      pager.fire('page-change');
+      curPage = pager.getNumPages();
+      update();
+      elm.trigger('page-change');
     });
 
     pageNum.on('change', function () {
       var changeTo = parseInt(pageNum.val(), 10);
 
-      if (changeTo > pager.getNumPages()) {
-        pageNum.val(pager.curPage);
+      if (changeTo > getNumPages()) {
+        pageNum.val(curPage);
         return;
       }
 
-      pager.curPage = changeTo;
-      pager.fire('page-change');
+      curPage = changeTo;
+      elm.trigger('page-change');
     });
 
-    return pager;
+    return $.extend(elm, {
+      getNumPages: getNumPages,
+      getPaging: function () {
+        return {
+          limit: pageSize,
+          offset: Math.max((curPage - 1) * pageSize, 0)
+        };
+      },
+      setTotal: function (t) {
+        total = t;
+
+        if (total === 0) {
+          curPage = 0;
+        } else if (curPage > getNumPages()) {
+          curPage = getNumPages();
+          elm.trigger('page-change');
+        }
+        update();
+      },
+      update: update
+    });
   };
 
 } (jQuery, CDT));
