@@ -32,11 +32,9 @@ class CrudRequestHandler extends BaseRequestHandler implements RequestHandler {
   private $_crud;
   private $_info;
   private $_modelName;
-  private $_urlBase;
 
-  public function __construct($modelName, $urlBase) {
+  public function __construct($modelName) {
     $this->_modelName = $modelName;
-    $this->_urlBase = $urlBase;
   }
 
   /**
