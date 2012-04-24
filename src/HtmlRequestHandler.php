@@ -100,17 +100,6 @@ class HtmlRequestHandler extends BaseRequestHandler implements RequestHandler {
         ->addToHead();
     }
 
-    if (isset($anno['service'])) {
-      $services = $anno['service'];
-      if (!is_array($services)) {
-        $services = array($services);
-      }
-
-      foreach ($services as $srvc) {
-        Element::js($asWebPath("/js/$srvc.js"))->addToHead();
-      }
-    }
-
     if (isset($anno['css'])) {
       $sheets = $anno['css'];
       if (!is_array($sheets)) {
@@ -118,7 +107,11 @@ class HtmlRequestHandler extends BaseRequestHandler implements RequestHandler {
       }
 
       foreach ($sheets as $css) {
-        Element::css($asWebPath("/css/$css"))->addToHead();
+        if (substr($css, 0, 1) === '/') {
+          Element::css($asWebPath($css))->addToHead();
+        } else {
+          Element::css($asWebPath("/css/$css"))->addToHead();
+        }
       }
     }
 
@@ -129,7 +122,11 @@ class HtmlRequestHandler extends BaseRequestHandler implements RequestHandler {
       }
       
       foreach ($scripts as $js) {
-        Element::js($asWebPath("/js/$js"))->addToHead();
+        if (substr($js, 0, 1) === '/') {
+          Element::js($asWebPath($js))->addToHead();
+        } else {
+          Element::js($asWebPath("/js/$js"))->addToHead();
+        }
       }
     }
   }
