@@ -17,12 +17,14 @@ namespace conductor;
 use \conductor\CrudService;
 use \conductor\modeling\ModelInfo;
 use \reed\String;
+use \zeptech\anno\Annotations;
 use \zeptech\orm\generator\PersisterGenerator;
 use \zeptech\orm\generator\TransformerGenerator;
 use \zeptech\orm\generator\ValidatorGenerator;
 use \zeptech\orm\QueryBuilder;
 use \zpt\pct\CodeTemplateParser;
 use \DirectoryIterator;
+use \ReflectionClass;
 
 /**
  * This class compiles a site.
@@ -60,6 +62,7 @@ class Compiler {
     $this->compileServices($pathInfo, $ns);
     $this->compileResources($pathInfo, $ns);
     $this->compileJsLibs($pathInfo, $ns);
+    $this->compileModules($pathInfo, $ns);
     $this->compileServerConfigurator($pathInfo, $ns);
   }
 
@@ -87,6 +90,51 @@ class Compiler {
       "$pathInfo[src]/$ns/model",
       "$ns\\model",
       $pathInfo['target']);
+  }
+
+  protected function compileModules($pathInfo, $ns) {
+    $target = "$pathInfo[target]/htdocs";
+    $modDir = "$pathInfo[root]/modules";
+
+    $modules = array();
+    $dir = new DirectoryIterator($modDir);
+    foreach ($dir as $module) {
+      if ($module->isDot() || !$module->isDir()) {
+        continue;
+      }
+
+      $modDir = $module->getPathname();
+      $modName = $module->getBasename();
+      $modDocs = "$modDir/htdocs";
+
+      $modules[] = $modName;
+
+      // We need to first remove any existing module files otherwise the copy
+      // command will copy the module's htdocs folder into the existing module
+      // target instead of creating a copy of htdocs at the module target
+      $modTarget = "$target/$modName";
+      if (file_exists($modTarget)) {
+        $rmCmd = "rm -r $modTarget";
+        exec($rmCmd);
+      }
+      $cpCmd = "cp -a $modDocs $target/$modName";
+      exec($cpCmd);
+
+      // Compile module models and services
+      $modSrc = $module->getPathname() . "/zpt/mod/$modName";
+      $modBaseNs = "zpt\\mod\\$modName";
+
+      $this->_compileModelDir(
+        "$modSrc/model",
+        "$modBaseNs\\model",
+        $pathInfo['target'],
+        "/$modName");
+
+      $this->_compileServiceDir(
+        "$modSrc/srvc",
+        "$modBaseNs\\srvc",
+        $pathInfo['target']);
+    }
   }
 
   protected function compileResources($pathInfo, $ns) {
@@ -124,9 +172,42 @@ class Compiler {
 
     // Build html mappers
     $htmlDir = "$pathInfo[src]/$ns/html";
+    $this->_compileHtmlDir($htmlDir, $ns);
+
+    // Generator the Configurator
+    $values = array( 'mappings' => $this->_mappings );
+    $this->_compileResource($tmplSrc, $tmplOut, $values);
+  }
+
+  protected function compileServices($pathInfo, $ns) {
+    // Compile Conductor models
+    $this->_compileServiceDir(
+      "$pathInfo[lib]/conductor/src/srvc",
+      'conductor\\srvc',
+      $pathInfo['target']);
+
+    // Compile Site models
+    $this->_compileServiceDir(
+      "$pathInfo[src]/$ns/srvc",
+      "$ns\\srvc",
+      $pathInfo['target']);
+  }
+
+  private function _compileHtmlDir($htmlDir, $ns, $tmplBase = '/') {
     $dir = new DirectoryIterator($htmlDir);
     foreach ($dir as $pageDef) {
-      if ($pageDef->isDot() || $pageDef->isDir()) {
+      if ($pageDef->isDot() || substr($pageDef->getFileName(), 0, 1) === '.') {
+        continue;
+      }
+
+      if ($pageDef->isDir()) {
+        if ($tmplBase === '/') {
+          $dirTmplBase = '/' . $pageDef->getBasename();
+        } else {
+          $dirTmplBase = $tmplBase . '/' . $pageDef->getBasename();
+        }
+
+        $this->_compileHtmlDir($pageDef->getPathname(), $ns, $dirTmplBase);
         continue;
       }
 
@@ -138,11 +219,21 @@ class Compiler {
       $pageId = $pageDef->getBasename('.php');
 
       $hdlr = '\conductor\HtmlRequestHandler';
-      $args = array( "'$ns\\html\\$pageId'" );
-      $tmpl = '/' . String::fromCamelCase($pageId) . '.html';
+      if ($tmplBase === '/') {
+        $viewClass = "$ns\\html\\$pageId";
+      } else {
+        $viewNs = str_replace('/', '\\', ltrim($tmplBase, '/'));
+        $viewClass = "$ns\\html\\$viewNs\\$pageId";
+      }
+      $args = array( "'$viewClass'" );
+      $tmpl = $tmplBase . '/' . String::fromCamelCase($pageId) . '.html';
       $tmpls[] = $tmpl;
       if ($pageId === 'Index') {
-        $tmpls[] = '/';
+        if ($tmplBase === '/') {
+          $tmpls[] = $tmplBase;
+        } else {
+          $tmpls[] = rtrim($tmplBase, '/');
+        }
       }
 
       $mapping = array(
@@ -153,17 +244,15 @@ class Compiler {
 
       $this->_mappings[] = $mapping;
     }
-
-    // Generator the Configurator
-    $values = array( 'mappings' => $this->_mappings );
-    $this->_compileResource($tmplSrc, $tmplOut, $values);
   }
 
-  protected function compileServices($pathInfo, $ns) {
-    // TODO
-  }
+  private function _compileModelDir($models, $ns, $target, $urlBase = '') {
+    if (!file_exists($models)) {
+      // Nothing to do here
+      return;
+    }
 
-  private function _compileModelDir($models, $ns, $target) {
+    // TODO These should be class variables
     $persisterGen = new PersisterGenerator($target);
     $transformerGen = new TransformerGenerator($target);
     $validatorGen = new ValidatorGenerator($target);
@@ -207,17 +296,16 @@ class Compiler {
 
       // Create a mapping for the REST server that maps to the CrudService
       $crudInfo = $crudGen->getInfo();
-      $urlBase = '/' . strtolower($crudInfo->getDisplayNamePlural());
+      $url = "$urlBase/" . strtolower($crudInfo->getDisplayNamePlural());
 
       $this->_mappings[] = array(
         'hdlr' => '\\conductor\\crud\\CrudRequestHandler',
         'hdlrArgs' => array(
-          "'$modelClass'",
-          "'$urlBase'"
+          "'$modelClass'"
         ),
         'tmpls' => array (
-          $urlBase,
-          $urlBase . '/{id}'
+          $url,
+          "$url/{id}"
         )
       );
     }
@@ -246,6 +334,40 @@ class Compiler {
         continue;
       }
       copy($resource->getPathname(), "$outDir/" . $resource->getFilename());
+    }
+  }
+
+  private function _compileServiceDir($srvcs, $ns, $target) {
+    if (!file_exists($srvcs)) {
+      // Nothing to do here
+      return;
+    }
+
+    $dir = new DirectoryIterator($srvcs);
+    foreach ($dir as $srvc) {
+      if ($srvc->isDot() || $srvc->isDir()) {
+        continue;
+      }
+
+      $fname = $srvc->getFilename();
+      if (substr($fname, -4) !== '.php') {
+        continue;
+      }
+
+      $srvcName = substr($fname, 0, -4);
+      $srvcClass = "$ns\\$srvcName";
+
+      $annos = new Annotations(new ReflectionClass($srvcClass));
+      $uris = $annos['uri'];
+      if (!is_array($uris)) {
+        $uris = array($uris);
+      }
+
+      $this->_mappings[] = array(
+        'hdlr' => "\\$srvcClass",
+        'hdlrArgs' => array(),
+        'tmpls' => $uris
+      );
     }
   }
 }
