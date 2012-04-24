@@ -14,6 +14,7 @@
  */
 namespace conductor;
 
+use \DirectoryIterator;
 use \Exception;
 use \SplClassLoader;
 
@@ -51,8 +52,7 @@ class Loader {
 
     $libPaths = array(
       'reed' => "$lib/reed/src",
-      'oboe' => "$lib/oboe/src",
-      'bassoon' => "$lib/bassoon/src"
+      'oboe' => "$lib/oboe/src"
     );
 
     foreach ($libPaths as $libName => $libPath) {
@@ -96,5 +96,16 @@ class Loader {
     // Class loader for site classes
     $siteLdr = new SplClassLoader($namespace, $src);
     $siteLdr->register();
+
+    // Register loaders for the site's modules
+    if (file_exists("$root/modules")) {
+      $dir = new DirectoryIterator("$root/modules");
+      foreach ($dir as $mod) {
+        $modName = $mod->getBasename();
+
+        $modLdr = new SplClassLoader("zpt\\mod\\$modName", $mod->getPathName());
+        $modLdr->register();
+      }
+    }
   }
 }
