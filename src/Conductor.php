@@ -217,48 +217,6 @@ class Conductor {
   }
 
   /**
-   * Loads the framework.  This is only necessary when handling non-ajax
-   * requests.
-   *
-   * @param PageTemplate $template The PageTemplate for the response.
-   */
-  public static function load() {
-    global $asWebPath;
-
-    self::_ensureInitialized();
-    // All pages contain a script which declares necessary namespaces and
-    // provides functions which give access to path into.  This script is
-    // built here - TODO - Make this a template so it can be compiled when the
-    // site is deployed
-    // -------------------------------------------------------------------------
-    Element::js($pathInfo->asWebPath('/js/base.js'))->addToHead();
-
-    // Include resources
-    // -------------------------------------------------------------------------
-    $theme = $pageCfg !== null
-      ? $pageCfg->getTheme()
-      : null;
-
-    $resources = new BaseResources($theme);
-
-    if ($pageCfg->requiresJsAppSupport()) {
-      $resources->merge(new JsAppResources());
-    }
-
-    if ($template !== null) {
-      $resources = $resources->merge(
-        self::$_config->getTemplate($template)->getResources());
-      Page::setTemplate($template);
-    }
-
-    if ($pageCfg !== null) {
-      $resources = $resources->merge($pageCfg->getResources());
-    }
-
-    $resources->inc($pathInfo, self::$_config->isDevMode());
-  }
-
-  /**
    * Process the request.
    */
   public static function processRequest() {
