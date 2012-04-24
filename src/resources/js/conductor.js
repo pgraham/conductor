@@ -7,7 +7,11 @@
  */
 var CDT = {};
 
+/**
+ * Page loading.  Hooks in with browser history API.  This needs an overhaul.
+ */
 (function ($, CDT, undefined) {
+  "use strict";
 
   var curPage, curPageSel, loadPage,
 
@@ -130,4 +134,21 @@ $(document).ready(function () {
 
 // Override the jquery.working plugin's path for the loading image to account
 // for the site's configured web root
+// TODO Should this be here?
 jQuery.working.imgPath = _p(jQuery.working.imgPath);
+
+/**
+ * CDT.ns - ensure declared namespace exists.
+ */
+(function (CDT, undefined) {
+
+  CDT.ns = function (ns) {
+    var parts = ns.split('.'), o = window, i, len;
+
+    for (i = 0, len = parts.length; i < len; i++) {
+      o[parts[i]] = o[parts[i]] || {};
+      o = o[parts[i]];
+    }
+
+  };
+} (CDT));
