@@ -17,7 +17,6 @@ if (typeof Function.prototype.method !== 'function') {
 }
 
 // From Javascript: The Good Parts by Douglas Crockford
-// TODO - Move this into a utility script
 var eventuality = function (that) {
   var registry = {};
 
@@ -407,6 +406,7 @@ if (!JSON) {
 // Javascript part for assigning and retrieving a value from an object
 // -----------------------------------------------------------------------------
 
+// TODO Determine a more appropriate spot for this, or if it is even need at all
 var hasValue = function (that, spec) {
   that = that || {};
 
@@ -423,6 +423,22 @@ var hasValue = function (that, spec) {
 
   return that;
 };
+
+// Add trim, ltrim and rtrim functions to strings
+(function () {
+  "use strict";
+  String.prototype.trim = function (chars) {
+    return this.replace(/^\s+|\s+$/g, '');
+  }
+
+  String.prototype.ltrim = function () {
+    return this.replace(/^\s+/, '');
+  }
+
+  String.prototype.rtime = function () {
+    return this.replace(/\s+$/, '');
+  }
+}());
 
 // Add a date function that converts a given date string or object representing
 // a UTC time to localtime
