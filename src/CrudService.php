@@ -23,6 +23,9 @@ use \zeptech\orm\generator\model\Parser as ModelParser;
  * This class encapsulates information about a CRUD remote service for a model
  * class.
  *
+ * TODO This class should only be used during compilation, update it to match
+ *      the interface of the clarinet model actors
+ *
  * @author Philip Graham <philip@zeptech.ca>
  */
 class CrudService {
@@ -37,10 +40,7 @@ class CrudService {
     $this->_srvcInfo = new CrudServiceInfo($model);
   }
 
-  public function generate() {
-    $pathInfo = Conductor::getPathInfo();
-    $asWebPath = $pathInfo->asWebPath;
-
+  public function generate($pathInfo) {
     $generator = new CrudServiceGenerator($this->_srvcInfo);
     $generator->generate($pathInfo);
   }

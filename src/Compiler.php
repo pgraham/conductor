@@ -81,12 +81,14 @@ class Compiler {
   protected function compileModels($pathInfo, $ns) {
     // Compile Conductor models
     $this->_compileModelDir(
+      $pathInfo,
       "$pathInfo[lib]/conductor/src/model",
       'conductor\\model',
       $pathInfo['target']);
 
     // Compile Site models
     $this->_compileModelDir(
+      $pathInfo,
       "$pathInfo[src]/$ns/model",
       "$ns\\model",
       $pathInfo['target']);
@@ -125,6 +127,7 @@ class Compiler {
       $modBaseNs = "zpt\\mod\\$modName";
 
       $this->_compileModelDir(
+        $pathInfo,
         "$modSrc/model",
         "$modBaseNs\\model",
         $pathInfo['target'],
@@ -246,7 +249,9 @@ class Compiler {
     }
   }
 
-  private function _compileModelDir($models, $ns, $target, $urlBase = '') {
+  private function _compileModelDir($pathInfo, $models, $ns, $target,
+      $urlBase = '')
+  {
     if (!file_exists($models)) {
       // Nothing to do here
       return;
@@ -292,7 +297,7 @@ class Compiler {
       */
       // Generate a crud service for the model
       $crudGen = new CrudService($modelClass);
-      $crudGen->generate();
+      $crudGen->generate($pathInfo);
 
       // Create a mapping for the REST server that maps to the CrudService
       $crudInfo = $crudGen->getInfo();
