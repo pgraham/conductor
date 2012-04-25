@@ -34,9 +34,7 @@ class CrudService {
   private $_webPath;
 
   public function __construct($modelClass) {
-    $pathInfo = Conductor::getPathInfo();
     $model = ModelParser::getModel($modelClass);
-
     $this->_srvcInfo = new CrudServiceInfo($model);
   }
 
