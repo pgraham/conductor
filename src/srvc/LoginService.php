@@ -12,8 +12,12 @@
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
  */
-namespace conductor;
+namespace conductor\srvc;
 
+use \zeptech\rest\BaseRequestHandler;
+use \zeptech\rest\RequestHandler;
+use \zeptech\rest\Request;
+use \zeptech\rest\Response;
 use \LightOpenId;
 
 /**
@@ -21,19 +25,23 @@ use \LightOpenId;
  *
  * @author Philip Graham <philip@zeptech.ca>
  *
- * @Service(name = LoginService)
- * @CsrfToken conductorsessid
- * @Requires Autoloader.php
+ * @Uri /login
+ * @Uri /logout
  */
-class LoginService {
+class LoginService extends BaseRequestHandler implements RequestHandler {
 
-  /**
-   * Initiate Conductor.
-   */
-  public function __construct() {
-    Conductor::init();
+  public function post(Request $request, Response $response) {
+    $uri = $request->getUri();
+
+    $data = $request->getData();
+    if ($uri === '/login') {
+      $response->setData($this->login($data['uname'], $data['pw']));
+    } else if ($uri === '/logout') {
+      $response->setData($this->logout());
+    }
   }
 
+  // TODO - This needs to be handled by the service
   public function googleLogin() {
     Auth::openIdLogin('https://www.google.com/accounts/o8/id');
     $openId = Auth::getOpenId();
@@ -72,13 +80,20 @@ class LoginService {
     Auth::login($username, $password);
 
     if (Auth::$session->getUser() === null) {
-      return Array('msg' => 'Invalid username or password');
+      return array(
+        'success' => false,
+        'msg' => 'Invalid username or password'
+      );
     } else {
-      return Array('msg' => null);
+      return array(
+        'success' => true,
+        'msg' => null
+      );
     }
   }
 
   public function logout() {
     setcookie('conductorsessid', '', time() - 3600, '/');
+    return array('success' => true);
   }
 }

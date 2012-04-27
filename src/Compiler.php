@@ -196,7 +196,9 @@ class Compiler {
       $pathInfo['target']);
   }
 
-  private function _compileHtmlDir($htmlDir, $ns, $tmplBase = '/') {
+  private function _compileHtmlDir($htmlDir, $ns, $tmplBase = '') {
+    $tmplBase = rtrim($tmplBase, '/');
+
     $dir = new DirectoryIterator($htmlDir);
     foreach ($dir as $pageDef) {
       if ($pageDef->isDot() || substr($pageDef->getFileName(), 0, 1) === '.') {
@@ -204,12 +206,7 @@ class Compiler {
       }
 
       if ($pageDef->isDir()) {
-        if ($tmplBase === '/') {
-          $dirTmplBase = '/' . $pageDef->getBasename();
-        } else {
-          $dirTmplBase = $tmplBase . '/' . $pageDef->getBasename();
-        }
-
+        $dirTmplBase = $tmplBase . '/' . $pageDef->getBasename();
         $this->_compileHtmlDir($pageDef->getPathname(), $ns, $dirTmplBase);
         continue;
       }
@@ -232,11 +229,7 @@ class Compiler {
       $tmpl = $tmplBase . '/' . String::fromCamelCase($pageId) . '.html';
       $tmpls[] = $tmpl;
       if ($pageId === 'Index') {
-        if ($tmplBase === '/') {
-          $tmpls[] = $tmplBase;
-        } else {
-          $tmpls[] = rtrim($tmplBase, '/');
-        }
+        $tmpls[] = $tmplBase . '/';
       }
 
       $mapping = array(

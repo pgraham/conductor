@@ -97,7 +97,7 @@ CDT.ns('CDT.widget');
       elm.trigger('page-change');
     });
     last.click(function () {
-      curPage = pager.getNumPages();
+      curPage = getNumPages();
       update();
       elm.trigger('page-change');
     });

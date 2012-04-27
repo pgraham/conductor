@@ -43,6 +43,9 @@ class HtmlRequestHandler extends BaseRequestHandler implements RequestHandler {
     $page = Page::getInstance();
     $this->_parsePage($page);
 
+    $pageImpl = $this->_pageDef->newInstance();
+    $page->bodyAdd($pageImpl->getContent());
+
     $response->setData($page);
   }
 
@@ -70,9 +73,12 @@ class HtmlRequestHandler extends BaseRequestHandler implements RequestHandler {
     Element::css($asWebPath('/css/cdt.css'))->addToHead();
 
     // JQuery and plugins
+    $uitheme = isset($anno['page']['uitheme'])
+      ? $anno['page']['uitheme']
+      : null;
     PageLoader::loadJQuery();
     PageLoader::loadJQueryCookie();
-    PageLoader::loadJQueryUi($anno['page']['uitheme']);
+    PageLoader::loadJQueryUi($uitheme);
 
     Element::js($asWebPath('/js/jquery.working.js'))->addToHead();
 

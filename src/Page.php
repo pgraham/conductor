@@ -128,7 +128,7 @@ class Page extends \oboe\Page {
    *
    * @param element
    */
-  protected function bodyAdd(FlowContent $element) {
+  public function bodyAdd(FlowContent $element) {
     if ($this->_template !== null) {
       $this->_template->getContentContainer()->add($element);
     } else {

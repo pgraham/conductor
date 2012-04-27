@@ -61,8 +61,12 @@
     logout = $('<button>Logout</button>').button()
       .addClass('ui-button-small')
       .click(function () {
-        window['LoginService'].logout(function () {
-          window.location.href = _p('/index.php');
+        $.ajax({
+          url: _p('/logout'),
+          type: 'POST',
+          success: function () {
+            window.location.href = _p('/index.php');
+          }
         });
       });
     viewSite = $('<button>View Site</button>').button()
