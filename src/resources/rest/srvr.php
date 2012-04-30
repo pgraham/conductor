@@ -25,6 +25,8 @@ spl_autoload_register(function ($classname) use ($cdtPath) {
   $relPath = str_replace('\\', '/', substr($classname, 10));
   $fullPath = "$cdtPath/$relPath.php";
 
-  require $fullPath;
+  if (file_exists($fullPath)) {
+    require $fullPath;
+  }
 });
 \conductor\Conductor::init("$siteRoot/conductor.cfg.xml");

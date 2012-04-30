@@ -240,7 +240,11 @@ class Conductor {
         $server->setData($_POST);
       }
 
-      $server->setAcceptType($_SERVER['HTTP_ACCEPT']);
+      if (isset($_SERVER['HTTP_ACCEPT'])) {
+        $server->setAcceptType($_SERVER['HTTP_ACCEPT']);
+      } else {
+        $server->setAcceptType('*/*');
+      }
 
       // Process the request
       $server->handleRequest($action, $resource);

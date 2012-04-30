@@ -49,6 +49,10 @@ class JslibCompiler {
       $this->compileFileUploader($pathInfo);
       break;
 
+      case 'galleria':
+      $this->compileGalleria($pathInfo);
+      break;
+
       // Default, simply copy the library's source file to the target
       default:
       // TODO
@@ -67,6 +71,26 @@ class JslibCompiler {
     copy("$jslibSrc/client/fileuploader.js", "$jslibOut/fileuploader.js");
     copy("$jslibSrc/client/fileuploader.css", "$jslibOut/fileuploader.css");
     copy("$jslibSrc/client/loading.gif", "$jslibOut/loading.gif");
+  }
+
+  protected function compileGalleria($pathInfo) {
+    $jslibSrc = "$pathInfo[lib]/jslib/galleria/src";
+    $jslibOut = "$pathInfo[target]/htdocs/jslib/galleria";
+
+    if (!file_exists($jslibOut)) {
+      mkdir($jslibOut, 0755, true);
+    }
+    copy("$jslibSrc/galleria.js", "$jslibOut/galleria.js");
+
+    $themeSrc = "$jslibSrc/themes/classic";
+    $themeOut = "$jslibOut/themes/classic";
+    if (!file_exists($themeOut)) {
+      mkdir($themeOut, 0755, true);
+    }
+    copy("$themeSrc/galleria.classic.js", "$themeOut/galleria.classic.js");
+    copy("$themeSrc/galleria.classic.css", "$themeOut/galleria.classic.css");
+    copy("$themeSrc/classic-loader.gif", "$themeOut/classic-loader.gif");
+    copy("$themeSrc/classic-map.png", "$themeOut/classic-map.png");
   }
 
   protected function compileJQueryCookie($pathInfo) {

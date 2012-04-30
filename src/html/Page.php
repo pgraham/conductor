@@ -13,10 +13,8 @@
  * @license http://www.opensource.org/licenses/bsd-license.php
  * @package conductor
  */
-namespace conductor;
+namespace conductor\html;
 
-use \conductor\template\PageTemplate;
-use \conductor\template\TemplateValidator;
 use \conductor\Conductor;
 use \oboe\struct\FlowContent;
 
@@ -106,12 +104,6 @@ class Page extends \oboe\Page {
    * =========================================================================
    */
 
-  /*
-   * If set, any items added to the body will actually be added to the div
-   * specified by the template as the content area.
-   */
-  private $_template;
-
   /* Whether or not the page's dump method has been called */
   private $_dumped = false;
 
@@ -120,20 +112,6 @@ class Page extends \oboe\Page {
 
   protected function __construct() {
     parent::__construct();
-  }
-
-  /**
-   * Override the add to body method to add the given element to the template
-   * if one is set.
-   *
-   * @param element
-   */
-  public function bodyAdd(FlowContent $element) {
-    if ($this->_template !== null) {
-      $this->_template->getContentContainer()->add($element);
-    } else {
-      parent::bodyAdd($element);
-    }
   }
 
   /**
@@ -179,53 +157,16 @@ class Page extends \oboe\Page {
 
   /**
    * Set the page's template.  Once this is set, any items added to the body
-   * will be added to the div the specified by the template as the area where
+   * will be added to the div specified by the template as the area where
    * content is placed.
    *
    * @param template
    * @throws Exception
    */
   protected function setPageTemplate(PageTemplate $template) {
-    // Template can only be set once
-    if ($this->_template !== null) {
-      throw new Exception(
-        'Cannot set the page template more than once');
+    $container = $template->initialize($this);
+    if ($container !== null) {
+      $this->_body = $container;
     }
-
-    if (Conductor::isDevMode()) {
-      $validator = new TemplateValidator($template);
-      $validator->validate();
-    }
-
-    // If there is a debug catcher set its container to the one defined by
-    // the template
-    $dc = $template->getDebugContainer();
-    if ($this->_debugCatcher !== null && $dc !== null) {
-      $this->_debugCatcher->setOutputContainer($dc);
-    }
-
-    // Set the page's title to be the base title in case the page is
-    // dumped without one
-    $baseTitle = $template->getBaseTitle();
-    if ($baseTitle !== null) {
-      $this->_head->setTitle($baseTitle);
-    }
-
-    $this->_template = $template;
-  }
-
-  /**
-   * Override the setTitle method to honour any template's base title.
-   *
-   * @param string title
-   */
-  public function setPageTitle($title) {
-    if ($this->_template !== null) {
-      $baseTitle = $this->_template->getBaseTitle();
-      if ($baseTitle !== null) {
-        $title = $baseTitle.' - '.$title;
-      }
-    }
-    parent::setPageTitle($title);
   }
 }

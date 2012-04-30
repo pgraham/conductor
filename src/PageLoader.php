@@ -17,6 +17,7 @@ namespace conductor;
 
 use \conductor\admin\AdminClient;
 use \conductor\auth\AuthorizationException;
+use \conductor\html\Page;
 use \conductor\jslib\JsLib;
 use \conductor\widget\ModelEditor;
 use \conductor\widget\LoginForm;

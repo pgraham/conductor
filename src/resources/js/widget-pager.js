@@ -28,7 +28,7 @@ CDT.ns('CDT.widget');
         first.button('option', 'disabled', false);
       }
 
-      if (curPage >= numPages) {
+      if (curPage >= pages) {
         next.button('option', 'disabled', true);
         last.button('option', 'disabled', true);
       } else {

@@ -65,7 +65,7 @@
           url: _p('/logout'),
           type: 'POST',
           success: function () {
-            window.location.href = _p('/index.php');
+            window.location.href = _p('/');
           }
         });
       });
@@ -73,7 +73,7 @@
       .addClass('ui-button-small')
       .click(function () {
         if (previewWnd === undefined || previewWnd.closed) {
-          previewWnd = window.open(_p('/index.php'), 'preview');
+          previewWnd = window.open(_p('/'), 'preview');
         } else {
           previewWnd.location.reload();
           previewWnd.focus();

@@ -12,21 +12,23 @@
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
  */
-namespace conductor;
+namespace conductor\html;
+
+use \oboe\Element;
 
 /**
- * Interface for classes that encapsulate a view.
+ * Base implementations of a PageTemplate.
  *
- * @author Philip Graham <philip@zeptech.ca>
+ * @author Philip Graham
  */
-interface View {
+class BasePageTemplate implements PageTemplate {
 
-  /**
-   * This method is responsible for returning a string or stringable object
-   * representing the HTML content of the page.
-   *
-   * @return string|stringable
-   */
-  public function getContent();
+  public function getBaseTitle() {
+    return null;
+  }
+
+  public function getContentContainer() {
+    return Element::div();
+  }
 
 }

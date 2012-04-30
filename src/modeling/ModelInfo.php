@@ -15,7 +15,7 @@
 namespace conductor\modeling;
 
 use \zeptech\orm\generator\model\Model;
-use \zeptech\orm\generator\AbstractGenerator;
+use \zeptech\orm\generator\AbstractModelGenerator;
 use \zpt\pct\CodeTemplateParser;
 
 /**
@@ -26,7 +26,7 @@ use \zpt\pct\CodeTemplateParser;
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class ModelInfo extends AbstractGenerator {
+class ModelInfo extends AbstractModelGenerator {
 
   private static $_cache = array();
 
@@ -61,7 +61,7 @@ class ModelInfo extends AbstractGenerator {
       file_get_contents(__DIR__ . '/modelInfo.tmpl.php'));
   }
 
-  protected function _generate(Model $model) {
+  protected function _generateForModel(Model $model) {
     $displayName = $model->getDisplayName();
     if ($displayName === null) {
       $actorParts = explode('_', $model->getActor());

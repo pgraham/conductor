@@ -14,8 +14,9 @@
  */
 namespace conductor;
 
-use \conductor\CrudService;
+use \conductor\html\HtmlProvider;
 use \conductor\modeling\ModelInfo;
+use \conductor\CrudService;
 use \reed\String;
 use \zeptech\anno\Annotations;
 use \zeptech\orm\generator\PersisterGenerator;
@@ -33,6 +34,8 @@ use \ReflectionClass;
  */
 class Compiler {
 
+  private $_htmlProvider;
+
   private $_compressed;
   private $_tmplParser;
   private $_jslibCompiler;
@@ -49,6 +52,8 @@ class Compiler {
   }
 
   public function compile($pathInfo, $ns) {
+    $this->_initGenerators($pathInfo['target']);
+
     // Compile server dispatcher
     copy(
       "$pathInfo[lib]/conductor/src/resources/rest/.htaccess",
@@ -201,6 +206,7 @@ class Compiler {
 
     $dir = new DirectoryIterator($htmlDir);
     foreach ($dir as $pageDef) {
+      $tmpls = array();
       if ($pageDef->isDot() || substr($pageDef->getFileName(), 0, 1) === '.') {
         continue;
       }
@@ -217,19 +223,30 @@ class Compiler {
       }
 
       $pageId = $pageDef->getBasename('.php');
+      if (strlen($pageId) > 8 && substr($pageId, -8) === 'Template') {
+        // This file is a page template definition
+        continue;
+      }
 
-      $hdlr = '\conductor\HtmlRequestHandler';
-      if ($tmplBase === '/') {
+      if ($tmplBase === '') {
         $viewClass = "$ns\\html\\$pageId";
       } else {
         $viewNs = str_replace('/', '\\', ltrim($tmplBase, '/'));
         $viewClass = "$ns\\html\\$viewNs\\$pageId";
       }
+
+      $this->_htmlProvider->generate($viewClass);
+
+      $hdlr = '\conductor\html\HtmlRequestHandler';
       $args = array( "'$viewClass'" );
-      $tmpl = $tmplBase . '/' . String::fromCamelCase($pageId) . '.html';
-      $tmpls[] = $tmpl;
+      $tmpls[] = $tmplBase . '/' . String::fromCamelCase($pageId) . '.html';
+      $tmpls[] = $tmplBase . '/' . String::fromCamelCase($pageId) . '.php';
       if ($pageId === 'Index') {
-        $tmpls[] = $tmplBase . '/';
+        if ($tmplBase === '') {
+          $tmpls[] = '/';
+        } else {
+          $tmpls[] = $tmplBase;
+        }
       }
 
       $mapping = array(
@@ -367,5 +384,9 @@ class Compiler {
         'tmpls' => $uris
       );
     }
+  }
+
+  private function _initGenerators($target) {
+    $this->_htmlProvider = new HtmlProvider($target);
   }
 }
