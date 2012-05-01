@@ -71,7 +71,8 @@ class HtmlProvider extends AbstractGenerator {
     }
 
     $values = array(
-      'actor' => str_replace('\\', '_', $className)
+      'actor' => str_replace('\\', '_', $className),
+      'jscripts' => array()
     );
 
     $title = null;
@@ -91,6 +92,14 @@ class HtmlProvider extends AbstractGenerator {
         } else {
           $title = $template['title'];
         }
+      }
+
+      if (isset($template['script'])) {
+        $jscripts = $template['script'];
+        if (!is_array($jscripts)) {
+          $jscripts = array($jscripts);
+        }
+        $values['jscripts'] = array_merge($values['jscripts'], $jscripts);
       }
     }
     $values['title'] = $title;
@@ -149,15 +158,18 @@ class HtmlProvider extends AbstractGenerator {
         $jscripts = array($page['script']);
       }
 
-      $values['jscripts'] = array();
-      foreach ($jscripts as $js) {
-        if (substr($js, 0, 1) === '/') {
-          $values['jscripts'][] = $asWebPath($js);
-        } else {
-          $values['jscripts'][] = $asWebPath("/js/$js");
-        }
+      $values['jscripts'] = array_merge($values['jscripts'], $jscripts);
+    }
+
+    $resolved = array();
+    foreach ($values['jscripts'] as $js) {
+      if (substr($js, 0, 1) === '/') {
+        $resolved[] = $asWebPath($js);
+      } else {
+        $resolved[] = $asWebPath("/js/$js");
       }
     }
+    $values['jscripts'] = $resolved;
 
     $values['hasContent'] = false;
     if ($pageDef->hasMethod('getContent')) {
