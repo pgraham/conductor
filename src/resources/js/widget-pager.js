@@ -11,6 +11,8 @@ CDT.ns('CDT.widget');
         curPage = 1,
         total;
 
+    pageSize = pageSize || DEFAULT_PAGE_SIZE;
+
     function getNumPages() {
       return Math.ceil(total / pageSize);
     }
