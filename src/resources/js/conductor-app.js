@@ -133,6 +133,15 @@
     $('body').ajaxError(function (e, xhr, opts, err) {
       var response, msg, msgs;
 
+      if (xhr.status === 401) {
+        // Request was unauthorized, reload the current page to request
+        // authorization.
+        // TODO This will need to be made smarter, possibly will need to build a
+        //      login form dynamically and authorize async.
+        window.location.reload();
+        return;
+      }
+
       if (opts.dataType === 'json') {
         response = $.parseJSON(xhr.responseText);
 

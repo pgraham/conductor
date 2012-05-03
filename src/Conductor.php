@@ -14,6 +14,7 @@
  */
 namespace conductor;
 
+use \conductor\auth\AuthorizationException;
 use \conductor\jslib\JsLib;
 use \conductor\resources\BaseResources;
 use \conductor\resources\JsAppResources;
@@ -257,6 +258,14 @@ class Conductor {
         header($header);
       }
       echo $response;
+
+    } catch (AuthorizationException $e) {
+      error_log($e->getMessage());
+      error_log($e->getTraceAsString());
+
+      header('HTTP/1.1 401 Unauthorized');
+      // TODO Add appropriate WWW-Authenticate header
+      echo "You are not authorized to $action the requested resource.";
 
     } catch (Exception $e) {
       error_log($e->getMessage());
