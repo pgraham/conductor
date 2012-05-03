@@ -103,6 +103,10 @@ class Compiler {
     $target = "$pathInfo[target]/htdocs";
     $modDir = "$pathInfo[root]/modules";
 
+    if (!file_exists($modDir)) {
+      return;
+    }
+
     $modules = array();
     $dir = new DirectoryIterator($modDir);
     foreach ($dir as $module) {
