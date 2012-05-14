@@ -16,6 +16,7 @@
 namespace conductor;
 
 use \conductor\auth\Authenticate;
+use \conductor\auth\AuthorizationException;
 use \conductor\auth\Authorize;
 use \conductor\auth\AuthService;
 use \conductor\auth\SessionManager;
@@ -42,6 +43,19 @@ class Auth {
 
   private static $_openId;
   private static $_visitor;
+
+  /**
+   * Check if the current session has the requested authorization and if not
+   * throw an exception
+   *
+   * @param string $permName
+   * @param string $level Default 'write'
+   */
+  public static function checkPermission($permName, $level = 'write') {
+    if (!self::hasPermission($permName, $level)) {
+      throw new AuthorizationException("$permName:$level");
+    }
+  }
 
   /**
    * Getter for the current openId status.
