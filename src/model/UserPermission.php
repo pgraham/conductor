@@ -11,7 +11,6 @@
  * =============================================================================
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
- * @package conductor/model
  */
 namespace conductor\model;
 
@@ -23,9 +22,9 @@ use \conductor\model\User;
  * access level to the relationship.  The relationship is many to many.
  *
  * @author Philip Graham <philip@zeptech.ca>
- * @package conductor/model
  *
  * @Entity(table = users_permissions_link)
+ * @NoCrud
  */
 class UserPermission {
 

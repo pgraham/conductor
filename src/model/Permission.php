@@ -22,6 +22,7 @@ namespace conductor\model;
  * @package conductor/model
  *
  * @Entity(table = permissions)
+ * @NoCrud
  */
 class Permission {
 

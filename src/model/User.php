@@ -20,6 +20,7 @@ namespace conductor\model;
  * @author Philip Graham <philip@zeptech.ca>
  *
  * @Entity(table = users)
+ * @NoCrud
  */
 class User {
 

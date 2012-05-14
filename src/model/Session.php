@@ -23,6 +23,7 @@ namespace conductor\model;
  * @author Philip Graham <philip@zeptech.ca>
  *
  * @Entity(table = session)
+ * @NoCrud
  */
 class Session {
 
