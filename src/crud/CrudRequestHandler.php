@@ -99,14 +99,13 @@ class CrudRequestHandler extends BaseRequestHandler implements RequestHandler {
 
     try {
       $data = $request->getData();
-      $params = json_decode($data['params']);
 
       $id = $request->getParameter('id');
       if ($id !== null) {
-        $this->_crud->update($id, (array) $params);
+        $this->_crud->update($id, $data);
         $msg = $this->_info->updateSuccessMsg();
       } else {
-        $this->_crud->create((array) $params);
+        $this->_crud->create($data);
         $msg = $this->_info->createSuccessMsg();
       }
       $response->setData(array( 'msg' => array(
@@ -133,6 +132,9 @@ class CrudRequestHandler extends BaseRequestHandler implements RequestHandler {
     }
 
     try {
+      $data = $request->getData();
+
+      // TODO What is allowed to be PUT?
     } catch (CrudException $e) {
       $response->header($e->getResponseHeader());
       $response->setData($e->getResponseMessage());

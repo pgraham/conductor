@@ -19,7 +19,9 @@
         $.ajax({
           url: baseUrl,
           type: 'POST',
-          data: { 'params': JSON.stringify(params) },
+          data: JSON.stringify(params),
+          contentType: 'application/json',
+          processData: false,
           dataType: 'json',
           success: cb
         });
@@ -73,7 +75,9 @@
         $.ajax({
           url: baseUrl + '/' + id,
           type: 'POST',
-          data: { 'params': JSON.stringify(params) },
+          data: JSON.stringify(params),
+          contentType: 'application/json',
+          processData: false,
           dataType: 'json',
           success: function (response) {
             delete cache[id];
