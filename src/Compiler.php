@@ -291,6 +291,7 @@ class Compiler {
 
       $modelName = substr($fname, 0, -4);
       $modelClass = "$ns\\$modelName";
+      $annos = new Annotations(new ReflectionClass($modelClass));
 
       // TODO - Update generators to receive an injected template parser.
       $persisterGen->generate($modelClass);
@@ -299,34 +300,26 @@ class Compiler {
       $infoGen->generate($modelClass);
       $queryBuilderGen->generate($modelClass);
 
-      /* TODO - Implement this interface
-      $crudInfo = new ModelCrudInfo($modelClass);
-      if ($crudInfo->hasCrudService()) {
-        $crudGen = new CrudService($crudInfo);
-        $crudGen->generate();
+      if ( !isset($annos['nocrud']) ) {
+        // Generate a crud service for the model
+        $crudGen = new CrudService($modelClass);
+        $crudGen->generate($pathInfo);
 
-        $urlBase = ...
-        // ...
+        // Create a mapping for the REST server that maps to the CrudService
+        $crudInfo = $crudGen->getInfo();
+        $url = "$urlBase/" . strtolower($crudInfo->getDisplayNamePlural());
+
+        $this->_mappings[] = array(
+          'hdlr' => '\\conductor\\crud\\CrudRequestHandler',
+          'hdlrArgs' => array(
+            "'$modelClass'"
+          ),
+          'tmpls' => array (
+            $url,
+            "$url/{id}"
+          )
+        );
       }
-      */
-      // Generate a crud service for the model
-      $crudGen = new CrudService($modelClass);
-      $crudGen->generate($pathInfo);
-
-      // Create a mapping for the REST server that maps to the CrudService
-      $crudInfo = $crudGen->getInfo();
-      $url = "$urlBase/" . strtolower($crudInfo->getDisplayNamePlural());
-
-      $this->_mappings[] = array(
-        'hdlr' => '\\conductor\\crud\\CrudRequestHandler',
-        'hdlrArgs' => array(
-          "'$modelClass'"
-        ),
-        'tmpls' => array (
-          $url,
-          "$url/{id}"
-        )
-      );
     }
   }
 
