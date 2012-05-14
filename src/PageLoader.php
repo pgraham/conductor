@@ -16,7 +16,6 @@
 namespace conductor;
 
 use \conductor\admin\AdminClient;
-use \conductor\auth\AuthorizationException;
 use \conductor\html\Page;
 use \conductor\jslib\JsLib;
 use \conductor\widget\ModelEditor;
@@ -48,6 +47,14 @@ class PageLoader {
       return null;
     }
     return $page->getTitle();
+  }
+
+  /**
+   * Add DateJs to the page.
+   */
+  public static function loadDateJs() {
+    global $asWebPath;
+    Element::js($asWebPath('/jslib/datejs/date.js'))->addToHead();
   }
 
   /**
