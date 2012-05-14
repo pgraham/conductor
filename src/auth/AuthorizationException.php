@@ -15,6 +15,8 @@
  */
 namespace conductor\auth;
 
+use \Exception;
+
 /**
  * Clarinet exception class.  All messages are prepended with 'Clarinet: '.
  * The constructor is also overloaded to allow a previous exception to be
@@ -23,16 +25,7 @@ namespace conductor\auth;
  * @author Philip Graham <philip@zeptech.ca>
  * @package conductor/auth
  */
-class AuthorizationException extends \Exception {
-
-  /* Used by PageLoader::loadPage to customize the returned login form */
-  private $_usernameLbl;
-
-  /* Used by PageLoader::loadPage to customize the returned login form */
-  private $_passwordLbl;
-
-  /** Array of additional infomation to add to the bottom of the login form */
-  private $_content = array();
+class AuthorizationException extends Exception {
 
   /**
    * Create a new authorization exception.  Throwing an authorization exception
@@ -48,29 +41,5 @@ class AuthorizationException extends \Exception {
    */
   public function __construct($msg = null) {
     parent::__construct($msg);
-  }
-
-  public function add($ctnt) {
-    $this->_content[] = $ctnt;
-  }
-
-  public function getContent() {
-    $this->_content;
-  }
-
-  public function getPasswordLabel() {
-    return $this->_passwordLbl;
-  }
-
-  public function getUsernameLabel() {
-    return $this->_usernameLbl;
-  }
-
-  public function setPasswordLabel($passwordLbl) {
-    $this->_passwordLbl = $passwordLbl;
-  }
-
-  public function setUsernameLabel($usernameLbl) {
-    $this->_usernameLbl = $usernameLbl;
   }
 }
