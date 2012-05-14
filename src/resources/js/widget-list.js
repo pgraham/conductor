@@ -1,12 +1,10 @@
+CDT.ns('CDT.widget');
+
 /**
  * CDT.widget.list
  */
 (function ($, CDT, undefined) {
   "use strict";
-
-  if (CDT.widget === undefined) {
-    CDT.widget = {};
-  }
 
   function basicRenderer(dataIndex) {
     return function (rowData) {
@@ -91,13 +89,17 @@
       if (config.dataIdx && !config.renderer) {
         config.renderer = basicRenderer(config.dataIdx);
       }
-      cols.push(config.renderer);
+      cols.push(config);
 
       hdr = $('<th/>')
         .addClass('ui-widget-header')
         .addClass(config.autoExpand ? 'auto-expand' : '')
         .append(config.lbl)
         .appendTo(headers);
+
+      if (config.align) {
+        align(hdr, config.align);
+      }
 
       // NOTE: autoExpand will override width
       if (config.width) {
@@ -124,13 +126,42 @@
         );
 
       $.each(cols, function (idx, col) {
-        row.append(
-          $('<td/>')
-            .addClass('ui-widget-content')
-            .append(col(rowData))
-        );
+        var cell, ctnt;
+        
+        ctnt = col.renderer(rowData);
+        cell = $('<td/>')
+          .addClass('ui-widget-content')
+          .appendTo(row);
+
+        if ($.isArray(ctnt)) {
+          $.each(ctnt, function (idx, item) {
+            cell.append(item);
+          });
+        } else {
+          cell.append(ctnt);
+        }
+
+        if (col.align) {
+          align(cell, col.align);
+        }
       });
       row.layout();
+    }
+
+    function align(elm, align) {
+      switch (align) {
+        case 'center':
+        elm.css('text-align', 'center');
+        break;
+
+        case 'right':
+        elm.css('text-align', 'right');
+        break;
+
+        case 'left':
+        elm.css('text-align', 'left');
+        break;
+      }
     }
 
     function clearSelected() {
