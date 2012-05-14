@@ -103,7 +103,7 @@
 .cdt-list td {
   padding: 5px;
   border-top: none;
-  vertical-align: top;
+  vertical-align: middle;
 }
 
 .cdt-list td.left-col, .cdt-list th.left-col {

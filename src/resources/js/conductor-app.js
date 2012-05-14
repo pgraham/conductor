@@ -38,6 +38,7 @@
     $('<div class="cdt-app-msg ui-corner-top"/>')
       .addClass(type)
       .html(message)
+      .attr('title', 'Click to dismiss').tooltip()
       .appendTo($('body'))
       .css('opacity', 0.8)
       .css('zIndex', 1002)
@@ -122,7 +123,11 @@
           msgType = response.msg.type;
         } else {
           msg = response.msg;
-          msgType = 'error';
+          if (response.success) {
+            msgType = 'info';
+          } else {
+            msgType = 'error';
+          }
         }
 
         CDT.app.addMessage(msg, msgType);

@@ -5,6 +5,9 @@ namespace zeptech\dynamic\info;
  * This is a generated class that provides pre-parsed information about a model
  * that is used by various Conductor classes, generated or otherwise.
  *
+ * TODO Separate messages into it's own generated class that can be used for
+ *      localization.
+ *
  * @author Philip Graham <philip@zeptech.ca>
  */
 class ${actor} {
