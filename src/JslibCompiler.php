@@ -35,12 +35,14 @@ class JslibCompiler {
 
     switch ($jslibName) {
 
-      // JQuery Cookie
+      case 'datejs':
+      $this->compileDateJs($pathInfo);
+      break;
+
       case 'jquery-cookie':
       $this->compileJQueryCookie($pathInfo);
       break;
 
-      // JQuery UI
       case 'jquery-ui':
       $this->compileJQueryUi($pathInfo);
       break;
@@ -53,11 +55,26 @@ class JslibCompiler {
       $this->compileGalleria($pathInfo);
       break;
 
+      case 'raphael':
+      $this->compileRaphael($pathInfo);
+      break;
+
       // Default, simply copy the library's source file to the target
       default:
       // TODO
       break;
     }
+  }
+
+  protected function compileDateJs($pathInfo) {
+    $jslibSrc = "$pathInfo[lib]/jslib/datejs";
+    $jslibOut = "$pathInfo[target]/htdocs/jslib/datejs";
+
+    if (!file_exists($jslibOut)) {
+      mkdir($jslibOut, 0755, true);
+    }
+
+    copy("$jslibSrc/build/date.js", "$jslibOut/date.js");
   }
 
   protected function compileFileUploader($pathInfo) {
@@ -134,12 +151,13 @@ class JslibCompiler {
       'ui/jquery.ui.sortable.js',
       'ui/jquery.effects.core.js',
       'ui/jquery.ui.button.js',
-      'ui/jquery.ui.menu.js',
-      'ui/jquery.ui.dialog.js',
-      'ui/jquery.ui.tabs.js',
-      'ui/jquery.ui.spinner.js',
       'ui/jquery.ui.datepicker.js',
+      'ui/jquery.ui.dialog.js',
+      'ui/jquery.ui.menu.js',
+      'ui/jquery.ui.spinner.js',
       'ui/jquery.ui.slider.js',
+      'ui/jquery.ui.tabs.js',
+      'ui/jquery.ui.tooltip.js'
     );
     foreach ($scripts as $js) {
       $jsAll[] = file_get_contents("$jslibSrc/$js");
@@ -183,6 +201,17 @@ class JslibCompiler {
 
     // Compile site specific themes
     $this->_compileThemeDir("$pathInfo[src]/themes", "$jslibOut/themes");
+  }
+
+  protected function compileRaphael($pathInfo) {
+    $jslibSrc = "$pathInfo[lib]/jslib/raphael";
+    $jslibOut = "$pathInfo[target]/htdocs/jslib/raphael";
+
+    if (!file_exists($jslibOut)) {
+      mkdir($jslibOut, 0755, true);
+    }
+
+    copy("$jslibSrc/raphael-min.js", "$jslibOut/raphael.js");
   }
 
   private function _compileTheme($src, $out) {
