@@ -237,8 +237,15 @@ class Conductor {
       if (!empty($_GET)) {
         $server->setQuery($_GET);
       }
+      global $HTTP_RAW_POST_DATA;
       if (!empty($_POST)) {
         $server->setData($_POST);
+      } else if (!empty($HTTP_RAW_POST_DATA)) {
+        if (strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false) {
+          $server->setData((array) json_decode($HTTP_RAW_POST_DATA));
+        } else {
+          $server->setData($HTTP_RAW_POST_DATA);
+        }
       }
 
       if (isset($_SERVER['HTTP_ACCEPT'])) {
