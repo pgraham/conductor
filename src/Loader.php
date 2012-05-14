@@ -76,6 +76,17 @@ class Loader {
       }
     });
 
+    $optLibs = array(
+      'pdf' => 'php-pdf'
+    );
+
+    foreach ($optLibs as $optLib => $optLibPath) {
+      if (file_exists("$lib/$optLibPath")) {
+        $ldr = new SplClassLoader("zpt\\$optLib", "$lib/$optLibPath");
+        $ldr->register();
+      }
+    }
+
     // Class loader for php-annotations, php-code-templates, php-rest-server,
     // clarinet and generated classes
     $annoLdr = new SplClassLoader('zeptech\anno', "$cdtLib/php-annotations");
