@@ -102,6 +102,9 @@ class PageLoader {
   public static function loadJsAppSupport() {
     global $asWebPath;
 
+    // Add JsApp javascript libraries
+    Element::js($asWebPath('/jslib/raphael/raphael.js'))->addToHead();
+
     Element::css($asWebPath('/css/conductor-app.css'))->addToHead();
 
     $scripts = array(
@@ -115,6 +118,8 @@ class PageLoader {
       '/js/widget-form.js',
       '/js/widget-pager.js',
       '/js/widget-list.js',
+      '/js/widget-icon.js',
+      '/js/widget-download.js',
       '/js/component-configurationEditor.js',
       '/js/conductor-app.js'
     );
