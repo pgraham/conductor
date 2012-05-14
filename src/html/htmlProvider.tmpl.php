@@ -38,6 +38,7 @@ class ${actor} {
     Element::css('${cdtCssPath}')->addToHead();
 
     // Javascript libraries
+    PageLoader::loadDateJs();
     PageLoader::loadJQuery();
     PageLoader::loadJQueryCookie();
     ${if:uitheme ISSET}
