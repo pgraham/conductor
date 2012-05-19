@@ -76,6 +76,11 @@ class Loader {
       }
     });
 
+    // Register a loader for condutor classes that follow the SPR-0 compliant
+    // package structure
+    $cdtLdr = new SplClassLoader('zpt\ct', "$lib/conductor");
+    $cdtLdr->register();
+
     $optLibs = array(
       'pdf' => 'php-pdf'
     );
