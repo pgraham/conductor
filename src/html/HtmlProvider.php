@@ -72,7 +72,9 @@ class HtmlProvider extends AbstractGenerator {
 
     $values = array(
       'actor' => str_replace('\\', '_', $className),
-      'jscripts' => array()
+      'jscripts' => array(),
+      'sheets' => array(),
+      'fonts' => array()
     );
 
     $title = null;
@@ -94,13 +96,17 @@ class HtmlProvider extends AbstractGenerator {
         }
       }
 
-      if (isset($template['script'])) {
-        $jscripts = $template['script'];
-        if (!is_array($jscripts)) {
-          $jscripts = array($jscripts);
-        }
-        $values['jscripts'] = array_merge($values['jscripts'], $jscripts);
-      }
+      $values['jscripts'] = array_merge(
+        $values['jscripts'],
+        $template->asArray('script'));
+
+      $values['sheets'] = array_merge(
+        $values['sheets'],
+        $template->asArray('css'));
+
+      $values['fonts'] = array_merge(
+        $values['fonts'],
+        $template->asArray('font'));
     }
     $values['title'] = $title;
 
@@ -128,48 +134,25 @@ class HtmlProvider extends AbstractGenerator {
     $values['jqueryDomPath'] = $asWebPath('/js/jquery-dom.js');
     $values['cdtJsPath'] = $asWebPath('/js/conductor.js');
 
-    if (isset($page['font'])) {
-      $fonts = is_array($page['font'])
-        ? $page['font']
-        : array($page['font']);
+    $values['jscripts'] = array_merge(
+      $values['jscripts'],
+      $page->asArray('script'));
+    $values['jscripts'] = $this->_resolveResources($values['jscripts'], '/js');
 
-      $values['fonts'] = implode('|', str_replace(' ', '+', $fonts));
+    $values['sheets'] = array_merge(
+      $values['sheets'],
+      $page->asArray('css'));
+    $values['sheets'] = $this->_resolveResources($values['sheets'], '/css');
+
+    $values['fonts'] = array_merge(
+      $values['fonts'],
+      $page->asArray('font'));
+
+    if (count($values['fonts']) === 0) {
+      unset($values['fonts']);
+    } else {
+      $values['fonts'] = implode('|', str_replace(' ', '+', $values['fonts']));
     }
-
-    if (isset($page['css'])) {
-      $sheets = $page['css'];
-      if (!is_array($sheets)) {
-        $sheets = array($sheets);
-      }
-
-      $values['sheets'] = array();
-      foreach ($sheets AS $css) {
-        if (substr($css, 0, 1) === '/') {
-          $values['sheets'][] = $asWebPath($css);
-        } else {
-          $values['sheets'][] = $asWebPath("/css/$css");
-        }
-      }
-    }
-
-    if (isset($page['script'])) {
-      $jscripts = $page['script'];
-      if (!is_array($page['script'])) {
-        $jscripts = array($page['script']);
-      }
-
-      $values['jscripts'] = array_merge($values['jscripts'], $jscripts);
-    }
-
-    $resolved = array();
-    foreach ($values['jscripts'] as $js) {
-      if (substr($js, 0, 1) === '/') {
-        $resolved[] = $asWebPath($js);
-      } else {
-        $resolved[] = $asWebPath("/js/$js");
-      }
-    }
-    $values['jscripts'] = $resolved;
 
     $values['hasContent'] = false;
     if ($pageDef->hasMethod('getContent')) {
@@ -190,5 +173,19 @@ class HtmlProvider extends AbstractGenerator {
     }
 
     return substr($pageClass, 0, strrpos($pageClass, '\\') + 1) . $template;
+  }
+
+  private function _resolveResources($paths, $relBase) {
+    global $asWebPath;
+
+    $resolved = array();
+    foreach ($paths as $path) {
+      if (substr($path, 0, 1) === '/') {
+        $resolved[] = $asWebPath($path);
+      } else {
+        $resolved[] = $asWebPath("$relBase/$path");
+      }
+    }
+    return $resolved;
   }
 }
