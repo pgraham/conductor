@@ -198,6 +198,9 @@ class Conductor {
     // Initialize clarinet
     Clarinet::init($pdo);
 
+    // Initialize Dependency injection
+    require_once "$pathInfo[target]/zeptech/dynamic/injection.php";
+
     // Authenticate.
     if ($authenticate) {
       Auth::init();
