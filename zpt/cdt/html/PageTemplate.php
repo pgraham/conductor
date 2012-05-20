@@ -12,7 +12,7 @@
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
  */
-namespace conductor\html;
+namespace zpt\cdt\html;
 
 /**
  * This interface defines a page template.

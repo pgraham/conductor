@@ -13,7 +13,7 @@
  * @license http://www.opensource.org/licenses/bsd-license.php
  * @package conductor
  */
-namespace conductor\html;
+namespace zpt\cdt\html;
 
 use \conductor\Conductor;
 use \oboe\struct\FlowContent;

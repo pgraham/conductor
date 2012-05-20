@@ -1,7 +1,7 @@
 <?php
 namespace zeptech\dynamic\html;
 
-use \conductor\html\Page;
+use \zpt\cdt\html\Page;
 use \conductor\Auth;
 use \conductor\PageLoader;
 use \oboe\struct\FlowContent;
