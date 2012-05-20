@@ -76,9 +76,9 @@ class Loader {
       }
     });
 
-    // Register a loader for condutor classes that follow the SPR-0 compliant
+    // Register a loader for conductor classes that follow the SPR-0 compliant
     // package structure
-    $cdtLdr = new SplClassLoader('zpt\ct', "$lib/conductor");
+    $cdtLdr = new SplClassLoader('zpt\cdt', "$lib/conductor");
     $cdtLdr->register();
 
     $optLibs = array(
