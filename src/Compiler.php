@@ -14,7 +14,7 @@
  */
 namespace conductor;
 
-use \conductor\html\HtmlProvider;
+use \zpt\cdt\html\HtmlProvider;
 use \conductor\modeling\ModelInfo;
 use \conductor\CrudService;
 use \reed\String;
@@ -312,7 +312,7 @@ class Compiler {
 
       $this->_htmlProvider->generate($viewClass);
 
-      $hdlr = '\conductor\html\HtmlRequestHandler';
+      $hdlr = '\zpt\cdt\html\HtmlRequestHandler';
       $args = array( "'$viewClass'" );
       $tmpls[] = $tmplBase . '/' . String::fromCamelCase($pageId) . '.html';
       $tmpls[] = $tmplBase . '/' . String::fromCamelCase($pageId) . '.php';
