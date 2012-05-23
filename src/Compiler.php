@@ -85,7 +85,7 @@ class Compiler {
           LIBXML_NOCDATA);
 
         $beanDefs = $cfg->bean;
-        if (!is_array($beanDefs)) {
+        if ($beanDefs && !is_array($beanDefs)) {
           $beanDefs = array($beanDefs);
         }
 
@@ -135,7 +135,7 @@ class Compiler {
     }
 
     // Build the InjectionConfiguration script
-    $srcPath = "$pathInfo[lib]/conductor/zpt/cdt/di/injection.tmpl.php";
+    $srcPath = "$pathInfo[lib]/conductor/src/resources/tmpl/injection.tmpl.php";
     $outPath = "$pathInfo[target]/zeptech/dynamic/injection.php";
     $tmpl = $this->_tmplParser->parse(file_get_contents($srcPath));
     $tmpl->save($outPath, array('beans' => $beans));
