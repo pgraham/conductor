@@ -15,6 +15,7 @@
 namespace zpt\cdt\html;
 
 use \zeptech\anno\Annotations;
+use \zpt\cdt\di\DependencyParser;
 use \zpt\pct\AbstractGenerator;
 use \zpt\pct\CodeTemplateParser;
 use \Exception;
@@ -158,6 +159,9 @@ class HtmlProvider extends AbstractGenerator {
     if ($pageDef->hasMethod('getContent')) {
       $values['hasContent'] = true;
       $values['contentProvider'] = $className;
+
+      $dependencies = DependencyParser::parse($pageDef);
+      $values['dependencies'] = $dependencies;
     }
 
     return $this->_tmpl->forValues($values);

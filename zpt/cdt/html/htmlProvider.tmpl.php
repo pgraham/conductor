@@ -1,6 +1,7 @@
 <?php
 namespace zeptech\dynamic\html;
 
+use \zpt\cdt\di\Injector;
 use \zpt\cdt\html\Page;
 use \conductor\Auth;
 use \conductor\PageLoader;
@@ -80,6 +81,7 @@ class ${actor} {
 
     ${if:hasContent}
       $ctntProvider = new \${contentProvider}();
+      Injector::inject($ctntProvider, ${php:dependencies});
       $page->bodyAdd($ctntProvider->getContent());
     ${fi}
   }
