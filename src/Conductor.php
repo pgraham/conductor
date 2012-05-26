@@ -33,6 +33,7 @@ use \zeptech\orm\runtime\Clarinet;
 use \zeptech\orm\runtime\Criteria;
 use \zeptech\orm\runtime\Persister;
 use \zeptech\rest\RestServer;
+use \zpt\cdt\L10N;
 
 use \Exception;
 use \PDO;
@@ -205,6 +206,22 @@ class Conductor {
     if ($authenticate) {
       Auth::init();
     }
+
+    // Initialize localization
+    // TODO Make the language determination smart.  Should be retrieved from the
+    //      following places in order of priority
+    //
+    //        1. $_GET['lang']
+    //        2. $_SESSION['lang']
+    //        3. Default: en
+    //
+    //      If a login has just completed successfully, then the login process
+    //      should retrieve the user's preferred language and store it in the
+    //      session.  If the language is set in $_GET['lang'] then it will be
+    //      stored in the session for future requests.  This means that
+    //      $_GET['lang'] will override a user's preferred language for the
+    //      current session.
+    L10N::load('en', $pathInfo['target']);
 
     // Now that initialization is finished the request can be processed
     self::processRequest();

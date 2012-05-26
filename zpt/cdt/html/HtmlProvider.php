@@ -85,9 +85,14 @@ class HtmlProvider extends AbstractGenerator {
     
     if (isset($page['template'])) {
       $templateClass = $this->_getTemplateClass($page['template'], $className);
+      $templateDef = new ReflectionClass($templateClass);
 
-      $template = new Annotations(new ReflectionClass($templateClass));
+      $template = new Annotations($templateDef);
       $values['template'] = $templateClass;
+      $tmplDependencies = DependencyParser::parse($templateDef);
+      if (count($tmplDependencies) > 0) {
+        $values['tmplDependencies'] = $tmplDependencies;
+      }
 
       if (isset($template['title'])) {
         if ($title !== null) {

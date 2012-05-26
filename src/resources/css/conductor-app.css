@@ -38,26 +38,17 @@
   overflow-x: hidden;
 }
 
-.cdt-app-msg {
-  position: absolute;
-  bottom: 0;
-  left: 13px;
-  right: 13px;
-  padding: 5px 0;
-
+.cdt-msg {
   font-family: 'Lato', sans-serif;
   font-weight: 300;
-  text-align: center;
   color: #DDD;
-
-  cursor: pointer;
 }
 
-.cdt-app-msg.error {
+.cdt-msg.error {
   background-color: #AA0000;
 }
 
-.cdt-app-msg.info {
+.cdt-msg.info {
   background-color: #00AA00;
 }
 

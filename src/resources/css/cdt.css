@@ -72,3 +72,14 @@
   border-top-right-radius: 16px;
   border-bottom-right-radius: 16px;
 }
+
+.cdt-msg {
+  position: absolute;
+  bottom: 0;
+  left: 13px;
+  right: 13px;
+  padding: 5px 0;
+
+  cursor: pointer;
+  text-align: center;
+}

@@ -23,6 +23,7 @@ use \zeptech\orm\generator\PersisterGenerator;
 use \zeptech\orm\generator\TransformerGenerator;
 use \zeptech\orm\generator\ValidatorGenerator;
 use \zeptech\orm\QueryBuilder;
+use \zpt\cdt\di\DependencyParser;
 use \zpt\pct\CodeTemplateParser;
 use \DirectoryIterator;
 use \ReflectionClass;
@@ -64,6 +65,7 @@ class Compiler {
 
     // Compile site
     $this->compileDiContainer($pathInfo, $ns);
+    $this->compileLanguageFiles($pathInfo, $ns);
     $this->compileModels($pathInfo, $ns);
     $this->compileServices($pathInfo, $ns);
     $this->compileResources($pathInfo, $ns);
@@ -139,7 +141,6 @@ class Compiler {
     $outPath = "$pathInfo[target]/zeptech/dynamic/injection.php";
     $tmpl = $this->_tmplParser->parse(file_get_contents($srcPath));
     $tmpl->save($outPath, array('beans' => $beans));
-
   }
 
   protected function compileJsLibs($pathInfo, $ns) {
@@ -151,6 +152,35 @@ class Compiler {
 
       $jslibName = $jslib->getFilename();
       $this->_jslibCompiler->compile($jslibName, $pathInfo);
+    }
+  }
+
+  protected function compileLanguageFiles($pathInfo, $ns) {
+    $languageDir = "$pathInfo[src]/resources/i18n";
+    if (!file_exists($languageDir)) {
+      return;
+    }
+
+    $dir = new DirectoryIterator($languageDir);
+
+    $tmplSrcPath = $pathInfo['lib']
+      . '/conductor/src/resources/tmpl/language.strings.tmpl.php';
+    $tmpl = $this->_tmplParser->parse(file_get_contents($tmplSrcPath));
+
+    foreach ($dir as $f) {
+      if ($f->isDot() || $f->isDir()) {
+        continue;
+      }
+
+      if (substr($f->getFilename(), -9) !== '.messages') {
+        continue;
+      }
+
+      $lang = $f->getBasename('.messages');
+      $messages = $this->_parseMessages(file_get_contents($f->getPathname()));
+
+      $outPath = "$pathInfo[target]/i18n/$lang.strings.php";
+      $tmpl->save($outPath, array('msgs' => $messages));
     }
   }
 
@@ -439,22 +469,71 @@ class Compiler {
 
       $srvcName = substr($fname, 0, -4);
       $srvcClass = "$ns\\$srvcName";
+      $srvcDef = new ReflectionClass($srvcClass);
 
-      $annos = new Annotations(new ReflectionClass($srvcClass));
+
+      $annos = new Annotations($srvcDef);
       $uris = $annos['uri'];
       if (!is_array($uris)) {
         $uris = array($uris);
       }
 
-      $this->_mappings[] = array(
+      $mapping = array(
         'hdlr' => "\\$srvcClass",
         'hdlrArgs' => array(),
         'tmpls' => $uris
       );
+
+      // If the service declares any dependency, make sure they are injected
+      $dependencies = DependencyParser::parse($srvcDef);
+      if (count($dependencies) > 0) {
+        $mapping['dependencies'] = $dependencies;
+      }
+
+      $this->_mappings[] = $mapping;
     }
   }
 
   private function _initGenerators($target) {
     $this->_htmlProvider = new HtmlProvider($target);
+  }
+
+  private function _parseMessages($msgs) {
+    $result = array();
+
+    $lines = explode("\n", $msgs);
+    $key = null;
+    $val = array();
+
+    $isWaitingForOtherLine = false;
+    foreach ($lines as $line) {
+      $line = trim($line);
+
+      if (empty($line) || ($key === null && strpos($line, '#') === 0)) {
+        continue;
+      }
+
+      if ($key === null) {
+        $eqPos = strpos($line, '=');
+        $key = substr($line, 0, $eqPos);
+        $value = substr($line, $eqPos + 1);
+
+      } else {
+        $value = $line;
+      }
+
+      // Check if ends with single '\'
+      if (substr($value, -1) !== '\\') {
+        $val[] = $value;
+
+        $result[$key] = implode(' ', $val);
+        $key = null;
+        $val = array();
+      } else {
+        $val[] = substr($value, 0, -1);
+      }
+    }
+
+    return $result;
   }
 }

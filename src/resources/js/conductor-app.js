@@ -1,3 +1,5 @@
+CDT.ns('CDT.app');
+
 /**
  * This javascript provides a basic shell for building a javascript web-app.
  *
@@ -8,7 +10,6 @@
 
   var tabs;
 
-  CDT.app = {};
   eventuality(CDT.app);
 
   CDT.app.addView = function (id, lbl, elm) {
@@ -27,30 +28,11 @@
   }
 
   CDT.app.addMessage = function (message, type, details) {
-    if (details) {
-      message += '<ul>';
-      $.each(details, function (idx, val) {
-        message += '<li>' + val;
-      });
-      message += '</ul>';
-    }
-
-    $('<div class="cdt-app-msg ui-corner-top"/>')
-      .addClass(type)
-      .html(message)
-      .attr('title', 'Click to dismiss').tooltip()
-      .appendTo($('body'))
-      .css('opacity', 0.8)
-      .css('zIndex', 1002)
-      .hide()
-      .slideDown()
-      .click(function () {
-        $(this).slideUp('fast', function () { $(this).remove(); });
-      });
+    CDT.message(message, type, details);
   };
 
   CDT.app.clearMessages = function () {
-    $('.cdt-app-msg').slideUp('fast', function () {
+    $('.cdt-msg').slideUp('fast', function () {
       $(this).remove();
     });
   };

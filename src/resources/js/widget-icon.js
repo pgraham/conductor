@@ -1,5 +1,3 @@
-CDT.ns('CDT.widget');
-
 /**
  * CDT.icon
  */

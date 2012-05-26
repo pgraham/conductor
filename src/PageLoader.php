@@ -120,6 +120,7 @@ class PageLoader {
       '/js/widget-list.js',
       '/js/widget-icon.js',
       '/js/widget-download.js',
+      '/js/widget-message.js',
       '/js/component-configurationEditor.js',
       '/js/conductor-app.js'
     );

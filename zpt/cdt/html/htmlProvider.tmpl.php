@@ -9,7 +9,7 @@ use \oboe\struct\FlowContent;
 use \oboe\Element;
 
 /**
- * This is a generated class that populates an conductor\Page instance.
+ * This is a generated class that populates a conductor\Page instance.
  *
  * DO NOT MODIFY.
  *
@@ -17,13 +17,17 @@ use \oboe\Element;
  */
 class ${actor} {
 
-  public function populate (Page $page) {
+  public function populate(Page $page, array $query = null) {
     ${if:title ISSET}
       $page->setPageTitle('${title}');
     ${fi}
 
     ${if:template ISSET}
-      $page->setTemplate(new \${template}());
+      $tmpl = new \${template}();
+      ${if:tmplDependencies ISSET}
+        Injector::inject($tmpl, ${php:tmplDependencies});
+      ${fi}
+      $page->setTemplate($tmpl);
     ${fi}
 
     ${if:auth ISSET}
@@ -82,7 +86,7 @@ class ${actor} {
     ${if:hasContent}
       $ctntProvider = new \${contentProvider}();
       Injector::inject($ctntProvider, ${php:dependencies});
-      $page->bodyAdd($ctntProvider->getContent());
+      $page->bodyAdd($ctntProvider->getContent($query));
     ${fi}
   }
 }
