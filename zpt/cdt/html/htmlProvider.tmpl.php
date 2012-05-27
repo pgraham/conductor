@@ -83,10 +83,16 @@ class ${actor} {
       ${done}
     ${fi}
 
+    $page->bodyAdd($this->getFragment($query));
+  }
+
+  public function getFragment($query) {
     ${if:hasContent}
       $ctntProvider = new \${contentProvider}();
       Injector::inject($ctntProvider, ${php:dependencies});
-      $page->bodyAdd($ctntProvider->getContent($query));
+      return $ctntProvider->getContent($query);
+    ${else}
+      return '';
     ${fi}
   }
 }

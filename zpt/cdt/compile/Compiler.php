@@ -355,9 +355,16 @@ class Compiler {
         } else {
           $tmpls[] = $tmplBase;
         }
+      } else {
+        // Add a mapping for retrieving only page fragment
+        $this->_serverCompiler->addMapping(
+          '\zpt\cdt\html\HtmlFragmentRequestHandler',
+          array( "'$viewClass'" ),
+          array( String::fromCamelCase($pageId) . '.frag' )
+        );
       }
 
-      $this->_serverCompiler->addMapping( $hdlr, $args, $tmpls);
+      $this->_serverCompiler->addMapping($hdlr, $args, $tmpls);
     }
   }
 
