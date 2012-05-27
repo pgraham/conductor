@@ -440,7 +440,12 @@ class Compiler {
     }
 
     foreach ($dir as $resource) {
-      if ($resource->isDot() || $resource->isDir()) {
+      if ($resource->isDot()) {
+        continue;
+      }
+
+      if ($resource->isDir()) {
+        $this->_compileResourceDir($resource->getPathname(), "$outDir/" . $resource->getBasename());
         continue;
       }
       if (substr($resource->getFilename(), 0, 1) === '.') {
