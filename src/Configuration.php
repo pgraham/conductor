@@ -33,14 +33,6 @@ class Configuration {
     $xmlCfg = simplexml_load_file($configPath, 'SimpleXMLElement',
       LIBXML_NOCDATA);
 
-    // Set the web site's title
-    // ------------------------
-    if (isset($xmlCfg->title)) {
-      $cfg['title'] = (string) $xmlCfg->title;
-    } else {
-      $cfg['title'] = 'Powered by Conductor';
-    }
-
     if (isset($xmlCfg->namespace)) {
       $cfg['namespace'] = (string) $xmlCfg->namespace;
     }
