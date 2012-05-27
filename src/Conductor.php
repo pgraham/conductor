@@ -33,6 +33,7 @@ use \zeptech\orm\runtime\Clarinet;
 use \zeptech\orm\runtime\Criteria;
 use \zeptech\orm\runtime\Persister;
 use \zeptech\rest\RestServer;
+use \zpt\cdt\compile\Compiler;
 use \zpt\cdt\L10N;
 
 use \Exception;

@@ -12,7 +12,7 @@
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
  */
-namespace conductor;
+namespace zpt\cdt\compile;
 
 use \conductor\jslib\JQueryUi;
 use \DirectoryIterator;

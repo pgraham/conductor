@@ -12,7 +12,7 @@
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
  */
-namespace conductor;
+namespace zpt\cdt\compile;
 
 use \zpt\cdt\html\HtmlProvider;
 use \conductor\modeling\ModelInfo;
@@ -255,7 +255,7 @@ class Compiler {
 
     // Compile conductor resources
     // ---------------------------
-    $resourceSrc = __DIR__ . '/resources';
+    $resourceSrc = "$pathInfo[lib]/conductor/src/resources";
 
     // Compile base javascript
     $this->_compileResource(
@@ -280,7 +280,8 @@ class Compiler {
   }
 
   protected function compileServerConfigurator($pathInfo, $ns) {
-    $tmplSrc = __DIR__ . '/resources/tmpl/ServerConfigurator.php';
+    $resourceSrc = "$pathInfo[lib]/conductor/src/resources";
+    $tmplSrc = "$resourceSrc/tmpl/ServerConfigurator.php";
     $tmplOut = "$pathInfo[target]/zeptech/dynamic/ServerConfigurator.php";
 
     // Build html mappers
