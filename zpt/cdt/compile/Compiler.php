@@ -40,16 +40,24 @@ class Compiler {
   private $_compressed;
   private $_tmplParser;
   private $_jslibCompiler;
+  private $_serverCompiler;
 
-  // Array of mappings for the REST server configurator that gets generated at
-  // the end of compilation
-  private $_mappings = array();
-  
+  /**
+   * Create a new site compiler.
+   *
+   * @param boolean $compressed Whether or not content that is delivered to the
+   *   client should be compressed.  This should be enabled for production
+   *   sites.
+   *   Default: false
+   */
   public function __construct($compressed = false) {
     $this->_compressed = $compressed;
 
     $this->_tmplParser = new CodeTemplateParser();
     $this->_jslibCompiler = new JslibCompiler($compressed);
+    $this->_serverCompiler = new ServerCompiler($compressed);
+
+    $this->_serverCompiler->setTemplateParser($this->_tmplParser);
   }
 
   public function compile($pathInfo, $ns) {
@@ -71,7 +79,9 @@ class Compiler {
     $this->compileResources($pathInfo, $ns);
     $this->compileJsLibs($pathInfo, $ns);
     $this->compileModules($pathInfo, $ns);
-    $this->compileServerConfigurator($pathInfo, $ns);
+    $this->compileHtml($pathInfo, $ns);
+
+    $this->_serverCompiler->compile($pathInfo);
   }
 
   protected function compileDiContainer($pathInfo, $ns) {
@@ -279,18 +289,10 @@ class Compiler {
     $this->_compileResourceDir("$resourceSrc/img", "$resourceOut/img");
   }
 
-  protected function compileServerConfigurator($pathInfo, $ns) {
-    $resourceSrc = "$pathInfo[lib]/conductor/src/resources";
-    $tmplSrc = "$resourceSrc/tmpl/ServerConfigurator.php";
-    $tmplOut = "$pathInfo[target]/zeptech/dynamic/ServerConfigurator.php";
-
+  protected function compileHtml($pathInfo, $ns) {
     // Build html mappers
     $htmlDir = "$pathInfo[src]/$ns/html";
     $this->_compileHtmlDir($htmlDir, $ns);
-
-    // Generator the Configurator
-    $values = array( 'mappings' => $this->_mappings );
-    $this->_compileResource($tmplSrc, $tmplOut, $values);
   }
 
   protected function compileServices($pathInfo, $ns) {
@@ -355,13 +357,7 @@ class Compiler {
         }
       }
 
-      $mapping = array(
-        'hdlr' => $hdlr,
-        'hdlrArgs' => $args,
-        'tmpls' => $tmpls
-      );
-
-      $this->_mappings[] = $mapping;
+      $this->_serverCompiler->addMapping( $hdlr, $args, $tmpls);
     }
   }
 
@@ -411,15 +407,10 @@ class Compiler {
         $crudInfo = $crudGen->getInfo();
         $url = "$urlBase/" . strtolower($crudInfo->getDisplayNamePlural());
 
-        $this->_mappings[] = array(
-          'hdlr' => '\\conductor\\crud\\CrudRequestHandler',
-          'hdlrArgs' => array(
-            "'$modelClass'"
-          ),
-          'tmpls' => array (
-            $url,
-            "$url/{id}"
-          )
+        $this->_serverCompiler->addMapping(
+          '\\conductor\\crud\\CrudRequestHandler',
+          array( "'$modelClass'"),
+          array ( $url, "$url/{id}")
         );
       }
     }
@@ -484,19 +475,13 @@ class Compiler {
         $uris = array($uris);
       }
 
-      $mapping = array(
-        'hdlr' => "\\$srvcClass",
-        'hdlrArgs' => array(),
-        'tmpls' => $uris
+      $this->_serverCompiler->addMapping(
+        "\\$srvcClass",
+        array(),
+        $uris,
+        // If the service declares any dependency, make sure they are injected
+        DependencyParser::parse($srvcDef)
       );
-
-      // If the service declares any dependency, make sure they are injected
-      $dependencies = DependencyParser::parse($srvcDef);
-      if (count($dependencies) > 0) {
-        $mapping['dependencies'] = $dependencies;
-      }
-
-      $this->_mappings[] = $mapping;
     }
   }
 

@@ -12,13 +12,13 @@ class ServerConfigurator {
 
   public function configure(RestServer $server) {
     ${each:mappings as mapping}
-      $hdlr = new ${mapping[hdlr]}(${join:mapping[hdlrArgs]:,});
-      ${if:mapping[dependencies] ISSET}
-        Injector::inject($hdlr, ${php:mapping[dependencies]});
+      $hdlr = new ${mapping[hdlr]}(${join:mapping[args]:,});
+      ${if:mapping[beans] ISSET}
+        Injector::inject($hdlr, ${php:mapping[beans]});
       ${fi}
 
-      ${each:mapping[tmpls] as tmpl}
-        $server->addMapping('${tmpl}', $hdlr);
+      ${each:mapping[uris] as uri}
+        $server->addMapping('${uri}', $hdlr);
       ${done}
 
     ${done}
