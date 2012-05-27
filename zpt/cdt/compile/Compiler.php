@@ -96,12 +96,7 @@ class Compiler {
         $cfg = simplexml_load_file($context, 'SimpleXMLElement',
           LIBXML_NOCDATA);
 
-        $beanDefs = $cfg->bean;
-        if ($beanDefs && !is_array($beanDefs)) {
-          $beanDefs = array($beanDefs);
-        }
-
-        foreach ($beanDefs as $beanDef) {
+        foreach ($cfg->bean as $beanDef) {
           $bean = array();
           $bean['id'] = $beanDef['id'];
           $bean['class'] = $beanDef['class'];
