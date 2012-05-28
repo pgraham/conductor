@@ -1,2 +1,2 @@
 <?php
-$GLOBALS['L10N'] = ${php:msgs};
+$GLOBALS['L10N'] = ${php:strings};

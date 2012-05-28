@@ -35,12 +35,26 @@ use \ReflectionClass;
  */
 class Compiler {
 
+  /* Whether or compilation output should be compressed when possible. */
+  private $_compressed;
+
+  /* Html Provider Generator. */
   private $_htmlProvider;
 
-  private $_compressed;
-  private $_tmplParser;
+  /* Javascript library compiler. */
   private $_jslibCompiler;
+
+  /* Localization compiler. */
+  private $_l10nCompiler;
+
+  /* Path to the site's modules directory. */
+  private $_modulesPath;
+
+  /* REST server configurator compiler. */
   private $_serverCompiler;
+
+  /* Code template parser. */
+  private $_tmplParser;
 
   /**
    * Create a new site compiler.
@@ -54,14 +68,18 @@ class Compiler {
     $this->_compressed = $compressed;
 
     $this->_tmplParser = new CodeTemplateParser();
-    $this->_jslibCompiler = new JslibCompiler($compressed);
-    $this->_serverCompiler = new ServerCompiler($compressed);
 
+    $this->_jslibCompiler = new JslibCompiler($compressed);
+
+    $this->_l10nCompiler = new L10NCompiler($compressed);
+    $this->_l10nCompiler->setTemplateParser($this->_tmplParser);
+
+    $this->_serverCompiler = new ServerCompiler($compressed);
     $this->_serverCompiler->setTemplateParser($this->_tmplParser);
   }
 
   public function compile($pathInfo, $ns) {
-    $this->_initGenerators($pathInfo['target']);
+    $this->_initCompiler($pathInfo);
 
     // Compile server dispatcher
     copy(
@@ -71,14 +89,35 @@ class Compiler {
       "$pathInfo[lib]/conductor/src/resources/rest/srvr.php",
       "$pathInfo[target]/htdocs/srvr.php");
 
-    // Compile site
+    // Compile the site's application context.
+    // ----------------------------------------
+    // 
+    // This will include the following application contexts
     $this->compileDiContainer($pathInfo, $ns);
-    $this->compileLanguageFiles($pathInfo, $ns);
     $this->compileModels($pathInfo, $ns);
     $this->compileServices($pathInfo, $ns);
     $this->compileResources($pathInfo, $ns);
     $this->compileJsLibs($pathInfo, $ns);
+
     $this->compileModules($pathInfo, $ns);
+
+    // Compile The sites language files.
+    // ----------------------------------
+    //
+    // Language file compilation involves parsing properties files and building
+    // a hash or string for each language and outputting a php script which can
+    // be parsed quicker than parsing the language properties files at runtime.
+    //
+    // Language files are defined by modules and by the site.  Compile language
+    // files are:
+    //
+    //    * modules/<mod-name/resources/i18n/<lang>.messages
+    //    * src/resources/i18n/<lang>.messages
+    //
+    // Any string defined by a module can be overriden by the site by defining a
+    // string with the same key in the site's language file.
+    $this->compileLanguageFiles($pathInfo, $ns);
+
     $this->compileHtml($pathInfo, $ns);
 
     $this->_serverCompiler->compile($pathInfo);
@@ -161,32 +200,15 @@ class Compiler {
   }
 
   protected function compileLanguageFiles($pathInfo, $ns) {
-    $languageDir = "$pathInfo[src]/resources/i18n";
-    if (!file_exists($languageDir)) {
-      return;
-    }
+    $compiler = $this;
+    $this->_doWithModules(function ($modulePath) use ($compiler) {
+      $compiler->_compileLanguageDir("$modulePath/resources/i18n");
+    });
 
-    $dir = new DirectoryIterator($languageDir);
+    $this->_compileLanguageDir("$pathInfo[src]/resources/i18n");
 
-    $tmplSrcPath = $pathInfo['lib']
-      . '/conductor/src/resources/tmpl/language.strings.tmpl.php';
-    $tmpl = $this->_tmplParser->parse(file_get_contents($tmplSrcPath));
-
-    foreach ($dir as $f) {
-      if ($f->isDot() || $f->isDir()) {
-        continue;
-      }
-
-      if (substr($f->getFilename(), -9) !== '.messages') {
-        continue;
-      }
-
-      $lang = $f->getBasename('.messages');
-      $messages = $this->_parseMessages(file_get_contents($f->getPathname()));
-
-      $outPath = "$pathInfo[target]/i18n/$lang.strings.php";
-      $tmpl->save($outPath, array('msgs' => $messages));
-    }
+    $this->_l10nCompiler->compile($pathInfo);
+    
   }
 
   protected function compileModels($pathInfo, $ns) {
@@ -363,6 +385,30 @@ class Compiler {
     }
   }
 
+  // TODO This should be made private once PHP 5.4 is available.  It is public
+  //      for now because it is accessed from the scope of an anonymous
+  //      function.
+  public function _compileLanguageDir($languageDir) {
+    if (!file_exists($languageDir)) {
+      return;
+    }
+
+    $dir = new DirectoryIterator($languageDir);
+    foreach ($dir as $f) {
+      if ($f->isDot() || $f->isDir()) {
+        continue;
+      }
+
+      if (substr($f->getFilename(), -9) !== '.messages') {
+        continue;
+      }
+
+      $lang = $f->getBasename('.messages');
+      $strings = $this->_parseStrings(file_get_contents($f->getPathname()));
+      $this->_l10nCompiler->addStrings($lang, $strings);
+    }
+  }
+
   private function _compileModelDir($pathInfo, $models, $ns, $target,
       $urlBase = '')
   {
@@ -487,11 +533,27 @@ class Compiler {
     }
   }
 
-  private function _initGenerators($target) {
-    $this->_htmlProvider = new HtmlProvider($target);
+  private function _doWithModules($fn) {
+    if (!file_exists($this->_modulesPath)) {
+      return;
+    }
+
+    $modules = new DirectoryIterator($this->_modulesPath);
+    foreach ($modules as $module) {
+      if ($module->isDot() || !$module->isDir()) {
+        continue;
+      }
+
+      $fn($module->getPathname());
+    }
   }
 
-  private function _parseMessages($msgs) {
+  private function _initCompiler($pathInfo) {
+    $this->_htmlProvider = new HtmlProvider($pathInfo['target']);
+    $this->_modulesPath = "$pathInfo[root]/modules";
+  }
+
+  private function _parseStrings($msgs) {
     $result = array();
 
     $lines = explode("\n", $msgs);
