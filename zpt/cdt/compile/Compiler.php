@@ -216,15 +216,26 @@ class Compiler {
     $this->_compileModelDir(
       $pathInfo,
       "$pathInfo[lib]/conductor/src/model",
-      'conductor\\model',
-      $pathInfo['target']);
+      'conductor\\model');
 
     // Compile Site models
     $this->_compileModelDir(
       $pathInfo,
       "$pathInfo[src]/$ns/model",
-      "$ns\\model",
-      $pathInfo['target']);
+      "$ns\\model");
+
+    // Compile Module models
+    $compiler = $this;
+    $this->_doWithModules(function ($modulePath) use ($compiler, $pathInfo) {
+      $modName = basename($modulePath);
+      $modBaseNs = "zpt\\mod\\$modName";
+      $compiler->_compileModelDir(
+        $pathInfo,
+        "$modulePath/zpt/mod/$modName/model",
+        "$modBaseNs\\model",
+        "/$modName"
+      );
+    });
   }
 
   protected function compileModules($pathInfo, $ns) {
@@ -262,13 +273,6 @@ class Compiler {
       // Compile module models and services
       $modSrc = $module->getPathname() . "/zpt/mod/$modName";
       $modBaseNs = "zpt\\mod\\$modName";
-
-      $this->_compileModelDir(
-        $pathInfo,
-        "$modSrc/model",
-        "$modBaseNs\\model",
-        $pathInfo['target'],
-        "/$modName");
 
       $this->_compileServiceDir(
         "$modSrc/srvc",
@@ -409,13 +413,16 @@ class Compiler {
     }
   }
 
-  private function _compileModelDir($pathInfo, $models, $ns, $target,
-      $urlBase = '')
-  {
+  // TODO This should be made private once PHP 5.4 is available.  It is public
+  //      for now because it is accessed from the scope of an anonymous
+  //      function.
+  public function _compileModelDir($pathInfo, $models, $ns, $urlBase = '') {
     if (!file_exists($models)) {
       // Nothing to do here
       return;
     }
+
+    $target = $pathInfo['target'];
 
     // TODO These should be class variables
     $persisterGen = new PersisterGenerator($target);
