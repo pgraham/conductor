@@ -3,8 +3,4 @@
 
   <bean id="configValueProvider" class="zpt\cdt\ConfigValueProvider" />
 
-  <bean id="contentProvider" class="zpt\cdt\ContentProvider">
-    <property name="pdo" ref="pdo" />
-  </bean>
-
 </beans>
