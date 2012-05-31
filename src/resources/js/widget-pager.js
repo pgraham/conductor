@@ -22,6 +22,12 @@ CDT.ns('CDT.widget');
 
       pages = getNumPages();
 
+      if (curPage === 0 && pages > 0) {
+        // This can happen when an initially empty list has something added to
+        // it.  In this case, move to the first page.
+        curPage = 1;
+      }
+
       if (curPage <= 1) {
         prev.button('option', 'disabled', true);
         first.button('option', 'disabled', true);
