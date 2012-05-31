@@ -210,9 +210,13 @@
   border: 1px solid #C50000;
 }
 
-.ui-button-small.ui-button-text-only .ui-button-text {
+.ui-button-small.ui-button-text-only .ui-button-text,
+.ui-button-small.ui-button-icons-only .ui-button-text {
   padding: .1em 1em;
   font-size: .8em;
+}
+.ui-button-small.ui-button-icons-only {
+  width: 2.5em;
 }
 
 .hblock {
