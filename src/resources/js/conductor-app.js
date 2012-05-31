@@ -8,7 +8,7 @@ CDT.ns('CDT.app');
 (function ($, CDT, undefined) {
   "use strict";
 
-  var tabs;
+  var tabs, menu;
 
   eventuality(CDT.app);
 
@@ -43,9 +43,13 @@ CDT.ns('CDT.app');
     }
 
     // Now that the tab has been added, it is guaranteed that there is a tab
-    // nav element.  Only top needs to be set programtically, the rest of the
-    // edges are set in css
+    // nav element so we can position the added tab.  Only top needs to be set
+    // programtically, the rest of the edges are set in css
     elm.css('top', tabs.find('.ui-tabs-nav').outerHeight(true)).layout();
+  };
+
+  CDT.app.addMenuItem = function (item) {
+    menu.append(item);
   }
 
   CDT.app.addMessage = function (message, type, details) {
@@ -68,35 +72,8 @@ CDT.ns('CDT.app');
   };
 
   $(document).ready(function () {
-    var options, logout, viewSite, previewWnd;
 
-    // Initialize the options menu for the app
-    logout = $('<button>Logout</button>').button()
-      .addClass('ui-button-small')
-      .click(function () {
-        $.ajax({
-          url: _p('/logout'),
-          type: 'POST',
-          success: function () {
-            window.location.href = _p('/');
-          }
-        });
-      });
-    viewSite = $('<button>View Site</button>').button()
-      .addClass('ui-button-small')
-      .click(function () {
-        if (previewWnd === undefined || previewWnd.closed) {
-          previewWnd = window.open(_p('/'), 'preview');
-        } else {
-          previewWnd.location.reload();
-          previewWnd.focus();
-        }
-      });
-
-    options = $('<div id="cdt-app-menu" />')
-      .append(viewSite)
-      .append(logout)
-      .appendTo('body');
+    menu = $('<div id="cdt-app-menu" />').appendTo('body');
 
     // Initialize the tab panel that will contain the app
     tabs = $('<div id="cdt-app-container"><ul/></div>')
