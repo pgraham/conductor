@@ -58,6 +58,15 @@ CDT.ns('CDT.app');
     });
   };
 
+  CDT.app.showView = function (id) {
+    tabs.find('.ui-tabs-nav li').each(function (idx) {
+      if ($(this).attr('aria-controls') === id) {
+        tabs.tabs('select', idx);
+        return false;
+      }
+    });
+  };
+
   $(document).ready(function () {
     var options, logout, viewSite, previewWnd;
 
