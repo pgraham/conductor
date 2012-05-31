@@ -12,7 +12,7 @@ CDT.ns('CDT.app');
 
   eventuality(CDT.app);
 
-  CDT.app.addView = function (id, lbl, elm) {
+  CDT.app.addView = function (id, lbl, elm, closeable) {
     if (tabs === undefined) {
       // TODO Queue the view to be added once the document is ready
       return;
@@ -20,6 +20,27 @@ CDT.ns('CDT.app');
 
     elm.attr('id', id).addClass('cdt-app-view').appendTo(tabs);
     tabs.tabs('add', '#' + id, lbl);
+
+    if (closeable) {
+      tabs.find('.ui-tabs-nav li').last().addClass('closeable')
+        .append(
+          $('<span class="ui-icon ui-icon-close">Remove Tab</span>')
+            .css({
+              border: '1px solid transparent',
+              cursor: 'pointer'
+            })
+            .click(function () {
+              var idx = tabs.find('.ui-tabs-nav li').index($(this).parent())
+              tabs.tabs('remove', idx);
+            })
+            .mouseover(function () {
+              $(this).css('border', '1px solid #000');
+            })
+            .mouseout(function () {
+              $(this).css('border', '1px solid transparent');
+            })
+        );
+    }
 
     // Now that the tab has been added, it is guaranteed that there is a tab
     // nav element.  Only top needs to be set programtically, the rest of the
