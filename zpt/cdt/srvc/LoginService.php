@@ -12,7 +12,7 @@
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
  */
-namespace conductor\srvc;
+namespace zpt\cdt\srvc;
 
 use \zeptech\rest\BaseRequestHandler;
 use \zeptech\rest\RequestHandler;

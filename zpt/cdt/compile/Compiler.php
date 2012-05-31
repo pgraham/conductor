@@ -229,8 +229,7 @@ class Compiler {
 
       $this->_compileServiceDir(
         "$modSrc/srvc",
-        "$modBaseNs\\srvc",
-        $pathInfo['target']);
+        "$modBaseNs\\srvc");
     }
   }
 
@@ -272,15 +271,13 @@ class Compiler {
   protected function compileServices($pathInfo, $ns) {
     // Compile Conductor models
     $this->_compileServiceDir(
-      "$pathInfo[lib]/conductor/src/srvc",
-      'conductor\\srvc',
-      $pathInfo['target']);
+      "$pathInfo[lib]/conductor/zpt/cdt/srvc",
+      'zpt\\cdt\\srvc');
 
     // Compile Site models
     $this->_compileServiceDir(
       "$pathInfo[src]/$ns/srvc",
-      "$ns\\srvc",
-      $pathInfo['target']);
+      "$ns\\srvc");
   }
 
   private function _compileHtmlDir($htmlDir, $ns, $tmplBase = '') {
@@ -455,7 +452,7 @@ class Compiler {
     }
   }
 
-  private function _compileServiceDir($srvcs, $ns, $target) {
+  private function _compileServiceDir($srvcs, $ns) {
     if (!file_exists($srvcs)) {
       // Nothing to do here
       return;
