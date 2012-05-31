@@ -59,6 +59,10 @@ class JslibCompiler {
       $this->compileRaphael($pathInfo);
       break;
 
+      case 'jwysiwyg':
+      $this->compileJWysiwyg($pathInfo);
+      break;
+
       // Default, simply copy the library's source file to the target
       default:
       // TODO
@@ -212,6 +216,20 @@ class JslibCompiler {
     }
 
     copy("$jslibSrc/raphael-min.js", "$jslibOut/raphael.js");
+  }
+
+  protected function compileJWysiwyg($pathInfo) {
+    $jslibSrc = "$pathInfo[lib]/jslib/jwysiwyg";
+    $jslibOut = "$pathInfo[target]/htdocs/jslib/jwysiwyg";
+
+    if (!file_exists($jslibOut)) {
+      mkdir($jslibOut, 0755, true);
+    }
+
+    copy("$jslibSrc/jquery.wysiwyg.js", "$jslibOut/jquery.wysiwyg.js");
+    copy("$jslibSrc/jquery.wysiwyg.css", "$jslibOut/jquery.wysiwyg.css");
+    copy("$jslibSrc/jquery.wysiwyg.bg.png", "$jslibOut/jquery.wysiwyg.bg.png");
+    copy("$jslibSrc/jquery.wysiwyg.gif", "$jslibOut/jquery.wysiwyg.gif");
   }
 
   private function _compileTheme($src, $out) {
