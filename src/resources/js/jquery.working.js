@@ -19,6 +19,7 @@
         mask = $('<div/>')
           .addClass('ui-widget-overlay')
           .css('opacity', '0.65')
+          .css('zIndex', 1)
           .append(
             $('<img/>')
               .css('position', 'absolute')
