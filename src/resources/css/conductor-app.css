@@ -181,6 +181,15 @@
   margin: 0 11px;
 }
 
+.cdt-btn-menu .cdt-btn-menu-item {
+  cursor: pointer;
+  padding: 2px 5px;
+
+  /* Add a transparent border so that when a border is added by the hover style
+     the menu isn't resized */
+  border: 1px solid transparent; 
+}
+
 .ui-widget .input-label {
   margin-right: 20px;
 }
