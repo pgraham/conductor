@@ -14,6 +14,10 @@
       message += '</ul>';
     }
 
+    // Remove current message.
+    // TODO Allow stacking
+    $('.cdt-msg').slideUp('fast', function () { $(this).remove(); });
+
     return $('<div class="cdt-msg ui-corner-top"/>')
       .addClass(type)
       .html(message)
