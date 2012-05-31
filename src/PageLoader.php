@@ -15,13 +15,9 @@
  */
 namespace conductor;
 
-use \conductor\admin\AdminClient;
-use \conductor\html\Page;
-use \conductor\jslib\JsLib;
-use \conductor\widget\ModelEditor;
 use \conductor\widget\LoginForm;
 use \oboe\Element;
-use \reed\FsToWebPathConverter;
+use \zpt\cdt\html\Page;
 
 /**
  * This class provides methods for loading various predefined pages.
