@@ -22,7 +22,7 @@ namespace conductor\model;
  * @package clarinet/model
  *
  * @Entity(table = config_values)
- * @Gatekeeper conductor\model\gatekeeper\ConfigValueGatekeeper
+ * @NoCrud
  */
 class ConfigValue {
 
