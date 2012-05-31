@@ -56,11 +56,19 @@
 
     if (type) {
       return this.each(function () {
-        var ctx = $(this);
+        var ctx = $(this), fn;
 
-        ctx.data('layout-fn', function () {
-          $.layouts[type](ctx, params);
-        });
+        if ($.isFunction(type)) {
+          fn = function () {
+            type(ctx, params);
+          };
+        } else {
+          fn = function () {
+            $.layouts[type](ctx, params);
+          };
+        }
+
+        ctx.data('layout-fn', fn);
       });
     }
 
