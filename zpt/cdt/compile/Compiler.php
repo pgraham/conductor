@@ -38,6 +38,9 @@ class Compiler {
   /* Whether or compilation output should be compressed when possible. */
   private $_compressed;
 
+  /* Dependency Injection compiler. */
+  private $_diCompiler;
+
   /* Html Provider Generator. */
   private $_htmlProvider;
 
@@ -68,6 +71,9 @@ class Compiler {
     $this->_compressed = $compressed;
 
     $this->_tmplParser = new CodeTemplateParser();
+
+    $this->_diCompiler = new DependencyInjectionCompiler($compressed);
+    $this->_diCompiler->setTemplateParser($this->_tmplParser);
 
     $this->_jslibCompiler = new JslibCompiler($compressed);
 
@@ -124,67 +130,14 @@ class Compiler {
   }
 
   protected function compileDiContainer($pathInfo, $ns) {
-    // Compile list of application contexts to parse
-    $contexts = array(
-      "$pathInfo[lib]/conductor/dependencies.xml"
-    );
+    $diCompiler = $this->_diCompiler;
+    $diCompiler->addFile("$pathInfo[lib]/conductor/dependencies.xml");
 
-    $beans = array();
-    foreach ($contexts as $context) {
-      if (file_exists($context)) {
-        $cfg = simplexml_load_file($context, 'SimpleXMLElement',
-          LIBXML_NOCDATA);
+    $this->_doWithModules(function ($modulePath) use ($diCompiler) {
+      $diCompiler->addFile("$modulePath/dependencies.xml");
+    });
 
-        foreach ($cfg->bean as $beanDef) {
-          $bean = array();
-          $bean['id'] = $beanDef['id'];
-          $bean['class'] = $beanDef['class'];
-
-          $props = array();
-          $refs = array();
-          if (isset($beanDef->property)) {
-            $propDefs = $beanDef->property;
-            if (!is_array($propDefs)) {
-              $propDefs = array($propDefs);
-            }
-
-            foreach ($propDefs as $propDef) {
-              $prop = array();
-              $prop['name'] = $propDef['name'];
-
-              if (isset($propDef['value'])) {
-                $val = $propDef['value'];
-                if (is_numeric($val)) {
-                  $val = (float) $val;
-                } else if (strtolower($val) === 'true') {
-                  $val = true;
-                } else if (strtolower($val) === 'false') {
-                  $val = false;
-                }
-                $prop['val'] = $val;
-                
-                $props[] = $prop;
-              } else if (isset($propDef['ref'])) {
-                $prop['ref'] = $propDef['ref'];
-                $refs[] = $prop;
-              } else {
-                // TODO Warn about an invalid bean definition
-              }
-            }
-          }
-          $bean['props'] = $props;
-          $bean['refs'] = $refs;
-
-          $beans[] = $bean;
-        }
-      }
-    }
-
-    // Build the InjectionConfiguration script
-    $srcPath = "$pathInfo[lib]/conductor/src/resources/tmpl/injection.tmpl.php";
-    $outPath = "$pathInfo[target]/zeptech/dynamic/injection.php";
-    $tmpl = $this->_tmplParser->parse(file_get_contents($srcPath));
-    $tmpl->save($outPath, array('beans' => $beans));
+    $diCompiler->compile($pathInfo, $ns);
   }
 
   protected function compileJsLibs($pathInfo, $ns) {
