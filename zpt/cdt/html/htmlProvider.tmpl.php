@@ -57,6 +57,7 @@ class ${actor} {
     Element::js('${utilityJsPath}')->addToHead();
     Element::js('${jqueryDomPath}')->addToHead();
     Element::js('${cdtJsPath}')->addToHead();
+    Element::js('${messageJsPath}')->addToHead();
 
     ${if:jsappsupport}
       ${if:jsapptheme ISSET}
