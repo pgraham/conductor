@@ -31,6 +31,9 @@ use \LightOpenId;
  * This class ensures that the requesting user is assigned to a session.  The
  * session can optionally be associated with a user.
  *
+ * TODO Refactor this class so that it can be injected rather than accessed
+ *      statically. -- Rename to AuthProvider
+ *
  * @author Philip Graham <philip@lightbox.org>
  * @package conductor
  */
@@ -43,6 +46,19 @@ class Auth {
 
   private static $_openId;
   private static $_visitor;
+
+  public static function authenticate($username, $password) {
+    $pwHash = md5($password);
+
+    $c = new Criteria();
+    $c->addEquals('username', $username);
+    $c->addEquals('password', $pwHash);
+
+    $persister = Persister::get('conductor\model\User');
+    $user = $persister->retrieveOne($c);
+
+    return $user;
+  }
 
   /**
    * Check if the current session has the requested authorization and if not
@@ -167,7 +183,7 @@ class Auth {
     // is an implicit logout, whether the login succeeds or not
     $session = self::_getSession(SessionManager::NEW_IF_AUTHENTICATED);
 
-    $user = Authenticate::login($username, $password);
+    $user = self::authenticate($username, $password);
     if ($user !== null) {
       $session->setUser($user);
 
