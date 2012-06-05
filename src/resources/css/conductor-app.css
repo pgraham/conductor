@@ -79,6 +79,9 @@
 
   border-top: none;
   border-bottom: none;
+
+  overflow: auto;
+  overflow-x: hidden;
 }
 
 .cdt-list th, .cdt-list td {
