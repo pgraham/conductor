@@ -193,6 +193,44 @@
   border: 1px solid transparent; 
 }
 
+.global-config-editor h1 {
+  font-size: 2em;
+  color: #999;
+  font-weight: 700;
+  margin: 0 0 20px 10px;
+}
+.global-config-editor h1 .cdt-icon {
+  margin-right: 10px;
+  vertical-align: middle;
+}
+.cdt-config-section {
+  padding: 20px;
+}
+.cdt-config-section .section-name {
+  font-size: 1.5em;
+  font-weight: 700;
+}
+.cdt-config-section .section-name .cdt-icon {
+  display: inline-block;
+  cursor: pointer;
+  vertical-align: middle;
+  margin-left: 20px;
+}
+.cdt-config-section > .cdt-config-value label {
+  float: left;
+  margin-left: 20px;
+}
+.cdt-config-section > .cdt-config-value div {
+  margin-left: 150px;
+}
+.cdt-config-section > .cdt-config-value div span {
+  margin-right: 20px;
+  vertical-align: middle;
+}
+.cdt-config-section > .cdt-config-value div button {
+  vertical-align: middle;
+}
+
 .ui-widget .input-label {
   margin-right: 20px;
 }
@@ -220,6 +258,9 @@
 }
 .ui-button-small.ui-button-icons-only {
   width: 2.5em;
+}
+.ui-button-small.ui-button-icon-only {
+  width: 1em;
 }
 
 .hblock {

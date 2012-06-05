@@ -8,13 +8,18 @@ CDT.ns('CDT.app');
 (function ($, CDT, undefined) {
   "use strict";
 
-  var tabs, menu;
+  var tabs, menu, msgManager;
 
   eventuality(CDT.app);
 
   CDT.app.addView = function (id, lbl, elm, closeable) {
     if (tabs === undefined) {
       // TODO Queue the view to be added once the document is ready
+      return;
+    }
+
+    if ($('#' + id + '.ui-tabs-panel').length) {
+      CDT.app.showView(id);
       return;
     }
 
@@ -25,9 +30,11 @@ CDT.ns('CDT.app');
       tabs.find('.ui-tabs-nav li').last().addClass('closeable')
         .append(
           $('<span class="ui-icon ui-icon-close">Remove Tab</span>')
+            .addClass('ui-corner-all')
             .css({
               border: '1px solid transparent',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              margin: '1px 1px 0 0'
             })
             .click(function () {
               var idx = tabs.find('.ui-tabs-nav li').index($(this).parent())
@@ -48,20 +55,6 @@ CDT.ns('CDT.app');
     elm.css('top', tabs.find('.ui-tabs-nav').outerHeight(true)).layout();
   };
 
-  CDT.app.addMenuItem = function (item) {
-    menu.append(item);
-  }
-
-  CDT.app.addMessage = function (message, type, details) {
-    CDT.message(message, type, details);
-  };
-
-  CDT.app.clearMessages = function () {
-    $('.cdt-msg').slideUp('fast', function () {
-      $(this).remove();
-    });
-  };
-
   CDT.app.showView = function (id) {
     tabs.find('.ui-tabs-nav li').each(function (idx) {
       if ($(this).attr('aria-controls') === id) {
@@ -71,8 +64,52 @@ CDT.ns('CDT.app');
     });
   };
 
-  $(document).ready(function () {
+  CDT.app.addMenuItem = function (item) {
+    menu.append(item);
+  }
 
+  msgManager = (function () {
+    var newMsg = false;
+
+    return {
+      addMessage: function (message, type, details) {
+        newMsg = true;
+        CDT.message(message, {
+          type: type,
+          details: details,
+          autoRemove: type === 'info' ? 5000 : 0
+        });
+
+        // Fire a timeout to clean the new message flag so that any AJAX
+        // requests not triggered durring the current execution frame will
+        // clear the current messages.
+        setTimeout(function () {
+          newMsg = false;
+        }, 10);
+      },
+      clearMessages: function () {
+        // Only clear the messages if there is no new message.  A new message is
+        // one that has been added durring the current execution frame.  This is
+        // to prevent clearing the message of an AJAX response that triggers
+        // another AJAX request
+        if (!newMsg) {
+          $('.cdt-msg').slideUp('fast', function () {
+            $(this).remove();
+          });
+        }
+      }
+    };
+  } ());
+
+  CDT.app.addMessage = function (message, type, details) {
+    msgManager.addMessage(message, type, details);
+  };
+
+  CDT.app.clearMessages = function () {
+    msgManager.clearMessages();
+  };
+
+  $(document).ready(function () {
     menu = $('<div id="cdt-app-menu" />').appendTo('body');
 
     // Initialize the tab panel that will contain the app
@@ -101,7 +138,9 @@ CDT.ns('CDT.app');
     $('body').ajaxSuccess(function (e, xhr, opts) {
       var response, msg, msgType, elm;
       
-      if (opts.dataType === 'json') {
+      if (opts.dataType === 'json' ||
+          xhr.getResponseHeader('Content-Type') === 'application/json')
+      {
         response = $.parseJSON(xhr.responseText);
         if (!response || !response.msg) {
           return; 
