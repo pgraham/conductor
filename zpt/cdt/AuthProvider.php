@@ -164,21 +164,11 @@ class AuthProvider {
       return;
     }
 
-    // If crendentials have been provided, attempt to authenticate with them
-    if (isset($_POST['uname']) && isset($_POST['pw'])) {
-      // A successful login attempt for a synchronous request will result
-      // in a page redirect back to the same page in order to avoid
-      // re-logging in if the user refreshes the page.
-      $session = $this->login($_POST['uname'], $_POST['pw']);
-
-    } else if (isset($_GET['openid_identity'])) {
-      $session = $this->openIdLogin($_GET['openid_identity']);
-
-    } else {
-      $session = $this->_getSession();
-    }
-
-    $this->_session = $session;
+    $this->_session = SessionManager::loadSession(
+      isset($_COOKIE['conductorsessid'])
+        ? $_COOKIE['conductorsessid']
+        : null
+    );
   }
 
   /**
@@ -188,25 +178,25 @@ class AuthProvider {
    * @param string $password An optional password to use to authenticate.
    */
   public function login($username, $password) {
+    // Ensure that a session is set
+    $this->init();
+
     // To save some headaches around ambiguous results, never preserve an
     // already authenticated user.  Otherwise, a failed login attempt could
     // appear to be successful since the session would still be associated
     // with a user.  Another way to consider this is that a login attempt
     // is an implicit logout, whether the login succeeds or not
-    $session = $this->_getSession(SessionManager::NEW_IF_AUTHENTICATED);
+    if ($this->_session->getUser() !== null) {
+      $this->_session = SessionManager::newSession();
+    }
 
     $user = $this->authenticate($username, $password);
     if ($user !== null) {
-      $session->setUser($user);
+      $this->_session->setUser($user);
 
-      $persister = Persister::get($session);
-      $persister->save($session);
-
-      // If this is a synchronous request, redirect to the current page so
-      // that a reload doesn't resubmit the login credentials
-      $this->_redirectIf();
+      $persister = Persister::get($this->_session);
+      $persister->save($this->_session);
     }
-    return $session;
   }
 
   /**
@@ -229,31 +219,25 @@ class AuthProvider {
    * Process an OpenId login.  This will handle an initial redirect to an
    * openid provider or an assertion from an OP
    *
+   * TODO This is broken FIXME
+   *
    * @param $identity OpenId identity
    */
-  public function openIdLogin($identity, $returnUrl = null) {
+  public function openIdLogin($identity, $returnUrl) {
     require_once dirname(__FILE__) . '/../../lightopenid/openid.php';
     $openId = new LightOpenId(Conductor::getHostName());
-
 
     if (!$openId->mode) {
       $openId->identity = $identity;
 
-      if ($returnUrl !== null) {
-        $openId->returnUrl = $returnUrl;
-      }
-
-      // If this is a synchronous request, redirect to the current page so
-      // that a reload doesn't resubmit the login credentials
-      $this->_redirectIf($openId->authUrl());
-
-      // Don't create a session until now so that a session isn't created for
-      // just this request since it will only be used for this one request.
-      $session = $this->_getSession();
+      header('Location: ' . $openId->authUrl());
+      exit;
 
     } else {
       
       if ($openId->validate()) {
+        // Ensure a session is set
+        $this->init();
 
         // This is a positive assertion.
         // To save some headaches around ambiguous results, never preserve an
@@ -263,7 +247,9 @@ class AuthProvider {
         // is an implicit logout, whether the login succeeds or not.  However,
         // if a current session is unauthenticated, it will be associated with
         // the now logged in user.
-        $session = $this->_getSession(SessionManager::NEW_IF_AUTHENTICATED);
+        if ($this->_session->getUser() !== null) {
+          $this->_session = SessionManager::newSession();
+        }
 
         // Need to assign a user ID to the session
         $persister = Persister::get('conductor\model\User');
@@ -277,21 +263,20 @@ class AuthProvider {
           $persister->save($user);
         }
 
-        $session->setUser($user);
-        $persister = Persister::get($session);
-        $persister->save($session);
+        $this->_session->setUser($user);
+        $persister = Persister::get($this->_session);
+        $persister->save($this->_session);
 
         // Redirect to the same page if handling a synchronous request so
         // that a refresh doesn't re-authenticate the same user
         $this->_redirectIf();
       } else {
-        $session = $this->_getSession();
+        $this->_session = $this->_getSession();
       }
 
     }
 
     $this->_openId = $openId;
-    return $session;
   }
 
   /**
@@ -311,35 +296,5 @@ class AuthProvider {
 
     $persister = Persister::get($user);
     $persister->save($user);
-  }
-
-  private function _getSession($newIfAuthenticated = false) {
-    $sessId = isset($_COOKIE['conductorsessid'])
-      ? $_COOKIE['conductorsessid']
-      : null;
-
-    return SessionManager::loadSession($sessId, $newIfAuthenticated);
-  }
-
-  /*
-   * Redirect to the given URL (or REQUEST_URI if not provided) if the current
-   * request is not asynchronous.
-   */
-  private function _redirectIf($url = null) {
-    $asyncRequest = false;
-    if (isset($_SERVER['HTTP_X_REQUESTED_WITH'])) {
-      $requestType = strtolower($_SERVER['HTTP_X_REQUESTED_WITH']);
-      if ($requestType == 'xmlhttprequest') {
-        $asyncRequest = true;
-      }
-    }
-    if (!$asyncRequest) {
-      if ($url === null) {
-        $url = $_SERVER['REQUEST_URI'];
-      }
-
-      header("Location: $url");
-      exit;
-    }
   }
 }

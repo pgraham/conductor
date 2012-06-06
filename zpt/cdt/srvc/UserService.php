@@ -45,32 +45,28 @@ class UserService extends BaseRequestHandler implements RequestHandler {
     }
 
     $data = $request->getData();
-    $success = true;
     $fieldMsgs = array();
     
     if (!$this->_authProvider->checkPassword(
         $data[self::CURRENT_PASSWORD_FIELD]))
     {
-      $success = false;
       $msg = _L('users.password.currentInvalid');
       $fieldMsgs[self::CURRENT_PASSWORD_FIELD] = $msg;
     }
 
     $newPw = $data[self::NEW_PASSWORD_FIELD];
     if (!$newPw) {
-      $success = false;
       $msg = _L('users.password.noPassword');
       $fieldMsgs[self::NEW_PASSWORD_FIELD] = $msg;
     }
 
     $confirm = $data[self::CONFIRM_PASSWORD_FIELD];
     if ($newPw !== $confirm) {
-      $success = false;
       $msg = _L('users.password.noMatch');
       $fieldMsgs[self::CONFIRM_PASSWORD_FIELD] = $msg;
     }
 
-    if ($success) {
+    if (count($fieldMsgs) === 0) {
       $this->_authProvider->updatePassword($newPw);
       $msg = _L('users.password.success');
     } else {
@@ -78,7 +74,7 @@ class UserService extends BaseRequestHandler implements RequestHandler {
     }
 
     $response->setData(array(
-      'success' => $success,
+      'success' => count($fieldMsgs) === 0,
       'msg' => $msg,
       'fieldMsgs' => $fieldMsgs
     ));

@@ -52,10 +52,13 @@ class LoginForm extends Composite {
    *   constant, i.e. $form = new LoginForm("LOGIN PLEASE", LoginForm::ASYNC);
    */
   public function __construct($caption = null, $async = false) {
+    global $asWebPath;
+
     $this->initElement(
       Element::form()
         ->setId('login')
         ->setMethod(CanSubmit::METHOD_POST)
+        ->setAction($asWebPath('/login'))
         ->setClass('cdt-LoginForm')
     );
 
@@ -133,22 +136,6 @@ class LoginForm extends Composite {
    */
   public function add($ctnt) {
     $this->elm->add($ctnt);
-  }
-
-  /**
-   * Add the login form and it's resources to the page.
-   */
-  public function addToPage() {
-    $fonts = array(
-      'http://fonts.googleapis.com/css?family=OFL+Sorts+Mill+Goudy+TT&v1',
-      'http://fonts.googleapis.com/css?family=Varela&v1'
-    );
-
-    foreach ($fonts AS $font) {
-      Element::styleSheet($font)->addToHead();
-    }
-
-    $this->addToBody();
   }
 
   /**

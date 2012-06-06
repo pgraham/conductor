@@ -38,7 +38,7 @@ class LoginService extends BaseRequestHandler implements RequestHandler {
 
     $data = $request->getData();
     if ($uri === '/login') {
-      $response->setData($this->login($data['uname'], $data['pw']));
+      $this->login($request, $response);
     } else if ($uri === '/logout') {
       $response->setData($this->logout());
     }
@@ -77,19 +77,36 @@ class LoginService extends BaseRequestHandler implements RequestHandler {
     }
   }
 
-  public function login($username, $password) {
-    $this->_authProvider->login($username, $password);
+  /*
+   * TODO Handle openIdLogins
+   *
+   * if (isset($_GET['openid_identity'])) {
+   *   $session = $this->openIdLogin($_GET['openid_identity']);
+   * }
+   */
+  public function login($request, $response) {
+    $data = $request->getData();
 
+    if (isset($data['uname']) && isset($data['pw'])) {
+      $username = $data['uname'];
+      $password = $data['pw'];
+      $this->_authProvider->login($username, $password);
+    }
+
+    $this->_redirectIf();
+
+    // If not redirected then this is an AJAX request so return a JSON
+    // response
     if ($this->_authProvider->getSession->getUser() === null) {
-      return array(
+      $response->setData(array(
         'success' => false,
         'msg' => 'Invalid username or password'
-      );
+      ));
     } else {
-      return array(
+      $response->setData(array(
         'success' => true,
         'msg' => null
-      );
+      ));
     }
   }
 
@@ -100,5 +117,33 @@ class LoginService extends BaseRequestHandler implements RequestHandler {
 
   public function setAuthProvider($authProvider) {
     $this->_authProvider = $authProvider;
+  }
+
+  /*
+   * Redirect to the given URL (or HTTP_REFERER if not provided) if the current
+   * request is not asynchronous.
+   */
+  private function _redirectIf($url = null) {
+    global $asWebPath;
+
+    $asyncRequest = false;
+    if (isset($_SERVER['HTTP_X_REQUESTED_WITH'])) {
+      $requestType = strtolower($_SERVER['HTTP_X_REQUESTED_WITH']);
+      if ($requestType == 'xmlhttprequest') {
+        $asyncRequest = true;
+      }
+    }
+    if (!$asyncRequest) {
+      if ($url === null) {
+        if (isset($_SERVER['HTTP_REFERER'])) {
+          $url = $_SERVER['HTTP_REFERER'];
+        } else {
+          $url = $asWebPath('/');
+        }
+      }
+
+      header("Location: $url");
+      exit;
+    }
   }
 }

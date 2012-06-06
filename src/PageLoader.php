@@ -131,13 +131,14 @@ class PageLoader {
   public static function loadLogin($msg = null) {
     global $asWebPath;
 
-    self::loadJQuery();
-    Element::js($asWebPath('/js/login.js'))->addToHead();
+    Element::css('http://fonts.googleapis.com/css?family=Sorts+Mill+Goudy|Varela')->addToHead();
     Element::css($asWebPath('/css/login.css'))->addToHead();
 
+    self::loadJQuery();
+    Element::js($asWebPath('/js/login.js'))->addToHead();
+
     $login = new LoginForm($msg);
-    $login->addToPage();
+    $login->addToBody();
     Page::dump();
-    exit;
   }
 }
