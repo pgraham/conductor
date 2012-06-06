@@ -37,8 +37,28 @@ CDT.ns('CDT.app');
               margin: '1px 1px 0 0'
             })
             .click(function () {
-              var idx = tabs.find('.ui-tabs-nav li').index($(this).parent())
-              tabs.tabs('remove', idx);
+              var tab = $(this).parent(),
+                  tabH = tab.height(),
+                  idx = tabs.find('.ui-tabs-nav li').index(tab);
+
+              // Show the previous tab, or next tab if this is the first tab
+              if (idx === 0) {
+                tabs.tabs('select', idx + 1);
+              } else {
+                tabs.tabs('select', idx - 1);
+              }
+    
+              tab.css({
+                position: 'absolute',
+                top: 'auto',
+                bottom: $(window).height() - tab.offset().top - tabH,
+                left: tab.offset().left
+              }).animate({
+                height: 0
+              }, 'slow', 'easeOutCirc', function () {
+                tabs.tabs('remove', idx);
+              });
+
             })
             .mouseover(function () {
               $(this).css('border', '1px solid #000');
@@ -115,7 +135,9 @@ CDT.ns('CDT.app');
     // Initialize the tab panel that will contain the app
     tabs = $('<div id="cdt-app-container"><ul/></div>')
       .appendTo($('body'))
-      .tabs()
+      .tabs({
+        fx: { opacity: 'toggle', duration: 200 }
+      })
       .bind('tabsshow', function (event, ui) {
         $(ui.panel).layout();
         CDT.app.fire({
