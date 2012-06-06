@@ -115,10 +115,11 @@ class Compiler {
 
   protected function compileDiContainer($pathInfo, $ns) {
     $diCompiler = $this->_diCompiler;
-    $diCompiler->addFile("$pathInfo[lib]/conductor/dependencies.xml");
+    $diCompiler->addFile(
+      "$pathInfo[lib]/conductor/src/resources/dependencies.xml");
 
     $this->_doWithModules(function ($modulePath) use ($diCompiler) {
-      $diCompiler->addFile("$modulePath/dependencies.xml");
+      $diCompiler->addFile("$modulePath/resources/dependencies.xml");
     });
 
     $diCompiler->compile($pathInfo, $ns);
