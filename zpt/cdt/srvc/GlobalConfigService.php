@@ -29,8 +29,8 @@ use \zeptech\rest\Response;
  *
  * @author Philip Graham <philip@zeptech.ca>
  *
- * @Uri /globalConfig
- * @Uri /globalConfig/{name}
+ * @Uri /config
+ * @Uri /config/{name}
  */
 class GlobalConfigService extends BaseRequestHandler implements RequestHandler {
 
@@ -53,11 +53,13 @@ class GlobalConfigService extends BaseRequestHandler implements RequestHandler {
   }
 
   public function put(Request $request, Response $response) {
+    if (!Auth::hasPermission('cdt-admin')) {
+      throw new RestException(401);
+    }
+
     $configName = $request->getParameter('name');
     if ($configName === null) {
-      $e = new RestException(405);
-      $e->header('Allow: GET');
-      throw $e;
+      throw new RestException(405, array( 'Allow: GET' ));
     }
 
     $configValue = $request->getData();

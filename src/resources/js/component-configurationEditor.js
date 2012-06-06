@@ -89,7 +89,7 @@ CDT.ns('CDT.model');
         if (e.which === 13) {
           ctx.addClass('working');
           $.ajax({
-            url: _p('/globalConfig/' + name),
+            url: _p('/config/' + name),
             type: 'PUT',
             data: $(this).val(),
             processData: false,
@@ -145,7 +145,7 @@ CDT.ns('CDT.model');
   function loadGlobalConfig(elm) {
     elm.working();
     $.ajax({
-      url: _p('/globalConfig'),
+      url: _p('/config'),
       type: 'GET',
       dataType: 'json',
       success: function (data) {
