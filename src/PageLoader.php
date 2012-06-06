@@ -117,7 +117,6 @@ class PageLoader {
       '/js/widget-list.js',
       '/js/widget-icon.js',
       '/js/widget-download.js',
-      '/js/component-configurationEditor.js',
       '/js/conductor-app.js'
     );
     foreach ($scripts as $js) {
