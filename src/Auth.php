@@ -61,6 +61,23 @@ class Auth {
   }
 
   /**
+   * Check if the given password is the password for the current user. Returns
+   * false if there is no current user.
+   *
+   * @param string $password Password to check.
+   * @return boolean
+   */
+  public static function checkPassword($password) {
+    $user = self::getSession()->getUser();
+    if ($user === null) {
+      throw new AuthorizationException(AuthorizationException::NOT_LOGGED_IN);
+    }
+
+    $pwHash = md5($password);
+    return $user->getPassword() === $pwHash;
+  }
+
+  /**
    * Check if the current session has the requested authorization and if not
    * throw an exception
    *
@@ -282,6 +299,25 @@ class Auth {
 
     self::$_openId = $openId;
     return $session;
+  }
+
+  /**
+   * Update the password for the current user to the given password.
+   *
+   * @param string $password
+   */
+  public static function updatePassword($password) {
+    $user = self::getSession()->getUser();
+    if ($user === null) {
+      // There is no user associated with the current session
+      throw new AuthorizationException(AuthorizationException::NOT_LOGGED_IN);
+    }
+
+    $pwHash = md5($password);
+    $user->setPassword($pwHash);
+
+    $persister = Persister::get('conductor\model\User');
+    $persister->save($user);
   }
 
   private static function _getSession($newIfAuthenticated = false) {

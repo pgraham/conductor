@@ -73,9 +73,6 @@ class LoginService extends BaseRequestHandler implements RequestHandler {
     }
   }
 
-  /**
-   * @requestType post
-   */
   public function login($username, $password) {
     Auth::login($username, $password);
 

@@ -4,6 +4,7 @@
  * @author Philip Graham <philip@zeptech.ca>
  */
 (function ($, CDT, undefined) {
+  "use strict";
 
   $(document).ready(function () {
     var viewSite, previewWnd, options, optionsMenu;
@@ -49,6 +50,37 @@
         CDT.app.showView('globalSettings');
       })
       .addMenuItem('Change Password', function () {
+        var pwForm = CDT.cmp.changePasswordForm();
+
+        $('<div class="change-password"/>').attr('title', 'Change Password')
+          .append( pwForm )
+          .dialog({
+            resizable: false,
+            modal: true,
+            width: 605,
+            zIndex: 1,
+            buttons: {
+              'Cancel': function () {
+                $(this).dialog('close').dialog('destroy').remove();
+              },
+              'Change Password': function () {
+                var dialog = $(this);
+                $.ajax({
+                  url: _p('/users/current/password'),
+                  type: 'POST',
+                  data: $(this).find('form').serialize(),
+                  dataType: 'json',
+                  success: function (response) {
+                    if (response.success) {
+                      dialog.dialog('close').dialog('destroy').remove();
+                    } else {
+                      pwForm.setMessages(response.fieldMsgs);
+                    }
+                  }
+                });
+              }
+            }
+          })
       })
       .addMenuItem('Logout', function () {
         $.ajax({

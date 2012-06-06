@@ -25,8 +25,7 @@
   function createLbl(forInput, lbl) {
     return $('<label/>')
       .attr('for', forInput)
-      .text(lbl)
-      .css('float', 'left');
+      .text(lbl);
   }
 
   function fieldify(elm, overrides) {
@@ -35,9 +34,21 @@
 
   CDT.form = {};
 
+  CDT.form.password = function (name, opts) {
+    var elm = $('<input type="password"/>')
+      .attr('name', name)
+      .addClass('password')
+      .addClass('ui-widget-content')
+      .addClass('ui-corner-all')
+      .change(function () {
+        elm.clearInvalid();
+      });
+    
+    return fieldify(elm);
+  };
+
   CDT.form.spinner = function (name, opts) {
     var cont, elm, inpt;
-    
     
     cont = $('<span/>');
     inpt = $('<input type="text"/>')
@@ -114,7 +125,7 @@
         addInput;
 
     inputs = {};
-    elm = $('<form/>').addClass('cdt-form');
+    elm = $('<form class="ui-widget cdt-form"/>');
     flds = $('<fieldset/>').appendTo(elm);
 
     addInput = function (input, lbl) {
@@ -124,15 +135,21 @@
     };
 
     return $.extend(elm, {
-
+      addPassword: function (name, lbl) {
+        addInput(CDT.form.password(name), lbl);
+        return this;
+      },
       addSpinner: function (name, lbl) {
         addInput(CDT.form.spinner(name), lbl);
+        return this;
       },
       addTextArea: function (name, lbl) {
         addInput(CDT.form.textArea(name), lbl);
+        return this;
       },
       addTextInput: function (name, lbl) {
         addInput(CDT.form.textInput(name), lbl);
+        return this;
       },
       getData: function () {
         var data = {};
@@ -145,6 +162,7 @@
         $.each(inputs, function (name, input) {
           input.setValue(data[name]);
         });
+        return this;
       }
     });
   };

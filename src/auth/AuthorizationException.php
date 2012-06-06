@@ -11,27 +11,22 @@
  * =============================================================================
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
- * @package conductor/auth
  */
 namespace conductor\auth;
 
 use \Exception;
 
 /**
- * Clarinet exception class.  All messages are prepended with 'Clarinet: '.
- * The constructor is also overloaded to allow a previous exception to be
- * given without requiring a code.
+ * Exception for any Authorization or Authentication related exceptions.
  *
  * @author Philip Graham <philip@zeptech.ca>
- * @package conductor/auth
  */
 class AuthorizationException extends Exception {
 
+  const NOT_LOGGED_IN = 'auth.notLoggedIn';
+
   /**
-   * Create a new authorization exception.  Throwing an authorization exception
-   * as a result of calling PageLoader::loadPage() will result in the a login
-   * form being displayed.  For this reason it is possible to set customization
-   * information for the login form through this exception.
+   * Create a new authorization exception.
    *
    * @param string $msg The exception's message.
    * @param integer|Exception $code Either the exception's code or the causing
@@ -39,7 +34,7 @@ class AuthorizationException extends Exception {
    * @param Exception $previous The exception that is the reason this exception
    *     is being thrown.
    */
-  public function __construct($msg = null) {
-    parent::__construct($msg);
+  public function __construct($code) {
+    parent::__construct(call_user_func_array('_L', func_get_args()));
   }
 }

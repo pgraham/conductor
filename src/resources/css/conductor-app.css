@@ -129,35 +129,30 @@
   margin: 0 20px 0 10px;
 }
 
-.cdt-form label {
-  float: left;
-  height: 25px;
-}
-
-.cdt-form input,
-.cdt-form textarea,
-.cdt-form select,
-.cdt-form .ui-spinner {
+.ui-widget.cdt-form label {
   display: block;
-  margin: 5px 0 5px 150px;
+}
+.ui-widget.cdt-form input,
+.ui-widget.cdt-form textarea,
+.ui-widget.cdt-form select,
+.ui-widget.cdt-form .ui-spinner {
+  display: block;
+  margin: 5px 0;
   padding: 2px 3px;
 }
 
-.cdt-form input.text,
-.cdt-form textarea,
-.cdt-form select {
-  width: 400px;
+.ui-widget.cdt-form input.text,
+.ui-widget.cdt-form input.password,
+.ui-widget.cdt-form textarea,
+.ui-widget.cdt-form select {
+  width: 100%
 }
 
-.cdt-form input {
-  height: 20px;
-}
-
-.cdt-form .ui-spinner {
+.ui-widget.cdt-form .ui-spinner {
   width: 100px;
 }
 
-.cdt-form .ui-spinner input {
+.ui-widget.cdt-form .ui-spinner input {
   margin: 0;
 }
 
@@ -240,13 +235,21 @@
   line-height: 1.4;
   width: 250px;
 }
-.ui-widget input.text {
+.ui-widget input.text,
+.ui-widget input.password {
   padding: 2px 3px;
-  width: 300px;
   height: 24px;
 }
 
+.ui-widget input.text.working {
+  background-image: url(../img/working-small.gif);
+  background-repeat: no-repeat;
+  background-position: right center;
+  padding-right: 20px;
+}
+
 .ui-widget input.text.invalid,
+.ui-widget input.password.invalid,
 .ui-widget .ui-spinner.invalid {
   border: 1px solid #C50000;
 }
