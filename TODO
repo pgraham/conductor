@@ -1,15 +1,7 @@
-- Update session manager to delete expired sessions.
+- Update session manager to delete expired sessions. This needs to be
+  re-evaluated.
 
 - Move model parsing and ActorFactory out of clarinet and into a reed package.
 
-- Eliminate static methods from libraries (this will make them easier to test)
-  and make the 'singleton' behaviour provided by the static's injectable.  Once
-  this is done update Conductor's initialization and affected tests to do the
-  injection.
-
-- Update CRUD service retrieve method to support sorting and paging
-
-- Update sql to not use backticks but to use double quotes instead.  This will
-  require that MySQL users turn on the ANSI_QUOTES SQL_MODE.
-
-- Create a ResourceCollection class
+- Update clarinet to have classes that implement database specific behaviour for
+  supported databases.  Should support MySQL, PostgreSQL and SQLite
