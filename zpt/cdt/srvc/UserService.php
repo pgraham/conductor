@@ -34,6 +34,9 @@ class UserService extends BaseRequestHandler implements RequestHandler {
   const NEW_PASSWORD_FIELD = 'newPw';
   const CONFIRM_PASSWORD_FIELD = 'confirmPw';
 
+  /** @Injected */
+  private $_authProvider;
+
   public function post(Request $request, Response $response) {
     $userId = $request->getParameter('userId');
 
@@ -45,7 +48,9 @@ class UserService extends BaseRequestHandler implements RequestHandler {
     $success = true;
     $fieldMsgs = array();
     
-    if (!Auth::checkPassword($data[self::CURRENT_PASSWORD_FIELD])) {
+    if (!$this->_authProvider->checkPassword(
+        $data[self::CURRENT_PASSWORD_FIELD]))
+    {
       $success = false;
       $msg = _L('users.password.currentInvalid');
       $fieldMsgs[self::CURRENT_PASSWORD_FIELD] = $msg;
@@ -66,7 +71,7 @@ class UserService extends BaseRequestHandler implements RequestHandler {
     }
 
     if ($success) {
-      Auth::updatePassword($newPw);
+      $this->_authProvider->updatePassword($newPw);
       $msg = _L('users.password.success');
     } else {
       $msg = _L('users.password.failure');
@@ -77,5 +82,9 @@ class UserService extends BaseRequestHandler implements RequestHandler {
       'msg' => $msg,
       'fieldMsgs' => $fieldMsgs
     ));
+  }
+
+  public function setAuthProvider($authProvider) {
+    $this->_authProvider = $authProvider;
   }
 }

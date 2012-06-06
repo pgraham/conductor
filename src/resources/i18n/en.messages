@@ -1,3 +1,4 @@
+auth.notAuthorized=You are not authorized to perform the requested action.
 auth.notLoggedIn=You are not logged in.
 
 users.password.currentInvalid=The supplied current password is incorrect.

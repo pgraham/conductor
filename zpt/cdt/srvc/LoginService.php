@@ -30,6 +30,9 @@ use \LightOpenId;
  */
 class LoginService extends BaseRequestHandler implements RequestHandler {
 
+  /** @Injected */
+  private $_authProvider;
+
   public function post(Request $request, Response $response) {
     $uri = $request->getUri();
 
@@ -43,8 +46,9 @@ class LoginService extends BaseRequestHandler implements RequestHandler {
 
   // TODO - This needs to be handled by the service
   public function googleLogin() {
-    Auth::openIdLogin('https://www.google.com/accounts/o8/id');
-    $openId = Auth::getOpenId();
+    $this->_authProvider->openIdLogin('https://www.google.com/accounts/o8/id');
+
+    $openId = $this->_authProvider->getOpenId();
     if (!$openId->mode) {
       $openId->identity = 'https://www.google.com/accounts/o8/id';
       $openId->returnUrl = 'http://zeptech.ca/5x5calc/';
@@ -74,9 +78,9 @@ class LoginService extends BaseRequestHandler implements RequestHandler {
   }
 
   public function login($username, $password) {
-    Auth::login($username, $password);
+    $this->_authProvider->login($username, $password);
 
-    if (Auth::$session->getUser() === null) {
+    if ($this->_authProvider->getSession->getUser() === null) {
       return array(
         'success' => false,
         'msg' => 'Invalid username or password'
@@ -92,5 +96,9 @@ class LoginService extends BaseRequestHandler implements RequestHandler {
   public function logout() {
     setcookie('conductorsessid', '', time() - 3600, '/');
     return array('success' => true);
+  }
+
+  public function setAuthProvider($authProvider) {
+    $this->_authProvider = $authProvider;
   }
 }

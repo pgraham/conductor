@@ -23,7 +23,6 @@ use \zeptech\orm\generator\PersisterGenerator;
 use \zeptech\orm\generator\TransformerGenerator;
 use \zeptech\orm\generator\ValidatorGenerator;
 use \zeptech\orm\QueryBuilder;
-use \zpt\cdt\di\DependencyParser;
 use \zpt\pct\CodeTemplateParser;
 use \DirectoryIterator;
 use \ReflectionClass;
@@ -327,7 +326,7 @@ class Compiler {
 
       $this->_htmlProvider->generate($viewClass);
 
-      $hdlr = '\zpt\cdt\html\HtmlRequestHandler';
+      $hdlr = 'zpt\cdt\html\HtmlRequestHandler';
       $args = array( "'$viewClass'" );
       $tmpls[] = $tmplBase . '/' . String::fromCamelCase($pageId) . '.html';
       $tmpls[] = $tmplBase . '/' . String::fromCamelCase($pageId) . '.php';
@@ -340,7 +339,7 @@ class Compiler {
       } else {
         // Add a mapping for retrieving only page fragment
         $this->_serverCompiler->addMapping(
-          '\zpt\cdt\html\HtmlFragmentRequestHandler',
+          'zpt\cdt\html\HtmlFragmentRequestHandler',
           array( "'$viewClass'" ),
           array( String::fromCamelCase($pageId) . '.frag' )
         );
@@ -424,7 +423,7 @@ class Compiler {
         $url = "$urlBase/" . strtolower($crudInfo->getDisplayNamePlural());
 
         $this->_serverCompiler->addMapping(
-          '\\conductor\\crud\\CrudRequestHandler',
+          'conductor\\crud\\CrudRequestHandler',
           array( "'$modelClass'"),
           array ( $url, "$url/{id}")
         );
@@ -491,13 +490,7 @@ class Compiler {
         $uris = array($uris);
       }
 
-      $this->_serverCompiler->addMapping(
-        "\\$srvcClass",
-        array(),
-        $uris,
-        // If the service declares any dependency, make sure they are injected
-        DependencyParser::parse($srvcDef)
-      );
+      $this->_serverCompiler->addMapping("$srvcClass", array(), $uris);
     }
   }
 

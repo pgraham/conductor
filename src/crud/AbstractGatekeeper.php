@@ -15,8 +15,8 @@
 namespace conductor\crud;
 
 use \zeptech\orm\runtime\ActorFactory;
+use \zpt\cdt\exception\AuthException;
 
-use \conductor\auth\AuthorizationException;
 
 /**
  * Base implementation for Gatekeepers.  Implements the four checkCan* methods,
@@ -36,25 +36,29 @@ abstract class AbstractGatekeeper implements Gatekeeper {
 
   public function checkCanCreate($model) {
     if (!$this->canCreate($model)) {
-      throw new AuthorizationException($this->msg($model, 'create'));
+      throw new AuthException(AuthException::NOT_AUTHORIZED,
+        $this->msg($model, 'create'));
     }
   }
 
   public function checkCanDelete($model) {
     if (!$this->canDelete($model)) {
-      throw new AuthorizationException($this->msg($model, 'delete'));
+      throw new AuthException(AuthException::NOT_AUTHORIZED,
+        $this->msg($model, 'delete'));
     }
   }
 
   public function checkCanRead($model) {
     if (!$this->canRead($model)) {
-      throw new AuthorizationException($this->msg($model, 'read'));
+      throw new AuthException(AuthException::NOT_AUTHORIZED,
+      $this->msg($model, 'read'));
     }
   }
 
   public function checkCanWrite($model) {
     if (!$this->canWrite($model)) {
-      throw new AuthorizationException($this->msg($model, 'write'));
+      throw new AuthException(AuthException::NOT_AUTHORIZED,
+      $this->msg($model, 'write'));
     }
   }
 

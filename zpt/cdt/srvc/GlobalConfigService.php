@@ -34,6 +34,9 @@ use \zeptech\rest\Response;
  */
 class GlobalConfigService extends BaseRequestHandler implements RequestHandler {
 
+  /** @Injected */
+  private $_authProvider;
+
   public function get(Request $request, Response $response) {
     $configName = $request->getParameter('name');
     if ($configName === null) {
@@ -53,7 +56,7 @@ class GlobalConfigService extends BaseRequestHandler implements RequestHandler {
   }
 
   public function put(Request $request, Response $response) {
-    if (!Auth::hasPermission('cdt-admin')) {
+    if (!$this->_authProvider->hasPermission('cdt-admin')) {
       throw new RestException(401);
     }
 
@@ -80,5 +83,9 @@ class GlobalConfigService extends BaseRequestHandler implements RequestHandler {
       'success' => true,
       'msg' => "$configName has been updated"
     ));
+  }
+
+  public function setAuthProvider($authProvider) {
+    $this->_authProvider = $authProvider;
   }
 }

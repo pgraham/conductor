@@ -14,7 +14,6 @@
  */
 namespace conductor;
 
-use \conductor\auth\AuthorizationException;
 use \conductor\jslib\JsLib;
 use \conductor\resources\BaseResources;
 use \conductor\resources\JsAppResources;
@@ -34,6 +33,8 @@ use \zeptech\orm\runtime\Criteria;
 use \zeptech\orm\runtime\Persister;
 use \zeptech\rest\RestServer;
 use \zpt\cdt\compile\Compiler;
+use \zpt\cdt\di\Injector;
+use \zpt\cdt\exception\AuthException;
 use \zpt\cdt\L10N;
 
 use \Exception;
@@ -205,7 +206,7 @@ class Conductor {
 
     // Authenticate.
     if ($authenticate) {
-      Auth::init();
+      Injector::getBean('authProvider')->init();
     }
 
     // Initialize localization
@@ -273,7 +274,7 @@ class Conductor {
       }
       echo $response;
 
-    } catch (AuthorizationException $e) {
+    } catch (AuthException $e) {
       error_log($e->getMessage());
       error_log($e->getTraceAsString());
 

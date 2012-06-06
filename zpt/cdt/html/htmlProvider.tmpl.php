@@ -17,6 +17,9 @@ use \oboe\Element;
  */
 class ${actor} {
 
+  /** @Injected */
+  private $_authProvider;
+
   public function populate(Page $page, array $query = null) {
     ${if:title ISSET}
       $page->setPageTitle('${title}');
@@ -31,7 +34,7 @@ class ${actor} {
     ${fi}
 
     ${if:auth ISSET}
-      if (!Auth::hasPermission('${auth}')) {
+      if (!$this->_authProvider->hasPermission('${auth}')) {
         PageLoader::loadLogin();
         exit;
       }
@@ -88,6 +91,13 @@ class ${actor} {
   }
 
   public function getFragment($query) {
+    ${if:auth ISSET}
+      if (!$this->_authProvider->hasPermission('${auth}')) {
+        PageLoader::loadLogin();
+        exit;
+      }
+    ${fi}
+
     ${if:hasContent}
       $ctntProvider = new \${contentProvider}();
       Injector::inject($ctntProvider, ${php:dependencies});
@@ -95,5 +105,9 @@ class ${actor} {
     ${else}
       return '';
     ${fi}
+  }
+
+  public function setAuthProvider($authProvider) {
+    $this->_authProvider = $authProvider;
   }
 }

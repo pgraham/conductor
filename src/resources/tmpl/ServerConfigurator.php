@@ -12,7 +12,7 @@ class ServerConfigurator {
 
   public function configure(RestServer $server) {
     ${each:mappings as mapping}
-      $hdlr = new ${mapping[hdlr]}(${join:mapping[args]:,});
+      $hdlr = new \${mapping[hdlr]}(${join:mapping[args]:,});
       ${if:mapping[beans] ISSET}
         Injector::inject($hdlr, ${php:mapping[beans]});
       ${fi}

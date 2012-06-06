@@ -25,7 +25,11 @@ use \ReflectionClass;
  */
 class DependencyParser {
 
-  public static function parse(ReflectionClass $classDef) {
+  public static function parse($classDef) {
+    if (is_string($classDef)) {
+      $classDef = new ReflectionClass($classDef);
+    }
+
     $beans = array();
 
     $properties = $classDef->getProperties();

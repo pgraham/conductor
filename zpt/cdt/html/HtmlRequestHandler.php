@@ -26,6 +26,9 @@ use \ReflectionClass;
 
 class HtmlRequestHandler extends BaseRequestHandler implements RequestHandler {
 
+  /** @Injected */
+  private $_authProvider;
+
   private $_pageDef;
   private $_htmlProvider;
 
@@ -45,9 +48,14 @@ class HtmlRequestHandler extends BaseRequestHandler implements RequestHandler {
     $page = Page::getInstance();
 
     $this->_htmlProvider = HtmlProvider::get($this->_pageDef);
+    $this->_htmlProvider->setAuthProvider($this->_authProvider);
     $this->_htmlProvider->populate($page, $request->getQuery());
 
     $response->setData($page);
+  }
+
+  public function setAuthProvider($authProvider) {
+    $this->_authProvider = $authProvider;
   }
 
 }

@@ -30,6 +30,9 @@ class HtmlFragmentRequestHandler extends BaseRequestHandler
     implements RequestHandler
 {
 
+  /** @Injected */
+  private $_authProvider;
+
   /**
    * Create a new  HtmlFragmentRequestHandler for the given Page definition
    * class.
@@ -42,6 +45,7 @@ class HtmlFragmentRequestHandler extends BaseRequestHandler
 
   public function get(Request $request, Response $response) {
     $this->_htmlProvider = HtmlProvider::get($this->_pageDef);
+    $this->_htmlProvider->setAuthProvider($this->_authProvider);
 
     $frag = $this->_htmlProvider->getFragment($request->getQuery());
     if (!is_array($frag)) {
@@ -53,5 +57,9 @@ class HtmlFragmentRequestHandler extends BaseRequestHandler
       $fragStr .= $f;
     }
     $response->setData($fragStr);
+  }
+
+  public function setAuthProvider($authProvider) {
+    $this->_authProvider = $authProvider;
   }
 }

@@ -14,6 +14,8 @@
  */
 namespace zpt\cdt\compile;
 
+use \zpt\cdt\di\DependencyParser;
+
 /**
  * This class generates a RESTful ServerConfigurator implementation from a
  * set of mappings.
@@ -40,12 +42,14 @@ class ServerCompiler {
    * @param array $beans List of bean id that should be injected into the
    *   handler.
    */
-  public function addMapping($hdlr, $args, $uris, $beans = null) {
+  public function addMapping($hdlr, $args, $uris) {
     $mapping = array(
       'hdlr' => $hdlr,
       'args' => $args,
       'uris' => $uris
     );
+
+    $beans = DependencyParser::parse($hdlr);
     if ($beans !== null && count($beans) > 0) {
       $mapping['beans'] = $beans;
     }

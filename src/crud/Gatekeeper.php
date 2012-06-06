@@ -62,7 +62,7 @@ interface Gatekeeper {
    * Check that the current user is allowed to create the given model.
    *
    * @param model $model The model for which create authorization is requested.
-   * @throws conductor\auth\AuthorizationException if the user is not allowed to
+   * @throws AuthException if the user is not allowed to
    *   create the given model.
    */
   public function checkCanCreate($model);
@@ -71,7 +71,7 @@ interface Gatekeeper {
    * Check that the current user is allowed to delete the given model.
    *
    * @param model $model The model for which delete authorization is requested.
-   * @throws conductor\auth\AuthorizationException if the user is not allowed to
+   * @throws AuthException if the user is not allowed to
    *   delete the given model.
    */
   public function checkCanDelete($model);
@@ -80,7 +80,7 @@ interface Gatekeeper {
    * Check that the current user is allowed to read the given model.
    *
    * @param model $model The model for which read authorization is requested.
-   * @throws conductor\auth\AuthorizationException if the user is not allowed to
+   * @throws AuthException if the user is not allowed to
    *   read the given model.
    */
   public function checkCanRead($model);
@@ -89,7 +89,7 @@ interface Gatekeeper {
    * Check that the current user is allowed to write the given model.
    *
    * @param model $model The model for which write authorization is requested.
-   * @throws conductor\auth\AuthorizationException if the user is not allowed to
+   * @throws AuthException if the user is not allowed to
    *   write the given model.
    */
   public function checkCanWrite($model);

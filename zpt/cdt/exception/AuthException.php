@@ -12,7 +12,7 @@
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
  */
-namespace conductor\auth;
+namespace zpt\cdt\exception;
 
 use \Exception;
 
@@ -21,8 +21,9 @@ use \Exception;
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class AuthorizationException extends Exception {
+class AuthException extends Exception {
 
+  const NOT_AUTHORIZED = 'auth.notAuthorized';
   const NOT_LOGGED_IN = 'auth.notLoggedIn';
 
   /**

@@ -15,6 +15,7 @@
 namespace conductor\crud;
 
 use \conductor\Auth;
+use \zpt\cdt\di\Injector;
 
 /**
  * Default Gatekeeper.  Allows read access to all users and create, write and
@@ -24,16 +25,20 @@ use \conductor\Auth;
  */
 class DefaultGatekeeper extends AbstractGatekeeper implements Gatekeeper {
 
+  /** @Injected */
+  private $_authProvider;
+
   public function __construct($modelClass) {
     parent::__construct($modelClass);
+    Injector::inject($this, array('authProvider'));
   }
 
   public function canCreate($model) {
-    return Auth::hasPermission('cdt-admin');
+    return $this->_authProvider->hasPermission('cdt-admin');
   }
 
   public function canDelete($model) {
-    return Auth::hasPermission('cdt-admin');
+    return $this->_authProvider->hasPermission('cdt-admin');
   }
 
   public function canRead($model) {
@@ -41,6 +46,10 @@ class DefaultGatekeeper extends AbstractGatekeeper implements Gatekeeper {
   }
 
   public function canWrite($model) {
-    return Auth::hasPermission('cdt-admin');
+    return $this->_authProvider->hasPermission('cdt-admin');
+  }
+
+  public function setAuthProvider($authProvider) {
+    $this->_authProvider = $authProvider;
   }
 }
