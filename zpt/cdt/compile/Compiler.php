@@ -107,21 +107,6 @@ class Compiler {
 
     $this->compileModules($pathInfo, $ns);
 
-    // Compile The sites language files.
-    // ----------------------------------
-    //
-    // Language file compilation involves parsing properties files and building
-    // a hash or string for each language and outputting a php script which can
-    // be parsed quicker than parsing the language properties files at runtime.
-    //
-    // Language files are defined by modules and by the site.  Compile language
-    // files are:
-    //
-    //    * modules/<mod-name/resources/i18n/<lang>.messages
-    //    * src/resources/i18n/<lang>.messages
-    //
-    // Any string defined by a module can be overriden by the site by defining a
-    // string with the same key in the site's language file.
     $this->compileLanguageFiles($pathInfo, $ns);
 
     $this->compileHtml($pathInfo, $ns);
@@ -152,12 +137,38 @@ class Compiler {
     }
   }
 
+  /**
+   * Compile The site's language files.
+   * ----------------------------------
+   * 
+   * Language file compilation involves parsing properties files and building
+   * a hash or string for each language and outputting a php script which can
+   * be parsed quicker than parsing the language properties files at runtime.
+   *
+   * Language files are defined by conductor, modules and by the site.
+   * Compiled language files, in order, are:
+   *
+   *    * lib/conductor/src/resources/i18n/<lang>.messages
+   *    * modules/<mod-name/resources/i18n/<lang>.messages
+   *    * src/resources/i18n/<lang>.messages
+   *
+   * Any string defined by conductor can be overridden by a module or by the
+   * site and any string defined by a module can be overriden by the site by
+   * defining a string with the same key in the site's (or module's) language
+   * file.
+   */
   protected function compileLanguageFiles($pathInfo, $ns) {
     $compiler = $this;
+
+    // Compile conductor language files
+    $this->_compileLanguageDir("$pathInfo[lib]/conductor/src/resources/i18n");
+
+    // Compile module language files
     $this->_doWithModules(function ($modulePath) use ($compiler) {
       $compiler->_compileLanguageDir("$modulePath/resources/i18n");
     });
 
+    // Compile site language files
     $this->_compileLanguageDir("$pathInfo[src]/resources/i18n");
 
     $this->_l10nCompiler->compile($pathInfo);
