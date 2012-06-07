@@ -231,8 +231,10 @@ class Compiler {
         $rmCmd = "rm -r $modTarget";
         exec($rmCmd);
       }
-      $cpCmd = "cp -a $modDocs $target/$modName";
-      exec($cpCmd);
+      if (file_exists($modDocs)) {
+        $cpCmd = "cp -a $modDocs $target/$modName";
+        exec($cpCmd);
+      }
 
       // Compile module models and services
       $modSrc = $module->getPathname() . "/zpt/mod/$modName";
