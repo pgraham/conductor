@@ -41,9 +41,9 @@ class ${actor} {
     ${fi}
 
     // Basic client support
-    Element::js('${baseJsPath}')->addToHead();
-    Element::css('${resetCssPath}')->addToHead();
-    Element::css('${cdtCssPath}')->addToHead();
+    Element::js('${jsPath}/base.js')->addToHead();
+    Element::css('${cssPath}/reset.css')->addToHead();
+    Element::css('${cssPath}/cdt.css')->addToHead();
 
     // Javascript libraries
     PageLoader::loadDateJs();
@@ -56,11 +56,13 @@ class ${actor} {
     ${fi}
 
     // Client support scripts
-    Element::js('${jqueryWorkingPath}')->addToHead();
-    Element::js('${utilityJsPath}')->addToHead();
-    Element::js('${jqueryDomPath}')->addToHead();
-    Element::js('${cdtJsPath}')->addToHead();
-    Element::js('${messageJsPath}')->addToHead();
+    Element::js('${jsPath}/jquery.working.js')->addToHead();
+    Element::js('${jsPath}/utility.js')->addToHead();
+    Element::js('${jsPath}/utility-loadCss.js')->addToHead();
+    Element::js('${jsPath}/jquery-dom.js')->addToHead();
+    Element::js('${jsPath}/conductor.js')->addToHead();
+    Element::js('${jsPath}/widget-message.js')->addToHead();
+    Element::js('${jsPath}/layout.js')->addToHead();
 
     ${if:jsappsupport}
       ${if:jsapptheme ISSET}

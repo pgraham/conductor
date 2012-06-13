@@ -130,16 +130,8 @@ class HtmlProvider extends AbstractGenerator {
       $values['uitheme'] = 'zpt';
     }
 
-    $values['baseJsPath'] = $asWebPath('/js/base.js');
-    $values['resetCssPath'] = $asWebPath('/css/reset.css');
-    $values['cdtCssPath'] = $asWebPath('/css/cdt.css');
-
-
-    $values['jqueryWorkingPath'] = $asWebPath('/js/jquery.working.js');
-    $values['utilityJsPath'] = $asWebPath('/js/utility.js');
-    $values['jqueryDomPath'] = $asWebPath('/js/jquery-dom.js');
-    $values['cdtJsPath'] = $asWebPath('/js/conductor.js');
-    $values['messageJsPath'] = $asWebPath('/js/widget-message.js');
+    $values['jsPath'] = $asWebPath('/js');
+    $values['cssPath'] = $asWebPath('/css');
 
     $values['jscripts'] = array_merge(
       $values['jscripts'],
