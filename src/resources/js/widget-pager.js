@@ -29,19 +29,19 @@ CDT.ns('CDT.widget');
       }
 
       if (curPage <= 1) {
-        prev.button('option', 'disabled', true);
-        first.button('option', 'disabled', true);
+        prev.removeClass('ui-state-hover').button('option', 'disabled', true);
+        first.removeClass('ui-state-hover').button('option', 'disabled', true);
       } else {
-        prev.button('option', 'disabled', false);
-        first.button('option', 'disabled', false);
+        prev.removeClass('ui-state-hover').button('option', 'disabled', false);
+        first.removeClass('ui-state-hover').button('option', 'disabled', false);
       }
 
       if (curPage >= pages) {
-        next.button('option', 'disabled', true);
-        last.button('option', 'disabled', true);
+        next.removeClass('ui-state-hover').button('option', 'disabled', true);
+        last.removeClass('ui-state-hover').button('option', 'disabled', true);
       } else {
-        next.button('option', 'disabled', false);
-        last.button('option', 'disabled', false);
+        next.removeClass('ui-state-hover').button('option', 'disabled', false);
+        last.removeClass('ui-state-hover').button('option', 'disabled', false);
       }
 
       pageNum.val(curPage);
