@@ -41,16 +41,17 @@ class CrudException extends Exception {
   private $_isNotNullViolation = false;
 
   public function __construct() {
-    parent::__construct();
-
     $arg1 = func_get_arg(0);
     if ($arg1 instanceof PdoExceptionWrapper) {
       $this->_initiateFromPdoException($arg1);
+      parent::__construct($arg1->getMessage(), $arg1->getCode(), $arg1);
     } else if ($arg1 instanceof ValidationException) {
       $this->_initiateFromValidationException($arg1);
+      parent::__construct($arg1->getMessage(), $arg1->getCode(), $arg1);
     } else {
       $this->_responseHeader = $arg1;
       $this->_responseMessage = func_get_arg(1);
+      parent::__construct($this->_responseMessage);
     }
   }
 

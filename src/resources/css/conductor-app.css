@@ -85,6 +85,9 @@
 }
 
 .cdt-list th, .cdt-list td {
+  position: relative;
+  top: 0;
+  left: 0;
   border-right: none;
 }
 
@@ -188,6 +191,13 @@
   border: 1px solid transparent; 
 }
 
+.cdt-icon {
+  display: inline-block;
+}
+.cdt-icon svg {
+  vertical-align: middle;
+}
+
 .global-config-editor h1 {
   font-size: 2em;
   color: #999;
@@ -206,9 +216,7 @@
   font-weight: 700;
 }
 .cdt-config-section .section-name .cdt-icon {
-  display: inline-block;
   cursor: pointer;
-  vertical-align: middle;
   margin-left: 20px;
 }
 .cdt-config-section > .cdt-config-value label {

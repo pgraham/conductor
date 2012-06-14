@@ -87,6 +87,8 @@ class CrudRequestHandler extends BaseRequestHandler implements RequestHandler {
         $response->setData($this->_crud->retrieve($spf));
       } catch (CrudException $e) {
         $this->_handleException($e, $response, 'retrieving', true /* Plural */);
+        error_log($e->getMessage());
+        error_log($e->getTraceAsString());
       }
     }
   }

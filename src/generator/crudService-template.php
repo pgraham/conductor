@@ -106,6 +106,7 @@ class ${modelName}Crud {
         'total' => $total
       );
     } catch (PdoExceptionWrapper $e) {
+      error_log("Encountered an error process SQL:\n\n{$e->getSql()}");
       throw new CrudException($e);
     } catch (ValidationException $e) {
       throw new CrudException($e);
