@@ -25,6 +25,7 @@ use \zeptech\orm\generator\ValidatorGenerator;
 use \zeptech\orm\QueryBuilder;
 use \zpt\pct\CodeTemplateParser;
 use \DirectoryIterator;
+use \Exception;
 use \ReflectionClass;
 
 /**
@@ -315,11 +316,6 @@ class Compiler {
       }
 
       $pageId = $pageDef->getBasename('.php');
-      if (strlen($pageId) > 8 && substr($pageId, -8) === 'Template') {
-        // This file is a page template definition
-        continue;
-      }
-
       if ($tmplBase === '') {
         $viewClass = "$ns\\html\\$pageId";
       } else {
@@ -327,7 +323,17 @@ class Compiler {
         $viewClass = "$ns\\html\\$viewNs\\$pageId";
       }
 
-      $this->_htmlProvider->generate($viewClass);
+      try {
+        $this->_htmlProvider->generate($viewClass);
+      } catch (Exception $e) {
+        // TODO Make a more reliable way of determining if this exception is
+        //      because the file is not a page definition so that other
+        //      exceptions aren't swallowed.
+
+        // This is likely because the file is not a page definition so just
+        // continue.
+        continue;
+      }
 
       $hdlr = 'zpt\cdt\html\HtmlRequestHandler';
       $args = array( "'$viewClass'" );
@@ -343,7 +349,7 @@ class Compiler {
         // Add a mapping for retrieving only page fragment
         $this->_serverCompiler->addMapping(
           'zpt\cdt\html\HtmlFragmentRequestHandler',
-          array( "'$viewClass'" ),
+          $args,
           array( String::fromCamelCase($pageId) . '.frag' )
         );
       }
