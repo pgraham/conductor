@@ -14,6 +14,8 @@
  */
 namespace zpt\cdt {
 
+use oboe\Element;
+
 /**
  * This class provides localized content.  If no language file is present for
  * the given language then the default language is used but strings will be
@@ -29,6 +31,32 @@ class L10N {
   public static function get($key) {
     $getFn = self::$_getFn;
     return $getFn($key);
+  }
+
+  /**
+   * Wrap any text in localized subject matching localized search with anchor
+   * tags for the given URL.
+   *
+   * @param string $subjectId L10N id of the linkify subject
+   * @param string $searchId L10N id of the text to wrap within subject
+   * @param string $url
+   */
+  public static function linkify($subjectId, $searchId, $url) {
+    $subject = _L($subjectId);
+    $search = _L($searchId);
+
+    $re = '/(' . preg_quote($search) . ')/i';
+    $split = preg_split($re, $subject, null, PREG_SPLIT_DELIM_CAPTURE);
+
+    $linkified = '';
+    foreach ($split as $chunk) {
+      if (preg_match($re, $chunk)) {
+        $linkified .= Element::a($url, $chunk)->__toString();
+      } else {
+        $linkified .= $chunk;
+      }
+    }
+    return $linkified;
   }
 
   /**

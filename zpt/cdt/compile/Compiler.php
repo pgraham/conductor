@@ -26,6 +26,7 @@ use \zeptech\orm\QueryBuilder;
 use \zpt\cdt\di\DependencyParser;
 use \zpt\pct\CodeTemplateParser;
 use \DirectoryIterator;
+use \Exception;
 use \ReflectionClass;
 
 /**
@@ -308,10 +309,6 @@ class Compiler {
       }
 
       $pageId = $pageDef->getBasename('.php');
-      if (strlen($pageId) > 8 && substr($pageId, -8) === 'Template') {
-        // This file is a page template definition
-        continue;
-      }
 
       $viewClass = $pageId;
       $beanId = lcfirst($pageId);
@@ -323,7 +320,17 @@ class Compiler {
       $viewClass = "$ns\\html\\$viewClass";
       $beanId .= 'HtmlProvider';
 
-      $this->_htmlProvider->generate($viewClass);
+      try {
+        $this->_htmlProvider->generate($viewClass);
+      } catch (Exception $e) {
+        // TODO Make a more reliable way of determining if this exception is
+        //      because the file is not a page definition so that other
+        //      exceptions aren't swallowed.
+
+        // This is likely because the file is not a page definition so just
+        // continue.
+        continue;
+      }
 
       $inst = HtmlProvider::get($viewClass);
       $instClass = get_class($inst);
