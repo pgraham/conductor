@@ -115,36 +115,7 @@ class AuthProvider {
    * @return Visitor
    */
   public function getVisitor() {
-    if ($this->_visitor === null) {
-      $persister = Persister::get('conductor\model\Visitor');
-
-      $visitor = null;
-      if (isset($_COOKIE['visitor_id'])) {
-        $visitorKey = $_COOKIE['visitor_id'];
-
-        $c = new Criteria();
-        $c->addEquals('key', $visitorKey);
-        
-        $this->_visitor = $persister->retrieveOne($c);
-      } else {
-        $visitorKey = uniqid('visitor_', true);
-
-        $visitor = new Visitor();
-        $visitor->setKey($visitorKey);
-        $persister->save($visitor);
-
-        // TODO - Support IP addresses
-        $domainParts = explode('.', $_SERVER['SERVER_NAME']);
-        if (count($domainParts) > 2) {
-          $domainParts = array_slice($domainParts, -2);
-        }
-        $domain = implode('.', $domainParts);
-
-        setcookie('visitor_id', $visitorKey, 0, '/', ".$domain");
-        $this->_visitor = $visitor;
-      }
-
-    }
+    $this->init();
     return $this->_visitor;
   }
 
@@ -159,16 +130,8 @@ class AuthProvider {
    * request, then initiate a new session with default permissions.
    */
   public function init() {
-    // Only authenticate once per request
-    if ($this->_session !== null) {
-      return;
-    }
-
-    $this->_session = SessionManager::loadSession(
-      isset($_COOKIE['conductorsessid'])
-        ? $_COOKIE['conductorsessid']
-        : null
-    );
+    $this->_initSession();
+    $this->_initVisitor();
   }
 
   /**
@@ -296,5 +259,54 @@ class AuthProvider {
 
     $persister = Persister::get($user);
     $persister->save($user);
+  }
+
+  /* Initialize the session. */
+  private function _initSession() {
+    if ($this->_session !== null) {
+      return;
+    }
+
+    // Initialize session
+    $this->_session = SessionManager::loadSession(
+      isset($_COOKIE['conductorsessid'])
+        ? $_COOKIE['conductorsessid']
+        : null
+    );
+  }
+
+  /* Initialize the visitor. */
+  private function _initVisitor() {
+    global $asWebPath;
+
+    // Initialize visitor
+    if ($this->_visitor !== null) {
+      return;
+    }
+
+    $persister = Persister::get('conductor\model\Visitor');
+
+    $visitor = null;
+    if (isset($_COOKIE['visitor_id'])) {
+      $visitorKey = $_COOKIE['visitor_id'];
+
+      $c = new Criteria();
+      $c->addEquals('key', $visitorKey);
+      
+      $visitor = $persister->retrieveOne($c);
+    } else {
+      $visitorKey = uniqid('visitor_', true);
+
+      $visitor = new Visitor();
+      $visitor->setKey($visitorKey);
+      $persister->save($visitor);
+
+      $tenYearsFromNow = time() + 315569260;
+      $path = $asWebPath('/');
+      setcookie('visitor_id', $visitorKey, $tenYearsFromNow, $path);
+    }
+
+    $this->_visitor = $visitor;
+
   }
 }
