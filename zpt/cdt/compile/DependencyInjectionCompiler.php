@@ -26,11 +26,21 @@ class DependencyInjectionCompiler {
   private $_compressed;
 
   private $_files = array();
+  private $_beans = array();
 
   private $_tmplParser;
 
   public function __construct($compressed) {
     $this->_compressed = $compressed;
+  }
+
+  public function addBean($id, $class, $refs) {
+    $this->_beans[] = array(
+      'id' => $id,
+      'class' => $class,
+      'refs' => $refs,
+      'props' => array()
+    );
   }
 
   public function addFile($file) {
@@ -40,7 +50,6 @@ class DependencyInjectionCompiler {
   }
 
   public function compile($pathInfo, $ns) {
-    $beans = array();
     foreach ($this->_files as $context) {
       if (file_exists($context)) {
         $cfg = simplexml_load_file($context, 'SimpleXMLElement',
@@ -87,7 +96,7 @@ class DependencyInjectionCompiler {
           $bean['props'] = $props;
           $bean['refs'] = $refs;
 
-          $beans[] = $bean;
+          $this->_beans[] = $bean;
         }
       }
     }
@@ -96,7 +105,7 @@ class DependencyInjectionCompiler {
     $srcPath = "$pathInfo[lib]/conductor/src/resources/tmpl/InjectionConfigurator.php";
     $outPath = "$pathInfo[target]/zeptech/dynamic/InjectionConfigurator.php";
     $tmpl = $this->_tmplParser->parse(file_get_contents($srcPath));
-    $tmpl->save($outPath, array('beans' => $beans));
+    $tmpl->save($outPath, array('beans' => $this->_beans));
   }
 
   public function setTemplateParser($templateParser) {

@@ -21,15 +21,13 @@ use \zeptech\rest\BaseRequestHandler;
 use \zeptech\rest\RequestHandler;
 use \zeptech\rest\Request;
 use \zeptech\rest\Response;
+use \zpt\cdt\di\Injector;
 use \Exception;
 use \ReflectionClass;
 
 class HtmlRequestHandler extends BaseRequestHandler implements RequestHandler {
 
-  /** @Injected */
-  private $_authProvider;
-
-  private $_pageDef;
+  private $_beanId;
   private $_htmlProvider;
 
   /**
@@ -37,8 +35,8 @@ class HtmlRequestHandler extends BaseRequestHandler implements RequestHandler {
    *
    * @param string $pageDef
    */
-  public function __construct($pageDef) {
-    $this->_pageDef = $pageDef;
+  public function __construct($beanId) {
+    $this->_beanId = $beanId;
   }
 
   /**
@@ -47,8 +45,7 @@ class HtmlRequestHandler extends BaseRequestHandler implements RequestHandler {
   public function get(Request $request, Response $response) {
     $page = Page::getInstance();
 
-    $this->_htmlProvider = HtmlProvider::get($this->_pageDef);
-    $this->_htmlProvider->setAuthProvider($this->_authProvider);
+    $this->_htmlProvider = Injector::getBean($this->_beanId);
     $this->_htmlProvider->populate($page, $request->getQuery());
 
     $response->setData($page);

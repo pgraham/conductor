@@ -23,6 +23,7 @@ use \zeptech\orm\generator\PersisterGenerator;
 use \zeptech\orm\generator\TransformerGenerator;
 use \zeptech\orm\generator\ValidatorGenerator;
 use \zeptech\orm\QueryBuilder;
+use \zpt\cdt\di\DependencyParser;
 use \zpt\pct\CodeTemplateParser;
 use \DirectoryIterator;
 use \ReflectionClass;
@@ -94,22 +95,16 @@ class Compiler {
       "$pathInfo[lib]/conductor/src/resources/rest/srvr.php",
       "$pathInfo[target]/htdocs/srvr.php");
 
-    // Compile the site's application context.
-    // ----------------------------------------
-    // 
-    // This will include the following application contexts
     $this->compileDiContainer($pathInfo, $ns);
     $this->compileModels($pathInfo, $ns);
     $this->compileServices($pathInfo, $ns);
     $this->compileResources($pathInfo, $ns);
     $this->compileJsLibs($pathInfo, $ns);
-
     $this->compileModules($pathInfo, $ns);
-
     $this->compileLanguageFiles($pathInfo, $ns);
-
     $this->compileHtml($pathInfo, $ns);
 
+    $this->_diCompiler->compile($pathInfo, $ns);
     $this->_serverCompiler->compile($pathInfo);
   }
 
@@ -121,8 +116,6 @@ class Compiler {
     $this->_doWithModules(function ($modulePath) use ($diCompiler) {
       $diCompiler->addFile("$modulePath/resources/dependencies.xml");
     });
-
-    $diCompiler->compile($pathInfo, $ns);
   }
 
   protected function compileJsLibs($pathInfo, $ns) {
@@ -320,17 +313,26 @@ class Compiler {
         continue;
       }
 
-      if ($tmplBase === '') {
-        $viewClass = "$ns\\html\\$pageId";
-      } else {
+      $viewClass = $pageId;
+      $beanId = lcfirst($pageId);
+      if ($tmplBase !== '') {
         $viewNs = str_replace('/', '\\', ltrim($tmplBase, '/'));
-        $viewClass = "$ns\\html\\$viewNs\\$pageId";
+        $viewClass = "$viewNs\\$pageId";
+        $beanId = lcfirst(String::toCamelCase($viewNs, '\\', true) . $pageId);
       }
+      $viewClass = "$ns\\html\\$viewClass";
+      $beanId .= 'HtmlProvider';
 
       $this->_htmlProvider->generate($viewClass);
 
+      $inst = HtmlProvider::get($viewClass);
+      $instClass = get_class($inst);
+      $deps = DependencyParser::parse($instClass);
+      $this->_diCompiler->addBean($beanId, $instClass, $deps);
+
+      $args = array( "'$beanId'" );
+
       $hdlr = 'zpt\cdt\html\HtmlRequestHandler';
-      $args = array( "'$viewClass'" );
       $tmpls[] = $tmplBase . '/' . String::fromCamelCase($pageId) . '.html';
       $tmpls[] = $tmplBase . '/' . String::fromCamelCase($pageId) . '.php';
       if ($pageId === 'Index') {
@@ -343,7 +345,7 @@ class Compiler {
         // Add a mapping for retrieving only page fragment
         $this->_serverCompiler->addMapping(
           'zpt\cdt\html\HtmlFragmentRequestHandler',
-          array( "'$viewClass'" ),
+          $args,
           array( String::fromCamelCase($pageId) . '.frag' )
         );
       }
