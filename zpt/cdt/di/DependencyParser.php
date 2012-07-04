@@ -41,12 +41,27 @@ class DependencyParser {
 
       $beanId = ltrim($prop->getName(), '_');
 
+      $setter = 'set' . ucfirst($beanId);
+
       // Make sure that there is a setter for this property
-      if (!$classDef->hasMethod('set' . ucfirst($beanId))) {
+      if (!$classDef->hasMethod($setter)) {
         throw new Exception("Injection property does not have a setter: $beanId");
       }
 
-      $beans[] = $beanId;
+      if (isset($annos['collection'])) {
+        $method = $classDef->getMethod($setter);
+        $params = $method->getParameters();
+        if (count($params) < 1 || !$params[0]->isArray()) {
+          throw new Exception("Collection setters must accept an array");
+        }
+        $beans[] = array(
+          'id'     => $beanId,
+          'lookup' => 'byType',
+          'type'   => $annos['collection']
+        );
+      } else {
+        $beans[] = array( 'id' => $beanId, 'lookup' => 'byId' );
+      }
     }
 
     return $beans;

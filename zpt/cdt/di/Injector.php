@@ -24,18 +24,47 @@ class Injector {
 
   private static $_beans = array();
 
+  /**
+   * Add a bean to the container.
+   */
   public static function addBean($id, $bean) {
     self::$_beans[$id] = $bean;
   }
 
+  /**
+   * Get the bean with the given ID or null if not found.
+   *
+   * @return Object
+   */
   public static function getBean($id) {
     return self::$_beans[$id];
   }
 
+  /**
+   * Get an array containing all beans with the given type.
+   *
+   * @return array
+   */
+  public static function getBeans($type) {
+    $beans = array();
+    foreach (self::$_beans as $bean) {
+      if ($bean instanceof $type) {
+        $beans[] = $bean;
+      }
+    }
+    return $beans;
+  }
+
   public static function inject($obj, array $beans) {
     foreach ($beans as $bean) {
-      $setter = "set" . ucfirst($bean);
-      $obj->$setter(self::getBean($bean));
+      $beanId = $bean['id'];
+      $setter = "set" . ucfirst($beanId);
+
+      if ($bean['lookup'] === 'byId') {
+        $obj->$setter(self::getBean($beanId));
+      } else {
+        $obj->$setter(self::getBeans($bean['type']));
+      }
     }
   }
 }

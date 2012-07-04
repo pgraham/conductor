@@ -61,9 +61,9 @@ class DependencyInjectionCompiler {
 
             foreach ($propDefs as $propDef) {
               $prop = array();
-              $prop['name'] = $propDef['name'];
 
               if (isset($propDef['value'])) {
+                $prop['name'] = $propDef['name'];
                 $val = $propDef['value'];
                 if (is_numeric($val)) {
                   $val = (float) $val;
@@ -76,7 +76,8 @@ class DependencyInjectionCompiler {
                 
                 $props[] = $prop;
               } else if (isset($propDef['ref'])) {
-                $prop['ref'] = $propDef['ref'];
+                $prop['id'] = $propDef['name'];
+                $prop['lookup'] = 'byId';
                 $refs[] = $prop;
               } else {
                 // TODO Warn about an invalid bean definition
