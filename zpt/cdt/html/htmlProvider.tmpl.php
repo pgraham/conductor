@@ -20,6 +20,12 @@ class ${actor} {
   /** @Injected */
   private $_authProvider;
 
+  /**
+   * @Injected
+   * @Collection zpt\cdt\html\PageViewListener
+   */
+  private $_pageViewListeners;
+
   public function populate(Page $page, array $query = null) {
     ${if:title ISSET}
       $page->setPageTitle('${title}');
@@ -100,16 +106,30 @@ class ${actor} {
       }
     ${fi}
 
+    $ctnt = '';
     ${if:hasContent}
       $ctntProvider = new \${contentProvider}();
       Injector::inject($ctntProvider, ${php:dependencies});
-      return $ctntProvider->getContent($query);
-    ${else}
-      return '';
+      $ctnt = $ctntProvider->getContent($query);
     ${fi}
+
+    // Invoke any registered page view listeners
+    $this->_onPageView();
+
+    return $ctnt;
   }
 
   public function setAuthProvider($authProvider) {
     $this->_authProvider = $authProvider;
+  }
+
+  public function setPageViewListeners(array $pageViewListeners) {
+    $this->_pageViewListeners = $pageViewListeners;
+  }
+
+  private function _onPageView() {
+    foreach ($this->_pageViewListeners as $pageViewListener) {
+      $pageViewListener->pageView();
+    }
   }
 }
