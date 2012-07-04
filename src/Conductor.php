@@ -27,6 +27,7 @@ use \reed\generator\CodeTemplate;
 use \reed\ClassLoader;
 use \reed\File;
 
+use \zeptech\dynamic\InjectionConfigurator;
 use \zeptech\dynamic\ServerConfigurator;
 use \zeptech\orm\runtime\Clarinet;
 use \zeptech\orm\runtime\Criteria;
@@ -202,7 +203,8 @@ class Conductor {
     Clarinet::init($pdo);
 
     // Initialize Dependency injection
-    require_once "$pathInfo[target]/zeptech/dynamic/injection.php";
+    $configurator = new InjectionConfigurator();
+    $configurator->configure();
 
     // Authenticate.
     if ($authenticate) {
