@@ -28,40 +28,13 @@ use \zpt\pct\CodeTemplateParser;
  */
 class ModelInfo extends AbstractModelGenerator {
 
-  private static $_cache = array();
+  protected static $actorNamespace = 'zeptech\dynamic\info';
 
-  /**
-   * Retrieve a ModelInfo instance for the specified model.  This ModelInfo
-   * class must already be generated.
-   *
-   * @param string $modelName
-   */
-  public static function get($modelName) {
-    if (!array_key_exists($modelName, self::$_cache)) {
-      $actor = str_replace('\\', '_', $modelName);
-      $fq = "zeptech\\dynamic\\info\\$actor";
-      self::$_cache[$modelName] = new $fq();
-    }
-    return self::$_cache[$modelName];
+  protected function getTemplatePath() {
+    return __DIR__ . '/modelInfo.tmpl.php';
   }
 
-  /*
-   * ===========================================================================
-   * Generator
-   * ===========================================================================
-   */
-
-  private $_tmpl;
-
-  public function __construct($outputPath) {
-    parent::__construct($outputPath . '/zeptech/dynamic/info');
-
-    $parser = new CodeTemplateParser();
-    $this->_tmpl = $parser->parse(
-      file_get_contents(__DIR__ . '/modelInfo.tmpl.php'));
-  }
-
-  protected function _generateForModel(Model $model) {
+  protected function getValuesForModel(Model $model) {
     $displayName = $model->getDisplayName();
     if ($displayName === null) {
       $actorParts = explode('_', $model->getActor());
@@ -82,11 +55,11 @@ class ModelInfo extends AbstractModelGenerator {
         : 'a';
     }
 
-    return $this->_tmpl->forValues(array(
+    return array(
       'actor'   => $model->getActor(),
       'display' => $displayName,
       'plural'  => $displayNamePlural,
       'article' => $article
-    ));
+    );
   }
 }

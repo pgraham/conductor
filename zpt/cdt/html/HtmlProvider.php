@@ -17,7 +17,6 @@ namespace zpt\cdt\html;
 use \zeptech\anno\Annotations;
 use \zpt\cdt\di\DependencyParser;
 use \zpt\pct\AbstractGenerator;
-use \zpt\pct\CodeTemplateParser;
 use \Exception;
 use \ReflectionClass;
 
@@ -29,40 +28,13 @@ use \ReflectionClass;
  */
 class HtmlProvider extends AbstractGenerator {
 
-  private static $_cache = array();
+  protected static $actorNamespace = 'zeptech\dynamic\html';
 
-  /**
-   * Retrieve an HtmlProvider instance for the specified page definition.  The
-   * HtmlProvider must already have been generated.
-   *
-   * @param string $pageDef
-   */
-  public static function get($pageDef) {
-    if (!array_key_exists($pageDef, self::$_cache)) {
-      $actor = str_replace('\\', '_', $pageDef);
-      $fq = "zeptech\\dynamic\\html\\$actor";
-      self::$_cache[$pageDef] = new $fq();
-    }
-    return self::$_cache[$pageDef];
+  protected function getTemplatePath() {
+    return __DIR__ . '/htmlProvider.tmpl.php';
   }
 
-  /*
-   * ===========================================================================
-   * Generator
-   * ===========================================================================
-   */
-
-  private $_tmpl;
-
-  public function __construct($outputPath) {
-    parent::__construct($outputPath . '/zeptech/dynamic/html');
-
-    $parser = new CodeTemplateParser();
-    $this->_tmpl = $parser->parse(
-      file_get_contents(__DIR__ . '/htmlProvider.tmpl.php'));
-  }
-
-  protected function _generate($className) {
+  protected function getValues($className) {
     global $asWebPath;
 
     $pageDef = new ReflectionClass($className);
@@ -72,7 +44,6 @@ class HtmlProvider extends AbstractGenerator {
     }
 
     $values = array(
-      'actor' => str_replace('\\', '_', $className),
       'jscripts' => array(),
       'sheets' => array(),
       'fonts' => array()
@@ -162,7 +133,7 @@ class HtmlProvider extends AbstractGenerator {
       $values['dependencies'] = $dependencies;
     }
 
-    return $this->_tmpl->forValues($values);
+    return $values;
   }
 
   /*

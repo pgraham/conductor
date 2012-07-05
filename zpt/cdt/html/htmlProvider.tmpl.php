@@ -1,5 +1,5 @@
 <?php
-namespace zeptech\dynamic\html;
+namespace ${actorNs};
 
 use \zpt\cdt\di\Injector;
 use \zpt\cdt\html\Page;
@@ -15,7 +15,7 @@ use \oboe\Element;
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class ${actor} {
+class ${actorClass} {
 
   /** @Injected */
   private $_authProvider;
