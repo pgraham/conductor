@@ -72,7 +72,7 @@ class DependencyInjectionCompiler {
               $prop = array();
 
               if (isset($propDef['value'])) {
-                $prop['name'] = $propDef['name'];
+                $prop['name'] = (string) $propDef['name'];
                 $val = $propDef['value'];
                 if (is_numeric($val)) {
                   $val = (float) $val;
@@ -85,7 +85,7 @@ class DependencyInjectionCompiler {
                 
                 $props[] = $prop;
               } else if (isset($propDef['ref'])) {
-                $prop['id'] = $propDef['name'];
+                $prop['id'] = (string) $propDef['name'];
                 $prop['lookup'] = 'byId';
                 $refs[] = $prop;
               } else {
