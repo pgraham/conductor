@@ -64,9 +64,6 @@ class DependencyInjectionCompiler {
           $refs = array();
           if (isset($beanDef->property)) {
             $propDefs = $beanDef->property;
-            if (!is_array($propDefs)) {
-              $propDefs = array($propDefs);
-            }
 
             foreach ($propDefs as $propDef) {
               $prop = array();
