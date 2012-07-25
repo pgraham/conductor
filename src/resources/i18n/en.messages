@@ -1,6 +1,9 @@
 auth.notAuthorized=You are not authorized to perform the requested action.
 auth.notLoggedIn=You are not logged in.
 
+error.generic=The server encountered an unexpected condition which prevented it\
+    from fulfilling the request.
+
 users.password.currentInvalid=The supplied current password is incorrect.
 users.password.failure=Unable to update password.
 users.password.failureReason=Unable to update password: {0}

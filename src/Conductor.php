@@ -288,7 +288,12 @@ class Conductor {
       error_log($e->getMessage());
       error_log($e->getTraceAsString());
       header('HTTP/1.1 500 Internal Server Error');
-      echo $e->getMessage();
+
+      $msg = $e->getMessage();
+      if (!$msg) {
+        $msg = _L('error.generic');
+      }
+      echo $msg;
     }
   }
 
