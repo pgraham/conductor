@@ -24,12 +24,26 @@ use \zpt\cdt\di\DependencyParser;
  */
 class ServerCompiler {
 
+  /* List of generated request handlers */
+  private $_actors = array();
+
   private $_compressed;
-  private $_mappings;
+
+  /* List of request handlers */
+  private $_mappings = array();
+
   private $_tmplParser;
 
   public function __construct($compressed = false) {
     $this->_compressed = false;
+  }
+
+  public function addActor($generator, $def, $uris) {
+    $this->_actors[] = array(
+      'generator' => $generator,
+      'definition' => $def,
+      'uris' => $uris
+    );
   }
 
   /**
@@ -61,7 +75,10 @@ class ServerCompiler {
     $tmplSrc = "$resourceSrc/tmpl/ServerConfigurator.php";
     $tmplOut = "$pathInfo[target]/zeptech/dynamic/ServerConfigurator.php";
 
-    $values = array( 'mappings' => $this->_mappings );
+    $values = array(
+      'mappings' => $this->_mappings,
+      'actors' => $this->_actors
+    );
     $tmpl = $this->_tmplParser->parse(file_get_contents($tmplSrc));
     $tmpl->save($tmplOut, $values);
   }

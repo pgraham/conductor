@@ -16,11 +16,20 @@ class ServerConfigurator {
       ${if:mapping[beans] ISSET}
         Injector::inject($hdlr, ${php:mapping[beans]});
       ${fi}
-
       ${each:mapping[uris] as uri}
         $server->addMapping('${uri}', $hdlr);
       ${done}
 
+    ${done}
+
+    ${each:actors as actor}
+      $hdlr = ${actor[generator]}::get('${actor[definition]}');
+      ${if:actor[beans] ISSET}
+        Injector::inject($hdlr, ${php:actor[beans]});
+      ${fi}
+      ${each:actor[uris] as uri}
+        $server->addMapping('${uri[template]}', $hdlr, '${uri[id]}');
+      ${done}
     ${done}
   }
 }
