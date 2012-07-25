@@ -236,11 +236,11 @@ class Compiler {
 
     // Compile conductor resources
     // ---------------------------
-    $resourceSrc = "$pathInfo[lib]/conductor/src/resources";
+    $resourceSrc = "$pathInfo[lib]/conductor/htdocs";
 
     // Compile base javascript
     $this->_compileResource(
-      "$resourceSrc/tmpl/base.tmpl.js",
+      "$pathInfo[lib]/conductor/src/resources/tmpl/base.tmpl.js",
       "$resourceOut/js/base.js",
       array(
         'rootPath' => $pathInfo['webRoot'],
