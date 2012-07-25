@@ -24,6 +24,7 @@ use \zeptech\orm\generator\TransformerGenerator;
 use \zeptech\orm\generator\ValidatorGenerator;
 use \zeptech\orm\QueryBuilder;
 use \zpt\cdt\di\DependencyParser;
+use \zpt\cdt\rest\ServiceRequestDispatcher;
 use \zpt\pct\CodeTemplateParser;
 use \DirectoryIterator;
 use \Exception;
@@ -57,6 +58,9 @@ class Compiler {
   /* REST server configurator compiler. */
   private $_serverCompiler;
 
+  /* Service compiler */
+  private $_serviceCompiler;
+
   /* Code template parser. */
   private $_tmplParser;
 
@@ -83,6 +87,9 @@ class Compiler {
 
     $this->_serverCompiler = new ServerCompiler($compressed);
     $this->_serverCompiler->setTemplateParser($this->_tmplParser);
+
+    $this->_serviceCompiler = new ServiceCompiler($compressed);
+    $this->_serviceCompiler->setServerCompiler($this->_serverCompiler);
   }
 
   public function compile($pathInfo, $ns) {
@@ -229,14 +236,6 @@ class Compiler {
         $cpCmd = "cp -a $modDocs $target/$modName";
         exec($cpCmd);
       }
-
-      // Compile module models and services
-      $modSrc = $module->getPathname() . "/zpt/mod/$modName";
-      $modBaseNs = "zpt\\mod\\$modName";
-
-      $this->_compileServiceDir(
-        "$modSrc/srvc",
-        "$modBaseNs\\srvc");
     }
   }
 
@@ -276,15 +275,28 @@ class Compiler {
   }
 
   protected function compileServices($pathInfo, $ns) {
-    // Compile Conductor models
-    $this->_compileServiceDir(
+    // Compile Conductor services
+    $this->_serviceCompiler->compile(
       "$pathInfo[lib]/conductor/zpt/cdt/srvc",
-      'zpt\\cdt\\srvc');
+      'zpt\\cdt\\srvc'
+    );
 
-    // Compile Site models
-    $this->_compileServiceDir(
+    // Compile modules services
+    $compiler = $this->_serviceCompiler;
+    $this->_doWithModules(function ($modulePath) use ($compiler) {
+      $modName = basename($modulePath);
+      $modBaseNs = "zpt\\mod\\$modName";
+      $compiler->compile(
+        "$modulePath/zpt/mod/$modName/srvc",
+        "$modBaseNs\\srvc"
+      );
+    });
+
+    // Compile Site services
+    $this->_serviceCompiler->compile(
       "$pathInfo[src]/$ns/srvc",
-      "$ns\\srvc");
+      "$ns\\srvc"
+    );
   }
 
   private function _compileHtmlDir($htmlDir, $ns, $tmplBase = '') {
@@ -474,38 +486,6 @@ class Compiler {
     }
   }
 
-  private function _compileServiceDir($srvcs, $ns) {
-    if (!file_exists($srvcs)) {
-      // Nothing to do here
-      return;
-    }
-
-    $dir = new DirectoryIterator($srvcs);
-    foreach ($dir as $srvc) {
-      if ($srvc->isDot() || $srvc->isDir()) {
-        continue;
-      }
-
-      $fname = $srvc->getFilename();
-      if (substr($fname, -4) !== '.php') {
-        continue;
-      }
-
-      $srvcName = substr($fname, 0, -4);
-      $srvcClass = "$ns\\$srvcName";
-      $srvcDef = new ReflectionClass($srvcClass);
-
-
-      $annos = new Annotations($srvcDef);
-      $uris = $annos['uri'];
-      if (!is_array($uris)) {
-        $uris = array($uris);
-      }
-
-      $this->_serverCompiler->addMapping("$srvcClass", array(), $uris);
-    }
-  }
-
   private function _doWithModules($fn) {
     if (!file_exists($this->_modulesPath)) {
       return;
@@ -524,6 +504,11 @@ class Compiler {
   private function _initCompiler($pathInfo) {
     $this->_htmlProvider = new HtmlProvider($pathInfo['target']);
     $this->_modulesPath = "$pathInfo[root]/modules";
+    $serviceRequestDispatcher = new ServiceRequestDispatcher(
+      $pathInfo['target']);
+
+    $this->_serviceCompiler->setServiceRequestDispatcher(
+      $serviceRequestDispatcher);
   }
 
   private function _parseStrings($msgs) {
