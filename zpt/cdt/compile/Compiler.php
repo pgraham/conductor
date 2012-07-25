@@ -1,22 +1,13 @@
 <?php
 /**
- * =============================================================================
  * Copyright (c) 2010, Philip Graham
  * All rights reserved.
- *
- * This file is part of Conductor and is licensed by the Copyright holder under
- * the 3-clause BSD License.  The full text of the license can be found in the
- * LICENSE.txt file included in the root directory of this distribution or at
- * the link below.
- * =============================================================================
- *
- * @license http://www.opensource.org/licenses/bsd-license.php
  */
 namespace zpt\cdt\compile;
 
-use \zpt\cdt\html\HtmlProvider;
 use \conductor\modeling\ModelInfo;
 use \conductor\CrudService;
+use \reed\File;
 use \reed\String;
 use \zeptech\anno\Annotations;
 use \zeptech\orm\generator\PersisterGenerator;
@@ -24,6 +15,7 @@ use \zeptech\orm\generator\TransformerGenerator;
 use \zeptech\orm\generator\ValidatorGenerator;
 use \zeptech\orm\QueryBuilder;
 use \zpt\cdt\di\DependencyParser;
+use \zpt\cdt\html\HtmlProvider;
 use \zpt\cdt\rest\ServiceRequestDispatcher;
 use \zpt\pct\CodeTemplateParser;
 use \DirectoryIterator;
@@ -304,19 +296,19 @@ class Compiler {
 
     $dir = new DirectoryIterator($htmlDir);
     foreach ($dir as $pageDef) {
-      $tmpls = array();
-      if ($pageDef->isDot() || substr($pageDef->getFileName(), 0, 1) === '.') {
+      $fname = $pageDef->getBasename();
+
+      if ($pageDef->isDot() || substr($fname, 0, 1) === '.') {
         continue;
       }
 
       if ($pageDef->isDir()) {
-        $dirTmplBase = $tmplBase . '/' . $pageDef->getBasename();
+        $dirTmplBase = $tmplBase . '/' . $fname;
         $this->_compileHtmlDir($pageDef->getPathname(), $ns, $dirTmplBase);
         continue;
       }
 
-      $extension = substr($pageDef->getFilename(), -4);
-      if ($extension !== '.php') {
+      if (!File::checkExtension($fname, 'php')) {
         continue;
       }
 
@@ -352,6 +344,7 @@ class Compiler {
       $args = array( "'$beanId'" );
 
       $hdlr = 'zpt\cdt\html\HtmlRequestHandler';
+      $tmpls = array();
       $tmpls[] = $tmplBase . '/' . String::fromCamelCase($pageId) . '.html';
       $tmpls[] = $tmplBase . '/' . String::fromCamelCase($pageId) . '.php';
       if ($pageId === 'Index') {
