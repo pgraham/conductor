@@ -30,7 +30,12 @@ class DefaultGatekeeper extends AbstractGatekeeper implements Gatekeeper {
 
   public function __construct($modelClass) {
     parent::__construct($modelClass);
-    Injector::inject($this, array('authProvider'));
+    Injector::inject($this, array(
+      array(
+        'id' => 'authProvider',
+        'lookup' => 'byId'
+      )
+    ));
   }
 
   public function canCreate($model) {
