@@ -99,7 +99,7 @@ class DependencyInjectionCompiler {
     }
 
     // Build the InjectionConfiguration script
-    $srcPath = "$pathInfo[lib]/conductor/src/resources/tmpl/InjectionConfigurator.php";
+    $srcPath = __DIR__ . '/InjectionConfigurator.php';
     $outPath = "$pathInfo[target]/zeptech/dynamic/InjectionConfigurator.php";
     $tmpl = $this->_tmplParser->parse(file_get_contents($srcPath));
     $tmpl->save($outPath, array('beans' => $this->_beans));

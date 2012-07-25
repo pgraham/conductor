@@ -204,7 +204,7 @@ class JslibCompiler {
     //    of compilation
 
     // Compile predefined conductor themes
-    $this->_compileThemeDir("$pathInfo[lib]/conductor/src/resources/themes",
+    $this->_compileThemeDir("$pathInfo[lib]/conductor/resources/themes",
       "$jslibOut/themes");
 
     // Compile site specific themes
@@ -272,8 +272,8 @@ class JslibCompiler {
       }
 
       $src = "$dir/{$theme->getBasename()}";
-      $out = "$out/{$theme->getBasename()}";
-      $this->_compileTheme($src, $out);
+      $themeOut = "$out/{$theme->getBasename()}";
+      $this->_compileTheme($src, $themeOut);
     }
   }
 

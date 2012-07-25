@@ -38,8 +38,7 @@ class L10NCompiler {
   }
 
   public function compile($pathInfo) {
-    $tmplSrcPath = "$pathInfo[lib]/conductor/src/resources/tmpl/"
-                 . "language.strings.tmpl.php";
+    $tmplSrcPath = __DIR__ . "/language.strings.tmpl.php";
     $tmpl = $this->_tmplParser->parse(file_get_contents($tmplSrcPath));
 
     foreach ($this->_languages as $lang => $strings) {

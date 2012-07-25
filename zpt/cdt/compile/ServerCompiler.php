@@ -71,8 +71,7 @@ class ServerCompiler {
   }
 
   public function compile($pathInfo) {
-    $resourceSrc = "$pathInfo[lib]/conductor/src/resources";
-    $tmplSrc = "$resourceSrc/tmpl/ServerConfigurator.php";
+    $tmplSrc = __DIR__ . '/ServerConfigurator.php';
     $tmplOut = "$pathInfo[target]/zeptech/dynamic/ServerConfigurator.php";
 
     $values = array(

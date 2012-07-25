@@ -89,10 +89,10 @@ class Compiler {
 
     // Compile server dispatcher
     copy(
-      "$pathInfo[lib]/conductor/src/resources/rest/.htaccess",
+      "$pathInfo[lib]/conductor/htdocs/.htaccess",
       "$pathInfo[target]/htdocs/.htaccess");
     copy(
-      "$pathInfo[lib]/conductor/src/resources/rest/srvr.php",
+      "$pathInfo[lib]/conductor/htdocs/srvr.php",
       "$pathInfo[target]/htdocs/srvr.php");
 
     $this->compileDiContainer($pathInfo, $ns);
@@ -111,7 +111,7 @@ class Compiler {
   protected function compileDiContainer($pathInfo, $ns) {
     $diCompiler = $this->_diCompiler;
     $diCompiler->addFile(
-      "$pathInfo[lib]/conductor/src/resources/dependencies.xml");
+      "$pathInfo[lib]/conductor/resources/dependencies.xml");
 
     $this->_doWithModules(function ($modulePath) use ($diCompiler) {
       $diCompiler->addFile("$modulePath/resources/dependencies.xml");
@@ -154,7 +154,7 @@ class Compiler {
     $compiler = $this;
 
     // Compile conductor language files
-    $this->_compileLanguageDir("$pathInfo[lib]/conductor/src/resources/i18n");
+    $this->_compileLanguageDir("$pathInfo[lib]/conductor/resources/i18n");
 
     // Compile module language files
     $this->_doWithModules(function ($modulePath) use ($compiler) {
@@ -240,7 +240,7 @@ class Compiler {
 
     // Compile base javascript
     $this->_compileResource(
-      "$pathInfo[lib]/conductor/src/resources/tmpl/base.tmpl.js",
+      "$pathInfo[lib]/conductor/resources/base.tmpl.js",
       "$resourceOut/js/base.js",
       array(
         'rootPath' => $pathInfo['webRoot'],

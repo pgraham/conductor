@@ -15,8 +15,6 @@
 namespace conductor;
 
 use \conductor\jslib\JsLib;
-use \conductor\resources\BaseResources;
-use \conductor\resources\JsAppResources;
 use \conductor\template\PageTemplate;
 
 use \oboe\head\Javascript;
