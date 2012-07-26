@@ -102,6 +102,7 @@ class HtmlProvider extends AbstractGenerator {
     }
 
     $values['jsPath'] = $asWebPath('/js');
+    $values['jslibPath'] = $asWebPath('/jslib');
     $values['cssPath'] = $asWebPath('/css');
 
     $values['jscripts'] = array_merge(

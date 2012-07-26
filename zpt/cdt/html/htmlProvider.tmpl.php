@@ -54,6 +54,7 @@ class ${actorClass} {
     // Javascript libraries
     PageLoader::loadDateJs();
     PageLoader::loadJQuery();
+    Element::js('${jslibPath}/webshims/polyfiller.js')->addToHead();
     PageLoader::loadJQueryCookie();
     ${if:uitheme ISSET}
       PageLoader::loadJQueryUi('${uitheme}');
