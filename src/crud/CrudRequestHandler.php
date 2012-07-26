@@ -100,7 +100,7 @@ class CrudRequestHandler extends BaseRequestHandler implements RequestHandler {
     $this->_ensureCrud();
 
     try {
-      $data = $request->getData();
+      $data = (array) $request->getData();
 
       $id = $request->getParameter('id');
       if ($id !== null) {
@@ -134,7 +134,7 @@ class CrudRequestHandler extends BaseRequestHandler implements RequestHandler {
     }
 
     try {
-      $data = $request->getData();
+      $data = (array) $request->getData();
 
       // TODO What is allowed to be PUT?
     } catch (CrudException $e) {
