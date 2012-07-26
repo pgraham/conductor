@@ -64,9 +64,14 @@ class JslibCompiler {
       $this->compileRaphael($pathInfo, $jslibPath);
       break;
 
+      case 'webshims':
+      $this->compileWebshims($pathInfo, $jslibPath);
+      break;
+
       // Default, simply copy the library's source files to the target
       default:
-      // TODO
+      // TODO Abstract _compileResourceDir into a class and reuse it to compile
+      //      the jslib
       break;
     }
   }
@@ -218,7 +223,6 @@ class JslibCompiler {
   }
 
   protected function compileJWysiwyg($pathInfo, $jslibSrc) {
-    $jslibSrc = "$pathInfo[lib]/jslib/jwysiwyg";
     $jslibOut = "$pathInfo[target]/htdocs/jslib/jwysiwyg";
 
     if (!file_exists($jslibOut)) {
@@ -229,6 +233,37 @@ class JslibCompiler {
     copy("$jslibSrc/jquery.wysiwyg.css", "$jslibOut/jquery.wysiwyg.css");
     copy("$jslibSrc/jquery.wysiwyg.bg.png", "$jslibOut/jquery.wysiwyg.bg.png");
     copy("$jslibSrc/jquery.wysiwyg.gif", "$jslibOut/jquery.wysiwyg.gif");
+  }
+
+  protected function compileWebshims($pathInfo, $jslibSrc) {
+    $jslibSrc = "$jslibSrc/js-webshim/minified";
+    $jslibOut = "$pathInfo[target]/htdocs/jslib/webshims";
+
+    if (!file_exists($jslibOut)) {
+      mkdir($jslibOut, 0755, true);
+    }
+
+    
+    $modernizrPath = "$jslibSrc/extras/modernizr-custom.js";
+    $polyfillerPath = "$jslibSrc/polyfiller.js";
+    $load = <<<LOAD
+
+// Since jQuery 1.7+ is used there is no need to load the shiv for dynamic
+// HTML5 element creation
+window.html5 = { shivMethods: false};
+
+$.webshims.polyfill('geolocation json-storage');
+LOAD;
+
+    $modernizr = file_get_contents($modernizrPath);
+    $polyfiller = file_get_contents($polyfillerPath);
+
+    $script =  $modernizr . $polyfiller . $load;
+    file_put_contents("$jslibOut/polyfiller.js", $script);
+
+    // compile to copy $jslibSrc/shims
+    $resourceCompiler = new ResourceCompiler();
+    $resourceCompiler->compile("$jslibSrc/shims", "$jslibOut/shims");
   }
 
   private function _compileTheme($src, $out) {
