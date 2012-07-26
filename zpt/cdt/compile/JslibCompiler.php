@@ -30,48 +30,48 @@ class JslibCompiler {
     $this->_compressed = $compressed;
   }
 
-  public function compile($jslibName, $pathInfo) {
+  public function compile($jslibPath, $pathInfo) {
+    $jslibName = basename($jslibPath);
     $this->_ensureTarget($pathInfo, $jslibName);
 
     switch ($jslibName) {
 
       case 'datejs':
-      $this->compileDateJs($pathInfo);
+      $this->compileDateJs($pathInfo, $jslibPath);
       break;
 
       case 'jquery-cookie':
-      $this->compileJQueryCookie($pathInfo);
+      $this->compileJQueryCookie($pathInfo, $jslibPath);
       break;
 
       case 'jquery-ui':
-      $this->compileJQueryUi($pathInfo);
+      $this->compileJQueryUi($pathInfo, $jslibPath);
       break;
 
       case 'file-uploader':
-      $this->compileFileUploader($pathInfo);
+      $this->compileFileUploader($pathInfo, $jslibPath);
       break;
 
       case 'galleria':
-      $this->compileGalleria($pathInfo);
+      $this->compileGalleria($pathInfo, $jslibPath);
       break;
 
       case 'raphael':
-      $this->compileRaphael($pathInfo);
+      $this->compileRaphael($pathInfo, $jslibPath);
       break;
 
       case 'jwysiwyg':
-      $this->compileJWysiwyg($pathInfo);
+      $this->compileJWysiwyg($pathInfo, $jslibPath);
       break;
 
-      // Default, simply copy the library's source file to the target
+      // Default, simply copy the library's source files to the target
       default:
       // TODO
       break;
     }
   }
 
-  protected function compileDateJs($pathInfo) {
-    $jslibSrc = "$pathInfo[lib]/jslib/datejs";
+  protected function compileDateJs($pathInfo, $jslibSrc) {
     $jslibOut = "$pathInfo[target]/htdocs/jslib/datejs";
 
     if (!file_exists($jslibOut)) {
@@ -81,8 +81,7 @@ class JslibCompiler {
     copy("$jslibSrc/build/date.js", "$jslibOut/date.js");
   }
 
-  protected function compileFileUploader($pathInfo) {
-    $jslibSrc = "$pathInfo[lib]/jslib/file-uploader";
+  protected function compileFileUploader($pathInfo, $jslibSrc) {
     $jslibOut = "$pathInfo[target]/htdocs/jslib/file-uploader";
 
     if (!file_exists($jslibOut)) {
@@ -94,16 +93,15 @@ class JslibCompiler {
     copy("$jslibSrc/client/loading.gif", "$jslibOut/loading.gif");
   }
 
-  protected function compileGalleria($pathInfo) {
-    $jslibSrc = "$pathInfo[lib]/jslib/galleria/src";
+  protected function compileGalleria($pathInfo, $jslibSrc) {
     $jslibOut = "$pathInfo[target]/htdocs/jslib/galleria";
 
     if (!file_exists($jslibOut)) {
       mkdir($jslibOut, 0755, true);
     }
-    copy("$jslibSrc/galleria.js", "$jslibOut/galleria.js");
+    copy("$jslibSrc/src/galleria.js", "$jslibOut/galleria.js");
 
-    $themeSrc = "$jslibSrc/themes/classic";
+    $themeSrc = "$jslibSrc/src/themes/classic";
     $themeOut = "$jslibOut/themes/classic";
     if (!file_exists($themeOut)) {
       mkdir($themeOut, 0755, true);
@@ -114,8 +112,7 @@ class JslibCompiler {
     copy("$themeSrc/classic-map.png", "$themeOut/classic-map.png");
   }
 
-  protected function compileJQueryCookie($pathInfo) {
-    $jslibSrc = "$pathInfo[lib]/jslib/jquery-cookie";
+  protected function compileJQueryCookie($pathInfo, $jslibSrc) {
     $jslibOut = "$pathInfo[target]/htdocs/jslib/jquery-cookie";
 
     if (!file_exists($jslibOut)) {
@@ -124,8 +121,7 @@ class JslibCompiler {
     copy("$jslibSrc/jquery.cookie.js", "$jslibOut/jquery.cookie.js");
   }
 
-  protected function compileJQueryUi($pathInfo) {
-    $jslibSrc = "$pathInfo[lib]/jslib/jquery-ui";
+  protected function compileJQueryUi($pathInfo, $jslibSrc) {
     $jslibOut = "$pathInfo[target]/htdocs/jslib/jquery-ui";
 
     if (!file_exists($jslibOut)) {
@@ -211,8 +207,7 @@ class JslibCompiler {
     $this->_compileThemeDir("$pathInfo[src]/themes", "$jslibOut/themes");
   }
 
-  protected function compileRaphael($pathInfo) {
-    $jslibSrc = "$pathInfo[lib]/jslib/raphael";
+  protected function compileRaphael($pathInfo, $jslibSrc) {
     $jslibOut = "$pathInfo[target]/htdocs/jslib/raphael";
 
     if (!file_exists($jslibOut)) {
@@ -222,7 +217,7 @@ class JslibCompiler {
     copy("$jslibSrc/raphael-min.js", "$jslibOut/raphael.js");
   }
 
-  protected function compileJWysiwyg($pathInfo) {
+  protected function compileJWysiwyg($pathInfo, $jslibSrc) {
     $jslibSrc = "$pathInfo[lib]/jslib/jwysiwyg";
     $jslibOut = "$pathInfo[target]/htdocs/jslib/jwysiwyg";
 

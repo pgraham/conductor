@@ -99,7 +99,7 @@ class Compiler {
     $this->compileModels($pathInfo, $ns);
     $this->compileServices($pathInfo, $ns);
     $this->compileResources($pathInfo, $ns);
-    $this->compileJsLibs($pathInfo, $ns);
+    $this->compileJslibs($pathInfo, $ns);
     $this->compileModules($pathInfo, $ns);
     $this->compileLanguageFiles($pathInfo, $ns);
     $this->compileHtml($pathInfo, $ns);
@@ -118,16 +118,9 @@ class Compiler {
     });
   }
 
-  protected function compileJsLibs($pathInfo, $ns) {
-    $jslibs = new DirectoryIterator("$pathInfo[lib]/jslib");
-    foreach ($jslibs as $jslib) {
-      if ($jslib->isDot() || !$jslib->isDir()) {
-        continue;
-      }
-
-      $jslibName = $jslib->getFilename();
-      $this->_jslibCompiler->compile($jslibName, $pathInfo);
-    }
+  protected function compileJslibs($pathInfo, $ns) {
+    $this->_compileJslibDir($pathInfo, "$pathInfo[lib]/jslib");
+    $this->_compileJslibDir($pathInfo, "$pathInfo[lib]/conductor/lib/jslib");
   }
 
   /**
@@ -363,6 +356,17 @@ class Compiler {
       }
 
       $this->_serverCompiler->addMapping($hdlr, $args, $tmpls);
+    }
+  }
+
+  protected function _compileJslibDir($pathInfo, $dir) {
+    $jslibs = new DirectoryIterator($dir);
+    foreach ($jslibs as $jslib) {
+      if ($jslib->isDot() || !$jslib->isDir()) {
+        continue;
+      }
+
+      $this->_jslibCompiler->compile($jslib->getPathname(), $pathInfo);
     }
   }
 

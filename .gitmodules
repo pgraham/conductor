@@ -10,3 +10,9 @@
 [submodule "lib/php-rest-server"]
 	path = lib/php-rest-server
 	url = /home/pgraham/repos/php-rest-server/
+[submodule "lib/jslib/jquery-cookie"]
+	path = lib/jslib/jquery-cookie
+	url = /home/pgraham/lib/jslib/jquery-cookie/
+[submodule "lib/jslib/jquery-ui"]
+	path = lib/jslib/jquery-ui
+	url = /home/pgraham/lib/jslib/jquery-ui
