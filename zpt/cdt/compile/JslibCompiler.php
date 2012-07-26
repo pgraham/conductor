@@ -40,14 +40,6 @@ class JslibCompiler {
       $this->compileDateJs($pathInfo, $jslibPath);
       break;
 
-      case 'jquery-cookie':
-      $this->compileJQueryCookie($pathInfo, $jslibPath);
-      break;
-
-      case 'jquery-ui':
-      $this->compileJQueryUi($pathInfo, $jslibPath);
-      break;
-
       case 'file-uploader':
       $this->compileFileUploader($pathInfo, $jslibPath);
       break;
@@ -56,12 +48,20 @@ class JslibCompiler {
       $this->compileGalleria($pathInfo, $jslibPath);
       break;
 
-      case 'raphael':
-      $this->compileRaphael($pathInfo, $jslibPath);
+      case 'jquery-cookie':
+      $this->compileJQueryCookie($pathInfo, $jslibPath);
+      break;
+
+      case 'jquery-ui':
+      $this->compileJQueryUi($pathInfo, $jslibPath);
       break;
 
       case 'jwysiwyg':
       $this->compileJWysiwyg($pathInfo, $jslibPath);
+      break;
+
+      case 'raphael':
+      $this->compileRaphael($pathInfo, $jslibPath);
       break;
 
       // Default, simply copy the library's source files to the target
