@@ -252,7 +252,7 @@ class JslibCompiler {
 // HTML5 element creation
 window.html5 = { shivMethods: false};
 
-$.webshims.polyfill('geolocation json-storage');
+$.webshims.polyfill('es5 geolocation json-storage');
 LOAD;
 
     $modernizr = file_get_contents($modernizrPath);
