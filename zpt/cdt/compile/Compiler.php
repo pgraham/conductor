@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2010, Philip Graham
+ * Copyright (c) 2012, Philip Graham
  * All rights reserved.
  */
 namespace zpt\cdt\compile;
@@ -47,6 +47,9 @@ class Compiler {
   /* Path to the site's modules directory. */
   private $_modulesPath;
 
+  /* Resource compiler. */
+  private $_resourceCompiler;
+
   /* REST server configurator compiler. */
   private $_serverCompiler;
 
@@ -82,6 +85,8 @@ class Compiler {
 
     $this->_serviceCompiler = new ServiceCompiler($compressed);
     $this->_serviceCompiler->setServerCompiler($this->_serverCompiler);
+
+    $this->_resourceCompiler = new ResourceCompiler($compressed);
   }
 
   public function compile($pathInfo, $ns) {
@@ -241,16 +246,16 @@ class Compiler {
       ));
 
     // Compile javascript resources
-    $this->_compileResourceDir("$resourceSrc/js", "$resourceOut/js");
-    $this->_compileResourceDir("$resourceSrc/css", "$resourceOut/css");
-    $this->_compileResourceDir("$resourceSrc/img", "$resourceOut/img");
+    $this->_resourceCompiler->compile("$resourceSrc/js", "$resourceOut/js");
+    $this->_resourceCompiler->compile("$resourceSrc/css", "$resourceOut/css");
+    $this->_resourceCompiler->compile("$resourceSrc/img", "$resourceOut/img");
 
     // Compile site resources
     // ----------------------
     $resourceSrc = "$pathInfo[src]/resources";
-    $this->_compileResourceDir("$resourceSrc/js", "$resourceOut/js");
-    $this->_compileResourceDir("$resourceSrc/css", "$resourceOut/css");
-    $this->_compileResourceDir("$resourceSrc/img", "$resourceOut/img");
+    $this->_resourceCompiler->compile("$resourceSrc/js", "$resourceOut/js");
+    $this->_resourceCompiler->compile("$resourceSrc/css", "$resourceOut/css");
+    $this->_resourceCompiler->compile("$resourceSrc/img", "$resourceOut/img");
   }
 
   protected function compileHtml($pathInfo, $ns) {
@@ -455,32 +460,6 @@ class Compiler {
   private function _compileResource($srcPath, $outPath, $values = array()) {
     $tmpl = $this->_tmplParser->parse(file_get_contents($srcPath));
     $tmpl->save($outPath, $values);
-  }
-
-  private function _compileResourceDir($srcDir, $outDir) {
-    if (!file_exists($srcDir)) {
-      return;
-    }
-    $dir = new DirectoryIterator($srcDir);
-
-    if (!file_exists($outDir)) {
-      mkdir($outDir, 0755, true);
-    }
-
-    foreach ($dir as $resource) {
-      if ($resource->isDot()) {
-        continue;
-      }
-
-      if ($resource->isDir()) {
-        $this->_compileResourceDir($resource->getPathname(), "$outDir/" . $resource->getBasename());
-        continue;
-      }
-      if (substr($resource->getFilename(), 0, 1) === '.') {
-        continue;
-      }
-      copy($resource->getPathname(), "$outDir/" . $resource->getFilename());
-    }
   }
 
   private function _doWithModules($fn) {
