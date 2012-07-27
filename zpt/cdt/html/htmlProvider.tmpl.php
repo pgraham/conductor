@@ -36,7 +36,6 @@ class ${actorClass} {
       ${if:tmplDependencies ISSET}
         Injector::inject($tmpl, ${php:tmplDependencies});
       ${fi}
-      $page->setTemplate($tmpl);
     ${fi}
 
     ${if:auth ISSET}
@@ -46,8 +45,7 @@ class ${actorClass} {
       }
     ${fi}
 
-    // Basic client support
-    Element::js('${jsPath}/base.js')->addToHead();
+    // Base styles
     Element::css('${cssPath}/reset.css')->addToHead();
     Element::css('${cssPath}/cdt.css')->addToHead();
 
@@ -63,6 +61,7 @@ class ${actorClass} {
     ${fi}
 
     // Client support scripts
+    Element::js('${jsPath}/base.js')->addToHead();
     Element::js('${jsPath}/jquery.working.js')->addToHead();
     Element::js('${jsPath}/utility.js')->addToHead();
     Element::js('${jsPath}/utility-loadCss.js')->addToHead();
@@ -96,6 +95,9 @@ class ${actorClass} {
       ${done}
     ${fi}
 
+    ${if:template}
+      $page->setTemplate($tmpl);
+    ${fi}
     $page->bodyAdd($this->getFragment($query));
   }
 
