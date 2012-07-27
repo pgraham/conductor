@@ -18,6 +18,7 @@ use \zeptech\rest\BaseRequestHandler;
 use \zeptech\rest\RequestHandler;
 use \zeptech\rest\Request;
 use \zeptech\rest\Response;
+use \zpt\cdt\di\Injector;
 
 /**
  * RESTful request handler for retriving a requested Page fragment.  A page
@@ -33,21 +34,23 @@ class HtmlFragmentRequestHandler extends BaseRequestHandler
   /** @Injected */
   private $_authProvider;
 
+  private $_beanId;
+
   /**
    * Create a new  HtmlFragmentRequestHandler for the given Page definition
    * class.
    *
    * @param string $pageDef
    */
-  public function __construct($pageDef) {
-    $this->_pageDef = $pageDef;
+  public function __construct($beanId) {
+    $this->_beanId = $beanId;
   }
 
   public function get(Request $request, Response $response) {
-    $this->_htmlProvider = HtmlProvider::get($this->_pageDef);
-    $this->_htmlProvider->setAuthProvider($this->_authProvider);
+    $htmlProvider = Injector::getBean($this->_beanId);
+    $htmlProvider->setAuthProvider($this->_authProvider);
 
-    $frag = $this->_htmlProvider->getFragment($request->getQuery());
+    $frag = $htmlProvider->getFragment($request->getQuery());
     if (!is_array($frag)) {
       $frag = array($frag);
     }

@@ -343,8 +343,8 @@ class Compiler {
 
       $hdlr = 'zpt\cdt\html\HtmlRequestHandler';
       $tmpls = array();
-      $tmpls[] = $tmplBase . '/' . String::fromCamelCase($pageId) . '.html';
-      $tmpls[] = $tmplBase . '/' . String::fromCamelCase($pageId) . '.php';
+      $tmpls[] = "$tmplBase/" . String::fromCamelCase($pageId) . '.html';
+      $tmpls[] = "$tmplBase/" . String::fromCamelCase($pageId) . '.php';
       if ($pageId === 'Index') {
         if ($tmplBase === '') {
           $tmpls[] = '/';
@@ -356,7 +356,7 @@ class Compiler {
         $this->_serverCompiler->addMapping(
           'zpt\cdt\html\HtmlFragmentRequestHandler',
           $args,
-          array( String::fromCamelCase($pageId) . '.frag' )
+          array( "$tmplBase/" . String::fromCamelCase($pageId) . '.frag' )
         );
       }
 
