@@ -81,7 +81,7 @@ class L10N {
       if (!isset($L10N[$key])) {
         return "XXXXXXXX $key XXXXXXXX";
       }
-      return $L10N[$key];
+      return $L10N[$key]['md'];
     };
   }
 } 

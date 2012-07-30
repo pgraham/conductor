@@ -14,6 +14,9 @@
  */
 namespace zpt\cdt\compile;
 
+use \reed\Markdown;
+use \SplFileInfo;
+
 /**
  * Compiler for language files.
  *
@@ -27,6 +30,11 @@ class L10NCompiler {
 
   public function __construct($compressed) {
     $this->_compressed = $compressed;
+  }
+
+  public function addLanguageFile(SplFileInfo $file) {
+    $strings = $this->_parseStrings(file_get_contents($file->getPathname()));
+    $this->addStrings($file->getBasename('.messages'), $strings);
   }
 
   public function addStrings($lang, array $strings) {
@@ -55,5 +63,50 @@ class L10NCompiler {
     if (!isset($this->_languages[$lang])) {
       $this->_languages[$lang] = array();
     }
+  }
+
+  private function _parseStrings($msgs) {
+    $result = array();
+
+    $lines = explode("\n", $msgs);
+    $key = null;
+    $val = array();
+
+    $isWaitingForOtherLine = false;
+    foreach ($lines as $line) {
+      $line = trim($line);
+
+      if (empty($line) || ($key === null && strpos($line, '#') === 0)) {
+        continue;
+      }
+
+      if ($key === null) {
+        $eqPos = strpos($line, '=');
+        $key = substr($line, 0, $eqPos);
+        $value = substr($line, $eqPos + 1);
+
+      } else {
+        $value = $line;
+      }
+
+      // Check if ends with single '\'
+      if (substr($value, -1) !== '\\') {
+        $val[] = $value;
+
+        $raw = implode(' ', $val);
+        $md = Markdown::parseInline($raw);
+        $result[$key] = array(
+          'md' => $md,
+          'raw' => $raw
+        );
+
+        $key = null;
+        $val = array();
+      } else {
+        $val[] = substr($value, 0, -1);
+      }
+    }
+
+    return $result;
   }
 }

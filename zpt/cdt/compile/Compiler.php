@@ -393,9 +393,7 @@ class Compiler {
         continue;
       }
 
-      $lang = $f->getBasename('.messages');
-      $strings = $this->_parseStrings(file_get_contents($f->getPathname()));
-      $this->_l10nCompiler->addStrings($lang, $strings);
+      $this->_l10nCompiler->addLanguageFile($f);
     }
   }
 
@@ -485,44 +483,5 @@ class Compiler {
 
     $this->_serviceCompiler->setServiceRequestDispatcher(
       $serviceRequestDispatcher);
-  }
-
-  private function _parseStrings($msgs) {
-    $result = array();
-
-    $lines = explode("\n", $msgs);
-    $key = null;
-    $val = array();
-
-    $isWaitingForOtherLine = false;
-    foreach ($lines as $line) {
-      $line = trim($line);
-
-      if (empty($line) || ($key === null && strpos($line, '#') === 0)) {
-        continue;
-      }
-
-      if ($key === null) {
-        $eqPos = strpos($line, '=');
-        $key = substr($line, 0, $eqPos);
-        $value = substr($line, $eqPos + 1);
-
-      } else {
-        $value = $line;
-      }
-
-      // Check if ends with single '\'
-      if (substr($value, -1) !== '\\') {
-        $val[] = $value;
-
-        $result[$key] = implode(' ', $val);
-        $key = null;
-        $val = array();
-      } else {
-        $val[] = substr($value, 0, -1);
-      }
-    }
-
-    return $result;
   }
 }
