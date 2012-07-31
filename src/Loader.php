@@ -39,14 +39,13 @@ class Loader {
    * @param string $root Root path for the website
    * @param string $namespace Site source namespace
    */
-  public static function loadDependencies($root, $namespace) {
+  public static function registerDependencies($root) {
     if (self::$_loaded) {
       return;
     }
     self::$_loaded = true;
 
     $lib = "$root/lib";
-    $src = "$root/src";
     $cdtLib = "$lib/conductor/lib";
     $target = "$root/target";
 
@@ -62,6 +61,8 @@ class Loader {
       }
     }
 
+    // Register class loaders for dependencies that follow legacy package
+    // structure
     spl_autoload_register(function ($classname) use ($libPaths) {
       $parts = explode("\\", $classname);
       $lib = array_shift($parts);
@@ -76,42 +77,23 @@ class Loader {
       }
     });
 
-    // Register a loader for conductor classes that follow the SPR-0 compliant
-    // package structure
-    $cdtLdr = new SplClassLoader('zpt\cdt', "$lib/conductor");
-    $cdtLdr->register();
-
     $optLibs = array(
       'pdf' => 'php-pdf'
     );
 
     foreach ($optLibs as $optLib => $optLibPath) {
       if (file_exists("$lib/$optLibPath")) {
-        $ldr = new SplClassLoader("zpt\\$optLib", "$lib/$optLibPath");
-        $ldr->register();
+        self::registerNamespace("zpt\\$opLib", "$lib/$optLibPath");
       }
     }
 
     // Class loader for php-annotations, php-code-templates, php-rest-server,
     // clarinet and generated classes
-    $annoLdr = new SplClassLoader('zeptech\anno', "$cdtLib/php-annotations");
-    $annoLdr->register();
-
-    $pctLdr = new SplClassLoader('zpt\pct', "$cdtLib/php-code-templates");
-    $pctLdr->register();
-
-    $restLdr = new SplClassLoader('zeptech\rest', "$cdtLib/php-rest-server");
-    $restLdr->register();
-
-    $ormLdr = new SplClassLoader('zeptech\orm', "$cdtLib/clarinet");
-    $ormLdr->register();
-
-    $dynLdr = new SplClassLoader('zeptech\dynamic', $target);
-    $dynLdr->register();
-
-    // Class loader for site classes
-    $siteLdr = new SplClassLoader($namespace, $src);
-    $siteLdr->register();
+    self::registerNamespace('zeptech\anno', "$cdtLib/php-annotations");
+    self::registerNamespace('zpt\pct', "$cdtLib/php-code-templates");
+    self::registerNamespace('zeptech\rest', "$cdtLib/php-rest-server");
+    self::registerNamespace('zeptech\orm', "$cdtLib/clarinet");
+    self::registerNamespace('zeptech\dynamic', $target);
 
     // Register loaders for the site's modules
     if (file_exists("$root/modules")) {
@@ -119,9 +101,13 @@ class Loader {
       foreach ($dir as $mod) {
         $modName = $mod->getBasename();
 
-        $modLdr = new SplClassLoader("zpt\\mod\\$modName", $mod->getPathName());
-        $modLdr->register();
+        self::registerNamespace("zpt\\mod\\$modName", $mod->getPathName());
       }
     }
+  }
+
+  public static function registerNamespace($namespace, $src, $debug = false) {
+    $ldr = new SplClassLoader($namespace, $src, $debug);
+    $ldr->register();
   }
 }

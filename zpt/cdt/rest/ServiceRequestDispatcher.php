@@ -42,8 +42,6 @@ class ServiceRequestDispatcher extends AbstractGenerator {
   }
 
   protected function getValues($className) {
-    global $asWebPath;
-
     $defClass = new ReflectionClass($className);
     $defAnnos = new Annotations($defClass);
     if (!isset($defAnnos['service'])) {

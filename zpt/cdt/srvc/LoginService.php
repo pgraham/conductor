@@ -124,8 +124,6 @@ class LoginService extends BaseRequestHandler implements RequestHandler {
    * request is not asynchronous.
    */
   private function _redirectIf($url = null) {
-    global $asWebPath;
-
     $asyncRequest = false;
     if (isset($_SERVER['HTTP_X_REQUESTED_WITH'])) {
       $requestType = strtolower($_SERVER['HTTP_X_REQUESTED_WITH']);
@@ -138,7 +136,7 @@ class LoginService extends BaseRequestHandler implements RequestHandler {
         if (isset($_SERVER['HTTP_REFERER'])) {
           $url = $_SERVER['HTTP_REFERER'];
         } else {
-          $url = $asWebPath('/');
+          $url = _P('/');
         }
       }
 

@@ -277,8 +277,6 @@ class AuthProvider {
 
   /* Initialize the visitor. */
   private function _initVisitor() {
-    global $asWebPath;
-
     // Initialize visitor
     if ($this->_visitor !== null) {
       return;
@@ -302,7 +300,7 @@ class AuthProvider {
       $persister->save($visitor);
 
       $tenYearsFromNow = time() + 315569260;
-      $path = $asWebPath('/');
+      $path = _P('/');
       setcookie('visitor_id', $visitorKey, $tenYearsFromNow, $path);
     }
 

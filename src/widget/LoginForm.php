@@ -52,13 +52,11 @@ class LoginForm extends Composite {
    *   constant, i.e. $form = new LoginForm("LOGIN PLEASE", LoginForm::ASYNC);
    */
   public function __construct($caption = null, $async = false) {
-    global $asWebPath;
-
     $this->initElement(
       Element::form()
         ->setId('login')
         ->setMethod(CanSubmit::METHOD_POST)
-        ->setAction($asWebPath('/login'))
+        ->setAction(_P('/login'))
         ->setClass('cdt-LoginForm')
     );
 

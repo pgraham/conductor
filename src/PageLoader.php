@@ -49,8 +49,7 @@ class PageLoader {
    * Add DateJs to the page.
    */
   public static function loadDateJs() {
-    global $asWebPath;
-    Element::js($asWebPath('/jslib/datejs/date.js'))->addToHead();
+    Element::js(_P('/jslib/datejs/date.js'))->addToHead();
   }
 
   /**
@@ -70,38 +69,30 @@ class PageLoader {
    * Add jQuery Cookie to the page.
    */
   public static function loadJQueryCookie() {
-    global $asWebPath;
-
-    Element::js($asWebPath('/jslib/jquery-cookie/jquery.cookie.js'))
-      ->addToHead();
+    Element::js(_P('/jslib/jquery-cookie/jquery.cookie.js'))->addToHead();
   }
 
   /**
    * Add jQuery UI to the page.
    */
   public static function loadJQueryUi($theme = null) {
-    global $asWebPath;
-
     if ($theme === null) {
       $theme = 'base';
     }
-    Element::css($asWebPath('/jslib/jquery-ui/jquery.ui.css'))->addToHead();
-    Element::css($asWebPath(
-      "/jslib/jquery-ui/themes/$theme/jquery.ui.theme.css"))->addToHead();
-
-    Element::js($asWebPath('/jslib/jquery-ui/external/globalize.js'))
+    Element::css(_P('/jslib/jquery-ui/jquery.ui.css'))->addToHead();
+    Element::css(_P("/jslib/jquery-ui/themes/$theme/jquery.ui.theme.css"))
       ->addToHead();
-    Element::js($asWebPath('/jslib/jquery-ui/jquery.ui.js'))->addToHead();
+
+    Element::js(_P('/jslib/jquery-ui/external/globalize.js'))->addToHead();
+    Element::js(_P('/jslib/jquery-ui/jquery.ui.js'))->addToHead();
 
   }
 
   public static function loadJsAppSupport() {
-    global $asWebPath;
-
     // Add JsApp javascript libraries
-    Element::js($asWebPath('/jslib/raphael/raphael.js'))->addToHead();
+    Element::js(_P('/jslib/raphael/raphael.js'))->addToHead();
 
-    Element::css($asWebPath('/css/conductor-app.css'))->addToHead();
+    Element::css(_P('/css/conductor-app.css'))->addToHead();
 
     $scripts = array(
       '/js/jquery-dom.js',
@@ -121,7 +112,7 @@ class PageLoader {
       '/js/conductor-app.js'
     );
     foreach ($scripts as $js) {
-      Element::js($asWebPath($js))->addToHead();
+      Element::js(_P($js))->addToHead();
     }
   }
 
@@ -130,13 +121,11 @@ class PageLoader {
    * any other load*(...) methods provided by this class.
    */
   public static function loadLogin($msg = null) {
-    global $asWebPath;
-
     Element::css('http://fonts.googleapis.com/css?family=Sorts+Mill+Goudy|Varela')->addToHead();
-    Element::css($asWebPath('/css/login.css'))->addToHead();
+    Element::css(_P('/css/login.css'))->addToHead();
 
     self::loadJQuery();
-    Element::js($asWebPath('/js/login.js'))->addToHead();
+    Element::js(_P('/js/login.js'))->addToHead();
 
     $login = new LoginForm($msg);
     $login->addToBody();

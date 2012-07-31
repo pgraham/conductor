@@ -87,7 +87,6 @@ class SessionManager {
    * @return new session instance
    */
   public static function newSession(User $user = null) {
-    global $asWebPath;
     $session = new Session();   
     if ($user !== null) {
       $session->setUser($user);
@@ -107,7 +106,7 @@ class SessionManager {
     Clarinet::save($session);
 
     // Send the session key to the client
-    $path = $asWebPath('/');
+    $path = _P('/');
     setcookie('conductorsessid', $session->getKey(), 0, $path);
 
     return $session;

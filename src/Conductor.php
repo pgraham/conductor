@@ -25,6 +25,7 @@ use \reed\generator\CodeTemplate;
 use \reed\ClassLoader;
 use \reed\File;
 
+use \zeptech\dynamic\Configurator;
 use \zeptech\dynamic\InjectionConfigurator;
 use \zeptech\dynamic\ServerConfigurator;
 use \zeptech\orm\runtime\Clarinet;
@@ -138,32 +139,45 @@ class Conductor {
    * Initialize the framework.  This consists of registering the autoloaders for
    * the libraries, connecting to the database and initializing clarinet.
    *
-   * @param string $config Either a {@link Configuration} object or the path to
-   *   a conductor.cfg.xml file.
+   * @param string $root The path to the root of the website.
    * @param boolean $authenticate Whether or not to authenticate a session,
-   *   default true.  The only time this is false is during compilation.
+   *   default true.  The only time this is false is during a deploy compile.
    */
-  public static function init($config, $authenticate = true) {
+  public static function init($root, $authenticate = true) {
     if (self::$_initialized) {
       return;
     }
     self::$_initialized = true;
 
-    // Load the site's configuration from the defined/default path
-    if (is_array($config)) {
-      self::$_config = $config;
-    } else if (is_string($config) && file_exists($config)) {
-      self::$_config = Configuration::parse($config);
-    } else {
-      throw new Exception("No config file specified");
+    // Register class loaders for conductor's dependencies
+    Loader::registerDependencies($root);
+
+    // Set dev mode configuration and do a compile if the target directory is
+    // writeable.
+    if (is_writable("$root/target")) {
+      ini_set('display_errors', 'on');
+      ini_set('html_errors', 'on');
+      ini_set('error_log', "$root/target/php.error");
+
+      assert_options(ASSERT_ACTIVE, 1);
+      assert_options(ASSERT_WARNING, 1);
+      assert_options(ASSERT_BAIL, 0);
+      assert_options(ASSERT_QUIET_EVAL, 0);
+
+      $compiler = new Compiler();
+      $compiler->compile($root);
     }
+
+    // Load the site's configuration
+    self::$_config = Configurator::getConfig();
 
     $pathInfo = self::$_config['pathInfo'];
     $namespace = self::$_config['namespace'];
 
-    // Register class loaders for conductor's dependencies
-    Loader::loadDependencies($pathInfo['root'], $namespace);
+    // Register a class loader for the site's base namespace
+    Loader::registerNamespace($namespace, "$root/src");
 
+    // Initiate a database connection
     try {
       $dbConfig = self::$_config['db_config'];
 
@@ -179,22 +193,6 @@ class Conductor {
 
     } catch (PDOException $e) {
       throw new Exception("Unable to connect to database");
-    }
-
-    // Set options for debug mode.
-    if (self::isDevMode()) {
-      ini_set('display_errors', 'on');
-      ini_set('html_errors', 'on');
-      ini_set('error_log', "$pathInfo[target]/php.error");
-
-      assert_options(ASSERT_ACTIVE, 1);
-      assert_options(ASSERT_WARNING, 1);
-      assert_options(ASSERT_BAIL, 0);
-      assert_options(ASSERT_QUIET_EVAL, 0);
-
-      // Do a site compile
-      $compiler = new Compiler();
-      $compiler->compile($pathInfo, $namespace);
     }
 
     // Initialize clarinet
@@ -236,7 +234,7 @@ class Conductor {
    */
   public static function isDevMode() {
     self::_ensureInitialized();
-    return self::$_config['devMode'];
+    return self::$_config['env'] === 'dev';
   }
 
   /**
@@ -251,9 +249,8 @@ class Conductor {
       $configurator = new ServerConfigurator();
       $configurator->configure($server);
 
-      global $asAbsWebPath;
       $urlInfo = parse_url($_SERVER['REQUEST_URI']);
-      $resource = $asAbsWebPath($urlInfo['path']);
+      $resource = _AbsP($urlInfo['path']);
       $action = $_SERVER['REQUEST_METHOD'];
 
       if (isset($_SERVER['HTTP_ACCEPT'])) {

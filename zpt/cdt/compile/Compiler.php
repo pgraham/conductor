@@ -10,6 +10,7 @@ use \conductor\CrudService;
 use \reed\File;
 use \reed\String;
 use \zeptech\anno\Annotations;
+use \zeptech\dynamic\Configurator;
 use \zeptech\orm\generator\PersisterGenerator;
 use \zeptech\orm\generator\TransformerGenerator;
 use \zeptech\orm\generator\ValidatorGenerator;
@@ -21,6 +22,7 @@ use \zpt\pct\CodeTemplateParser;
 use \DirectoryIterator;
 use \Exception;
 use \ReflectionClass;
+use \SplClassLoader;
 
 /**
  * This class compiles a site.
@@ -31,6 +33,9 @@ class Compiler {
 
   /* Whether or compilation output should be compressed when possible. */
   private $_compressed;
+
+  /* Configuration compiler. */
+  private $_configurationCompiler;
 
   /* Dependency Injection compiler. */
   private $_diCompiler;
@@ -72,6 +77,9 @@ class Compiler {
 
     $this->_tmplParser = new CodeTemplateParser();
 
+    $this->_configurationCompiler = new ConfigurationCompiler($compressed);
+    $this->_configurationCompiler->setTemplateParser($this->_tmplParser);
+
     $this->_diCompiler = new DependencyInjectionCompiler($compressed);
     $this->_diCompiler->setTemplateParser($this->_tmplParser);
 
@@ -89,7 +97,29 @@ class Compiler {
     $this->_resourceCompiler = new ResourceCompiler($compressed);
   }
 
-  public function compile($pathInfo, $ns) {
+  /**
+   * Compile the website found at the given root path.
+   *
+   * @param string $root The root path of the website to comile.
+   */
+  public function compile($root) {
+    // Configuration needs to be compiled first so that the site path
+    // information is available for the rest of the compilation process
+    $this->_configurationCompiler->compile($root);
+
+    // The rest of the compilation process needs the environment configuration.
+    // This will also register the global functions for working with context
+    // sensitive paths
+    $config = Configurator::getConfig();
+    $pathInfo = $config['pathInfo'];
+    $ns = $config['namespace'];
+
+    // The rest of the compilation process will require the site's namespace
+    // to be registered so that class files can be reflected.
+    $ldr = new SplClassLoader($ns, $pathInfo['src']);
+    $ldr->register();
+
+    // Initiate the compiler
     $this->_initCompiler($pathInfo);
 
     // Compile server dispatcher

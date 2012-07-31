@@ -35,8 +35,6 @@ class HtmlProvider extends AbstractGenerator {
   }
 
   protected function getValues($className) {
-    global $asWebPath;
-
     $pageDef = new ReflectionClass($className);
     $page = new Annotations($pageDef);
     if (!isset($page['page'])) {
@@ -101,9 +99,9 @@ class HtmlProvider extends AbstractGenerator {
       $values['uitheme'] = 'zpt';
     }
 
-    $values['jsPath'] = $asWebPath('/js');
-    $values['jslibPath'] = $asWebPath('/jslib');
-    $values['cssPath'] = $asWebPath('/css');
+    $values['jsPath'] = _P('/js');
+    $values['jslibPath'] = _P('/jslib');
+    $values['cssPath'] = _P('/css');
 
     $values['jscripts'] = array_merge(
       $values['jscripts'],
@@ -150,14 +148,12 @@ class HtmlProvider extends AbstractGenerator {
   }
 
   private function _resolveResources($paths, $relBase) {
-    global $asWebPath;
-
     $resolved = array();
     foreach ($paths as $path) {
       if (substr($path, 0, 1) === '/') {
-        $resolved[] = $asWebPath($path);
+        $resolved[] = _P($path);
       } else {
-        $resolved[] = $asWebPath("$relBase/$path");
+        $resolved[] = _P("$relBase/$path");
       }
     }
     return $resolved;
