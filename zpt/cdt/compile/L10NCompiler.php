@@ -46,12 +46,20 @@ class L10NCompiler {
   }
 
   public function compile($pathInfo) {
-    $tmplSrcPath = __DIR__ . "/language.strings.tmpl.php";
-    $tmpl = $this->_tmplParser->parse(file_get_contents($tmplSrcPath));
+    $phpTmplSrc = __DIR__ . "/language.strings.tmpl.php";
+    $phpTmpl = $this->_tmplParser->parse(file_get_contents($phpTmplSrc));
+
+    $jsTmplSrc = __DIR__ . '/language.strings.tmpl.js';
+    $jsTmpl = $this->_tmplParser->parse(file_get_contents($jsTmplSrc));
 
     foreach ($this->_languages as $lang => $strings) {
-      $outPath = "$pathInfo[target]/i18n/$lang.strings.php";
-      $tmpl->save($outPath, array('strings' => $strings));
+      $values = array('strings' => $strings);
+
+      $phpOutPath = "$pathInfo[target]/i18n/$lang.strings.php";
+      $phpTmpl->save($phpOutPath, $values);
+
+      $jsOutPath = "$pathInfo[target]/htdocs/js/$lang.js";
+      $jsTmpl->save($jsOutPath, $values);
     }
   }
 

@@ -10,3 +10,9 @@ function _p(path) {
     return '${rootPath}' + path;
   ${fi}
 }
+
+if (window._L === undefined) {
+  window._L = function (key) {
+    return '!!!!!!!! ' + key + ' !!!!!!!!';
+  }
+}

@@ -25,13 +25,31 @@ use oboe\Element;
  */
 class L10N {
 
-  /** Dynamically created function for retrieving a requested string */
+  /* Dynamically created function for retrieving a requested string */
   private static $_getFn;
 
+  /* The currently loaded language */
+  private static $_lang;
+
+  /**
+   * Get the localized string with the given key.
+   *
+   * @param string $key The key of the string to retrieve.
+   * @return string
+   */
   public static function get($key) {
     $getFn = self::$_getFn;
     return $getFn($key);
   }
+
+  /**
+   * Get the currently loaded language.
+   *
+   * @return string Language identifier.
+   */
+   public static function getLang() {
+     return self::$_lang;
+   }
 
   /**
    * Wrap any text in localized subject matching localized search with anchor
@@ -69,13 +87,17 @@ class L10N {
   public static function load($lang, $target) {
     $langFilePath = "$target/i18n/$lang.strings.php";
     if (!file_exists($langFilePath)) {
+      // Create a get function which returns an string indicating an error.
       self::$_getFn = function ($key) {
         return "!!!!!!!! $key !!!!!!!!";
       };
+
       return;
     }
 
+    // Save the loaded language and require the generated strings file.
     require $langFilePath;
+    self::$_lang = $lang;
     self::$_getFn = function ($key) {
       global $L10N;
       if (!isset($L10N[$key])) {

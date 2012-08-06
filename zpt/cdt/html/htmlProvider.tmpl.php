@@ -3,6 +3,7 @@ namespace ${actorNs};
 
 use \zpt\cdt\di\Injector;
 use \zpt\cdt\html\Page;
+use \zpt\cdt\L10N;
 use \conductor\Auth;
 use \conductor\PageLoader;
 use \oboe\struct\FlowContent;
@@ -61,6 +62,8 @@ class ${actorClass} {
     ${fi}
 
     // Client support scripts
+    $lang = L10N::getLang();
+    Element::js("${jsPath}/$lang.js")->addToHead();
     Element::js('${jsPath}/base.js')->addToHead();
     Element::js('${jsPath}/jquery.working.js')->addToHead();
     Element::js('${jsPath}/utility.js')->addToHead();
