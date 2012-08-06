@@ -1,0 +1,20 @@
+.ui-daterangepicker {
+  display: inline-block;
+  padding: 10px;
+  cursor: pointer;
+}
+.ui-daterangepicker .ui-icon {
+  display: inline-block;
+  visibility: hidden;
+  margin-left: 5px;
+}
+.ui-daterangepicker.ui-state-hover .ui-icon {
+  visibility: visible;
+}
+.ui-daterangepicker .ui-daterangepicker-separator {
+  padding: 0 5px;
+}
+.ui-daterangepicker-picker .ui-daterangepicker-datepicker {
+  float:left;
+  padding: 5px;
+}
