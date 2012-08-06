@@ -198,15 +198,17 @@
   vertical-align: middle;
 }
 
-.global-config-editor h1 {
+.cdt-app-view h1 {
   font-size: 2em;
   color: #999;
   font-weight: 700;
   margin: 0 0 20px 10px;
 }
-.global-config-editor h1 .cdt-icon {
+.cdt-app-view h1 .cdt-icon {
   margin-right: 10px;
-  vertical-align: middle;
+}
+.cdt-app-view h1 .cdt-icon svg {
+  vertical-align: baseline;
 }
 .cdt-config-section {
   padding: 20px;
