@@ -164,8 +164,20 @@ class Conductor {
       assert_options(ASSERT_BAIL, 0);
       assert_options(ASSERT_QUIET_EVAL, 0);
 
-      $compiler = new Compiler();
-      $compiler->compile($root);
+      try {
+        if (File::dirlock("$root/target")) {
+          $compiler = new Compiler();
+          $compiler->compile($root);
+          File::dirunlock("$root/target");
+        } else {
+          // This currently shouldn't happen since the only reason File::dirlock
+          // would return false is if the target isn't writeable but if that
+          // changes this may start to show up in the logs.
+          error_log('Unable to compile');
+        }
+      } catch (Exception $e) {
+        File::dirunlock("$root/target");
+      }
     }
 
     // Load the site's configuration
