@@ -30,6 +30,14 @@ class HtmlProvider extends AbstractGenerator {
 
   protected static $actorNamespace = 'zeptech\dynamic\html';
 
+  /* Filesystem path to htdocs. Used to resolve script groups. */
+  private $_htdocs;
+
+  public function __construct($outputPath, $htdocs) {
+    parent::__construct($outputPath);
+    $this->_htdocs = $htdocs;
+  }
+
   protected function getTemplatePath() {
     return __DIR__ . '/htmlProvider.tmpl.php';
   }
@@ -73,7 +81,9 @@ class HtmlProvider extends AbstractGenerator {
 
       $values['jscripts'] = array_merge(
         $values['jscripts'],
-        $template->asArray('script'));
+        $template->asArray('script'),
+        $this->_resolveScriptGroups($template->asArray('scriptgroup'))
+      );
 
       $values['sheets'] = array_merge(
         $values['sheets'],
@@ -82,6 +92,7 @@ class HtmlProvider extends AbstractGenerator {
       $values['fonts'] = array_merge(
         $values['fonts'],
         $template->asArray('font'));
+
     }
     $values['title'] = $title;
 
@@ -105,7 +116,9 @@ class HtmlProvider extends AbstractGenerator {
 
     $values['jscripts'] = array_merge(
       $values['jscripts'],
-      $page->asArray('script'));
+      $page->asArray('script'),
+      $this->_resolveScriptGroups($page->asArray('scriptgroup'))
+    );
     $values['jscripts'] = $this->_resolveResources($values['jscripts'], '/js');
 
     $values['sheets'] = array_merge(
@@ -157,5 +170,28 @@ class HtmlProvider extends AbstractGenerator {
       }
     }
     return $resolved;
+  }
+
+  private function _resolveScriptGroups($groups) {
+    $scripts = array();
+    foreach ($groups as $group) {
+      $base = $this->_htdocs;
+      if (substr($group, 0, 1) !== '/') {
+        $base .= '/js/';
+      }
+
+      // Get all suffixed scripts
+      foreach (glob("$base$group-*.js") as $script) {
+        $scripts[] = substr($script, strlen($base));
+      }
+
+      // See if a script with the group name and no suffix exists.  This script
+      // is added last so any initialization code that relies on the content
+      // of the scripts in the group should go in this script.
+      if (file_exists("$base$group.js")) {
+        $scripts[] = "$group.js";
+      }
+    }
+    return $scripts;
   }
 }

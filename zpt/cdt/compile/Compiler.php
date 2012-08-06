@@ -506,11 +506,13 @@ class Compiler {
   }
 
   private function _initCompiler($pathInfo) {
-    $this->_htmlProvider = new HtmlProvider($pathInfo['target']);
+    $this->_htmlProvider = new HtmlProvider(
+      $pathInfo['target'], $pathInfo['docRoot']);
+
     $this->_modulesPath = "$pathInfo[root]/modules";
+
     $serviceRequestDispatcher = new ServiceRequestDispatcher(
       $pathInfo['target']);
-
     $this->_serviceCompiler->setServiceRequestDispatcher(
       $serviceRequestDispatcher);
   }
