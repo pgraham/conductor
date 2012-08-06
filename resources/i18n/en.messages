@@ -10,3 +10,6 @@ users.password.failureReason=Unable to update password: {0}
 users.password.noPassword=No new password was supplied.
 users.password.noMatch=Passwords do not match.
 users.password.success=Successfully updated your password.
+
+# Generic strings
+label.date=Date
