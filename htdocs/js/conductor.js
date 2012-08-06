@@ -150,5 +150,6 @@ jQuery.working.imgPath = _p(jQuery.working.imgPath);
       o = o[parts[i]];
     }
 
+    return o;
   };
 } (CDT));
