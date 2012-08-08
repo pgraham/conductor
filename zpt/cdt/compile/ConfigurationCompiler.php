@@ -39,7 +39,7 @@ class ConfigurationCompiler {
    *
    * @param string $root The root path of site.
    */
-  public function compile($root) {
+  public function compile($root, $env) {
     $cfg = array();
 
     $xmlCfg = simplexml_load_file("$root/conductor.cfg.xml", 'SimpleXMLElement',
@@ -48,7 +48,6 @@ class ConfigurationCompiler {
     $this->_parsePathInfo($root, $xmlCfg);
     $this->_parseNamespace($xmlCfg);
     $this->_parseDb($xmlCfg);
-    $this->_parseEnv($xmlCfg);
 
     $tmplSrc = __DIR__ . '/Configurator.tmpl.php';
     $tmplOut = "{$this->_pathInfo['target']}/zeptech/dynamic/Configurator.php";
@@ -58,7 +57,7 @@ class ConfigurationCompiler {
       'webRootLen' => strlen($this->_pathInfo['webRoot']),
       'namespace' => $this->_namespace,
       'dbConfig' => $this->_db,
-      'env' => $this->_env
+      'env' => $env
     );
 
     $tmpl = $this->_tmplParser->parse(file_get_contents($tmplSrc));
@@ -104,15 +103,6 @@ class ConfigurationCompiler {
       : 'localhost';
 
     $this->_db = $dbConfig;
-  }
-
-  /* Must be called after path info is parsed. */
-  private function _parseEnv($xmlCfg) {
-    if (is_writeable($this->_pathInfo['target'])) {
-      $this->_env = 'dev';
-    } else {
-      $this->_env = 'prod';
-    }
   }
 
   private function _parseNamespace($xmlCfg) {

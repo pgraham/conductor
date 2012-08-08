@@ -102,10 +102,10 @@ class Compiler {
    *
    * @param string $root The root path of the website to comile.
    */
-  public function compile($root) {
+  public function compile($root, $env = 'dev') {
     // Configuration needs to be compiled first so that the site path
     // information is available for the rest of the compilation process
-    $this->_configurationCompiler->compile($root);
+    $this->_configurationCompiler->compile($root, $env);
 
     // The rest of the compilation process needs the environment configuration.
     // This will also register the global functions for working with context
