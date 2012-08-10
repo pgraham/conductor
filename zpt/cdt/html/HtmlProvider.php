@@ -183,7 +183,7 @@ class HtmlProvider extends AbstractGenerator {
 
       // Get all suffixed scripts
       echo "Script group: $base$group\n";
-      $dirPath = dirname($base$group);
+      $dirPath = dirname("$base$group");
       $dir = new DirectoryIterator($dirPath);
       echo "Contents of $dirPath:\n";
       foreach ($dir as $d) {
