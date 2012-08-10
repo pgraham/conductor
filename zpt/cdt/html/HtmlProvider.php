@@ -185,10 +185,14 @@ class HtmlProvider extends AbstractGenerator {
       echo __DIR__ . "\n";
       echo "Script group: $base$group\n";
       $dirPath = dirname("$base$group");
-      $dir = new DirectoryIterator($dirPath);
       echo "Contents of $dirPath:\n";
-      foreach ($dir as $d) {
-        echo "  {$d->getPathname()}\n";
+      if (file_exists($dirPath)) {
+        $dir = new DirectoryIterator($dirPath);
+        foreach ($dir as $d) {
+          echo "  {$d->getPathname()}\n";
+        }
+      } else {
+        echo "$dirPath does not exist";
       }
       foreach (glob("$base$group-*.js") as $script) {
         echo "Adding script $script\n";
