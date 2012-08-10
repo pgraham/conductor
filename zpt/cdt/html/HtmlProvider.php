@@ -17,6 +17,7 @@ namespace zpt\cdt\html;
 use \zeptech\anno\Annotations;
 use \zpt\cdt\di\DependencyParser;
 use \zpt\pct\AbstractGenerator;
+use \DirectoryIterator;
 use \Exception;
 use \ReflectionClass;
 
@@ -182,6 +183,12 @@ class HtmlProvider extends AbstractGenerator {
 
       // Get all suffixed scripts
       echo "Script group: $base$group\n";
+      $dirPath = dirname($base$group);
+      $dir = new DirectoryIterator($dirPath);
+      echo "Contents of $dirPath:\n";
+      foreach ($dir as $d) {
+        echo "  {$d->getPathname()}\n";
+      }
       foreach (glob("$base$group-*.js") as $script) {
         echo "Adding script $script\n";
         $scripts[] = substr($script, strlen($base));
