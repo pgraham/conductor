@@ -182,20 +182,7 @@ class HtmlProvider extends AbstractGenerator {
       }
 
       // Get all suffixed scripts
-      echo __DIR__ . "\n";
-      echo "Script group: $base$group\n";
-      $dirPath = dirname("$base$group");
-      echo "Contents of $dirPath:\n";
-      if (file_exists($dirPath)) {
-        $dir = new DirectoryIterator($dirPath);
-        foreach ($dir as $d) {
-          echo "  {$d->getPathname()}\n";
-        }
-      } else {
-        echo "$dirPath does not exist\n";
-      }
       foreach (glob("$base$group-*.js") as $script) {
-        echo "Adding script $script\n";
         $scripts[] = substr($script, strlen($base));
       }
 

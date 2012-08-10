@@ -226,7 +226,6 @@ class Compiler {
   protected function compileModules($pathInfo, $ns) {
     $target = "$pathInfo[target]/htdocs";
     $modDir = "$pathInfo[root]/modules";
-    echo "Compiling modules from $modDir to $target\n";
 
     if (!file_exists($modDir)) {
       return;
@@ -253,11 +252,9 @@ class Compiler {
         $rmCmd = "rm -r $modTarget";
         exec($rmCmd);
       }
-      echo "Attempting to copy $modDocs\n";
       if (file_exists($modDocs)) {
         $cpCmd = "cp -a $modDocs $target/$modName";
         exec($cpCmd);
-        echo "Copied: $cpCmd\n";
       }
     }
   }
