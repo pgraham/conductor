@@ -34,9 +34,9 @@ class HtmlProvider extends AbstractGenerator {
   /* Filesystem path to htdocs. Used to resolve script groups. */
   private $_htdocs;
 
-  public function __construct($outputPath, $htdocs) {
+  public function __construct($outputPath) {
     parent::__construct($outputPath);
-    $this->_htdocs = $htdocs;
+    $this->_htdocs = "$outputPath/htdocs";
   }
 
   protected function getTemplatePath() {

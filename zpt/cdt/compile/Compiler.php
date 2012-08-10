@@ -509,8 +509,7 @@ class Compiler {
   }
 
   private function _initCompiler($pathInfo) {
-    $this->_htmlProvider = new HtmlProvider(
-      $pathInfo['target'], $pathInfo['docRoot']);
+    $this->_htmlProvider = new HtmlProvider($pathInfo['target']);
 
     $this->_modulesPath = "$pathInfo[root]/modules";
 
