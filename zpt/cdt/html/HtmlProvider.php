@@ -181,6 +181,7 @@ class HtmlProvider extends AbstractGenerator {
       }
 
       // Get all suffixed scripts
+      echo "Script group: $base$group\n";
       foreach (glob("$base$group-*.js") as $script) {
         $scripts[] = substr($script, strlen($base));
       }
