@@ -192,7 +192,7 @@ class HtmlProvider extends AbstractGenerator {
           echo "  {$d->getPathname()}\n";
         }
       } else {
-        echo "$dirPath does not exist";
+        echo "$dirPath does not exist\n";
       }
       foreach (glob("$base$group-*.js") as $script) {
         echo "Adding script $script\n";
