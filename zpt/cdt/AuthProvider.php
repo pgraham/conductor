@@ -292,19 +292,33 @@ class AuthProvider {
       $c->addEquals('key', $visitorKey);
       
       $visitor = $persister->retrieveOne($c);
+      if ($visitor === null) {
+        // It is possible under certain circumstances to get here.  An
+        // example would be if the visitors table is cleared.  Some failure
+        // cases may also result in a cookie getting out of sync with the
+        // server.  In this case a new visitor ID should be assigned.
+        $visitor = $this->_newVisitor($persister);
+      }
     } else {
-      $visitorKey = uniqid('visitor_', true);
-
-      $visitor = new Visitor();
-      $visitor->setKey($visitorKey);
-      $persister->save($visitor);
-
-      $tenYearsFromNow = time() + 315569260;
-      $path = _P('/');
-      setcookie('visitor_id', $visitorKey, $tenYearsFromNow, $path);
+      $visitor = $this->_newVisitor($persister);
     }
 
     $this->_visitor = $visitor;
 
+  }
+
+  /* Create a new visitor. */
+  private function _newVisitor($persister) {
+    $visitorKey = uniqid('visitor_', true);
+
+    $visitor = new Visitor();
+    $visitor->setKey($visitorKey);
+    $persister->save($visitor);
+
+    $tenYearsFromNow = time() + 315569260;
+    $path = _P('/');
+    setcookie('visitor_id', $visitorKey, $tenYearsFromNow, $path);
+
+    return $visitor;
   }
 }
