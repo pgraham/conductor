@@ -120,7 +120,7 @@ class Compiler {
     $ldr->register();
 
     // Initiate the compiler
-    $this->_initCompiler($pathInfo);
+    $this->_initCompiler($pathInfo, $env);
 
     // Compile server dispatcher
     copy(
@@ -505,8 +505,8 @@ class Compiler {
     }
   }
 
-  private function _initCompiler($pathInfo) {
-    $this->_htmlProvider = new HtmlProvider($pathInfo['target']);
+  private function _initCompiler($pathInfo, $env) {
+    $this->_htmlProvider = new HtmlProvider($pathInfo['target'], $env);
 
     $this->_modulesPath = "$pathInfo[root]/modules";
 

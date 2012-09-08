@@ -1,20 +1,19 @@
 <?php
 /**
- * =============================================================================
- * Copyright (c) 2010, Philip Graham
+ * Copyright (c) 2012, Philip Graham
  * All rights reserved.
  *
  * This file is part of Conductor and is licensed by the Copyright holder under
  * the 3-clause BSD License.  The full text of the license can be found in the
  * LICENSE.txt file included in the root directory of this distribution or at
  * the link below.
- * =============================================================================
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
  */
 namespace zpt\cdt\html;
 
 use \zeptech\anno\Annotations;
+use \zpt\cdt\compile\ResourceDiscoverer;
 use \zpt\cdt\di\DependencyParser;
 use \zpt\pct\AbstractGenerator;
 use \DirectoryIterator;
@@ -31,12 +30,17 @@ class HtmlProvider extends AbstractGenerator {
 
   protected static $actorNamespace = 'zeptech\dynamic\html';
 
+  /* The type of environment for which HtmlProviders will be generated. */
+  private $_env;
+
   /* Filesystem path to htdocs. Used to resolve script groups. */
   private $_htdocs;
 
-  public function __construct($outputPath) {
+  public function __construct($outputPath, $env) {
     parent::__construct($outputPath);
+
     $this->_htdocs = "$outputPath/htdocs";
+    $this->_env = $env;
   }
 
   protected function getTemplatePath() {
@@ -51,10 +55,30 @@ class HtmlProvider extends AbstractGenerator {
     }
 
     $values = array(
+      'env' => $this->_env,
       'jscripts' => array(),
       'sheets' => array(),
       'fonts' => array()
     );
+
+
+    $jsPath = _P('/js');
+    $scripts = array(
+      "$jsPath/base.js"  
+    );
+
+    /**
+    if ($this->_env === 'dev') {
+      $resourceDiscoverer = new ResourceDiscoverer();
+
+      $cdtScripts = $resourceDiscoverer->discover('cdt');
+      foreach ($cdtScripts as $script) {
+        $scripts[] = _fsToWeb($script);
+      }
+    } else {
+      $scripts[] = "$jsPath/cdt.js";
+    }
+    */
 
     $title = null;
     if (isset($page['page']['title'])) {

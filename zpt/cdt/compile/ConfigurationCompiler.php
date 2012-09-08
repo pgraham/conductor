@@ -54,6 +54,7 @@ class ConfigurationCompiler {
 
     $values = array(
       'pathInfo' => $this->_pathInfo->getArrayCopy(),
+      'docRootLen' => strlen($this->_pathInfo['docRoot']),
       'webRootLen' => strlen($this->_pathInfo['webRoot']),
       'namespace' => $this->_namespace,
       'dbConfig' => $this->_db,

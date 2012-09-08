@@ -3,13 +3,6 @@
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-if (window['CDT'] === undefined) {
-  var CDT = {};
-}
-if (CDT.DOM === undefined) {
-  CDT.DOM = {};
-}
-
 (function ($, DOM, undefined) {
   "use strict";
 
@@ -33,4 +26,4 @@ if (CDT.DOM === undefined) {
       .attr('name', name);
   }
 
-} (jQuery, CDT.DOM));
+} (jQuery, CDT.ns('CDT.DOM')));

@@ -45,4 +45,27 @@ namespace { //global namespace
       return $path;
     ${fi}
   }
+
+  // Function to transform a file-system path into a web path
+  function _fsToWeb($path) {
+    if (substr($path, 0, ${docRootLen}) === '${pathInfo[docRoot]}') {
+      ${if:pathInfo[webRoot] = /}
+        return substr($path, ${docRootLen});
+      ${else}
+        return '${pathInfo[webRoot]}' . substr($path, ${docRootLen});
+      ${fi}
+    }
+
+    return false;
+  }
+
+  // Function to transform a context sensitive web path into a file system path.
+  function _webToFs($path) {
+    ${if:pathInfo[webRoot] = /}
+      return '${pathInfo[docRoot]}' . $path;
+    ${else}
+      return '${pathInfo[docRoot]}' . substr($path, ${webRootLen});
+    ${fi}
+  }
+
 }

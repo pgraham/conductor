@@ -63,15 +63,24 @@ class ${actorClass} {
 
     // Client support scripts
     $lang = L10N::getLang();
+
     Element::js("${jsPath}/$lang.js")->addToHead();
     Element::js('${jsPath}/base.js')->addToHead();
-    Element::js('${jsPath}/jquery.working.js')->addToHead();
-    Element::js('${jsPath}/utility.js')->addToHead();
-    Element::js('${jsPath}/utility-loadCss.js')->addToHead();
-    Element::js('${jsPath}/jquery-dom.js')->addToHead();
-    Element::js('${jsPath}/conductor.js')->addToHead();
-    Element::js('${jsPath}/widget-message.js')->addToHead();
-    Element::js('${jsPath}/layout.js')->addToHead();
+    ${if:env = dev}
+      Element::js('${jsPath}/cdt-__init.js')->addToHead();
+      Element::js('${jsPath}/cdt.jquery-dom.js')->addToHead();
+      Element::js('${jsPath}/cdt.jquery-working.js')->addToHead();
+      Element::js('${jsPath}/cdt.util-eventuality.js')->addToHead();
+      Element::js('${jsPath}/cdt.util-hasValue.js')->addToHead();
+      Element::js('${jsPath}/cdt.util-string.js')->addToHead();
+      Element::js('${jsPath}/cdt.util-date.js')->addToHead();
+      Element::js('${jsPath}/cdt.util-loadCss.js')->addToHead();
+      Element::js('${jsPath}/cdt.util-message.js')->addToHead();
+      Element::js('${jsPath}/cdt.util-layout.js')->addToHead();
+      //Element::js('${jsPath}/cdt-ajaxify.js')->addToHead();
+    ${else}
+      Element::js('${jsPath}/cdt.js')->addToHead();
+    ${fi}
 
     ${if:jsappsupport}
       ${if:jsapptheme ISSET}

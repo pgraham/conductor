@@ -6,9 +6,10 @@
  * @author Philip Graham <philip@zeptech.ca>
  */
 (function ( $ ) {
+  "use strict";
 
   $.working = {};
-  $.working.imgPath = '/img/working.gif';
+  $.working.imgPath = _p('/img/working.gif');
 
   $.fn.working = function () {
 
