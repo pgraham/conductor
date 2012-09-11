@@ -19,3 +19,6 @@
 [submodule "lib/reed"]
 	path = lib/reed
 	url = /home/pgraham/repos/reed/
+[submodule "lib/oboe"]
+	path = lib/oboe
+	url = /home/pgraham/repos/oboe/
