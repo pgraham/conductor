@@ -50,8 +50,8 @@ class Loader {
     $target = "$root/target";
 
     $libPaths = array(
-      'reed' => "$lib/reed/src",
-      'oboe' => "$lib/oboe/src"
+      'reed' => "$cdtLib/reed/src",
+      'oboe' => "$cdtLib/oboe/src"
     );
 
     foreach ($libPaths as $libName => $libPath) {
@@ -89,6 +89,7 @@ class Loader {
 
     // Class loader for php-annotations, php-code-templates, php-rest-server,
     // clarinet and generated classes
+    self::registerNamespace('zpt\util', "$cdtLib/reed");
     self::registerNamespace('zeptech\anno', "$cdtLib/php-annotations");
     self::registerNamespace('zpt\pct', "$cdtLib/php-code-templates");
     self::registerNamespace('zeptech\rest', "$cdtLib/php-rest-server");
