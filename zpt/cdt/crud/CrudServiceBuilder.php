@@ -12,11 +12,9 @@
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
  */
-namespace conductor\generator;
+namespace zpt\cdt\crud;
 
-use \conductor\Configuration;
 use \reed\generator\CodeTemplateLoader;
-use \reed\WebSitePathInfo;
 
 /**
  * This class creates a bassoon service for a given model.
@@ -40,8 +38,6 @@ class CrudServiceBuilder {
    * Create the source code for a CRUD service class for the model encapsulated
    * by the instance.
    *
-   * @param WebSitePathInfo $pathInfo
-   * @param Configuration $config
    * @return string
    */
   public function build() {

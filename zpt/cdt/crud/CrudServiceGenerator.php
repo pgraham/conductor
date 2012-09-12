@@ -12,7 +12,7 @@
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
  */
-namespace conductor\generator;
+namespace zpt\cdt\crud;
 
 use \reed\File;
 

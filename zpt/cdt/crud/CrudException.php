@@ -12,7 +12,7 @@
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
  */
-namespace conductor\crud;
+namespace zpt\cdt\crud;
 
 use \zeptech\orm\runtime\PdoExceptionWrapper;
 use \zeptech\orm\runtime\ValidationException;

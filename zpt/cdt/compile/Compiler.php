@@ -6,7 +6,6 @@
 namespace zpt\cdt\compile;
 
 use \conductor\modeling\ModelInfo;
-use \conductor\CrudService;
 use \reed\File;
 use \reed\String;
 use \zeptech\anno\Annotations;
@@ -15,6 +14,7 @@ use \zeptech\orm\generator\PersisterGenerator;
 use \zeptech\orm\generator\TransformerGenerator;
 use \zeptech\orm\generator\ValidatorGenerator;
 use \zeptech\orm\QueryBuilder;
+use \zpt\cdt\crud\CrudService;
 use \zpt\cdt\di\DependencyParser;
 use \zpt\cdt\html\HtmlProvider;
 use \zpt\cdt\html\NotAPageDefinitionException;
@@ -474,7 +474,7 @@ class Compiler {
         $url = "$urlBase/" . strtolower($crudInfo->getDisplayNamePlural());
 
         $this->_serverCompiler->addMapping(
-          'conductor\\crud\\CrudRequestHandler',
+          'zpt\\cdt\\crud\\CrudRequestHandler',
           array( "'$modelClass'"),
           array ( $url, "$url/{id}")
         );

@@ -12,11 +12,8 @@
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
  */
-namespace conductor;
+namespace zpt\cdt\crud;
 
-use \conductor\generator\CrudServiceGenerator;
-use \conductor\generator\CrudServiceInfo;
-use \reed\File;
 use \zeptech\orm\generator\model\Parser as ModelParser;
 
 /**

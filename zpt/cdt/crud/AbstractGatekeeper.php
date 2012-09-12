@@ -12,7 +12,7 @@
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
  */
-namespace conductor\crud;
+namespace zpt\cdt\crud;
 
 use \zeptech\orm\runtime\ActorFactory;
 use \zpt\cdt\exception\AuthException;
@@ -21,6 +21,10 @@ use \zpt\cdt\exception\AuthException;
 /**
  * Base implementation for Gatekeepers.  Implements the four checkCan* methods,
  * Leave the four can*() methods for the implementations.
+ *
+ * TODO Use Transformer instead of ActorFactory
+ * TODO This is not the right package for this class, where does it actually
+ *      belong?
  *
  * @author Philip Graham <philip@zeptech.ca>
  */

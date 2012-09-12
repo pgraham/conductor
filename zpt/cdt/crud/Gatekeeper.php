@@ -12,7 +12,7 @@
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
  */
-namespace conductor\crud;
+namespace zpt\cdt\crud;
 
 /**
  * Interface for model gatekeepers.  Gatekeepers are responsible for performing

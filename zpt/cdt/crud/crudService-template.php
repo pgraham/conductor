@@ -1,9 +1,6 @@
 <?php
 namespace zeptech\dynamic\crud;
 
-use \conductor\crud\CrudException;
-use \conductor\Loader;
-use \reed\String;
 use \zeptech\orm\runtime\Criteria;
 use \zeptech\orm\runtime\PdoExceptionWrapper;
 use \zeptech\orm\runtime\Persister;
@@ -11,12 +8,14 @@ use \zeptech\orm\runtime\Transformer;
 use \zeptech\orm\runtime\ValidationException;
 use \zeptech\orm\QueryBuilder;
 
+use \zpt\cdt\crud\CrudException;
+use \zpt\cdt\Conductor;
+
 ${if:gatekeeper ISSET}
   use \${gatekeeper} as Gatekeeper;
 ${else}
-  use \conductor\crud\DefaultGatekeeper as Gatekeeper;
+  use \zpt\cdt\crud\DefaultGatekeeper as Gatekeeper;
 ${fi}
-use \conductor\Conductor;
 
 /**
  * This is a CRUD service class for a ${model} class.
