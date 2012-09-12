@@ -95,10 +95,8 @@ class PageLoader {
     Element::css(_P('/css/conductor-app.css'))->addToHead();
 
     $scripts = array(
-      '/js/jquery-dom.js',
       '/js/data-store.js',
       '/js/data-crudProxy.js',
-      '/js/layout.js',
       '/js/layout-hblock.js',
       '/js/widget-section.js',
       '/js/widget-collapsible.js',
