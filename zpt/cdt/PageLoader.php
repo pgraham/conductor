@@ -13,7 +13,7 @@
  * @license http://www.opensource.org/licenses/bsd-license.php
  * @package conductor
  */
-namespace conductor;
+namespace zpt\cdt;
 
 use \conductor\widget\LoginForm;
 use \oboe\Element;

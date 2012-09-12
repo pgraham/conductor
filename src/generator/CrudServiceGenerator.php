@@ -14,7 +14,6 @@
  */
 namespace conductor\generator;
 
-use \conductor\Conductor;
 use \reed\File;
 
 /**
@@ -46,7 +45,7 @@ class CrudServiceGenerator {
    */
   public function generate($pathInfo) {
     $builder = new CrudServiceBuilder($this->_crudInfo);
-    $template = $builder->build(Conductor::getConfig());
+    $template = $builder->build();
 
     // Ensure the output directory exists
     $className = $this->_crudInfo->getClassName();

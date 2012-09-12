@@ -12,7 +12,7 @@
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
  */
-namespace conductor;
+namespace zpt\cdt;
 
 use \conductor\jslib\JsLib;
 use \conductor\template\PageTemplate;
@@ -35,7 +35,6 @@ use \zeptech\rest\RestServer;
 use \zpt\cdt\compile\Compiler;
 use \zpt\cdt\di\Injector;
 use \zpt\cdt\exception\AuthException;
-use \zpt\cdt\L10N;
 
 use \Exception;
 use \PDO;

@@ -38,4 +38,4 @@ $cdtLdr = new SplClassLoader('zpt\cdt', $cdtPath);
 $cdtLdr->register();
 
 // Initiate the environment
-\conductor\Conductor::init($siteRoot);
+\zpt\cdt\Conductor::init($siteRoot);

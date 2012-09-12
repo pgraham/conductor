@@ -1,13 +1,13 @@
 <?php
 namespace ${actorNs};
 
+use \conductor\Auth;
+use \oboe\struct\FlowContent;
+use \oboe\Element;
 use \zpt\cdt\di\Injector;
 use \zpt\cdt\html\Page;
 use \zpt\cdt\L10N;
-use \conductor\Auth;
-use \conductor\PageLoader;
-use \oboe\struct\FlowContent;
-use \oboe\Element;
+use \zpt\cdt\PageLoader;
 
 /**
  * This is a generated class that populates a conductor\Page instance.
