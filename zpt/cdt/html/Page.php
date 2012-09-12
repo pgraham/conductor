@@ -15,9 +15,6 @@
  */
 namespace zpt\cdt\html;
 
-use \conductor\Conductor;
-use \oboe\struct\FlowContent;
-
 /**
  * This class is an extension to Oboe_Page that adds some handy features.
  * These include transparent page templating and debug capture/output.
