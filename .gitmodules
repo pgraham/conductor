@@ -22,3 +22,6 @@
 [submodule "lib/oboe"]
 	path = lib/oboe
 	url = /home/pgraham/repos/oboe/
+[submodule "lib/jslib/raphael"]
+	path = lib/jslib/raphael
+	url = /home/pgraham/lib/jslib/raphael/
