@@ -28,6 +28,12 @@ class ${actorClass} {
   private $_pageViewListeners;
 
   public function populate(Page $page, array $query = null) {
+    ${if:env = dev}
+      $page->setCaptureDebug(true);
+    ${else}
+      $page->setCaptureDebug(false);
+    ${fi}
+
     ${if:title ISSET}
       $page->setPageTitle('${title}');
     ${fi}

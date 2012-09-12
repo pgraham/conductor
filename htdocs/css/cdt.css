@@ -84,3 +84,20 @@
   cursor: pointer;
   text-align: center;
 }
+
+#debugging {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+
+  padding: 10px;
+  border-top: 2px groove #AAA;
+  border-right: 2px groove #AAA;
+
+  background-color: #FFF;
+  opacity: 0.4;
+}
+#debugging h2 {
+  font-size: 1.3em;
+  margin-bottom: 5px;
+}

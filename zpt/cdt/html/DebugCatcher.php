@@ -16,10 +16,7 @@
 namespace zpt\cdt\html;
 
 use \oboe\Body;
-use \oboe\Div;
-use \oboe\ElementComposite;
-use \oboe\Heading;
-use \oboe\Paragraph;
+use \oboe\Element;
 
 /**
  * This class uses PHP output buffering to capture any output that occurs
@@ -29,9 +26,6 @@ use \oboe\Paragraph;
  * @package conductor
  */
 class DebugCatcher {
-
-  /* The container to use to output any captured debug */
-  private $_container;
 
   /* The captured output */
   private $_captured = '';
@@ -109,12 +103,13 @@ class DebugCatcher {
       return;
     }
 
-    if ($this->_container === null) {
-      $this->_container = new Div('debugging');
-      Body::getInstance()->add($this->_container);
-    }
-    $this->_container->add(new Heading('Debug Information'));
-    $this->_container->add(new Paragraph($this->_captured));
+    $debug = Element::div()
+      ->setId('debugging')
+      ->add(Element::h2('Debug Information'))
+      ->add(Element::p()->add($this->_captured));
+
+    // Add directly to body instance to avoid any template container
+    Body::getInstance()->add($debug);
   }
 
   /**
@@ -133,14 +128,5 @@ class DebugCatcher {
    */
   public function setOutput($output) {
     $this->_output = $output;
-  }
-
-  /**
-   * Set the container in which to output captured debug.
-   *
-   * @param ElementBase must implement Item_Body
-   */
-  public function setOutputContainer(ElementComposite $container) {
-    $this->_container = $container;
   }
 }

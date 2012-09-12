@@ -34,22 +34,6 @@ class Page extends \oboe\Page {
   private static $_initialized = false;
 
   /**
-   * After invoking this method any output until the page is dumped will be
-   * captured using output buffering and will optionally be displayed in a
-   * designated area when the page is dumped.
-   *
-   * Once turned on, debug capturing cannot be turned off.  Calling this
-   * method subsequent times will simple toggle whether or not debug captured
-   * after the latest invocation will be output or not.
-   *
-   * @param boolean whether or not to output any captured debug, Default is
-   *     to toggle.
-   */
-  public static function captureDebug($output = null) {
-    self::getInstance()->setCaptureDebug($output);
-  }
-
-  /**
    * Make sure we're initialized before allowing an instance to be retieved.
    *
    * N.B. Since it is not possible to override static methods in PHP, any
@@ -85,16 +69,6 @@ class Page extends \oboe\Page {
     self::getInstance()->setPageTemplate($template);
   }
 
-  /**
-   * This method toggles page level white space suppression.  Page level white
-   * space suppression can be useful for saving bandwidth in production.
-   *
-   * @param boolean whether or not to suppress extra white space characters
-   */
-  public static function suppressWhiteSpace($suppress = true) {
-    self::getInstance()->setSuppressWhiteSpace($suppress);
-  }
-
   /*
    * =========================================================================
    * Instance
@@ -111,6 +85,35 @@ class Page extends \oboe\Page {
     parent::__construct();
   }
 
+  public function __toString() {
+    if ($this->_debugCatcher !== null) {
+      $this->_debugCatcher->flush();
+    }
+    return parent::__toString();
+  }
+
+  /**
+   * Initializes the debug catcher.
+   *
+   * @param boolean whether or not to output captured debug information.
+   */
+  public function setCaptureDebug($output) {
+    // Don't allow debug capturing to be turned on once the page has been
+    // dumped
+    if ($this->_dumped) {
+      return;
+    }
+
+    if ($this->_debugCatcher === null) {
+      $this->_debugCatcher = new DebugCatcher();
+    }
+
+    if ($output === null) {
+      $output = !$this->_debugCatcher->getOutput();
+    }
+    $this->_debugCatcher->setOutput($output);
+  }
+
   /**
    * Override the dumpPage() method to handle any debug that's been captured.
    */
@@ -121,35 +124,6 @@ class Page extends \oboe\Page {
 
     $this->_dumped = true;
     parent::dumpPage();
-  }
-
-  /**
-   * Initializes the debug catcher.
-   *
-   * @param boolean whether or not to output captured debug information.
-   */
-  protected function setCaptureDebug($output) {
-    // Don't allow debug capturing to be turned on once the page has been
-    // dumped
-    if ($this->_dumped) {
-      return;
-    }
-
-    if ($this->_debugCatcher === null) {
-      $this->_debugCatcher = new DebugCatcher();
-
-      if ($this->_template !== null) {
-        $dc = $this->_template->getDebugContainer();
-        if ($db !== null) {
-          $this->_debugCatcher->setOutputContainer($dc);
-        }
-      }
-    }
-
-    if ($output === null) {
-      $output = !$this->_debugCatcher->getOutput();
-    }
-    $this->_debugCatcher->setOutput($output);
   }
 
   /**
