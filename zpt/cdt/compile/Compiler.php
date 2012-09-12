@@ -17,6 +17,7 @@ use \zeptech\orm\generator\ValidatorGenerator;
 use \zeptech\orm\QueryBuilder;
 use \zpt\cdt\di\DependencyParser;
 use \zpt\cdt\html\HtmlProvider;
+use \zpt\cdt\html\NotAPageDefinitionException;
 use \zpt\cdt\rest\ServiceRequestDispatcher;
 use \zpt\pct\CodeTemplateParser;
 use \DirectoryIterator;
@@ -325,7 +326,6 @@ class Compiler {
     $dir = new DirectoryIterator($htmlDir);
     foreach ($dir as $pageDef) {
       $fname = $pageDef->getBasename();
-
       if ($pageDef->isDot() || substr($fname, 0, 1) === '.') {
         continue;
       }
@@ -354,13 +354,10 @@ class Compiler {
 
       try {
         $this->_htmlProvider->generate($viewClass);
-      } catch (Exception $e) {
-        // TODO Make a more reliable way of determining if this exception is
-        //      because the file is not a page definition so that other
-        //      exceptions aren't swallowed.
-
+      } catch (NotAPageDefinitionException $e) {
         // This is likely because the file is not a page definition so just
         // continue.
+        error_log($e->getMessage());
         continue;
       }
 

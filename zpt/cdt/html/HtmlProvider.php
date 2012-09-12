@@ -51,7 +51,7 @@ class HtmlProvider extends AbstractGenerator {
     $pageDef = new ReflectionClass($className);
     $page = new Annotations($pageDef);
     if (!isset($page['page'])) {
-      throw new Exception("$className is not a page definition");
+      throw new NotAPageDefinitionException($className);
     }
 
     $values = array(

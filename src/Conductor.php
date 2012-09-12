@@ -177,6 +177,7 @@ class Conductor {
         }
       } catch (Exception $e) {
         File::dirunlock("$root/target");
+        throw new Exception($e);
       }
     }
 
