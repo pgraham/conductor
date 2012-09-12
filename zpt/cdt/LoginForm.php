@@ -13,7 +13,7 @@
  * @license http://www.opensource.org/licenses/bsd-license.php
  * @package conductor/widget
  */
-namespace conductor\widget;
+namespace zpt\cdt;
 
 use \oboe\attr\CanSubmit;
 use \oboe\Composite;
@@ -22,8 +22,9 @@ use \oboe\Element;
 /**
  * This class encapsulates a stylable login form.
  *
+ * TODO Inline this class into PageLoader
+ *
  * @author Philip Graham <philip@zeptech.ca>
- * @package conductor/widget
  */
 class LoginForm extends Composite {
 

@@ -15,7 +15,6 @@
  */
 namespace zpt\cdt;
 
-use \conductor\widget\LoginForm;
 use \oboe\Element;
 use \zpt\cdt\html\Page;
 
