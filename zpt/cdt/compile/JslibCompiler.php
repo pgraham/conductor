@@ -106,15 +106,29 @@ class JslibCompiler {
     }
     copy("$jslibSrc/src/galleria.js", "$jslibOut/galleria.js");
 
-    $themeSrc = "$jslibSrc/src/themes/classic";
-    $themeOut = "$jslibOut/themes/classic";
-    if (!file_exists($themeOut)) {
-      mkdir($themeOut, 0755, true);
+    $themesDir = new DirectoryIterator("$jslibSrc/src/themes");
+    foreach ($themesDir as $theme) {
+      if ($theme->isDot() || !$theme->isDir()) {
+        continue;
+      }
+
+      $themeName = $theme->getBasename();
+      $js = "galleria.$themeName.js";
+      $css = "galleria.$themeName.css";
+      $ldr = "$themeName-loader.gif";
+      $map = "$themeName-map.png";
+      
+      $themeSrc = $theme->getPathname();
+      $themeOut = "$jslibOut/themes/$themeName";
+      if (!file_exists($themeOut)) {
+        mkdir($themeOut, 0755, true);
+      }
+
+      copy("$themeSrc/$js", "$themeOut/$js");
+      copy("$themeSrc/$css", "$themeOut/$css");
+      copy("$themeSrc/$ldr", "$themeOut/$ldr");
+      copy("$themeSrc/$map", "$themeOut/$map");
     }
-    copy("$themeSrc/galleria.classic.js", "$themeOut/galleria.classic.js");
-    copy("$themeSrc/galleria.classic.css", "$themeOut/galleria.classic.css");
-    copy("$themeSrc/classic-loader.gif", "$themeOut/classic-loader.gif");
-    copy("$themeSrc/classic-map.png", "$themeOut/classic-map.png");
   }
 
   protected function compileJQueryCookie($pathInfo, $jslibSrc) {
