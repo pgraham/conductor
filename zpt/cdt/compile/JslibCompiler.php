@@ -32,40 +32,52 @@ class JslibCompiler {
 
   public function compile($jslibPath, $pathInfo) {
     $jslibName = basename($jslibPath);
-    $this->_ensureTarget($pathInfo, $jslibName);
+
+    $jslibOut = "$pathInfo[target]/htdocs/jslib/$jslibName";
+    if (!file_exists($jslibOut)) {
+      mkdir($jslibOut, 0755, true);
+    }
 
     switch ($jslibName) {
 
       case 'datejs':
-      $this->compileDateJs($pathInfo, $jslibPath);
+      $this->compileDateJs($pathInfo, $jslibPath, $jslibOut);
       break;
 
       case 'file-uploader':
-      $this->compileFileUploader($pathInfo, $jslibPath);
+      $this->compileFileUploader($pathInfo, $jslibPath, $jslibOut);
       break;
 
       case 'galleria':
-      $this->compileGalleria($pathInfo, $jslibPath);
+      $this->compileGalleria($pathInfo, $jslibPath, $jslibOut);
       break;
 
       case 'jquery-cookie':
-      $this->compileJQueryCookie($pathInfo, $jslibPath);
+      $this->compileJQueryCookie($pathInfo, $jslibPath, $jslibOut);
+      break;
+
+      case 'jquery-openid':
+      $this->compileJQueryOpenId($pathInfo, $jslibPath, $jslibOut);
+      break;
+
+      case 'jquery-selectBox':
+      $this->compileJQuerySelectBox($pathInfo, $jslibPath, $jslibOut);
       break;
 
       case 'jquery-ui':
-      $this->compileJQueryUi($pathInfo, $jslibPath);
+      $this->compileJQueryUi($pathInfo, $jslibPath, $jslibOut);
       break;
 
       case 'jwysiwyg':
-      $this->compileJWysiwyg($pathInfo, $jslibPath);
+      $this->compileJWysiwyg($pathInfo, $jslibPath, $jslibOut);
       break;
 
       case 'raphael':
-      $this->compileRaphael($pathInfo, $jslibPath);
+      $this->compileRaphael($pathInfo, $jslibPath, $jslibOut);
       break;
 
       case 'webshims':
-      $this->compileWebshims($pathInfo, $jslibPath);
+      $this->compileWebshims($pathInfo, $jslibPath, $jslibOut);
       break;
 
       // Default, simply copy the library's source files to the target
@@ -76,35 +88,20 @@ class JslibCompiler {
     }
   }
 
-  protected function compileDateJs($pathInfo, $jslibSrc) {
-    $jslibOut = "$pathInfo[target]/htdocs/jslib/datejs";
-
-    if (!file_exists($jslibOut)) {
-      mkdir($jslibOut, 0755, true);
-    }
-
+  protected function compileDateJs($pathInfo, $jslibSrc, $jslibOut) {
     copy("$jslibSrc/build/date.js", "$jslibOut/date.js");
   }
 
-  protected function compileFileUploader($pathInfo, $jslibSrc) {
-    $jslibOut = "$pathInfo[target]/htdocs/jslib/file-uploader";
-
-    if (!file_exists($jslibOut)) {
-      mkdir($jslibOut, 0755, true);
-    }
-
-    copy("$jslibSrc/client/fileuploader.js", "$jslibOut/fileuploader.js");
-    copy("$jslibSrc/client/fileuploader.css", "$jslibOut/fileuploader.css");
-    copy("$jslibSrc/client/loading.gif", "$jslibOut/loading.gif");
+  protected function compileFileUploader($pathInfo, $jslibSrc, $jslibOut) {
+    $this->_copyFiles("$jslibSrc/client", $jslibOut, array(
+      'fileuploader.js',
+      'fileuploader.css',
+      'loading.gif'
+    ));
   }
 
-  protected function compileGalleria($pathInfo, $jslibSrc) {
-    $jslibOut = "$pathInfo[target]/htdocs/jslib/galleria";
-
-    if (!file_exists($jslibOut)) {
-      mkdir($jslibOut, 0755, true);
-    }
-    copy("$jslibSrc/src/galleria.js", "$jslibOut/galleria.js");
+  protected function compileGalleria($pathInfo, $jslibSrc, $jslibOut) {
+    $this->_copyFiles("$jslibSrc/src", $jslibOut, array('galleria.js'));
 
     $themesDir = new DirectoryIterator("$jslibSrc/src/themes");
     foreach ($themesDir as $theme) {
@@ -113,10 +110,6 @@ class JslibCompiler {
       }
 
       $themeName = $theme->getBasename();
-      $js = "galleria.$themeName.js";
-      $css = "galleria.$themeName.css";
-      $ldr = "$themeName-loader.gif";
-      $map = "$themeName-map.png";
       
       $themeSrc = $theme->getPathname();
       $themeOut = "$jslibOut/themes/$themeName";
@@ -124,29 +117,47 @@ class JslibCompiler {
         mkdir($themeOut, 0755, true);
       }
 
-      copy("$themeSrc/$js", "$themeOut/$js");
-      copy("$themeSrc/$css", "$themeOut/$css");
-      copy("$themeSrc/$ldr", "$themeOut/$ldr");
-      copy("$themeSrc/$map", "$themeOut/$map");
+      $this->_copyFiles($themeSrc, $themeOut, array(
+        "galleria.$themeName.js",
+        "galleria.$themeName.css",
+        "$themeName-loader.gif",
+        "$themeName-map.png"
+      ));
     }
   }
 
-  protected function compileJQueryCookie($pathInfo, $jslibSrc) {
-    $jslibOut = "$pathInfo[target]/htdocs/jslib/jquery-cookie";
-
-    if (!file_exists($jslibOut)) {
-      mkdir($jslibOut, 0755, true);
-    }
+  protected function compileJQueryCookie($pathInfo, $jslibSrc, $jslibOut) {
     copy("$jslibSrc/jquery.cookie.js", "$jslibOut/jquery.cookie.js");
   }
 
-  protected function compileJQueryUi($pathInfo, $jslibSrc) {
-    $jslibOut = "$pathInfo[target]/htdocs/jslib/jquery-ui";
+  protected function compileJQueryOpenId($pathInfo, $jslibSrc, $jslibOut) {
+    $this->_copyFiles($jslibSrc, $jslibOut, array(
+      'jquery.openid.js',
+      'openid.css',
+      'login.html',
+      'images/fadegrey.png',
+      'images/big/yahoo.png',
+      'images/big/livejournal.png',
+      'images/big/hyves.png',
+      'images/big/blogger.png',
+      'images/big/orange.png',
+      'images/big/google.png',
+      'images/big/myspace.png',
+      'images/big/wordpress.png',
+      'images/big/aol.png',
+      'images/big/openid.png'
+    ));
+  }
 
-    if (!file_exists($jslibOut)) {
-      mkdir($jslibOut, 0755, true);
-    }
+  protected function compileJQuerySelectBox($pathInfo, $jslibSrc, $jslibOut) {
+    $this->_copyFiles($jslibSrc, $jslibOut, array(
+      'jquery.selectBox.min.js',
+      'jquery.selectBox.css',
+      'jquery.selectBox-arrow.gif'
+    ));
+  }
 
+  protected function compileJQueryUi($pathInfo, $jslibSrc, $jslibOut) {
     // Copy external dependencies into output dir
     $extSrc = "$jslibSrc/external";
     $extOut = "$jslibOut/external";
@@ -226,37 +237,21 @@ class JslibCompiler {
     $this->_compileThemeDir("$pathInfo[src]/themes", "$jslibOut/themes");
   }
 
-  protected function compileRaphael($pathInfo, $jslibSrc) {
-    $jslibOut = "$pathInfo[target]/htdocs/jslib/raphael";
+  protected function compileJWysiwyg($pathInfo, $jslibSrc, $jslibOut) {
+    $this->_copyFiles($jslibSrc, $jslibOut, array(
+      'jquery.wysiwyg.js',
+      'jquery.wysiwyg.css',
+      'jquery.wysiwyg.bg.png',
+      'jquery.wysiwyg.gif'
+    ));
+  }
 
-    if (!file_exists($jslibOut)) {
-      mkdir($jslibOut, 0755, true);
-    }
-
+  protected function compileRaphael($pathInfo, $jslibSrc, $jslibOut) {
     copy("$jslibSrc/raphael-min.js", "$jslibOut/raphael.js");
   }
 
-  protected function compileJWysiwyg($pathInfo, $jslibSrc) {
-    $jslibOut = "$pathInfo[target]/htdocs/jslib/jwysiwyg";
-
-    if (!file_exists($jslibOut)) {
-      mkdir($jslibOut, 0755, true);
-    }
-
-    copy("$jslibSrc/jquery.wysiwyg.js", "$jslibOut/jquery.wysiwyg.js");
-    copy("$jslibSrc/jquery.wysiwyg.css", "$jslibOut/jquery.wysiwyg.css");
-    copy("$jslibSrc/jquery.wysiwyg.bg.png", "$jslibOut/jquery.wysiwyg.bg.png");
-    copy("$jslibSrc/jquery.wysiwyg.gif", "$jslibOut/jquery.wysiwyg.gif");
-  }
-
-  protected function compileWebshims($pathInfo, $jslibSrc) {
+  protected function compileWebshims($pathInfo, $jslibSrc, $jslibOut) {
     $jslibSrc = "$jslibSrc/js-webshim/minified";
-    $jslibOut = "$pathInfo[target]/htdocs/jslib/webshims";
-
-    if (!file_exists($jslibOut)) {
-      mkdir($jslibOut, 0755, true);
-    }
-
     
     $modernizrPath = "$jslibSrc/extras/modernizr-custom.js";
     $polyfillerPath = "$jslibSrc/polyfiller.js";
@@ -321,7 +316,9 @@ LOAD;
     }
   }
 
-  private function _ensureTarget($pathInfo, $jslibName) {
-    $jslibTarget = "$pathInfo[target]/htdocs/jslib/$jslibName";
+  private function _copyFiles($src, $out, array $files) {
+    foreach ($files as $file) {
+      copy("$src/$file", "$out/$file");
+    }
   }
 }
