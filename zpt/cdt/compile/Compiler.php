@@ -5,7 +5,6 @@
  */
 namespace zpt\cdt\compile;
 
-use \conductor\modeling\ModelInfo;
 use \reed\File;
 use \reed\String;
 use \zeptech\anno\Annotations;
@@ -18,6 +17,7 @@ use \zpt\cdt\crud\CrudService;
 use \zpt\cdt\di\DependencyParser;
 use \zpt\cdt\html\HtmlProvider;
 use \zpt\cdt\html\NotAPageDefinitionException;
+use \zpt\cdt\i18n\ModelMessages;
 use \zpt\cdt\rest\ServiceRequestDispatcher;
 use \zpt\pct\CodeTemplateParser;
 use \DirectoryIterator;
@@ -439,7 +439,7 @@ class Compiler {
     $persisterGen = new PersisterGenerator($target);
     $transformerGen = new TransformerGenerator($target);
     $validatorGen = new ValidatorGenerator($target);
-    $infoGen = new ModelInfo($target);
+    $infoGen = new ModelMessages($target);
     $queryBuilderGen = new QueryBuilder($target);
 
     $dir = new DirectoryIterator($models);

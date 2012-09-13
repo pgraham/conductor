@@ -12,7 +12,7 @@
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
  */
-namespace conductor\modeling;
+namespace zpt\cdt\i18n;
 
 use \zeptech\orm\generator\model\Model;
 use \zeptech\orm\generator\AbstractModelGenerator;
@@ -26,12 +26,12 @@ use \zpt\pct\CodeTemplateParser;
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class ModelInfo extends AbstractModelGenerator {
+class ModelMessages extends AbstractModelGenerator {
 
-  protected static $actorNamespace = 'zeptech\dynamic\info';
+  protected static $actorNamespace = 'zeptech\dynamic\i18n';
 
   protected function getTemplatePath() {
-    return __DIR__ . '/modelInfo.tmpl.php';
+    return __DIR__ . '/ModelMessages.tmpl.php';
   }
 
   protected function getValuesForModel(Model $model) {
@@ -56,7 +56,6 @@ class ModelInfo extends AbstractModelGenerator {
     }
 
     return array(
-      'actor'   => $model->getActor(),
       'display' => $displayName,
       'plural'  => $displayNamePlural,
       'article' => $article

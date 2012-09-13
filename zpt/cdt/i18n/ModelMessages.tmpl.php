@@ -1,5 +1,5 @@
 <?php
-namespace zeptech\dynamic\info;
+namespace ${actorNs};
 
 /**
  * This is a generated class that provides pre-parsed information about a model
@@ -10,7 +10,7 @@ namespace zeptech\dynamic\info;
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class ${actor} {
+class ${actorClass} {
 
   public function createSuccessMsg() {
     return ucfirst($this->_successMsg('created', '${article}')) . '.';

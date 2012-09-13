@@ -14,11 +14,11 @@
  */
 namespace zpt\cdt\crud;
 
-use \conductor\modeling\ModelInfo;
 use \zeptech\rest\BaseRequestHandler;
 use \zeptech\rest\RequestHandler;
 use \zeptech\rest\Request;
 use \zeptech\rest\Response;
+use \zpt\cdt\i18n\ModelMessages;
 use \StdClass;
 
 /**
@@ -147,13 +147,13 @@ class CrudRequestHandler extends BaseRequestHandler implements RequestHandler {
   private function _ensureCrud() {
     if ($this->_crud === null) {
       // Update the CrudServiceGenerator class to follow the pattern of
-      // conductor\modeling\ModelInfo which acts as both generator and
+      // zpt\cdt\i18n\ModelMessages which acts as both generator and
       // runtime instance factory
       $actor = str_replace('\\', '_', $this->_modelName);
       $fq = "zeptech\\dynamic\\crud\\{$actor}Crud";
       $this->_crud = new $fq();
 
-      $this->_info = ModelInfo::get($this->_modelName);
+      $this->_info = ModelMessages::get($this->_modelName);
     }
   }
 
