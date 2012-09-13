@@ -10,31 +10,14 @@
  */
 
 // SplClassLoader needs to be available in the PHP include path
-// TODO Provide error checking for this
 require 'SplClassLoader.php';
 
 // This file should be located at <site-root>/target/htdocs/srvr.php
 $siteRoot = realpath(__DIR__ . '/../..');
 
-// Register a class loader for conductor classes that follow the legacy package
-// structure -- This will eventually be eliminated
-$cdtPath = "$siteRoot/lib/conductor";
-spl_autoload_register(function ($classname) use ($cdtPath) {
-  if (substr($classname, 0, 10) !== 'conductor\\') {
-    return;
-  }
-
-  $relPath = str_replace('\\', '/', substr($classname, 10));
-  $fullPath = "$cdtPath/src/$relPath.php";
-
-  if (file_exists($fullPath)) {
-    require $fullPath;
-  }
-});
-
 // Register a loader for conductor classes that follow the SPR-0 compliant
 // package structure
-$cdtLdr = new SplClassLoader('zpt\cdt', $cdtPath);
+$cdtLdr = new SplClassLoader('zpt\cdt', "$siteRoot/lib/conductor");
 $cdtLdr->register();
 
 // Initiate the environment
