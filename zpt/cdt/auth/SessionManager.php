@@ -13,11 +13,10 @@
  * @license http://www.opensource.org/licenses/bsd-license.php
  * @package conductor/auth
  */
-namespace conductor\auth;
+namespace zpt\cdt\auth;
 
 use \conductor\model\Session;
 use \conductor\model\User;
-use \conductor\Conductor;
 use \zeptech\orm\runtime\Clarinet;
 use \zeptech\orm\runtime\Criteria;
 

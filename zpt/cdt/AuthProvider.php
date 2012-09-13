@@ -15,12 +15,12 @@
  */
 namespace zpt\cdt;
 
-use \conductor\auth\Authorize;
-use \conductor\auth\SessionManager;
 use \conductor\model\User;
 use \conductor\model\Visitor;
 use \zeptech\orm\runtime\Criteria;
 use \zeptech\orm\runtime\Persister;
+use \zpt\cdt\auth\Authorize;
+use \zpt\cdt\auth\SessionManager;
 use \zpt\cdt\exception\AuthException;
 
 use \LightOpenId;

@@ -13,7 +13,7 @@
  * @license http://www.opensource.org/licenses/bsd-license.php
  * @package conductor/auth
  */
-namespace conductor\auth;
+namespace zpt\cdt\auth;
 
 use \clarinet\Clarinet;
 use \clarinet\Criteria;
