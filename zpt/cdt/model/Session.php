@@ -12,7 +12,7 @@
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
  */
-namespace conductor\model;
+namespace zpt\cdt\model;
 
 /**
  * This class represents a session in a web application.  All requests that
@@ -58,7 +58,7 @@ class Session {
   }
 
   /**
-   * @ManyToOne(entity = conductor\model\User)
+   * @ManyToOne(entity = zpt\cdt\model\User)
    */
   public function getUser() {
     return $this->_user;

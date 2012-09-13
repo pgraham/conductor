@@ -28,7 +28,7 @@ class ConfigValueProvider {
   private $_persister;
 
   public function __construct() {
-    $this->_persister = Persister::get('conductor\model\ConfigValue');
+    $this->_persister = Persister::get('zpt\cdt\model\ConfigValue');
   }
 
   /**

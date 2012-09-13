@@ -12,7 +12,7 @@
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
  */
-namespace conductor\model;
+namespace zpt\cdt\model;
 
 /**
  * This class represents a visitor to the web application.  All requests that

@@ -13,7 +13,7 @@
  * @license http://www.opensource.org/licenses/bsd-license.php
  * @package conductor/model
  */
-namespace conductor\model;
+namespace zpt\cdt\model;
 
 /**
  * Model class for a permission.
@@ -46,7 +46,7 @@ class Permission {
   }
 
   /**
-   * @OneToMany(entity = conductor\model\UserPermission)
+   * @OneToMany(entity = zpt\cdt\model\UserPermission)
    */
   public function getUsers() {
     return $this->_users;

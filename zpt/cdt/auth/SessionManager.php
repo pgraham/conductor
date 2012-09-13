@@ -15,8 +15,8 @@
  */
 namespace zpt\cdt\auth;
 
-use \conductor\model\Session;
-use \conductor\model\User;
+use \zpt\cdt\model\Session;
+use \zpt\cdt\model\User;
 use \zeptech\orm\runtime\Clarinet;
 use \zeptech\orm\runtime\Criteria;
 
@@ -49,7 +49,7 @@ class SessionManager {
    * does not exist or the session is expired then a new session is returned.
    *
    * @param string $sessionKey
-   * @return conductor\model\Session|null Return the session with the given key
+   * @return zpt\cdt\model\Session|null Return the session with the given key
    *   or null the session has expired or does not exist.
    */
   public static function loadSession($sessionKey, $newIfAuthenticated = false) {
@@ -60,7 +60,7 @@ class SessionManager {
     $c = new Criteria();
     $c->addEquals('sess_key', $sessionKey);
 
-    $session = Clarinet::getOne('conductor\model\Session', $c);
+    $session = Clarinet::getOne('zpt\cdt\model\Session', $c);
     if ($session === null) {
       return self::newSession();
     }
@@ -81,7 +81,7 @@ class SessionManager {
   /**
    * Initialize a new session a return its instance.
    *
-   * @param conductor\model\User $user The user with which to associate the
+   * @param zpt\cdt\model\User $user The user with which to associate the
    *   session
    * @return new session instance
    */

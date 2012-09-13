@@ -15,13 +15,13 @@
  */
 namespace zpt\cdt;
 
-use \conductor\model\User;
-use \conductor\model\Visitor;
 use \zeptech\orm\runtime\Criteria;
 use \zeptech\orm\runtime\Persister;
 use \zpt\cdt\auth\Authorize;
 use \zpt\cdt\auth\SessionManager;
 use \zpt\cdt\exception\AuthException;
+use \zpt\cdt\model\User;
+use \zpt\cdt\model\Visitor;
 
 use \LightOpenId;
 
@@ -46,7 +46,7 @@ class AuthProvider {
     $c->addEquals('username', $username);
     $c->addEquals('password', $pwHash);
 
-    $persister = Persister::get('conductor\model\User');
+    $persister = Persister::get('zpt\cdt\model\User');
     $user = $persister->retrieveOne($c);
 
     return $user;
@@ -215,7 +215,7 @@ class AuthProvider {
         }
 
         // Need to assign a user ID to the session
-        $persister = Persister::get('conductor\model\User');
+        $persister = Persister::get('zpt\cdt\model\User');
         $c = new Criteria();
         $c->addEquals('oid_identity', $openId->identity);
         $user = $persister->retrieveOne($c);
@@ -282,7 +282,7 @@ class AuthProvider {
       return;
     }
 
-    $persister = Persister::get('conductor\model\Visitor');
+    $persister = Persister::get('zpt\cdt\model\Visitor');
 
     $visitor = null;
     if (isset($_COOKIE['visitor_id'])) {

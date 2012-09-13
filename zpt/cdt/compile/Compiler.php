@@ -201,8 +201,8 @@ class Compiler {
     // Compile Conductor models
     $this->_compileModelDir(
       $pathInfo,
-      "$pathInfo[lib]/conductor/src/model",
-      'conductor\\model');
+      "$pathInfo[lib]/conductor/zpt/cdt/model",
+      'zpt\\cdt\\model');
 
     // Compile Site models
     $this->_compileModelDir(

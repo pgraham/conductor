@@ -42,14 +42,14 @@ class GlobalConfigService extends BaseRequestHandler implements RequestHandler {
     if ($configName === null) {
       // Get all global configuration values
       // TODO - Inject this
-      $persister = Persister::get('conductor\model\ConfigValue');
+      $persister = Persister::get('zpt\cdt\model\ConfigValue');
       $c = new Criteria();
       $c->addSelect('name')->addSelect('value')
         ->addEquals('editable', true)
         ->addSort('name');
       $globalConfig = $persister->retrieve($c);
 
-      $transformer = Transformer::get('conductor\model\ConfigValue');
+      $transformer = Transformer::get('zpt\cdt\model\ConfigValue');
       $response->setData($transformer->asCollection($globalConfig));
       return;
     }
@@ -70,7 +70,7 @@ class GlobalConfigService extends BaseRequestHandler implements RequestHandler {
     $c = new Criteria();
     $c->addEquals('name', $configName);
 
-    $persister = Persister::get('conductor\model\ConfigValue');
+    $persister = Persister::get('zpt\cdt\model\ConfigValue');
     $model = $persister->retrieveOne($c);
     if ($model === null) {
       throw new RestException(404);

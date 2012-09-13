@@ -75,7 +75,7 @@ class Conductor {
     $c = new Criteria();
     $c->addEquals('name', $name);
 
-    $persister = Persister::get('conductor\model\ConfigValue');
+    $persister = Persister::get('zpt\cdt\model\ConfigValue');
     $rows = $persister->retrieve($c);
     if (count($rows) == 0) {
       return null;
@@ -109,7 +109,7 @@ class Conductor {
     $c->addLike('name', $groupConditions);
 
   
-    $persister = Persister::get('conductor\model\ConfigValue');
+    $persister = Persister::get('zpt\cdt\model\ConfigValue');
     $values = $persister->retrieve($c);
     $idxd = array();
     foreach ($values AS $value) {

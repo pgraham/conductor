@@ -12,7 +12,7 @@
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
  */
-namespace conductor\model;
+namespace zpt\cdt\model;
 
 /**
  * Model class for a configuration value.  This is a normal model class which

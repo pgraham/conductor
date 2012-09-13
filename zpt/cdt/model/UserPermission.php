@@ -12,10 +12,10 @@
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
  */
-namespace conductor\model;
+namespace zpt\cdt\model;
 
-use \conductor\model\Permission;
-use \conductor\model\User;
+use \zpt\cdt\model\Permission;
+use \zpt\cdt\model\User;
 
 /**
  * This class represents a link between a user and a permission and attaches an
@@ -42,14 +42,14 @@ class UserPermission {
   }
 
   /**
-   * @ManyToOne(entity = conductor\model\User)
+   * @ManyToOne(entity = zpt\cdt\model\User)
    */
   public function getUser() {
     return $this->_user;
   }
 
   /**
-   * @ManyToOne(entity = conductor\model\Permission)
+   * @ManyToOne(entity = zpt\cdt\model\Permission)
    */
   public function getPermission() {
     return $this->_permission;

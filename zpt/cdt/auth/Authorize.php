@@ -17,7 +17,7 @@ namespace zpt\cdt\auth;
 
 use \clarinet\Clarinet;
 use \clarinet\Criteria;
-use \conductor\model\User;
+use \zpt\cdt\model\User;
 
 /**
  * This class provides authorization capabilities.
@@ -37,7 +37,7 @@ class Authorize {
    * Determines a wether or not a user has sufficient permissions to perform an
    * action on a resource.
    *
-   * @param conductor\model\User $user The user whose permission are to be
+   * @param zpt\cdt\model\User $user The user whose permission are to be
    *   checked.  If null false is returned.
    * @param string $permName The name of the resource on which the action will
    *   be performed.
