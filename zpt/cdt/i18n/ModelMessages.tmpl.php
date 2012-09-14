@@ -17,7 +17,7 @@ class ${actorClass} {
   }
 
   public function duplicateMsg($dupField, $dupValue) {
-    $msg = "${article} ${display} with $dupField '$dupValue' already exists";
+    $msg = "${article} ${singular} with $dupField '$dupValue' already exists";
     return ucfirst($msg) . '.';
   }
 
@@ -25,7 +25,7 @@ class ${actorClass} {
     if ($plural) {
       $msg = "there was an error $action the ${plural}";
     } else {
-      $msg = "there was an error $action ${article} ${display}";
+      $msg = "there was an error $action ${article} ${singular}";
     }
     $msg .= " Please try again later or contact an administrator if the problem"
           . " persists";
@@ -33,7 +33,7 @@ class ${actorClass} {
   }
 
   public function getDisplayName() {
-    return '${display}';
+    return '${singular}';
   }
 
   public function getDisplayNamePlural() {
@@ -45,7 +45,7 @@ class ${actorClass} {
   } 
 
   public function invalidEntityMsg() {
-    return "The given ${display} is not valid because:";
+    return "The given ${singular} is not valid because:";
   }
 
   public function invalidFilterMsg($filter) {
@@ -59,7 +59,7 @@ class ${actorClass} {
   }
 
   public function notNullMsg($field) {
-    $msg = "the '$field' field of ${article} ${display} cannot be blank";
+    $msg = "the '$field' field of ${article} ${singular} cannot be blank";
     return ucfirst($msg) . '.';
   }
 
@@ -68,7 +68,7 @@ class ${actorClass} {
   }
 
   public function _successMsg($action, $article) {
-    return "successfully $action $article ${display}";
+    return "successfully $action $article ${singular}";
   }
 
 }
