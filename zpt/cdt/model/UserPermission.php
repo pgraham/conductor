@@ -57,7 +57,7 @@ class UserPermission {
 
   /**
    * @Column(name = level)
-   * @Enumerated(values = { read, write })
+   * @Enumerated(values = [ read, write ])
    */
   public function getLevel() {
     return $this->_lvl;
