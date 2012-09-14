@@ -5,7 +5,7 @@
  */
 namespace zpt\cdt\compile;
 
-use \reed\File;
+use \zpt\util\File;
 use \DirectoryIterator;
 
 /**

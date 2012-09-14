@@ -14,17 +14,9 @@
  */
 namespace zpt\cdt;
 
-use \conductor\jslib\JsLib;
-use \conductor\template\PageTemplate;
-
 use \oboe\head\Javascript;
 use \oboe\head\Link;
 use \oboe\Element;
-
-use \reed\generator\CodeTemplate;
-use \reed\ClassLoader;
-use \reed\File;
-
 use \zeptech\dynamic\Configurator;
 use \zeptech\dynamic\InjectionConfigurator;
 use \zeptech\dynamic\ServerConfigurator;
@@ -35,7 +27,7 @@ use \zeptech\rest\RestServer;
 use \zpt\cdt\compile\Compiler;
 use \zpt\cdt\di\Injector;
 use \zpt\cdt\exception\AuthException;
-
+use \zpt\util\File;
 use \Exception;
 use \PDO;
 
@@ -127,7 +119,7 @@ class Conductor {
    * Getter for the path info associated with conductor config used to
    * initialize this session.
    *
-   * @return \reed\WebSitePathInfo
+   * @return array
    */
   public static function getPathInfo() {
     self::_ensureInitialized();

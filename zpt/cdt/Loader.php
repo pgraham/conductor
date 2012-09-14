@@ -50,7 +50,6 @@ class Loader {
     $target = "$root/target";
 
     $libPaths = array(
-      'reed' => "$cdtLib/reed/src",
       'oboe' => "$cdtLib/oboe/src"
     );
 

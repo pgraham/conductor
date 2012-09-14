@@ -5,8 +5,8 @@
  */
 namespace zpt\cdt\compile;
 
-use \reed\File;
 use \zeptech\anno\Annotations;
+use \zpt\util\File;
 use \DirectoryIterator;
 use \ReflectionClass;
 

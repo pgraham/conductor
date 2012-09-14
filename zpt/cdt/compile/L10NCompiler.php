@@ -14,7 +14,7 @@
  */
 namespace zpt\cdt\compile;
 
-use \reed\Markdown;
+use \zpt\util\Markdown;
 use \SplFileInfo;
 
 /**
