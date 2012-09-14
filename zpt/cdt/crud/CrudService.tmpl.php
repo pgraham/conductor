@@ -1,5 +1,5 @@
 <?php
-namespace zeptech\dynamic\crud;
+namespace ${actorNs};
 
 use \zeptech\orm\runtime\Criteria;
 use \zeptech\orm\runtime\PdoExceptionWrapper;
@@ -22,11 +22,8 @@ ${fi}
  *
  * This class is generated.  Do NOT modify this file.  Instead, modify the
  * model class used for generation then regenerate this class.
- *
- * @Service( name = ${proxyName} )
- * @CsrfToken conductorsessid
  */
-class ${modelName}Crud { 
+class ${actorClass} { 
 
   private $_gatekeeper;
 
@@ -126,7 +123,7 @@ class ${modelName}Crud {
       if ($model === null) {
         // TODO This needs to changed so that the CrudException has a
         // isNotFound() method and the message is built using a ModelInfo actor.
-        throw new CrudException('404 Not Found', 'The requested ${display} does not exist');
+        throw new CrudException('404 Not Found', 'The requested ${singular} does not exist');
       }
 
       $this->_gatekeeper->checkCanRead($model);

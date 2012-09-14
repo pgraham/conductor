@@ -14,7 +14,10 @@
  */
 namespace zpt\cdt\crud;
 
+use \zeptech\orm\generator\model\Model;
 use \zeptech\orm\generator\model\Parser as ModelParser;
+use \zeptech\orm\generator\AbstractModelGenerator;
+use \zpt\cdt\i18n\ModelDisplayParser;
 
 /**
  * This class encapsulates information about a CRUD remote service for a model
@@ -25,23 +28,21 @@ use \zeptech\orm\generator\model\Parser as ModelParser;
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class CrudService {
+class CrudService extends AbstractModelGenerator {
 
-  private $_srvcInfo;
-  private $_webPath;
+  protected static $actorNamespace = 'zeptech\dynamic\crud';
 
-  public function __construct($modelClass) {
-    $model = ModelParser::getModel($modelClass);
-    $this->_srvcInfo = new CrudServiceInfo($model);
+  protected function getTemplatePath() {
+    return __DIR__ . '/CrudService.tmpl.php';
   }
 
-  public function generate($pathInfo) {
-    $generator = new CrudServiceGenerator($this->_srvcInfo);
-    $generator->generate($pathInfo);
+  protected function getValuesForModel(Model $model) {
+    $modelStrings = new ModelDisplayParser($model);
+    return array(
+      'gatekeeper' => $model->getGatekeeper(),
+      'singular'   => $modelStrings->getSingular(),
+      'plural'     => $modelStrings->getPlural(),
+      'idColumn'   => $model->getId()->getColumn()
+    );
   }
-
-  public function getInfo() {
-    return $this->_srvcInfo;
-  }
-
 }

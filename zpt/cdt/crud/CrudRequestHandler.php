@@ -146,13 +146,7 @@ class CrudRequestHandler extends BaseRequestHandler implements RequestHandler {
 
   private function _ensureCrud() {
     if ($this->_crud === null) {
-      // Update the CrudServiceGenerator class to follow the pattern of
-      // zpt\cdt\i18n\ModelMessages which acts as both generator and
-      // runtime instance factory
-      $actor = str_replace('\\', '_', $this->_modelName);
-      $fq = "zeptech\\dynamic\\crud\\{$actor}Crud";
-      $this->_crud = new $fq();
-
+      $this->_crud = CrudService::get($this->_modelName);
       $this->_info = ModelMessages::get($this->_modelName);
     }
   }

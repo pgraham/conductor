@@ -5,10 +5,9 @@
  */
 namespace zpt\cdt\compile;
 
-use \reed\File;
-use \reed\String;
 use \zeptech\anno\Annotations;
 use \zeptech\dynamic\Configurator;
+use \zeptech\orm\generator\model\Parser as ModelParser;
 use \zeptech\orm\generator\PersisterGenerator;
 use \zeptech\orm\generator\TransformerGenerator;
 use \zeptech\orm\generator\ValidatorGenerator;
@@ -17,9 +16,12 @@ use \zpt\cdt\crud\CrudService;
 use \zpt\cdt\di\DependencyParser;
 use \zpt\cdt\html\HtmlProvider;
 use \zpt\cdt\html\NotAPageDefinitionException;
+use \zpt\cdt\i18n\ModelDisplayParser;
 use \zpt\cdt\i18n\ModelMessages;
 use \zpt\cdt\rest\ServiceRequestDispatcher;
 use \zpt\pct\CodeTemplateParser;
+use \zpt\util\File;
+use \zpt\util\String;
 use \DirectoryIterator;
 use \Exception;
 use \ReflectionClass;
@@ -440,8 +442,8 @@ class Compiler {
     $transformerGen = new TransformerGenerator($target);
     $validatorGen = new ValidatorGenerator($target);
     $infoGen = new ModelMessages($target);
-    $queryBuilderGen = new QueryBuilder($target);
-
+    $crudGen = new CrudService($target);
+    $queryBuilderGen = new QueryBuilder($target); 
     $dir = new DirectoryIterator($models);
     foreach ($dir as $model) {
       if ($model->isDot() || $model->isDir()) {
@@ -456,6 +458,7 @@ class Compiler {
       $modelName = substr($fname, 0, -4);
       $modelClass = "$ns\\$modelName";
       $annos = new Annotations(new ReflectionClass($modelClass));
+      $model = ModelParser::getModel($modelClass);
 
       // TODO - Update generators to receive an injected template parser.
       $persisterGen->generate($modelClass);
@@ -465,13 +468,11 @@ class Compiler {
       $queryBuilderGen->generate($modelClass);
 
       if ( !isset($annos['nocrud']) ) {
-        // Generate a crud service for the model
-        $crudGen = new CrudService($modelClass);
-        $crudGen->generate($pathInfo);
+        $crudGen->generate($modelClass);
 
         // Create a mapping for the REST server that maps to the CrudService
-        $crudInfo = $crudGen->getInfo();
-        $url = "$urlBase/" . strtolower($crudInfo->getDisplayNamePlural());
+        $modelDisplay = new ModelDisplayParser($model);
+        $url = "$urlBase/" . strtolower($modelDisplay->getPlural());
 
         $this->_serverCompiler->addMapping(
           'zpt\\cdt\\crud\\CrudRequestHandler',
