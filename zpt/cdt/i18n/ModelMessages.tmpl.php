@@ -16,6 +16,10 @@ class ${actorClass} {
     return ucfirst($this->_successMsg('created', '${article}')) . '.';
   }
 
+  public function deleteSuccessMsg() {
+    return ucfirst($this->_successMsg('deleted', 'the')) . '.';
+  }
+
   public function duplicateMsg($dupField, $dupValue) {
     $msg = "${article} ${singular} with $dupField '$dupValue' already exists";
     return ucfirst($msg) . '.';

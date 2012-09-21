@@ -470,15 +470,8 @@ class Compiler {
       if ( !isset($annos['nocrud']) ) {
         $crudGen->generate($modelClass);
 
-        // Create a mapping for the REST server that maps to the CrudService
-        $modelDisplay = new ModelDisplayParser($model);
-        $url = "$urlBase/" . strtolower($modelDisplay->getPlural());
-
-        $this->_serverCompiler->addMapping(
-          'zpt\\cdt\\crud\\CrudRequestHandler',
-          array( "'$modelClass'"),
-          array ( $url, "$url/{id}")
-        );
+        $crudSrvc = 'zeptech\\dynamic\\crud\\' . $model->getActor();
+        $this->_serviceCompiler->compileService($crudSrvc);
       }
     }
   }
