@@ -58,9 +58,9 @@ class LoginForm extends Composite {
     }
 
     $this->elm
-      ->add(Element::label('Username:'))
+      ->add(Element::label('Username:')->forInput('uname'))
       ->add(Element::textInput('uname'))
-      ->add(Element::label('Password:'))
+      ->add(Element::label('Password:')->forInput('pw'))
       ->add(Element::password('pw'))
       ->add(Element::submit('Login'));
   }
