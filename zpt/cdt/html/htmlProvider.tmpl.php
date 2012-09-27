@@ -105,17 +105,17 @@ class ${actorClass} {
       Element::js('${jslibPath}/raphael/raphael.js')->addToHead();
 
       ${if:env = dev}
-        Element::js('${jsPath}/widget-section.js')->addToHead();
-        Element::js('${jsPath}/widget-collapsible.js')->addToHead();
-        Element::js('${jsPath}/widget-dialog.js')->addToHead();
-        Element::js('${jsPath}/widget-floatingmenu.js')->addToHead();
-        Element::js('${jsPath}/widget-form.js')->addToHead();
-        Element::js('${jsPath}/widget-pager.js')->addToHead();
-        Element::js('${jsPath}/widget-list.js')->addToHead();
-        Element::js('${jsPath}/widget-icon.js')->addToHead();
-        Element::js('${jsPath}/widget-download.js')->addToHead();
+        Element::js('${jsPath}/cdt.widget-section.js')->addToHead();
+        Element::js('${jsPath}/cdt.widget-collapsible.js')->addToHead();
+        Element::js('${jsPath}/cdt.widget-dialog.js')->addToHead();
+        Element::js('${jsPath}/cdt.widget-floatingmenu.js')->addToHead();
+        Element::js('${jsPath}/cdt.widget-form.js')->addToHead();
+        Element::js('${jsPath}/cdt.widget-pager.js')->addToHead();
+        Element::js('${jsPath}/cdt.widget-list.js')->addToHead();
+        Element::js('${jsPath}/cdt.widget-icon.js')->addToHead();
+        Element::js('${jsPath}/cdt.widget-download.js')->addToHead();
       ${else}
-        Element::js('${jsPath}/widget.js')->addToHead();
+        Element::js('${jsPath}/cdt.widget.js')->addToHead();
       ${fi}
 
       Element::css('${cssPath}/jsapp.css')->addToHead();
