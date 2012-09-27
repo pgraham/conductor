@@ -86,36 +86,39 @@ class ${actorClass} {
     Element::js("${jsPath}/$lang.js")->addToHead();
     Element::js('${jsPath}/base.js')->addToHead();
     ${if:env = dev}
-      Element::js('${jsPath}/cdt-__init.js')->addToHead();
-      Element::js('${jsPath}/cdt.jquery-dom.js')->addToHead();
-      Element::js('${jsPath}/cdt.jquery-working.js')->addToHead();
-      Element::js('${jsPath}/cdt.util-eventuality.js')->addToHead();
-      Element::js('${jsPath}/cdt.util-hasValue.js')->addToHead();
-      Element::js('${jsPath}/cdt.util-string.js')->addToHead();
-      Element::js('${jsPath}/cdt.util-date.js')->addToHead();
-      Element::js('${jsPath}/cdt.util-loadCss.js')->addToHead();
-      Element::js('${jsPath}/cdt.util-message.js')->addToHead();
-      Element::js('${jsPath}/cdt.util-layout.js')->addToHead();
-      Element::js('${jsPath}/cdt.util.data-store.js')->addToHead();
-      Element::js('${jsPath}/cdt.util.data-crudProxy.js')->addToHead();
+      Element::js('${jsPath}/cdt.core-__init.js')->addToHead();
+      Element::js('${jsPath}/cdt.core.data-store.js')->addToHead();
+      Element::js('${jsPath}/cdt.core.data-crudProxy.js')->addToHead();
+      Element::js('${jsPath}/cdt.core.jquery-working.js')->addToHead();
+      Element::js('${jsPath}/cdt.core-date.js')->addToHead();
+      Element::js('${jsPath}/cdt.core-eventuality.js')->addToHead();
+      Element::js('${jsPath}/cdt.core-hasValue.js')->addToHead();
+      Element::js('${jsPath}/cdt.core-layout.js')->addToHead();
+      Element::js('${jsPath}/cdt.core-loadCss.js')->addToHead();
+      Element::js('${jsPath}/cdt.core-message.js')->addToHead();
+      Element::js('${jsPath}/cdt.core-string.js')->addToHead();
     ${else}
-      Element::js('${jsPath}/cdt.js')->addToHead();
+      Element::js('${jsPath}/cdt.core.js')->addToHead();
     ${fi}
 
     ${if:jsappsupport}
-      Element::css('${cssPath}/jsapp.css')->addToHead();
-
       Element::js('${jslibPath}/raphael/raphael.js')->addToHead();
-      Element::js('${jsPath}/widget-section.js')->addToHead();
-      Element::js('${jsPath}/widget-collapsible.js')->addToHead();
-      Element::js('${jsPath}/widget-dialog.js')->addToHead();
-      Element::js('${jsPath}/widget-floatingmenu.js')->addToHead();
-      Element::js('${jsPath}/widget-form.js')->addToHead();
-      Element::js('${jsPath}/widget-pager.js')->addToHead();
-      Element::js('${jsPath}/widget-list.js')->addToHead();
-      Element::js('${jsPath}/widget-icon.js')->addToHead();
-      Element::js('${jsPath}/widget-download.js')->addToHead();
 
+      ${if:env = dev}
+        Element::js('${jsPath}/widget-section.js')->addToHead();
+        Element::js('${jsPath}/widget-collapsible.js')->addToHead();
+        Element::js('${jsPath}/widget-dialog.js')->addToHead();
+        Element::js('${jsPath}/widget-floatingmenu.js')->addToHead();
+        Element::js('${jsPath}/widget-form.js')->addToHead();
+        Element::js('${jsPath}/widget-pager.js')->addToHead();
+        Element::js('${jsPath}/widget-list.js')->addToHead();
+        Element::js('${jsPath}/widget-icon.js')->addToHead();
+        Element::js('${jsPath}/widget-download.js')->addToHead();
+      ${else}
+        Element::js('${jsPath}/widget.js')->addToHead();
+      ${fi}
+
+      Element::css('${cssPath}/jsapp.css')->addToHead();
       Element::js('${jsPath}/jsapp.js')->addToHead();
     ${fi}
 
