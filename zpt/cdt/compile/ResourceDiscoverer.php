@@ -12,12 +12,16 @@
  */
 namespace zpt\cdt\compile;
 
+use \zpt\util\file\FileLister;
+
 /**
  * This class discovers all of the files included in a resource group.
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
 class ResourceDiscoverer {
+
+  private $_fileLister;
 
   private $_resourceDir;
   private $_ext;
@@ -27,6 +31,12 @@ class ResourceDiscoverer {
     $this->_ext = $ext;
   }
 
+  /**
+   * Discover all of the files that create the given group, or groups.
+   *
+   * @param string|array $groups Either the name of a single group to discover
+   *   or an array of group names.
+   */
   public function discover($groups) {
     if (is_array($groups)) {
       return $this->_discoverGroups($groups);
@@ -35,18 +45,55 @@ class ResourceDiscoverer {
     }
   }
 
-  private function _discoverGroup($group) {
-    $scripts = glob("$this->_resourceDir/$group-*.$this->_ext");
+  /**
+   * Setter for the FileLister implementation that lists the contents of a
+   * given directory.
+   */
+  public function setFileLister(FileLister $fileLister) {
+    $this->_fileLister = $fileLister;
+  }
 
-    // See if a script with the group name and no suffix exists.  This script
-    // is added last so any initialization code that relies on the content
-    // of the scripts in the group should go in this script.
-    $initScriptPath = "$this->_resourceDir/$group.$this->_ext";
-    if (file_exists($initScriptPath)) {
-      $scripts[] = $initScriptPath;
+  private function _discoverGroup($group) {
+    $ordered = array();
+
+    $scripts = $this->_fileLister->matchesInDirectory($this->_resourceDir,
+      "$group-*.$this->_ext");
+
+    $subGroups = $this->_fileLister->matchesInDirectory($this->_resourceDir,
+      "$group.*-*.$this->_ext");
+
+    // Check for a setup file.  This file contains anything that is depended on
+    // by other files in the group.
+    $setupPath = "$group-__setup.$this->_ext";
+    $setupIdx = array_search($setupPath, $scripts);
+    if ($setupIdx !== false) {
+      $ordered[] = $setupPath;
+      unset($scripts[$setupIdx]);
     }
 
-    return $scripts;
+    // Add all subgroup files
+    // TODO - Do this recursively so that subgroups can also have setup and init
+    // scripts and subgroups of their own
+    sort($subGroups);
+    foreach ($subGroups as $subGroup) {
+      $ordered[] = $subGroup;
+    }
+
+    // Add all group files
+    sort($scripts);
+    foreach ($scripts as $script) {
+      $ordered[] = $script;
+    }
+
+    // Check for initialization file.  This file is the name of the group with
+    // the appriopriate description.  It is included last in order to perform
+    // any initialization once the group has been loaded.
+    $initPath = "$group.$this->_ext";
+    if ($this->_fileLister->directoryContains($this->_resourceDir, $initPath)) {
+      $ordered[] = $initPath;
+    }
+
+    return $ordered;
   }
 
   private function _discoverGroups($groups) {
