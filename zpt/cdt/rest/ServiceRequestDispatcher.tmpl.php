@@ -26,12 +26,12 @@ class ${actorClass} extends BaseRequestHandler implements RequestHandler {
       $mappingId = $request->getMappingId();
       switch ($mappingId) {
 
-      ${each:deleteMethods as method}
+        ${each:deleteMethods as method}
           case '${method[name]}':
           $this->_srvc->${method[name]}($request, $response);
           return;
 
-      ${done}
+        ${done}
       }
       parent::delete($request, $response);
     }
@@ -42,12 +42,12 @@ class ${actorClass} extends BaseRequestHandler implements RequestHandler {
       $mappingId = $request->getMappingId();
       switch ($mappingId) {
 
-      ${each:getMethods as method}
+        ${each:getMethods as method}
           case '${method[name]}':
           $this->_srvc->${method[name]}($request, $response);
           return;
 
-      ${done}
+        ${done}
       }
       parent::get($request, $response);
     }
@@ -58,12 +58,12 @@ class ${actorClass} extends BaseRequestHandler implements RequestHandler {
       $mappingId = $request->getMappingId();
       switch ($mappingId) {
 
-      ${each:postMethods as method}
+        ${each:postMethods as method}
           case '${method[name]}':
           $this->_srvc->${method[name]}($request, $response);
           return;
 
-      ${done}
+        ${done}
       }
       parent::post($request, $response);
     }
@@ -74,12 +74,12 @@ class ${actorClass} extends BaseRequestHandler implements RequestHandler {
       $mappingId = $request->getMappingId();
       switch ($mappingId) {
 
-      ${each:putMethods as method}
+        ${each:putMethods as method}
           case '${method[name]}':
           $this->_srvc->${method[name]}($request, $response);
           return;
 
-      ${done}
+        ${done}
       }
       parent::put($request, $response);
     }

@@ -25,26 +25,19 @@ use \LightOpenId;
  *
  * @author Philip Graham <philip@zeptech.ca>
  *
- * @Uri /login
- * @Uri /logout
+ * @Service
  */
-class LoginService extends BaseRequestHandler implements RequestHandler {
+class LoginService {
 
   /** @Injected */
   private $_authProvider;
 
-  public function post(Request $request, Response $response) {
-    $uri = $request->getUri();
-
-    $data = $request->getData();
-    if ($uri === '/login') {
-      $this->login($request, $response);
-    } else if ($uri === '/logout') {
-      $response->setData($this->logout());
-    }
-  }
-
-  // TODO - This needs to be handled by the service
+  /**
+   * TODO L10N messages
+   *
+   * @Method post
+   * @Uri /oauth
+   */
   public function googleLogin() {
     $this->_authProvider->openIdLogin('https://www.google.com/accounts/o8/id');
 
@@ -77,14 +70,11 @@ class LoginService extends BaseRequestHandler implements RequestHandler {
     }
   }
 
-  /*
-   * TODO Handle openIdLogins
-   *
-   * if (isset($_GET['openid_identity'])) {
-   *   $session = $this->openIdLogin($_GET['openid_identity']);
-   * }
+  /**
+   * @Method post
+   * @Uri /login
    */
-  public function login($request, $response) {
+  public function login(Request $request, Response $response) {
     $data = $request->getData();
 
     if (isset($data['uname']) && isset($data['pw'])) {
@@ -110,9 +100,16 @@ class LoginService extends BaseRequestHandler implements RequestHandler {
     }
   }
 
-  public function logout() {
-    setcookie('conductorsessid', '', time() - 3600, '/');
-    return array('success' => true);
+  /**
+   * @Method post
+   * @Uri /logout
+   */
+  public function logout(Request $request, Response $response) {
+    $this->_authProvider->logout();
+
+    $this->_redirectIf();
+
+    $response->setData(array('success' => true));
   }
 
   public function setAuthProvider($authProvider) {
@@ -131,6 +128,7 @@ class LoginService extends BaseRequestHandler implements RequestHandler {
         $asyncRequest = true;
       }
     }
+
     if (!$asyncRequest) {
       if ($url === null) {
         if (isset($_SERVER['HTTP_REFERER'])) {

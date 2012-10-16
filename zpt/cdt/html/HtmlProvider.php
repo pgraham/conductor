@@ -15,6 +15,7 @@ namespace zpt\cdt\html;
 use \zeptech\anno\Annotations;
 use \zpt\cdt\compile\ResourceDiscoverer;
 use \zpt\cdt\di\DependencyParser;
+use \zpt\cdt\Conductor;
 use \zpt\pct\AbstractGenerator;
 use \DirectoryIterator;
 use \Exception;
@@ -133,8 +134,12 @@ class HtmlProvider extends AbstractGenerator {
       $values['uitheme'] = $page['page']['theme'];
     } else if ($values['jsappsupport']) {
       $values['uitheme'] = 'zpt';
+    }  else {
+      $values['uitheme'] = 'base';
     }
 
+    $values['jQueryPath'] = 'http://ajax.googleapis.com/ajax/libs/jquery/' .
+      Conductor::JQUERY_VERSION;
     $values['jsPath'] = _P('/js');
     $values['jslibPath'] = _P('/jslib');
     $values['cssPath'] = _P('/css');

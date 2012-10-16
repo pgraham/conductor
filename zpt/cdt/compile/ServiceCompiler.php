@@ -73,46 +73,52 @@ class ServiceCompiler {
 
       $srvcName = $srvc->getBasename('.php');
       $srvcClass = "$ns\\$srvcName";
-      $srvcDef = new ReflectionClass($srvcClass);
-      $annos = new Annotations($srvcDef);
 
-      // There are two methods of defining a service.
-      if ($srvcDef->implementsInterface('zeptech\rest\RequestHandler')) {
-        if (isset($annos['uri'])) {
-          // Direct RequestHandler implementation
-          // TODO Ensure that the class definition implements RequestHandler
-
-          $uris = $annos['uri'];
-          if (!is_array($uris)) {
-            $uris = array($uris);
-          }
-
-          $this->_serverCompiler->addMapping("$srvcClass", array(), $uris);
-        }
-      } else if (isset($annos['service'])) {
-        // Service definition, generate a RequestHandler implementation for this
-        // class that handles delegation to the appropriate method of the
-        // service.
-
-        // Generate a service handler for this class
-        $this->_serviceRequestDispatcher->generate($srvcClass);
-
-        $uris = array();
-        foreach ($srvcDef->getMethods() as $method) {
-          $methodAnnos = new Annotations($method);
-
-          if (isset($methodAnnos['uri'])) {
-            $uris[] = array(
-              'id' => $method->getName(),
-              'template' => $methodAnnos['uri']
-            );
-          }
-        }
-        $this->_serverCompiler->addActor(
-          '\zpt\cdt\rest\ServiceRequestDispatcher', $srvcClass, $uris);
-
-      } /* Else: ignore this file, it is not a service definition. */
+      $this->compileService($srvcClass);
     }
+  }
+
+  public function compileService($srvcClass) {
+    $srvcDef = new ReflectionClass($srvcClass);
+    $annos = new Annotations($srvcDef);
+
+    // There are two methods of defining a service.
+    if ($srvcDef->implementsInterface('zeptech\rest\RequestHandler')) {
+      if (isset($annos['uri'])) {
+        // Direct RequestHandler implementation
+        // TODO Ensure that the class definition implements RequestHandler
+
+        $uris = $annos['uri'];
+        if (!is_array($uris)) {
+          $uris = array($uris);
+        }
+
+        $this->_serverCompiler->addMapping("$srvcClass", array(), $uris);
+      }
+    } else if (isset($annos['service'])) {
+      // Service definition, generate a RequestHandler implementation for this
+      // class that handles delegation to the appropriate method of the
+      // service.
+
+      // Generate a service handler for this class
+      $this->_serviceRequestDispatcher->generate($srvcClass);
+
+      $uris = array();
+      foreach ($srvcDef->getMethods() as $method) {
+        $methodAnnos = new Annotations($method);
+
+        if (isset($methodAnnos['uri']) && isset($methodAnnos['method'])) {
+          $uris[] = array(
+            'id' => $method->getName(),
+            'template' => $methodAnnos['uri'],
+            'method' => $methodAnnos['method']
+          );
+        }
+      }
+      $this->_serverCompiler->addActor(
+        '\zpt\cdt\rest\ServiceRequestDispatcher', $srvcClass, $uris);
+
+    } /* Else: ignore this class, it is not a service definition. */
   }
 
   /**

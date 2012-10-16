@@ -1,17 +1,7 @@
 <?php
 /**
- * =============================================================================
- * Copyright (c) 2010, Philip Graham
+ * Copyright (c) 2012, Philip Graham
  * All rights reserved.
- *
- * This file is part of Conductor and is licensed by the Copyright holder under
- * the 3-clause BSD License.  The full text of the license can be found in the
- * LICENSE.txt file included in the root directory of this distribution or at
- * the link below.
- * =============================================================================
- *
- * @license http://www.opensource.org/licenses/bsd-license.php
- * @package conductor
  */
 namespace zpt\cdt;
 
@@ -30,7 +20,6 @@ use \LightOpenId;
  * session can optionally be associated with a user.
  *
  * @author Philip Graham <philip@lightbox.org>
- * @package conductor
  */
 class AuthProvider {
 
@@ -120,6 +109,22 @@ class AuthProvider {
   }
 
   /**
+   * Determine if the current session has the given permissions.
+   *
+   * @param string $permName The name of a permission resource to check
+   * @param string $level Optional level of permission on the given resource
+   * @return True if the current session has access, false otherwise.
+   */
+  public function hasPermission($permName, $level = 'write') {
+    $this->init();
+
+    if ($this->_session->getUser() !== null) {
+      return Authorize::allowed($this->_session->getUser(), $permName, $level);
+    }
+    return false;
+  }
+
+  /**
    * Authenticate the user.  The process is as follows.  Check if there is
    * a login attempt with the request and if so process it.  If there is no
    * login attempt check if there is opendId authentication info in the request
@@ -163,19 +168,11 @@ class AuthProvider {
   }
 
   /**
-   * Determine if the current session has the given permissions.
-   *
-   * @param string $permName The name of a permission resource to check
-   * @param string $level Optional level of permission on the given resource
-   * @return True if the current session has access, false otherwise.
+   * Logout the current user by deleting the conductor cookie.
    */
-  public function hasPermission($permName, $level = 'write') {
-    $this->init();
-
-    if ($this->_session->getUser() !== null) {
-      return Authorize::allowed($this->_session->getUser(), $permName, $level);
-    }
-    return false;
+  public function logout() {
+    $this->_session = null;
+    setcookie('conductorsessid', '', time() - 3600, _P('/'));
   }
 
   /**

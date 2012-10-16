@@ -28,7 +28,7 @@ class ServerConfigurator {
         Injector::inject($hdlr, ${php:actor[beans]});
       ${fi}
       ${each:actor[uris] as uri}
-        $server->addMapping('${uri[template]}', $hdlr, '${uri[id]}');
+        $server->addMapping('${uri[template]}', $hdlr, '${uri[id]}', '${uri[method]}');
       ${done}
     ${done}
   }

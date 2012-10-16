@@ -7,7 +7,7 @@ use \oboe\Element;
 use \zpt\cdt\di\Injector;
 use \zpt\cdt\html\Page;
 use \zpt\cdt\L10N;
-use \zpt\cdt\PageLoader;
+use \zpt\cdt\LoginForm;
 
 /**
  * This is a generated class that populates a conductor\Page instance.
@@ -47,7 +47,7 @@ class ${actorClass} {
 
     ${if:auth ISSET}
       if (!$this->_authProvider->hasPermission('${auth}')) {
-        PageLoader::loadLogin();
+        $this->_loadLogin();
         exit;
       }
     ${fi}
@@ -57,15 +57,28 @@ class ${actorClass} {
     Element::css('${cssPath}/cdt.css')->addToHead();
 
     // Javascript libraries
-    PageLoader::loadDateJs();
-    PageLoader::loadJQuery();
+    // -------------------------------------------------------------------------
+
+    // DateJS
+    Element::js('${jslibPath}/datejs/date.js')->addToHead();
+
+    // JQuery - If dev mode non-minimized version is included
+    $this->_loadJQuery();
+
+    // Webshims
     Element::js('${jslibPath}/webshims/polyfiller.js')->addToHead();
-    PageLoader::loadJQueryCookie();
-    ${if:uitheme ISSET}
-      PageLoader::loadJQueryUi('${uitheme}');
-    ${else}
-      PageLoader::loadJQueryUi();
-    ${fi}
+
+    // JQuery Cookie
+    Element::js('${jslibPath}/jquery-cookie/jquery.cookie.js')->addToHead();
+
+    // JQuery UI
+    Element::css('${jslibPath}/jquery-ui/jquery.ui.css')->addToHead();
+    Element::css('${jslibPath}/jquery-ui/themes/${uitheme}/jquery.ui.theme.css')
+      ->addToHead();
+    Element::js('${jslibPath}/jquery-ui/external/globalize.js')->addToHead();
+    Element::js('${jslibPath}/jquery-ui/jquery.ui.js')->addToHead();
+
+    // -------------------------------------------------------------------------
 
     // Client support scripts
     $lang = L10N::getLang();
@@ -73,27 +86,40 @@ class ${actorClass} {
     Element::js("${jsPath}/$lang.js")->addToHead();
     Element::js('${jsPath}/base.js')->addToHead();
     ${if:env = dev}
-      Element::js('${jsPath}/cdt-__init.js')->addToHead();
-      Element::js('${jsPath}/cdt.jquery-dom.js')->addToHead();
-      Element::js('${jsPath}/cdt.jquery-working.js')->addToHead();
-      Element::js('${jsPath}/cdt.util-eventuality.js')->addToHead();
-      Element::js('${jsPath}/cdt.util-hasValue.js')->addToHead();
-      Element::js('${jsPath}/cdt.util-string.js')->addToHead();
-      Element::js('${jsPath}/cdt.util-date.js')->addToHead();
-      Element::js('${jsPath}/cdt.util-loadCss.js')->addToHead();
-      Element::js('${jsPath}/cdt.util-message.js')->addToHead();
-      Element::js('${jsPath}/cdt.util-layout.js')->addToHead();
-      //Element::js('${jsPath}/cdt-ajaxify.js')->addToHead();
+      Element::js('${jsPath}/cdt.core-__init.js')->addToHead();
+      Element::js('${jsPath}/cdt.core.data-store.js')->addToHead();
+      Element::js('${jsPath}/cdt.core.data-crudProxy.js')->addToHead();
+      Element::js('${jsPath}/cdt.core.jquery-working.js')->addToHead();
+      Element::js('${jsPath}/cdt.core-date.js')->addToHead();
+      Element::js('${jsPath}/cdt.core-eventuality.js')->addToHead();
+      Element::js('${jsPath}/cdt.core-hasValue.js')->addToHead();
+      Element::js('${jsPath}/cdt.core-layout.js')->addToHead();
+      Element::js('${jsPath}/cdt.core-loadCss.js')->addToHead();
+      Element::js('${jsPath}/cdt.core-message.js')->addToHead();
+      Element::js('${jsPath}/cdt.core-string.js')->addToHead();
     ${else}
-      Element::js('${jsPath}/cdt.js')->addToHead();
+      Element::js('${jsPath}/cdt.core.js')->addToHead();
     ${fi}
 
     ${if:jsappsupport}
-      ${if:jsapptheme ISSET}
-        PageLoader::loadJsAppSupport('${jsapptheme}');
+      Element::js('${jslibPath}/raphael/raphael.js')->addToHead();
+
+      ${if:env = dev}
+        Element::js('${jsPath}/cdt.widget-section.js')->addToHead();
+        Element::js('${jsPath}/cdt.widget-collapsible.js')->addToHead();
+        Element::js('${jsPath}/cdt.widget-dialog.js')->addToHead();
+        Element::js('${jsPath}/cdt.widget-floatingmenu.js')->addToHead();
+        Element::js('${jsPath}/cdt.widget-form.js')->addToHead();
+        Element::js('${jsPath}/cdt.widget-pager.js')->addToHead();
+        Element::js('${jsPath}/cdt.widget-list.js')->addToHead();
+        Element::js('${jsPath}/cdt.widget-icon.js')->addToHead();
+        Element::js('${jsPath}/cdt.widget-download.js')->addToHead();
       ${else}
-        PageLoader::loadJsAppSupport();
+        Element::js('${jsPath}/cdt.widget.js')->addToHead();
       ${fi}
+
+      Element::css('${cssPath}/jsapp.css')->addToHead();
+      Element::js('${jsPath}/jsapp.js')->addToHead();
     ${fi}
 
     ${if:fonts ISSET}
@@ -122,7 +148,7 @@ class ${actorClass} {
   public function getFragment($query) {
     ${if:auth ISSET}
       if (!$this->_authProvider->hasPermission('${auth}')) {
-        PageLoader::loadLogin();
+        $this->_loadLogin();
         exit;
       }
     ${fi}
@@ -146,6 +172,26 @@ class ${actorClass} {
 
   public function setPageViewListeners(array $pageViewListeners) {
     $this->_pageViewListeners = $pageViewListeners;
+  }
+
+  private function _loadJQuery() {
+    ${if:env = dev}
+      Element::js('${jQueryPath}/jquery.min.js')->addToHead();
+    ${else}
+      Element::js('${jQueryPath}/jquery.js')->addToHead();
+    ${fi}
+  }
+
+  private function _loadLogin() {
+    Element::css('http://fonts.googleapis.com/css?family=Sorts+Mill+Goudy|Varela')->addToHead();
+    Element::css(_P('/css/login.css'))->addToHead();
+
+    $this->_loadJQuery();
+    Element::js(_P('/js/login.js'))->addToHead();
+
+    $login = new LoginForm();
+    $login->addToBody();
+    Page::dump();
   }
 
   private function _onPageView() {

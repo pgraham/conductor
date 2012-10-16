@@ -28,6 +28,7 @@ use \zpt\cdt\compile\Compiler;
 use \zpt\cdt\di\Injector;
 use \zpt\cdt\exception\AuthException;
 use \zpt\util\File;
+use \zpt\util\DirectoryLockTimeoutException;
 use \Exception;
 use \PDO;
 
@@ -156,7 +157,7 @@ class Conductor {
       assert_options(ASSERT_QUIET_EVAL, 0);
 
       try {
-        if (File::dirlock("$root/target")) {
+        if (File::dirlock("$root/target", isset($_GET['forceunlock']))) {
           $compiler = new Compiler();
           $compiler->compile($root);
           File::dirunlock("$root/target");
@@ -166,6 +167,24 @@ class Conductor {
           // changes this may start to show up in the logs.
           error_log('Unable to compile');
         }
+      } catch (DirectoryLockTimeoutException $e) {
+
+        // Since this is dev mode send a response which will allow the user to
+        // forcefully unlock the directory
+        // TODO
+        $url = $_SERVER['REQUEST_URI'];
+        if (strpos($url, '?') !== false) {
+          $url .= '&forceunlock';
+        } else {
+          $url .= '?forceunlock';
+        }
+
+        echo "<!DOCTYPE html>\n" .
+             "<html lang=en><head><meta charset=utf-8 /><title>Force unlock</title></head>\n" .
+             "<body><h1>Unable to aquire target lock</h1>\n".
+             "<a href=\"$url\">Click to forcefully remove the lock and continue</a></body></html>\n";
+        exit;
+        
       } catch (Exception $e) {
         File::dirunlock("$root/target");
         throw new Exception($e);

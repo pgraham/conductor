@@ -38,11 +38,21 @@ class CrudService extends AbstractModelGenerator {
 
   protected function getValuesForModel(Model $model) {
     $modelStrings = new ModelDisplayParser($model);
+    $plural = $modelStrings->getPlural();
+
+    $url = "/$plural";
+
+    $classname = $model->getClass();
+    if (preg_match('/^zpt\\\\mod\\\\([^\\\\]+)\\\\model\\\\/', $classname, $matches)) {
+      $url = "/$matches[1]$url";
+    }
+    
     return array(
       'gatekeeper' => $model->getGatekeeper(),
       'singular'   => $modelStrings->getSingular(),
-      'plural'     => $modelStrings->getPlural(),
-      'idColumn'   => $model->getId()->getColumn()
+      'plural'     => $plural,
+      'idColumn'   => $model->getId()->getColumn(),
+      'url'        => $url
     );
   }
 }

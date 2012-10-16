@@ -27,6 +27,7 @@ use \Exception;
  */
 class CrudException extends Exception {
 
+  // TODO Move message parsing and boolean simplifications into zeptech\orm\runtime\PdoExceptionWrapper
   const DUP_MSG = '/Duplicate entry \'(.+?)\' for key \'(.+?)\'/';
   const INVALID_FILTER = '/Unknown column \'(.+?)\' in \'where clause\'/';
   const INVALID_SORT = '/Unknown column \'(.+?)\' in \'order clause\'/';
@@ -42,12 +43,17 @@ class CrudException extends Exception {
 
   public function __construct() {
     $arg1 = func_get_arg(0);
-    if ($arg1 instanceof PdoExceptionWrapper) {
-      $this->_initiateFromPdoException($arg1);
+    if ($arg1 instanceof Exception) {
+      if ($arg1 instanceof PdoExceptionWrapper) {
+        $this->_initiateFromPdoException($arg1);
+      } else if ($arg1 instanceof ValidationException) {
+        $this->_initiateFromValidationException($arg1);
+      } else {
+        $this->_responseHeader = 'HTTP/1.1 500 Internal Server Error';
+        $this->_responseMessage = 'Internal Server Error';
+      }
       parent::__construct($arg1->getMessage(), $arg1->getCode(), $arg1);
-    } else if ($arg1 instanceof ValidationException) {
-      $this->_initiateFromValidationException($arg1);
-      parent::__construct($arg1->getMessage(), $arg1->getCode(), $arg1);
+
     } else {
       $this->_responseHeader = $arg1;
       $this->_responseMessage = func_get_arg(1);
