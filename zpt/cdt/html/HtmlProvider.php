@@ -17,6 +17,7 @@ use \zpt\cdt\compile\ResourceDiscoverer;
 use \zpt\cdt\di\DependencyParser;
 use \zpt\cdt\Conductor;
 use \zpt\pct\AbstractGenerator;
+use \zpt\util\file\GlobFileLister;
 use \DirectoryIterator;
 use \Exception;
 use \ReflectionClass;
@@ -63,24 +64,6 @@ class HtmlProvider extends AbstractGenerator {
     );
 
 
-    $jsPath = _P('/js');
-    $scripts = array(
-      "$jsPath/base.js"  
-    );
-
-    /**
-    if ($this->_env === 'dev') {
-      $resourceDiscoverer = new ResourceDiscoverer();
-
-      $cdtScripts = $resourceDiscoverer->discover('cdt');
-      foreach ($cdtScripts as $script) {
-        $scripts[] = _fsToWeb($script);
-      }
-    } else {
-      $scripts[] = "$jsPath/cdt.js";
-    }
-    */
-
     $title = null;
     if (isset($page['page']['title'])) {
       $title = $page['page']['title'];
@@ -122,6 +105,8 @@ class HtmlProvider extends AbstractGenerator {
     }
     $values['title'] = $title;
 
+    // If the page definition specifies an authorization level then ensure
+    // that it is enforced
     if (isset($page['auth'])) {
       $values['auth'] = $page['auth'];
     }
@@ -143,6 +128,12 @@ class HtmlProvider extends AbstractGenerator {
     $values['jsPath'] = _P('/js');
     $values['jslibPath'] = _P('/jslib');
     $values['cssPath'] = _P('/css');
+
+    $fileLister = new GlobFileLister();
+    $jsResources = new ResourceDiscoverer("$this->_htdocs/js", 'js');
+    $jsResources->setFileLister($fileLister);
+    $values['coreScripts'] = $jsResources->discover('cdt.core');
+    $values['widgetScripts'] = $jsResources->discover('cdt.widget');
 
     $values['jscripts'] = array_merge(
       $values['jscripts'],
@@ -202,6 +193,7 @@ class HtmlProvider extends AbstractGenerator {
     return $resolved;
   }
 
+  // TODO Update this function to use a ResourceDiscoverer instance
   private function _resolveScriptGroups($groups) {
     $scripts = array();
     foreach ($groups as $group) {

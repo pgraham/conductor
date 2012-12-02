@@ -53,8 +53,14 @@ class ${actorClass} {
     ${fi}
 
     // Base styles
+    // -------------------------------------------------------------------------
     Element::css('${cssPath}/reset.css')->addToHead();
     Element::css('${cssPath}/cdt.css')->addToHead();
+
+    // Load language script
+    // -------------------------------------------------------------------------
+    $lang = L10N::getLang();
+    Element::js("${jsPath}/$lang.js")->addToHead();
 
     // Javascript libraries
     // -------------------------------------------------------------------------
@@ -81,22 +87,11 @@ class ${actorClass} {
     // -------------------------------------------------------------------------
 
     // Client support scripts
-    $lang = L10N::getLang();
-
-    Element::js("${jsPath}/$lang.js")->addToHead();
     Element::js('${jsPath}/base.js')->addToHead();
     ${if:env = dev}
-      Element::js('${jsPath}/cdt.core-__init.js')->addToHead();
-      Element::js('${jsPath}/cdt.core.data-store.js')->addToHead();
-      Element::js('${jsPath}/cdt.core.data-crudProxy.js')->addToHead();
-      Element::js('${jsPath}/cdt.core.jquery-working.js')->addToHead();
-      Element::js('${jsPath}/cdt.core-date.js')->addToHead();
-      Element::js('${jsPath}/cdt.core-eventuality.js')->addToHead();
-      Element::js('${jsPath}/cdt.core-hasValue.js')->addToHead();
-      Element::js('${jsPath}/cdt.core-layout.js')->addToHead();
-      Element::js('${jsPath}/cdt.core-loadCss.js')->addToHead();
-      Element::js('${jsPath}/cdt.core-message.js')->addToHead();
-      Element::js('${jsPath}/cdt.core-string.js')->addToHead();
+      ${each:coreScripts as script}
+        Element::js('${jsPath}/${script}')->addToHead();
+      ${done}
     ${else}
       Element::js('${jsPath}/cdt.core.js')->addToHead();
     ${fi}
@@ -105,15 +100,9 @@ class ${actorClass} {
       Element::js('${jslibPath}/raphael/raphael.js')->addToHead();
 
       ${if:env = dev}
-        Element::js('${jsPath}/cdt.widget-section.js')->addToHead();
-        Element::js('${jsPath}/cdt.widget-collapsible.js')->addToHead();
-        Element::js('${jsPath}/cdt.widget-dialog.js')->addToHead();
-        Element::js('${jsPath}/cdt.widget-floatingmenu.js')->addToHead();
-        Element::js('${jsPath}/cdt.widget-form.js')->addToHead();
-        Element::js('${jsPath}/cdt.widget-pager.js')->addToHead();
-        Element::js('${jsPath}/cdt.widget-list.js')->addToHead();
-        Element::js('${jsPath}/cdt.widget-icon.js')->addToHead();
-        Element::js('${jsPath}/cdt.widget-download.js')->addToHead();
+        ${each:widgetScripts as script}
+          Element::js('${jsPath}/${script}')->addToHead();
+        ${done}
       ${else}
         Element::js('${jsPath}/cdt.widget.js')->addToHead();
       ${fi}
