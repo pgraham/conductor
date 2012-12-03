@@ -458,20 +458,24 @@ class Compiler {
       $modelName = substr($fname, 0, -4);
       $modelClass = "$ns\\$modelName";
       $annos = new Annotations(new ReflectionClass($modelClass));
-      $model = ModelParser::getModel($modelClass);
 
-      // TODO - Update generators to receive an injected template parser.
-      $persisterGen->generate($modelClass);
-      $transformerGen->generate($modelClass);
-      $validatorGen->generate($modelClass);
-      $infoGen->generate($modelClass);
-      $queryBuilderGen->generate($modelClass);
+      // Only try and parse entities.  This allows other types of related
+      // classes, such as gatekeepers, to be included in the model directory.
+      if (isset($annos['Entity'])) {
+        $model = ModelParser::getModel($modelClass);
 
-      if ( !isset($annos['nocrud']) ) {
-        $crudGen->generate($modelClass);
+        $persisterGen->generate($modelClass);
+        $transformerGen->generate($modelClass);
+        $validatorGen->generate($modelClass);
+        $infoGen->generate($modelClass);
+        $queryBuilderGen->generate($modelClass);
 
-        $crudSrvc = 'zeptech\\dynamic\\crud\\' . $model->getActor();
-        $this->_serviceCompiler->compileService($crudSrvc);
+        if ( !isset($annos['nocrud']) ) {
+          $crudGen->generate($modelClass);
+
+          $crudSrvc = 'zeptech\\dynamic\\crud\\' . $model->getActor();
+          $this->_serviceCompiler->compileService($crudSrvc);
+        }
       }
     }
   }
