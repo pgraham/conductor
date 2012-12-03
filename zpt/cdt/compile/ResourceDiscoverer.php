@@ -13,6 +13,7 @@
 namespace zpt\cdt\compile;
 
 use \zpt\util\file\FileLister;
+use \DirectoryIterator;
 
 /**
  * This class discovers all of the files included in a resource group.
@@ -20,8 +21,6 @@ use \zpt\util\file\FileLister;
  * @author Philip Graham <philip@zeptech.ca>
  */
 class ResourceDiscoverer {
-
-  private $_fileLister;
 
   private $_resourceDir;
   private $_ext;
@@ -45,52 +44,62 @@ class ResourceDiscoverer {
     }
   }
 
-  /**
-   * Setter for the FileLister implementation that lists the contents of a
-   * given directory.
-   */
-  public function setFileLister(FileLister $fileLister) {
-    $this->_fileLister = $fileLister;
-  }
-
   private function _discoverGroup($group) {
     $ordered = array();
 
-    $scripts = $this->_fileLister->matchesInDirectory($this->_resourceDir,
-      "$group-*.$this->_ext");
+    $subGroups = array();
+    $files = array();
 
-    $subGroups = $this->_fileLister->matchesInDirectory($this->_resourceDir,
-      "$group.*-*.$this->_ext");
+    $setup = null;
+    $init = null;
 
-    // Check for a setup file.  This file contains anything that is depended on
-    // by other files in the group.
-    $setupPath = "$group-__setup.$this->_ext";
-    $setupIdx = array_search($setupPath, $scripts);
-    if ($setupIdx !== false) {
-      $ordered[] = $setupPath;
-      unset($scripts[$setupIdx]);
+    $groupParts = explode('.', $group);
+    $groupBaseName = array_pop($groupParts);
+    $groupBasePath = str_replace('.', '/', $group);
+    $groupDir = new DirectoryIterator("$this->_resourceDir/$groupBasePath");
+    foreach ($groupDir as $f) {
+
+      if ($f->isDot()) {
+        continue;
+      }
+
+      if ($f->isDir()) {
+        $subGroup = $f->getBasename();
+        $subGroups[$subGroup] = $this->_discoverGroup("$group.$subGroup");
+
+      } else {
+        $fname = $f->getBasename();
+        if (pathinfo($fname, PATHINFO_EXTENSION) === 'js') {
+          
+          if ($fname === "__setup.$this->_ext") {
+            $setup = $fname;
+
+          } else if ($fname === "$groupBaseName.$this->_ext") {
+            $init = $fname;
+
+          } else {
+            $files[] = $fname;
+          }
+        }
+      }
     }
 
-    // Add all subgroup files
-    // TODO - Do this recursively so that subgroups can also have setup and init
-    // scripts and subgroups of their own
-    sort($subGroups);
-    foreach ($subGroups as $subGroup) {
-      $ordered[] = $subGroup;
+    if ($setup !== null) {
+      $ordered[] = "$groupBasePath/$setup";
+    }
+    ksort($subGroups);
+    foreach ($subGroups as $name => $subGroup) {
+      // Due to recursion, the filename should already be prepended with the
+      // groups base path
+      $ordered = array_merge($ordered, $subGroup);
     }
 
-    // Add all group files
-    sort($scripts);
-    foreach ($scripts as $script) {
-      $ordered[] = $script;
+    foreach ($files as $file) {
+      $ordered[] = "$groupBasePath/$file";
     }
 
-    // Check for initialization file.  This file is the name of the group with
-    // the appriopriate description.  It is included last in order to perform
-    // any initialization once the group has been loaded.
-    $initPath = "$group.$this->_ext";
-    if ($this->_fileLister->directoryContains($this->_resourceDir, $initPath)) {
-      $ordered[] = $initPath;
+    if ($init !== null) {
+      $ordered[] = "$groupBasePath/$init";
     }
 
     return $ordered;

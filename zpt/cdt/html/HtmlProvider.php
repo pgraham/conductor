@@ -129,9 +129,7 @@ class HtmlProvider extends AbstractGenerator {
     $values['jslibPath'] = _P('/jslib');
     $values['cssPath'] = _P('/css');
 
-    $fileLister = new GlobFileLister();
     $jsResources = new ResourceDiscoverer("$this->_htdocs/js", 'js');
-    $jsResources->setFileLister($fileLister);
     $values['coreScripts'] = $jsResources->discover('cdt.core');
     $values['widgetScripts'] = $jsResources->discover('cdt.widget');
 
