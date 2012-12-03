@@ -6,12 +6,14 @@ CDT.ns('CDT.widget');
 (function ($, CDT, undefined) {
   "use strict";
 
-  function basicRenderer(dataIndex) {
+  function createBasicRenderer(dataIndex) {
     return function (rowData) {
       return rowData[dataIndex];
     }
   }
 
+  // Add a layout function that fills available horizontal space with a lists
+  // specified auto-expand columns
   $.layouts.listLayout = function (list) {
     var toFill = list.find('th.auto-expand'),
         hdrs = list.find('th'),
@@ -22,7 +24,7 @@ CDT.ns('CDT.widget');
         fill;
 
     // Remove any set widths so that columns that have had their content changed
-    // can be adjusted by the browser
+    // since the last layout will get adjusted by the browser
     toFill.width('');
     list.find('tbody td').width('');
 
@@ -47,6 +49,8 @@ CDT.ns('CDT.widget');
     list.find('tbody').css('top', list.find('thead').outerHeight(true) + 'px');
   };
 
+  // Add a layout that sets the table data elements of each row to line up with
+  // their corresponding header elements.
   $.layouts.listRowLayout = function (row) {
     var tbl = row.closest('table'),
         hdrs = tbl.find('thead th');
@@ -70,24 +74,10 @@ CDT.ns('CDT.widget');
 
     function addColumn(lbl, renderer, autoExpand) {
       var config, hdr;
-      if (!$.isPlainObject(lbl)) {
-        // Old style parameters were passed, use them to create a config object
-        config = {
-          lbl: lbl,
-          autoExpand: autoExpand || false
-        };
-        
-        if (typeof renderer === 'string') {
-          config.dataIdx = renderer;
-        } else {
-          config.renderer = renderer;
-        }
-      } else {
-        config = lbl;
-      }
+      config = normalizeAddColumnArgs(lbl, renderer, autoExpand);
 
       if (config.dataIdx && !config.renderer) {
-        config.renderer = basicRenderer(config.dataIdx);
+        config.renderer = createBasicRenderer(config.dataIdx);
       }
       cols.push(config);
 
@@ -105,6 +95,15 @@ CDT.ns('CDT.widget');
       if (config.width) {
         hdr.width(config.width);
       }
+
+      return this;
+    }
+
+    function addColumns(cols) {
+      $.each(cols, function () {
+        addColumn(this);
+      });
+      return this;
     }
 
     function addRow(rowData) {
@@ -217,13 +216,40 @@ CDT.ns('CDT.widget');
     // Apply list layout
     elm.layout('listLayout');
 
+    // TODO Instead of extending elm either the methods need to attached as data
+    //      or the jQuery prototype needs to be expanded with list functions
     return $.extend(elm, {
       addColumn: addColumn,
+      addColumns: addColumns,
       clearSelected: clearSelected,
       getSelected: getSelected,
       populate: populate,
       selectAll: selectAll
     });
   };
+
+  /*
+   * Private function to normalize the arguments given to a lists addColumn
+   * method into a config object.
+   */
+  function normalizeAddColumnArgs(lbl, renderer, autoExpand) {
+    var config;
+    if ($.isPlainObject(lbl)) {
+      return lbl;
+    }
+
+    // Old style parameters were passed, use them to create a config object
+    config = {
+      lbl: lbl,
+      autoExpand: autoExpand || false
+    };
+    
+    if (typeof renderer === 'string') {
+      config.dataIdx = renderer;
+    } else {
+      config.renderer = renderer;
+    }
+    return config;
+  }
 
 } (jQuery, CDT));
