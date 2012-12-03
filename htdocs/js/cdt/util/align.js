@@ -17,4 +17,4 @@
     }
   };
 
-} (jQuery, CDT.ns('CDT.util'));
+} (jQuery, CDT.ns('CDT.util')));

@@ -88,7 +88,7 @@ CDT.ns('CDT.widget');
         .appendTo(headers);
 
       if (config.align) {
-        align(hdr, config.align);
+        CDT.util.align(hdr, config.align);
       }
 
       // NOTE: autoExpand will override width
@@ -141,26 +141,10 @@ CDT.ns('CDT.widget');
         }
 
         if (col.align) {
-          align(cell, col.align);
+          CDT.util.align(cell, col.align);
         }
       });
       row.layout();
-    }
-
-    function align(elm, align) {
-      switch (align) {
-        case 'center':
-        elm.css('text-align', 'center');
-        break;
-
-        case 'right':
-        elm.css('text-align', 'right');
-        break;
-
-        case 'left':
-        elm.css('text-align', 'left');
-        break;
-      }
     }
 
     function clearSelected() {
