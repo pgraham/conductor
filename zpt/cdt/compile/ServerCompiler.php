@@ -27,16 +27,10 @@ class ServerCompiler {
   /* List of generated request handlers */
   private $_actors = array();
 
-  private $_compressed;
-
   /* List of request handlers */
   private $_mappings = array();
 
   private $_tmplParser;
-
-  public function __construct($compressed = false) {
-    $this->_compressed = false;
-  }
 
   public function addActor($generator, $def, $uris) {
     $this->_actors[] = array(

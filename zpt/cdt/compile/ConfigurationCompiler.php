@@ -20,18 +20,12 @@ use \Exception;
  */
 class ConfigurationCompiler {
 
-  private $_compressed;
-
   private $_db;
   private $_env;
   private $_pathInfo;
   private $_namespace;
 
   private $_templatParser;
-
-  public function __construct($compressed) {
-    $this->_compresed = $compressed;
-  }
 
   /**
    * Compile the site Configurator implementation for the site located at the

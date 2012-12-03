@@ -16,12 +16,6 @@ use \DirectoryIterator;
  */
 class ResourceCompiler {
 
-  private $_compressed;
-
-  public function __construct($compressed = false) {
-    $this->_compressed = $compressed;
-  }
-
   public function compile($srcDir, $outDir) {
     if (!file_exists($srcDir)) {
       return;

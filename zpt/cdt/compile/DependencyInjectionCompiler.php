@@ -23,16 +23,10 @@ namespace zpt\cdt\compile;
  */
 class DependencyInjectionCompiler {
 
-  private $_compressed;
-
   private $_files = array();
   private $_beans = array();
 
   private $_tmplParser;
-
-  public function __construct($compressed) {
-    $this->_compressed = $compressed;
-  }
 
   public function addBean($id, $class, $refs) {
     $this->_beans[] = array(

@@ -34,9 +34,6 @@ use \SplClassLoader;
  */
 class Compiler {
 
-  /* Whether or compilation output should be compressed when possible. */
-  private $_compressed;
-
   /* Configuration compiler. */
   private $_configurationCompiler;
 
@@ -69,35 +66,28 @@ class Compiler {
 
   /**
    * Create a new site compiler.
-   *
-   * @param boolean $compressed Whether or not content that is delivered to the
-   *   client should be compressed.  This should be enabled for production
-   *   sites.
-   *   Default: false
    */
-  public function __construct($compressed = false) {
-    $this->_compressed = $compressed;
-
+  public function __construct() {
     $this->_tmplParser = new CodeTemplateParser();
 
-    $this->_configurationCompiler = new ConfigurationCompiler($compressed);
+    $this->_configurationCompiler = new ConfigurationCompiler();
     $this->_configurationCompiler->setTemplateParser($this->_tmplParser);
 
-    $this->_diCompiler = new DependencyInjectionCompiler($compressed);
+    $this->_diCompiler = new DependencyInjectionCompiler();
     $this->_diCompiler->setTemplateParser($this->_tmplParser);
 
-    $this->_jslibCompiler = new JslibCompiler($compressed);
+    $this->_jslibCompiler = new JslibCompiler();
 
-    $this->_l10nCompiler = new L10NCompiler($compressed);
+    $this->_l10nCompiler = new L10NCompiler();
     $this->_l10nCompiler->setTemplateParser($this->_tmplParser);
 
-    $this->_serverCompiler = new ServerCompiler($compressed);
+    $this->_serverCompiler = new ServerCompiler();
     $this->_serverCompiler->setTemplateParser($this->_tmplParser);
 
-    $this->_serviceCompiler = new ServiceCompiler($compressed);
+    $this->_serviceCompiler = new ServiceCompiler();
     $this->_serviceCompiler->setServerCompiler($this->_serverCompiler);
 
-    $this->_resourceCompiler = new ResourceCompiler($compressed);
+    $this->_resourceCompiler = new ResourceCompiler();
   }
 
   /**

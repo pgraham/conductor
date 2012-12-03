@@ -24,12 +24,6 @@ use \DirectoryIterator;
  */
 class JslibCompiler {
 
-  private $_compressed;
-
-  public function __construct($compressed = false) {
-    $this->_compressed = $compressed;
-  }
-
   public function compile($jslibPath, $pathInfo) {
     $jslibName = basename($jslibPath);
 

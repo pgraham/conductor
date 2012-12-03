@@ -24,13 +24,8 @@ use \SplFileInfo;
  */
 class L10NCompiler {
 
-  private $_compressed = false;
   private $_languages = array();
   private $_tmplParser;
-
-  public function __construct($compressed) {
-    $this->_compressed = $compressed;
-  }
 
   public function addLanguageFile(SplFileInfo $file) {
     $strings = $this->_parseStrings(file_get_contents($file->getPathname()));
