@@ -131,6 +131,7 @@ class HtmlProvider extends AbstractGenerator {
 
     $jsResources = new ResourceDiscoverer("$this->_htdocs/js", 'js');
     $values['coreScripts'] = $jsResources->discover('cdt.core');
+    $values['utilScripts'] = $jsResources->discover('cdt.util');
     $values['widgetScripts'] = $jsResources->discover('cdt.widget');
 
     $values['jscripts'] = array_merge(

@@ -88,24 +88,19 @@ class ${actorClass} {
 
     // Client support scripts
     Element::js('${jsPath}/base.js')->addToHead();
-    ${if:env = dev}
-      ${each:coreScripts as script}
-        Element::js('${jsPath}/${script}')->addToHead();
-      ${done}
-    ${else}
-      Element::js('${jsPath}/cdt.core.js')->addToHead();
-    ${fi}
+    ${each:coreScripts as script}
+      Element::js('${jsPath}/${script}')->addToHead();
+    ${done}
+    ${each:utilScripts as script}
+      Element::js('${jsPath}/${script}')->addToHead();
+    ${done}
 
     ${if:jsappsupport}
       Element::js('${jslibPath}/raphael/raphael.js')->addToHead();
 
-      ${if:env = dev}
-        ${each:widgetScripts as script}
-          Element::js('${jsPath}/${script}')->addToHead();
-        ${done}
-      ${else}
-        Element::js('${jsPath}/cdt.widget.js')->addToHead();
-      ${fi}
+      ${each:widgetScripts as script}
+        Element::js('${jsPath}/${script}')->addToHead();
+      ${done}
 
       Element::css('${cssPath}/jsapp.css')->addToHead();
       Element::js('${jsPath}/jsapp.js')->addToHead();
