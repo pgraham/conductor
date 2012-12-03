@@ -33,7 +33,7 @@ abstract class AbstractGatekeeper implements Gatekeeper {
   private $_modelClass;
   private $_transformer;
 
-  protected function __construct($modelClass) {
+  public function __construct($modelClass) {
     $this->_modelClass = $modelClass;
     $this->_transformer = ActorFactory::getActor('transformer', $modelClass);
   }
