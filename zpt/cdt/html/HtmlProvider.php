@@ -13,7 +13,7 @@
 namespace zpt\cdt\html;
 
 use \zeptech\anno\Annotations;
-use \zpt\cdt\compile\ResourceDiscoverer;
+use \zpt\cdt\compile\resource\ResourceDiscoverer;
 use \zpt\cdt\di\DependencyParser;
 use \zpt\cdt\Conductor;
 use \zpt\pct\AbstractGenerator;

@@ -12,6 +12,7 @@ use \zeptech\orm\generator\PersisterGenerator;
 use \zeptech\orm\generator\TransformerGenerator;
 use \zeptech\orm\generator\ValidatorGenerator;
 use \zeptech\orm\QueryBuilder;
+use \zpt\cdt\compile\resource\ResourceCompiler;
 use \zpt\cdt\crud\CrudService;
 use \zpt\cdt\di\DependencyParser;
 use \zpt\cdt\html\HtmlProvider;

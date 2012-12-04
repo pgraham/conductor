@@ -3,7 +3,7 @@
  * Copyright (c) 2012, Philip Graham
  * All rights reserved.
  */
-namespace zpt\cdt\compile;
+namespace zpt\cdt\compile\resource;
 
 use \zpt\util\File;
 use \DirectoryIterator;

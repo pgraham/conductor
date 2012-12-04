@@ -14,7 +14,7 @@
  */
 namespace zpt\cdt\compile;
 
-use \conductor\jslib\JQueryUi;
+use \zpt\cdt\compile\resource\ResourceCompiler;
 use \DirectoryIterator;
 
 /**

@@ -10,7 +10,7 @@
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
  */
-namespace zpt\cdt\compile;
+namespace zpt\cdt\compile\resource;
 
 use \zpt\util\file\FileLister;
 use \DirectoryIterator;
