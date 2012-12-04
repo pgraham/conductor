@@ -16,6 +16,12 @@ use \DirectoryIterator;
  */
 class ResourceCompiler {
 
+  private $_lessCompiler;
+
+  public function __construct() {
+    $this->_lessCompiler = new LessCompiler();
+  }
+
   public function compile($srcDir, $outDir) {
     if (!file_exists($srcDir)) {
       return;
@@ -36,7 +42,16 @@ class ResourceCompiler {
         $this->compile($resource->getPathname(), "$outDir/$fname");
         continue;
       }
-      copy($resource->getPathname(), "$outDir/$fname");
+
+      // PHP5.3.6: $ext = $resource->getExtension();
+      $ext = pathinfo($fname, PATHINFO_EXTENSION);
+      $basename = $resource->getBasename(".$ext");
+      $pathname = $resource->getPathname();
+      if ($ext === 'less') {
+        $this->_lessCompiler->compile($pathname, "$outDir/$basename.css");
+      } else {
+        copy($resource->getPathname(), "$outDir/$fname");
+      }
     }
   }
 }
