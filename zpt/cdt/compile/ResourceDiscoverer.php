@@ -69,7 +69,7 @@ class ResourceDiscoverer {
 
       } else {
         $fname = $f->getBasename();
-        if (pathinfo($fname, PATHINFO_EXTENSION) === 'js') {
+        if (pathinfo($fname, PATHINFO_EXTENSION) === $this->_ext) {
           
           if ($fname === "__setup.$this->_ext") {
             $setup = $fname;
