@@ -12,54 +12,6 @@ CDT.ns('CDT.widget');
     }
   }
 
-  // Add a layout function that fills available horizontal space with a lists
-  // specified auto-expand columns
-  $.layouts.listLayout = function (list) {
-    var toFill = list.find('th.auto-expand'),
-        hdrs = list.find('th'),
-        rows = list.find('tbody tr'),
-        width = list.width(),
-        allocated = 0,
-        remaining,
-        fill;
-
-    // Remove any set widths so that columns that have had their content changed
-    // since the last layout will get adjusted by the browser
-    toFill.width('');
-    list.find('tbody td').width('');
-
-    // Determine the amount of width allocated to non auto-expanding columns
-    hdrs.each(function () {
-      if (!$(this).is('.auto-expand')) {
-        allocated += $(this).outerWidth(true);
-      }
-    });
-
-    // Divide the remaining width amongst the auto-expand columns. Add any
-    // remainder due to integer division truncation to the right most
-    // auto-expand column
-    remaining = width - allocated;
-    fill = Math.floor(remaining / toFill.length);
-    toFill.each(function () {
-      remaining -= fill;
-      $(this).outerWidth(fill, true);
-    });
-    toFill.last().width(toFill.last().width() + remaining);
-
-    list.find('tbody').css('top', list.find('thead').outerHeight(true) + 'px');
-  };
-
-  // Add a layout that sets the table data elements of each row to line up with
-  // their corresponding header elements.
-  $.layouts.listRowLayout = function (row) {
-    var tbl = row.closest('table'),
-        hdrs = tbl.find('thead th');
-
-    row.children().each(function (idx) {
-      $(this).outerWidth(hdrs.eq(idx).outerWidth(true), true);
-    });
-  };
-
   /**
    * Create a new list widget
    */
@@ -198,7 +150,7 @@ CDT.ns('CDT.widget');
     headers.append($('<th/>').addClass('ui-widget-header left-col').append(selAll));
 
     // Apply list layout
-    elm.layout('listLayout');
+    elm.layout('columnLayout');
 
     // TODO Instead of extending elm either the methods need to attached as data
     //      or the jQuery prototype needs to be expanded with list functions
