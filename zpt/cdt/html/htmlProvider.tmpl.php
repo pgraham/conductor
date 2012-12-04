@@ -64,7 +64,6 @@ class ${actorClass} {
 
     // Javascript libraries
     // -------------------------------------------------------------------------
-
     // DateJS
     Element::js('${jslibPath}/datejs/date.js')->addToHead();
 
@@ -83,6 +82,8 @@ class ${actorClass} {
       ->addToHead();
     Element::js('${jslibPath}/jquery-ui/external/globalize.js')->addToHead();
     Element::js('${jslibPath}/jquery-ui/jquery.ui.js')->addToHead();
+
+    $this->_includeJsLibs();
 
     // -------------------------------------------------------------------------
 
@@ -112,14 +113,14 @@ class ${actorClass} {
 
     ${if:sheets ISSET}
       ${each:sheets as css}
-        Element::css('${css}')->addToHead();
+        Element::css('${cssPath}/${css}')->addToHead();
       ${done}
     ${fi}
 
     // Javascripts
     ${if:jscripts ISSET}
       ${each:jscripts as jscript}
-        Element::js('${jscript}')->addToHead();
+        Element::js('${jsPath}/${jscript}')->addToHead();
       ${done}
     ${fi}
 
@@ -156,6 +157,14 @@ class ${actorClass} {
 
   public function setPageViewListeners(array $pageViewListeners) {
     $this->_pageViewListeners = $pageViewListeners;
+  }
+
+  private function _includeJsLibs() {
+    ${each:jslibs as jslib}
+      ${if:jslib = raphael}
+        Element::js(_P('/jslib/raphael/raphael.js'))->addToHead();
+      ${fi}
+    ${done}
   }
 
   private function _loadJQuery() {

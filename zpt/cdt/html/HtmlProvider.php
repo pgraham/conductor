@@ -58,52 +58,25 @@ class HtmlProvider extends AbstractGenerator {
 
     $values = array(
       'env' => $this->_env,
-      'jscripts' => array(),
-      'sheets' => array(),
+      'jslibs' => array(),
       'fonts' => array()
     );
 
-
-    $title = null;
-    if (isset($page['page']['title'])) {
-      $title = $page['page']['title'];
-    }
-    
     if (isset($page['template'])) {
       $templateClass = $this->_getTemplateClass($page['template'], $className);
       $templateDef = new ReflectionClass($templateClass);
-
       $template = new Annotations($templateDef);
+
       $values['template'] = $templateClass;
       $tmplDependencies = DependencyParser::parse($templateDef);
       if (count($tmplDependencies) > 0) {
         $values['tmplDependencies'] = $tmplDependencies;
       }
-
-      if (isset($template['title'])) {
-        if ($title !== null) {
-          $title = $template['title'] . ' - ' . $title;
-        } else {
-          $title = $template['title'];
-        }
-      }
-
-      $values['jscripts'] = array_merge(
-        $values['jscripts'],
-        $template->asArray('script'),
-        $this->_resolveScriptGroups($template->asArray('scriptgroup'))
-      );
-
-      $values['sheets'] = array_merge(
-        $values['sheets'],
-        $template->asArray('css'));
-
-      $values['fonts'] = array_merge(
-        $values['fonts'],
-        $template->asArray('font'));
-
+    } else {
+      $template = new Annotations();
     }
-    $values['title'] = $title;
+    
+    $values['title'] = $this->_parseTitle($page, $template);
 
     // If the page definition specifies an authorization level then ensure
     // that it is enforced
@@ -125,6 +98,7 @@ class HtmlProvider extends AbstractGenerator {
 
     $values['jQueryPath'] = 'http://ajax.googleapis.com/ajax/libs/jquery/' .
       Conductor::JQUERY_VERSION;
+    $values['webRoot'] = _P('/');
     $values['jsPath'] = _P('/js');
     $values['jslibPath'] = _P('/jslib');
     $values['cssPath'] = _P('/css');
@@ -134,21 +108,18 @@ class HtmlProvider extends AbstractGenerator {
     $values['utilScripts'] = $jsResources->discover('cdt.util');
     $values['widgetScripts'] = $jsResources->discover('cdt.widget');
 
-    $values['jscripts'] = array_merge(
-      $values['jscripts'],
-      $page->asArray('script'),
-      $this->_resolveScriptGroups($page->asArray('scriptgroup'))
+    $values['jslibs'] = array_merge(
+      $template->asArray('jslib'),
+      $page->asArray('jslib')
     );
-    $values['jscripts'] = $this->_resolveResources($values['jscripts'], '/js');
 
-    $values['sheets'] = array_merge(
-      $values['sheets'],
-      $page->asArray('css'));
-    $values['sheets'] = $this->_resolveResources($values['sheets'], '/css');
+    $values['jscripts'] = $this->_parseScripts($page, $template);
+    $values['sheets'] = $this->_parseStylesheets($page, $template);
 
     $values['fonts'] = array_merge(
-      $values['fonts'],
-      $page->asArray('font'));
+      $template->asArray('font'),
+      $page->asArray('font')
+    );
 
     if (count($values['fonts']) === 0) {
       unset($values['fonts']);
@@ -180,39 +151,74 @@ class HtmlProvider extends AbstractGenerator {
     return substr($pageClass, 0, strrpos($pageClass, '\\') + 1) . $template;
   }
 
-  private function _resolveResources($paths, $relBase) {
+  /*
+   * Parse the required javascripts from the given sets of page and template
+   * annotations.  Scripts declared without a '.js' extension are considered
+   * to be script groups.
+   */
+  private function _parseScripts($page, $template) {
+    $jsResources = new ResourceDiscoverer("$this->_htdocs/js", 'js');
+
+    $declared = array_merge(
+      $template->asArray('script'),
+      $page->asArray('script')
+    );
+
     $resolved = array();
-    foreach ($paths as $path) {
-      if (substr($path, 0, 1) === '/') {
-        $resolved[] = _P($path);
+    foreach ($declared as $script) {
+      if (substr($script, -3) === '.js') {
+        $resolved[] = $script;
       } else {
-        $resolved[] = _P("$relBase/$path");
+        $resolved = array_merge($resolved, $jsResources->discover($script));
       }
     }
     return $resolved;
   }
 
-  // TODO Update this function to use a ResourceDiscoverer instance
-  private function _resolveScriptGroups($groups) {
-    $scripts = array();
-    foreach ($groups as $group) {
-      $base = $this->_htdocs;
-      if (substr($group, 0, 1) !== '/') {
-        $base .= '/js/';
-      }
+  /*
+   * Parse the required stylesheets from the given sets of page and template
+   * annotations.  Stylesheets declared without a '.css' extension are
+   * considered to be script groups.
+   */
+  private function _parseStylesheets($page, $template) {
+    $cssResources = new ResourceDiscoverer("$this->_htdocs/css", 'css');
 
-      // Get all suffixed scripts
-      foreach (glob("$base$group-*.js") as $script) {
-        $scripts[] = substr($script, strlen($base));
-      }
+    $declared = array_merge(
+      $template->asArray('css'),
+      $page->asArray('css')
+    );
 
-      // See if a script with the group name and no suffix exists.  This script
-      // is added last so any initialization code that relies on the content
-      // of the scripts in the group should go in this script.
-      if (file_exists("$base$group.js")) {
-        $scripts[] = "$group.js";
+    $resolved = array();
+    foreach ($declared as $stylesheet) {
+      if (substr($stylesheet, -4) === '.css') {
+        $resolved[] = $stylesheet;
+      } else {
+        $resolved = array_merge(
+          $resolved,
+          $cssResources->discover($stylesheet)
+        );
       }
     }
-    return $scripts;
+    return $resolved;
   }
+
+  /*
+   * Parse the title from the given sets of page and template annotations.
+   */
+  private function _parseTitle($page, $template) {
+    $title = null;
+    if (isset($page['page']['title'])) {
+      $title = $page['page']['title'];
+    }
+
+    if (isset($template['title'])) {
+      if ($title !== null) {
+        $title = $template['title'] . ' - ' . $title;
+      } else {
+        $title = $template['title'];
+      }
+    }
+    return $title;
+  }
+
 }
