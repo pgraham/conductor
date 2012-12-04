@@ -46,9 +46,14 @@ class Loader {
     self::$_loaded = true;
 
     $lib = "$root/lib";
-    $cdtLib = "$lib/conductor/lib";
+    $cdt = "$lib/conductor";
+    $cdtLib = "$cdt/lib";
     $target = "$root/target";
 
+    // Register composer autoloader
+    require "$cdt/vendor/autoload.php";
+
+    // Register zeptech autoloaders
     $libPaths = array(
       'oboe' => "$cdtLib/oboe/src"
     );
