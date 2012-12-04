@@ -1,0 +1,60 @@
+.cdt-list {
+  position: relative;
+}
+
+.cdt-list table, .cdt-list tbody, .cdt-list thead {
+  display: block;
+}
+
+.cdt-list table {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  
+  border-collapse: separate;
+}
+
+.cdt-list tbody {
+  position: absolute;
+  /* Top is set programatically */
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  border-top: none;
+  border-bottom: none;
+
+  overflow: auto;
+  overflow-x: hidden;
+}
+
+.cdt-list th, .cdt-list td {
+  position: relative;
+  top: 0;
+  left: 0;
+  border-right: none;
+}
+
+.cdt-list th {
+  padding: 10px;
+  border-top: none;
+  border-bottom: none;
+}
+
+.cdt-list td {
+  padding: 5px;
+  border-top: none;
+  vertical-align: middle;
+}
+
+.cdt-list td.left-col, .cdt-list th.left-col {
+  border-left: none;
+}
+
+.cdt-list td.no-data {
+  text-align: center;
+  color: #333;
+}
+

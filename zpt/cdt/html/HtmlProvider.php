@@ -108,6 +108,10 @@ class HtmlProvider extends AbstractGenerator {
     $values['utilScripts'] = $jsResources->discover('cdt.util');
     $values['widgetScripts'] = $jsResources->discover('cdt.widget');
 
+    $cssResources = new ResourceDiscoverer("$this->_htdocs/css", 'css');
+    $values['coreCss'] = $cssResources->discover('cdt.core');
+    $values['widgetCss'] = $cssResources->discover('cdt.widget');
+
     $values['jslibs'] = array_merge(
       $template->asArray('jslib'),
       $page->asArray('jslib')

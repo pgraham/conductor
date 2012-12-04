@@ -57,6 +57,15 @@ class ${actorClass} {
     Element::css('${cssPath}/reset.css')->addToHead();
     Element::css('${cssPath}/cdt.css')->addToHead();
 
+    ${each:coreCss as css}
+      Element::css('${cssPath}/${css}')->addToHead();
+    ${done}
+    ${if:sheets ISSET}
+      ${each:sheets as css}
+        Element::css('${cssPath}/${css}')->addToHead();
+      ${done}
+    ${fi}
+
     // Load language script
     // -------------------------------------------------------------------------
     $lang = L10N::getLang();
@@ -99,22 +108,19 @@ class ${actorClass} {
     ${if:jsappsupport}
       Element::js('${jslibPath}/raphael/raphael.js')->addToHead();
 
+      ${each:widgetCss as sheet}
+        Element::css('${cssPath}/${sheet}')->addToHead();
+      ${done}
+      Element::css('${cssPath}/jsapp.css')->addToHead();
+
       ${each:widgetScripts as script}
         Element::js('${jsPath}/${script}')->addToHead();
       ${done}
-
-      Element::css('${cssPath}/jsapp.css')->addToHead();
       Element::js('${jsPath}/jsapp.js')->addToHead();
     ${fi}
 
     ${if:fonts ISSET}
       Element::css("http://fonts.googleapis.com/css?family=${fonts}")->addToHead();
-    ${fi}
-
-    ${if:sheets ISSET}
-      ${each:sheets as css}
-        Element::css('${cssPath}/${css}')->addToHead();
-      ${done}
     ${fi}
 
     // Javascripts
