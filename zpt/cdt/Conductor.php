@@ -156,6 +156,20 @@ class Conductor {
       assert_options(ASSERT_BAIL, 0);
       assert_options(ASSERT_QUIET_EVAL, 0);
 
+      if (isset($_GET['clean'])) {
+        $dirs = array( 'i18n', 'zeptech', 'htdocs/css', 'htdocs/img',
+                       'htdocs/js', 'htdocs/jslib');
+        $files = array( 'php.error');
+
+        foreach ($dirs as $dir) {
+          passthru("rm -r $root/target/$dir");
+        }
+
+        foreach ($files as $file) {
+          passthru("rm $root/target/$file");
+        }
+      }
+
       try {
         if (File::dirlock("$root/target", isset($_GET['forceunlock']))) {
           $compiler = new Compiler();
