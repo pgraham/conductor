@@ -1,8 +1,13 @@
 // Adapted from Javascript: The Good Parts by Douglas Crockford
+/**
+ * @deprecated Use observable instead.
+ */
 (function (exports, undefined) {
   "use strict";
 
   exports.eventuality = function (that) {
+    console.log("DEPRECATED: cdt.core.eventuality() has been deprecated. " +
+      "Use cdt.core.observable() instead");
     var registry = {};
 
     that.fire = function (event) {
