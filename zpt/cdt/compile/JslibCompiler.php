@@ -174,7 +174,7 @@ class JslibCompiler {
       'ui/jquery.ui.resizable.js',
       'ui/jquery.ui.selectable.js',
       'ui/jquery.ui.sortable.js',
-      'ui/jquery.effects.core.js',
+      'ui/jquery.ui.effect.js',
       'ui/jquery.ui.accordion.js',
       'ui/jquery.ui.autocomplete.js',
       'ui/jquery.ui.button.js',
