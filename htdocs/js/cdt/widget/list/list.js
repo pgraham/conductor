@@ -1,9 +1,7 @@
-CDT.ns('CDT.widget');
-
 /**
  * CDT.widget.list
  */
-(function ($, CDT, undefined) {
+(function ($, CDT, exports, undefined) {
   "use strict";
 
   function createBasicRenderer(dataIndex) {
@@ -15,7 +13,7 @@ CDT.ns('CDT.widget');
   /**
    * Create a new list widget
    */
-  CDT.widget.list = function () {
+  exports.list = function () {
     var elm, tbl, thead, tbody, headers, selAll, cols = [];
 
     elm = $('<div/>').addClass('cdt-list');
@@ -188,4 +186,4 @@ CDT.ns('CDT.widget');
     return config;
   }
 
-} (jQuery, CDT));
+} (jQuery, CDT, CDT.ns('CDT.widget')));
