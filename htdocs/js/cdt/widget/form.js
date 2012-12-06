@@ -1,4 +1,4 @@
-(function ($, CDT, undefined) {
+(function ($, CDT, exports, undefined) {
   "use strict";
 
   var defaultSpinnerOpts = { step: 1 },
@@ -167,4 +167,117 @@
     });
   };
 
-} (jQuery, CDT));
+  $.widget('ui.formfield', {
+    options: {},
+
+    _create: function () {
+    },
+    _setOption: function (key, value) {
+    },
+    _destroy: function () {
+    },
+
+    clearInvalid: function () {
+      this.element.removeClass('invalid');
+    },
+    getName: function () {
+      return this.element.attr('name');
+    },
+    getValue: function () {
+      return this.element.val() === ''
+        ? null
+        : this.element.val();
+    },
+    markInvalid: function () {
+      this.element.addClass('invalid');
+    },
+    setValue: function (val) {
+      this.element.val(val);
+    }
+  });
+
+  $.widget('ui.form', {
+    options: {},
+
+    _create: function () {
+      this.element.addClass('cdt-form');
+      this.fields = $('<fieldset/>').appendTo(this.element);
+      this.inputs = {};
+    },
+    _setOption: function (key, value) {
+    },
+    _destroy: function () {
+    },
+
+    addTextInput: function (name, lbl) {
+      return this._addInput(CDT.form.textInput(name), lbl);
+    },
+
+    dialog: function (title, buttons) {
+      var instance = this;
+
+      buttons = buttons || {};
+      if (!buttons['Cancel']) {
+        buttons['Cancel'] = function () {
+          instance.dialog.dialog('close');
+        }
+      }
+
+      this.dialog = $('<div/>')
+        .attr('title', title)
+        .append(this.element)
+        .dialog({
+          buttons: buttons,
+          hide: 600,
+          modal: true,
+          resizable: false,
+          show: 200,
+          width:800,
+          close: function (ev, ui) {
+            $(this).dialog('destroy');
+          }
+        });
+
+      return this;
+    },
+
+    getData: function () {
+      var data = {};
+      $.each(this.inputs, function (name, input) {
+        data[name] = input.formfield('getValue');
+      });
+      return data;
+    },
+
+    setData: function (data) {
+      $.each(this.inputs, function (name, input) {
+        input.formfield('setValue', data[name]);
+      });
+      return this;
+    },
+
+    _addInput: function (input, lbl, overrides) {
+      var name = input.formfield().formfield('getName');
+      this.inputs[name] = input;
+      this.fields.append(createLbl(name, lbl));
+      this.fields.append(input);
+
+      return this;
+    }
+  });
+
+  exports.formBuilder = function () {
+    var elm = $('<form />').form();
+
+    return {
+      addInput: function (name, lbl) {
+        elm.form('addTextInput', name, lbl);
+        return this;
+      },
+      build: function () {
+        return elm;
+      },
+    }
+  };
+
+} (jQuery, CDT, CDT.ns('CDT.widget')));
