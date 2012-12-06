@@ -71,7 +71,7 @@ class ResourceDiscoverer {
         $fname = $f->getBasename();
         if (pathinfo($fname, PATHINFO_EXTENSION) === $this->_ext) {
           
-          if ($fname === "__setup.$this->_ext") {
+          if ($fname === "__init.$this->_ext") {
             $setup = $fname;
 
           } else if ($fname === "$groupBaseName.$this->_ext") {
