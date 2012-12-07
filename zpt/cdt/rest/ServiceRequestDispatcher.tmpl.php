@@ -9,16 +9,23 @@ use \zeptech\rest\RequestHandler;
 use \zeptech\rest\Request;
 use \zeptech\rest\Response;
 use \zpt\cdt\di\Injector;
+use \zpt\cdt\rest\BeanRequestHandler;
 
-class ${actorClass} extends BaseRequestHandler implements RequestHandler {
+class ${actorClass} extends BaseRequestHandler implements BeanRequestHandler {
 
-  private $_srvc;
+  private $_service;
+  private $_mappings;
 
   public function __construct() {
-    $this->_srvc = new \${serviceClass}();
-    ${if:beans}
-      Injector::inject($this->_srvc, ${php:beans});
-    ${fi}
+    $this->_mappings = ${php:mappings};
+  }
+
+  public function getMappings() {
+    return $this->_mappings;
+  }
+
+  public function setService($service) {
+    $this->_service = $service;
   }
 
   ${if:deleteMethods}
@@ -27,8 +34,8 @@ class ${actorClass} extends BaseRequestHandler implements RequestHandler {
       switch ($mappingId) {
 
         ${each:deleteMethods as method}
-          case '${method[name]}':
-          $this->_srvc->${method[name]}($request, $response);
+          case '${method}':
+          $this->_service->${method}($request, $response);
           return;
 
         ${done}
@@ -43,8 +50,8 @@ class ${actorClass} extends BaseRequestHandler implements RequestHandler {
       switch ($mappingId) {
 
         ${each:getMethods as method}
-          case '${method[name]}':
-          $this->_srvc->${method[name]}($request, $response);
+          case '${method}':
+          $this->_service->${method}($request, $response);
           return;
 
         ${done}
@@ -59,8 +66,8 @@ class ${actorClass} extends BaseRequestHandler implements RequestHandler {
       switch ($mappingId) {
 
         ${each:postMethods as method}
-          case '${method[name]}':
-          $this->_srvc->${method[name]}($request, $response);
+          case '${method}':
+          $this->_service->${method}($request, $response);
           return;
 
         ${done}
@@ -75,8 +82,8 @@ class ${actorClass} extends BaseRequestHandler implements RequestHandler {
       switch ($mappingId) {
 
         ${each:putMethods as method}
-          case '${method[name]}':
-          $this->_srvc->${method[name]}($request, $response);
+          case '${method}':
+          $this->_service->${method}($request, $response);
           return;
 
         ${done}

@@ -48,11 +48,12 @@ class CrudService extends AbstractModelGenerator {
     }
     
     return array(
-      'gatekeeper' => $model->getGatekeeper(),
-      'singular'   => $modelStrings->getSingular(),
-      'plural'     => $plural,
-      'idColumn'   => $model->getId()->getColumn(),
-      'url'        => $url
+      'gatekeeper'       => $model->getGatekeeper(),
+      'gatekeeperBeanId' => str_replace('\\', '_', $model->getGatekeeper()),
+      'singular'         => $modelStrings->getSingular(),
+      'plural'           => $plural,
+      'idColumn'         => $model->getId()->getColumn(),
+      'url'              => $url
     );
   }
 }

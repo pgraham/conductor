@@ -5,12 +5,17 @@
  */
 namespace zeptech\dynamic;
 
-use \zeptech\rest\RestServer;
 use \zpt\cdt\di\Injector;
+use \zpt\cdt\rest\InjectedRestServer;
 
 class ServerConfigurator {
 
-  public function configure(RestServer $server) {
+  public function configure(InjectedRestServer $server) {
+    ${each:beans as beanId}
+      $hdlr = Injector::getBean('${beanId}');
+      $server->addBeanRequestHandler($hdlr);
+    ${done}
+
     ${each:mappings as mapping}
       $hdlr = new \${mapping[hdlr]}(${join:mapping[args]:,});
       ${if:mapping[beans] ISSET}

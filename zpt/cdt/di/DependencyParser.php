@@ -19,7 +19,7 @@ use \Exception;
 use \ReflectionClass;
 
 /**
- * Parser for the names of any beans on which a given class depends.
+ * Parser for annotation configured bean dependencies.
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
@@ -39,13 +39,14 @@ class DependencyParser {
         continue;
       }
 
-      $beanId = ltrim($prop->getName(), '_');
-
-      $setter = 'set' . ucfirst($beanId);
+      $propertyName = ltrim($prop->getName(), '_');
 
       // Make sure that there is a setter for this property
+      $setter = 'set' . ucfirst($propertyName);
       if (!$classDef->hasMethod($setter)) {
-        throw new Exception("Injection property does not have a setter: $beanId");
+        throw new Exception("Injection property does not have a setter " .
+          "($setter): Tried to inject `$beanId` into `" .
+          $classDef->getName() . "`.");
       }
 
       if (isset($annos['collection'])) {
@@ -55,13 +56,20 @@ class DependencyParser {
           throw new Exception("Collection setters must accept an array");
         }
         $beans[] = array(
-          'id'     => $beanId,
-          'lookup' => 'byType',
-          'type'   => $annos['collection']
+          'name' => $propertyName,
+          'type' => $annos['collection']
         );
       } else {
-        $beans[] = array( 'id' => $beanId, 'lookup' => 'byId' );
+        $beanId = isset($annos['injected']['ref'])
+          ? $annos['injected']['ref']
+          : $propertyName;
+
+        $beans[] = array(
+          'name' => $propertyName,
+          'ref'   => $beanId,
+        );
       }
+
     }
 
     return $beans;

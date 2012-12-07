@@ -15,10 +15,11 @@
 namespace zpt\cdt\rest;
 
 use \zeptech\anno\Annotations;
-use \zpt\cdt\di\DependencyParser;
+use \zpt\cdt\di\Injector;
 use \zpt\pct\AbstractGenerator;
 use \Exception;
 use \ReflectionClass;
+use \StdClass;
 
 /**
  * This class generates zpt\rest\RequestHandler implementations that dispatch
@@ -35,6 +36,8 @@ use \ReflectionClass;
  */
 class ServiceRequestDispatcher extends AbstractGenerator {
 
+  const BEAN_ID_SUFFIX = 'ServiceRequestDispatcher';
+
   protected static $actorNamespace = 'zeptech\dynamic\rest';
 
   protected function getTemplatePath() {
@@ -48,6 +51,7 @@ class ServiceRequestDispatcher extends AbstractGenerator {
       throw new Exception("$className is not a service definition");
     }
 
+    $mappings = array();
     $deleteMethods = array();
     $getMethods = array();
     $postMethods = array();
@@ -56,65 +60,52 @@ class ServiceRequestDispatcher extends AbstractGenerator {
     $methods = $defClass->getMethods();
     foreach ($methods as $method) {
       $methodAnnos = new Annotations($method);
-
       if (!isset($methodAnnos['uri']) || !isset($methodAnnos['method'])) {
+        // This isn't a service method so ignore it.
         continue;
       }
 
       $methodName = $method->getName();
+      $httpMethods = explode(' ', $methodAnnos['method']);
+      foreach ($httpMethods as $httpMethod) {
 
-      $uris = $methodAnnos['uri'];
-      if (!is_array($uris) || isset($uris['id'])) {
-        $uris = array( $uris );
-      }
+        $mapping = new StdClass();
+        $mapping->uri = $methodAnnos['uri'];
+        $mapping->method = $httpMethod;
+        $mapping->id = $methodName;
+        $mappings[] = $mapping;
 
-      $methodDef = array(
-        'name' => $methodName
-      );
+        $httpMethod = strtoupper($httpMethod);
+        switch ($httpMethod) {
+          case 'DELETE':
+          $deleteMethods[] = $methodName;
+          break;
 
-      $httpMethods = $methodAnnos['method'];
-      if (!is_array($httpMethods)) {
-        $httpMethods = explode(' ', $httpMethods);
+          case 'GET':
+          $getMethods[] = $methodName;
+          break;
 
-        foreach ($httpMethods as $httpMethod) {
-          $httpMethod = strtoupper($httpMethod);
-          switch ($httpMethod) {
-            case 'DELETE':
-            $deleteMethods[] = $methodDef;
-            break;
+          case 'POST':
+          $postMethods[] = $methodName;
+          break;
 
-            case 'GET':
-            $getMethods[] = $methodDef;
-            break;
+          case 'PUT':
+          $putMethods[] = $methodName;
+          break;
 
-            case 'POST':
-            $postMethods[] = $methodDef;
-            break;
-
-            case 'PUT':
-            $putMethods[] = $methodDef;
-            break;
-
-            default:
-            assert("false /* Unrecognized HTTP method $httpMethod");
-          }
+          default:
+          assert("false /* Unrecognized HTTP method $httpMethod");
         }
       }
-
     }
 
     $values = array(
-      'serviceClass' => $className,
+      'mappings'      => $mappings,
       'deleteMethods' => $deleteMethods,
-      'getMethods' => $getMethods,
-      'postMethods' => $postMethods,
-      'putMethods' => $putMethods
+      'getMethods'    => $getMethods,
+      'postMethods'   => $postMethods,
+      'putMethods'    => $putMethods
     );
-
-    $beans = DependencyParser::parse($defClass);
-    if ($beans !== null && count($beans) > 0) {
-      $values['beans'] = $beans;
-    }
 
     return $values;
   }

@@ -30,14 +30,6 @@ use \zpt\cdt\exception\AuthException;
  */
 abstract class AbstractGatekeeper implements Gatekeeper {
 
-  private $_modelClass;
-  private $_transformer;
-
-  public function __construct($modelClass) {
-    $this->_modelClass = $modelClass;
-    $this->_transformer = ActorFactory::getActor('transformer', $modelClass);
-  }
-
   public function checkCanCreate($model) {
     if (!$this->canCreate($model)) {
       throw new AuthException(AuthException::NOT_AUTHORIZED,
@@ -67,8 +59,9 @@ abstract class AbstractGatekeeper implements Gatekeeper {
   }
 
   protected function msg($model, $action) {
-    $id = $this->_transformer->getId($model);
-    $msg = "Unable to $action {$this->_modelClass}";
+    $transformer = Transformer::get($model);
+    $id = $transformer->getId($model);
+    $msg = "Unable to $action " . get_class($model);
     if ($id) {
       $msg .= " with id $id";
     }

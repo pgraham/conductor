@@ -32,6 +32,19 @@ class Injector {
   }
 
   /**
+   * Generate a bean id for a given class name with an optional suffix.
+   *
+   * @param string $className
+   * @param string $suffix [optional]
+   */
+  public static function generateBeanId($className, $suffix = '') {
+    $namespaces = explode('\\', $className);
+    $class = array_pop($namespaces);
+
+    return $class . $suffix;
+  }
+
+  /**
    * Get the bean with the given ID or null if not found.
    *
    * @return Object
@@ -57,12 +70,14 @@ class Injector {
 
   public static function inject($obj, array $beans) {
     foreach ($beans as $bean) {
-      $beanId = $bean['id'];
-      $setter = "set" . ucfirst($beanId);
+      $property = $bean['property'];
+      $setter = "set" . ucfirst($property);
 
-      if ($bean['lookup'] === 'byId') {
-        $obj->$setter(self::getBean($beanId));
-      } else {
+      if (isset($bean['ref'])) {
+        $obj->$setter(self::getBean($bean['ref']));
+      } else if (isset($bean['val'])) {
+        $obj->$setter($bean['val']);
+      } else if (isset($bean['type'])) {
         $obj->$setter(self::getBeans($bean['type']));
       }
     }

@@ -15,6 +15,7 @@
 namespace zpt\cdt\compile;
 
 use \zpt\cdt\di\DependencyParser;
+use \zpt\cdt\di\Injector;
 
 /**
  * This class generates a RESTful ServerConfigurator implementation from a
@@ -30,6 +31,9 @@ class ServerCompiler {
   /* List of request handlers */
   private $_mappings = array();
 
+  /* List of bean RequestHandler implementations. */
+  private $_beans = array();
+
   private $_tmplParser;
 
   public function addActor($generator, $def, $uris) {
@@ -38,6 +42,10 @@ class ServerCompiler {
       'definition' => $def,
       'uris' => $uris
     );
+  }
+
+  public function addBean($beanId) {
+    $this->_beans[] = $beanId;
   }
 
   /**
@@ -70,7 +78,8 @@ class ServerCompiler {
 
     $values = array(
       'mappings' => $this->_mappings,
-      'actors' => $this->_actors
+      'actors' => $this->_actors,
+      'beans' => $this->_beans
     );
     $tmpl = $this->_tmplParser->parse(file_get_contents($tmplSrc));
     $tmpl->save($tmplOut, $values);

@@ -23,10 +23,10 @@ use \zeptech\dynamic\ServerConfigurator;
 use \zeptech\orm\runtime\Clarinet;
 use \zeptech\orm\runtime\Criteria;
 use \zeptech\orm\runtime\Persister;
-use \zeptech\rest\RestServer;
 use \zpt\cdt\compile\Compiler;
 use \zpt\cdt\di\Injector;
 use \zpt\cdt\exception\AuthException;
+use \zpt\cdt\rest\InjectedRestServer;
 use \zpt\util\File;
 use \zpt\util\DirectoryLockTimeoutException;
 use \Exception;
@@ -282,7 +282,7 @@ class Conductor {
     $pathInfo = self::getPathInfo();
 
     try {
-      $server = new RestServer();
+      $server = new InjectedRestServer();
       $configurator = new ServerConfigurator();
       $configurator->configure($server);
 

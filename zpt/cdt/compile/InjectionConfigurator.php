@@ -16,19 +16,22 @@ class InjectionConfigurator {
 
     // Create beans and set scalar property values
     ${each:beans as bean}
-      $bean = new \${bean[class]}();
-      Injector::addBean('${bean[id]}', $bean);
-      ${each:bean[props] as prop}
-        $bean->set${prop[name]}(${php:prop[val]});
-      ${done}
-
+      Injector::addBean('${bean[id]}', new \${bean[class]}());
     ${done}
 
     // Inject bean dependencies
     ${each:beans as bean}
-      ${if:bean[refs]}
+      ${if:bean[props]}
         $bean = Injector::getBean('${bean[id]}');
-        Injector::inject($bean, ${php: bean[refs]});
+        ${each:bean[props] as prop}
+          ${if:prop[ref] ISSET}
+            $bean->set${prop[name]}(Injector::getBean('${prop[ref]}'));
+          ${elseif:prop[val] ISSET}
+            $bean->set${prop[name]}(${php:prop[val]});
+          ${elseif:prop[type] ISSET}
+            $bean->set${prop[name]}(Injector::getBeans('${prop[type]}'));
+          ${fi}
+        ${done}
 
       ${fi}
     ${done}

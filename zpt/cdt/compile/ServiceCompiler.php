@@ -6,9 +6,12 @@
 namespace zpt\cdt\compile;
 
 use \zeptech\anno\Annotations;
+use \zpt\cdt\di\Injector;
+use \zpt\cdt\rest\ServiceRequestDispatcher;
 use \zpt\util\File;
 use \DirectoryIterator;
 use \ReflectionClass;
+use \StdClass;
 
 /**
  * This class compiles service definition classes.  There are two ways of
@@ -27,6 +30,12 @@ use \ReflectionClass;
  * @author Philip Graham <philip@zeptech.ca>
  */
 class ServiceCompiler {
+
+  /*
+   * The dependency injection compiler for adding bean definitions for
+   * compiled services.
+   */
+  private $_diCompiler;
 
   /*
    * The server compiler that generates a ServerConfigurator for adding mappings
@@ -78,22 +87,50 @@ class ServiceCompiler {
     }
   }
 
-  public function compileService($srvcClass) {
+  /**
+   * Compile the given service class.  Currently there are two supported ways
+   * of defining a compiled service class.  The first is to directly implement
+   * the RequestHandler interface and the second is to add a @Service annotation
+   * to the class.  For these classes a ServiceRequestDispatcher will be
+   * generated and used to bridge between the RestServer and Service instance.
+   *
+   *
+   * @param string $srvcClass The name of the service class.
+   * @param string $srvcBeanId Used only for serviced declared using @Service
+   *   annotations.  If given, then instead of adding an instance of the
+   *   service to DI, the specified bean will be used as the service instance
+   *   of the generated ServiceRequestDispatcher
+   */
+  public function compileService($srvcClass, $srvcBeanId = false) {
     $srvcDef = new ReflectionClass($srvcClass);
     $annos = new Annotations($srvcDef);
 
     // There are two methods of defining a service.
     if ($srvcDef->implementsInterface('zeptech\rest\RequestHandler')) {
+      // Direct RequestHandler implementation
       if (isset($annos['uri'])) {
-        // Direct RequestHandler implementation
-        // TODO Ensure that the class definition implements RequestHandler
 
-        $uris = $annos['uri'];
-        if (!is_array($uris)) {
-          $uris = array($uris);
+        $uris = $annos->asArray('uri');
+        $mappings = array();
+        foreach ($uris as $uri) {
+          $mapping = new StdClass();
+          $mapping->uri = $uri;
+
+          $mappings[] = $mapping;
         }
 
-        $this->_serverCompiler->addMapping("$srvcClass", array(), $uris);
+
+        $beanId = str_replace('\\', '_', $srvcClass);
+        $props = array( 
+          array(
+            'name' => 'Mappings',
+            'val'  => $mappings
+          )
+        );
+        $this->_diCompiler->addBean($beanId, $srvcClass, $props);
+        $this->_serverCompiler->addBean($beanId);
+      } else {
+        // TODO Request handler that declares no URIs, generate warning
       }
     } else if (isset($annos['service'])) {
       // Service definition, generate a RequestHandler implementation for this
@@ -103,22 +140,35 @@ class ServiceCompiler {
       // Generate a service handler for this class
       $this->_serviceRequestDispatcher->generate($srvcClass);
 
-      $uris = array();
-      foreach ($srvcDef->getMethods() as $method) {
-        $methodAnnos = new Annotations($method);
-
-        if (isset($methodAnnos['uri']) && isset($methodAnnos['method'])) {
-          $uris[] = array(
-            'id' => $method->getName(),
-            'template' => $methodAnnos['uri'],
-            'method' => $methodAnnos['method']
-          );
-        }
+      // Add a DI bean for the actual service
+      if (!$srvcBeanId) {
+        $srvcBeanId = Injector::generateBeanId($srvcClass);
+        $this->_diCompiler->addBean($srvcBeanId, $srvcClass);
       }
-      $this->_serverCompiler->addActor(
-        '\zpt\cdt\rest\ServiceRequestDispatcher', $srvcClass, $uris);
+
+      // Add a DI bean for the request dispatcher.  The generated dispatcher
+      // will be injected with the service instance using annotation
+      // configuration
+      $dispatcherBeanId = Injector::generateBeanId($srvcClass,
+        ServiceRequestDispatcher::BEAN_ID_SUFFIX);
+      $dispatcherClassName = $this->_serviceRequestDispatcher
+        ->getActorClassName($srvcClass);
+      $this->_diCompiler->addBean($dispatcherBeanId, $dispatcherClassName,
+        array( array( 'name' => 'service', 'ref' => $srvcBeanId ) ));
+
+      // Add the dispatcher bean as a RequestHandler
+      $this->_serverCompiler->addBean($dispatcherBeanId);
 
     } /* Else: ignore this class, it is not a service definition. */
+  }
+
+  /**
+   * Setter for the DependencyInjectionCompiler.
+   *
+   * @param DependencyInjectionCompiler $diCompiler
+   */
+  public function setDependencyInjectionCompiler($diCompiler) {
+    $this->_diCompiler = $diCompiler;
   }
 
   /**

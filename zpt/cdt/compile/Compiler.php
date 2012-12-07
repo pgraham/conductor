@@ -14,7 +14,6 @@ use \zeptech\orm\generator\ValidatorGenerator;
 use \zeptech\orm\QueryBuilder;
 use \zpt\cdt\compile\resource\ResourceCompiler;
 use \zpt\cdt\crud\CrudService;
-use \zpt\cdt\di\DependencyParser;
 use \zpt\cdt\html\HtmlProvider;
 use \zpt\cdt\html\NotAPageDefinitionException;
 use \zpt\cdt\i18n\ModelDisplayParser;
@@ -86,6 +85,7 @@ class Compiler {
     $this->_serverCompiler->setTemplateParser($this->_tmplParser);
 
     $this->_serviceCompiler = new ServiceCompiler();
+    $this->_serviceCompiler->setDependencyInjectionCompiler($this->_diCompiler);
     $this->_serviceCompiler->setServerCompiler($this->_serverCompiler);
 
     $this->_resourceCompiler = new ResourceCompiler();
@@ -124,7 +124,6 @@ class Compiler {
       "$pathInfo[lib]/conductor/htdocs/srvr.php",
       "$pathInfo[target]/htdocs/srvr.php");
 
-    $this->compileDiContainer($pathInfo, $ns);
     $this->compileModels($pathInfo, $ns);
     $this->compileServices($pathInfo, $ns);
     $this->compileResources($pathInfo, $ns);
@@ -133,11 +132,13 @@ class Compiler {
     $this->compileLanguageFiles($pathInfo, $ns);
     $this->compileHtml($pathInfo, $ns);
 
+    $this->collectDependencyXmls($pathInfo);
     $this->_diCompiler->compile($pathInfo, $ns);
+
     $this->_serverCompiler->compile($pathInfo);
   }
 
-  protected function compileDiContainer($pathInfo, $ns) {
+  protected function collectDependencyXmls($pathInfo) {
     $diCompiler = $this->_diCompiler;
     $diCompiler->addFile(
       "$pathInfo[lib]/conductor/resources/dependencies.xml");
@@ -356,8 +357,7 @@ class Compiler {
 
       $inst = HtmlProvider::get($viewClass);
       $instClass = get_class($inst);
-      $deps = DependencyParser::parse($instClass);
-      $this->_diCompiler->addBean($beanId, $instClass, $deps);
+      $this->_diCompiler->addBean($beanId, $instClass);
 
       $args = array( "'$beanId'" );
 
@@ -464,8 +464,17 @@ class Compiler {
         if ( !isset($annos['nocrud']) ) {
           $crudGen->generate($modelClass);
 
-          $crudSrvc = 'zeptech\\dynamic\\crud\\' . $model->getActor();
-          $this->_serviceCompiler->compileService($crudSrvc);
+          $actorName = $model->getActor();
+          $crudSrvc = "zeptech\\dynamic\\crud\\$actorName";
+          $beanId = $actorName . "_crudService";
+          $this->_diCompiler->addBean($beanId, $crudSrvc);
+
+          $gatekeeper = $model->getGatekeeper();
+          $gatekeeperBeanId = str_replace('\\', '_', $gatekeeper);
+          $this->_diCompiler->addBean($gatekeeperBeanId,
+            $gatekeeper);
+
+          $this->_serviceCompiler->compileService($crudSrvc, $beanId);
         }
       }
     }

@@ -19,9 +19,9 @@ use \zeptech\orm\runtime\Persister;
 use \zeptech\orm\runtime\Transformer;
 use \zeptech\rest\BaseRequestHandler;
 use \zeptech\rest\RestException;
-use \zeptech\rest\RequestHandler;
 use \zeptech\rest\Request;
 use \zeptech\rest\Response;
+use \zpt\cdt\rest\BeanRequestHandler;
 
 /**
  * This class provides a remote service for retrieving and updating global
@@ -32,10 +32,14 @@ use \zeptech\rest\Response;
  * @Uri /config
  * @Uri /config/{name}
  */
-class GlobalConfigService extends BaseRequestHandler implements RequestHandler {
+class GlobalConfigService extends BaseRequestHandler
+    implements BeanRequestHandler
+{
 
   /** @Injected */
   private $_authProvider;
+
+  private $_mappings;
 
   public function get(Request $request, Response $response) {
     $configName = $request->getParameter('name');
@@ -85,7 +89,15 @@ class GlobalConfigService extends BaseRequestHandler implements RequestHandler {
     ));
   }
 
+  public function getMappings() {
+    return $this->_mappings;
+  }
+
   public function setAuthProvider($authProvider) {
     $this->_authProvider = $authProvider;
+  }
+
+  public function setMappings(array $mappings) {
+    $this->_mappings = $mappings;
   }
 }

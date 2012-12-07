@@ -16,10 +16,10 @@ namespace zpt\cdt\srvc;
 
 use \conductor\Auth;
 use \zeptech\rest\BaseRequestHandler;
-use \zeptech\rest\RequestHandler;
 use \zeptech\rest\Request;
 use \zeptech\rest\Response;
 use \zeptech\rest\RestException;
+use \zpt\cdt\rest\BeanRequestHandler;
 
 /**
  * This class provides a remote interface for user management.
@@ -28,7 +28,7 @@ use \zeptech\rest\RestException;
  *
  * @Uri /users/{userId}/password
  */
-class UserService extends BaseRequestHandler implements RequestHandler {
+class UserService extends BaseRequestHandler implements BeanRequestHandler {
 
   const CURRENT_PASSWORD_FIELD = 'curPw';
   const NEW_PASSWORD_FIELD = 'newPw';
@@ -36,6 +36,8 @@ class UserService extends BaseRequestHandler implements RequestHandler {
 
   /** @Injected */
   private $_authProvider;
+
+  private $_mappings;
 
   public function post(Request $request, Response $response) {
     $userId = $request->getParameter('userId');
@@ -80,7 +82,15 @@ class UserService extends BaseRequestHandler implements RequestHandler {
     ));
   }
 
+  public function getMappings() {
+    return $this->_mappings;
+  }
+
   public function setAuthProvider($authProvider) {
     $this->_authProvider = $authProvider;
+  }
+
+  public function setMappings(array $mappings) {
+    $this->_mappings = $mappings;
   }
 }

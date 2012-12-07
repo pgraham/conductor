@@ -10,15 +10,10 @@ use \zeptech\orm\QueryBuilder;
 use \zeptech\rest\Request;
 use \zeptech\rest\Response;
 use \zpt\cdt\crud\CrudException;
+use \zpt\cdt\crud\Gatekeeper;
 use \zpt\cdt\i18n\ModelMessages;
 use \zpt\cdt\Conductor;
 use \StdClass;
-
-${if:gatekeeper ISSET}
-  use \${gatekeeper} as Gatekeeper;
-${else}
-  use \zpt\cdt\crud\DefaultGatekeeper as Gatekeeper;
-${fi}
 
 /**
  * This is a CRUD service class for a ${model} class.
@@ -30,11 +25,12 @@ ${fi}
  */
 class ${actorClass} { 
 
+  /** @Injected(ref = ${gatekeeperBeanId}) */
   private $_gatekeeper;
+
   private $_info;
 
   public function __construct() {
-    $this->_gatekeeper = new Gatekeeper('${model}');
     $this->_info = ModelMessages::get('${model}');
   }
 
@@ -239,6 +235,10 @@ class ${actorClass} {
     } catch (Exception $e) {
       $this->_handleException($e, $response);
     }
+  }
+
+  public function setGatekeeper(Gatekeeper $gatekeeper) {
+    $this->_gatekeeper = $gatekeeper;
   }
 
   private function _handleException($e, $response) {

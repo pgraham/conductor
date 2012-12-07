@@ -14,6 +14,8 @@
  */
 namespace zpt\cdt\compile;
 
+use \zpt\cdt\di\DependencyParser;
+
 /**
  * This class compiles a script which initializes the dependency injection
  * container.  Beans which are inserted into the container are parsed from
@@ -28,12 +30,18 @@ class DependencyInjectionCompiler {
 
   private $_tmplParser;
 
-  public function addBean($id, $class, $refs) {
+  public function addBean($id, $class, $props = array()) {
+    // Merge annotation configured beans with spefied bean property values.
+    // Specified property values override annotation configuration.
+    $props = array_merge(
+      DependencyParser::parse($class),
+      $props
+    );
+
     $this->_beans[] = array(
       'id' => $id,
       'class' => $class,
-      'refs' => $refs,
-      'props' => array()
+      'props' => $props
     );
   }
 
@@ -55,15 +63,14 @@ class DependencyInjectionCompiler {
           $bean['class'] = $beanDef['class'];
 
           $props = array();
-          $refs = array();
           if (isset($beanDef->property)) {
             $propDefs = $beanDef->property;
 
             foreach ($propDefs as $propDef) {
               $prop = array();
+              $prop['name'] = (string) $propDef['name'];
 
               if (isset($propDef['value'])) {
-                $prop['name'] = (string) $propDef['name'];
                 $val = $propDef['value'];
                 if (is_numeric($val)) {
                   $val = (float) $val;
@@ -76,16 +83,16 @@ class DependencyInjectionCompiler {
                 
                 $props[] = $prop;
               } else if (isset($propDef['ref'])) {
-                $prop['id'] = (string) $propDef['name'];
-                $prop['lookup'] = 'byId';
-                $refs[] = $prop;
+                $prop['ref'] = (string) $propDef['ref'];
+              } else if (isset($propDef['type'])) {
+                $prop['type'] = (string) $propDef['type'];
               } else {
                 // TODO Warn about an invalid bean definition
               }
+              $props[] = $prop;
             }
           }
           $bean['props'] = $props;
-          $bean['refs'] = $refs;
 
           $this->_beans[] = $bean;
         }
