@@ -175,9 +175,9 @@ class ${actorClass} {
 
   private function _loadJQuery() {
     ${if:env = dev}
-      Element::js('${jQueryPath}/jquery.min.js')->addToHead();
-    ${else}
       Element::js('${jQueryPath}/jquery.js')->addToHead();
+    ${else}
+      Element::js('${jQueryPath}/jquery.min.js')->addToHead();
     ${fi}
   }
 
