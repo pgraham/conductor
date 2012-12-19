@@ -10,71 +10,79 @@
     }
   }
 
-  /**
-   * Create a new list widget
-   */
-  exports.list = function () {
-    var elm, tbl, thead, tbody, headers, selAll, cols = [];
+  $.widget('ui.list', {
+    options: {
+      columns: [],
+      rows: []
+    },
 
-    elm = $('<div/>').addClass('cdt-list');
-    tbl = $('<table/>').appendTo(elm);
-    thead = $('<thead/>').addClass('ui-widget-content').appendTo(tbl);
-    tbody = $('<tbody/>').addClass('ui-widget-content').appendTo(tbl);
-    headers = $('<tr/>').appendTo(thead);
+    _create: function () {
+      var self = this;
+      this.element.addClass('cdt-list ui-widget-content');
 
-    function addColumn(lbl, renderer, autoExpand) {
-      var config, hdr;
-      config = normalizeAddColumnArgs(lbl, renderer, autoExpand);
+      this.tbl = $('<table/>').appendTo(this.element).layout('columnLayout');
+      this.thead = $('<thead/>').appendTo(this.tbl);
+      this.tbody = $('<tbody/>').appendTo(this.tbl);
+      this.headers = $('<tr/>').appendTo(this.thead);
 
+      this.selAll = $('<input type="checkbox"/>').click(function (e) {
+        self._setAllSelected($(this).is(':checked'));
+        self._trigger('selectionchange', e, { selected: self.getSelected() });
+      });
+      this.headers.append(
+        $('<th/>').addClass('ui-widget-header left-col').append(this.selAll)
+      );
+
+      this.cols = [];
+
+      if (this.options.columns.length > 0) {
+        this.addColumns(this.options.columns);
+      }
+
+      if (this.options.rows.length > 0) {
+        this.setRows(this.options.rows);
+      }
+    },
+
+    _setOption: function (key, value) {
+      // TODO
+    },
+
+    _destroy: function () {
+      // TODO
+    },
+
+    addColumn: function (col) {
+      var config = $.extend({}, col);
       if (config.dataIdx && !config.renderer) {
         config.renderer = createBasicRenderer(config.dataIdx);
       }
-      cols.push(config);
 
-      hdr = $('<th/>')
-        .addClass('ui-widget-header')
-        .addClass(config.autoExpand ? 'auto-expand' : '')
-        .append(config.lbl)
-        .appendTo(headers);
-
-      if (config.align) {
-        CDT.util.align(hdr, config.align);
-      }
-
-      // NOTE: autoExpand will override width
-      if (config.width) {
-        hdr.width(config.width);
-      }
+      this.cols.push(config);
+      this._addHeader(config);
 
       return this;
-    }
+    },
 
-    function addColumns(cols) {
+    addColumns: function (cols) {
+      var self = this;
       $.each(cols, function () {
-        addColumn(this);
+        self.addColumn(this);
       });
       return this;
-    }
+    },
 
-    function addRow(rowData) {
-      var row = $('<tr/>').layout('listRowLayout').appendTo(tbody);
+    addRow: function (rowData) {
+      var self = this, row;
 
-      $('<input type="checkbox"/>')
-        .addClass('cdt-list-row-selector')
-        .data('row-attributes', rowData)
-        .click(function () {
-          selAll.prop(
-            'checked',
-            tbody.find('.cdt-list-row-selector:not(:checked)').length ===  0
-          );
+      this.tbody.find('tr.no-data').remove();
+      
+      row = $('<tr/>')
+        .append(this._buildRowSelect(rowData))
+        .layout('listRowLayout')
+        .appendTo(this.tbody);
 
-          elm.trigger('selection-change');
-        })
-        .appendTo(
-          $('<td/>').addClass('ui-widget-content left-col').appendTo(row)
-        );
-
-      $.each(cols, function (idx, col) {
+      $.each(this.cols, function (idx, col) {
         var cell, ctnt;
         
         ctnt = col.renderer(rowData);
@@ -95,95 +103,117 @@
         }
       });
       row.layout();
-    }
+      return this;
+    },
 
-    function clearSelected() {
-      setAllSelected(false);
-    }
+    clearSelected: function () {
+      this._setAllSelected(false);
+      this.selAll.prop('checked', false);
+      this._trigger('selectionchange', null, { selected: [] });
+    },
 
-    function getSelected() {
-      return tbody.find('input:checked');
-    }
+    getSelected: function () {
+      var data = [];
+      $.each(this.tbody.find('input:checked'), function (idx, selected) {
+        data.push($(this).data('row-attributes'));
+      });
+      return data;
+    },
 
-    function populate(data, mapper) {
-      tbody.empty();
-      selAll.prop('checked', false);
+    setRows: function (rows, mapper) {
+      var self = this;
+      this.tbody.empty();
+      this.selAll.prop('checked', false);
 
-      if ($.isEmptyObject(data)) {
-        selAll.prop('disabled', true);
+      if ($.isEmptyObject(rows)) {
+        this.selAll.prop('disabled', true);
         $('<td/>')
-          .attr('colspan', headers.children().length)
-          .addClass('no-data')
+          .attr('colspan', this.headers.children().length)
           .text('No data to display')
-          .appendTo( $('<tr/>').appendTo(tbody) )
-          .outerWidth(tbody.outerWidth())
-          .outerHeight(tbody.outerHeight());
+          .appendTo( $('<tr class="no-data"/>').appendTo(this.tbody) )
+          .outerWidth(this.tbody.outerWidth())
+          .outerHeight(this.tbody.outerHeight());
         return;
       }
 
-      selAll.prop('disabled', false);
+      this.selAll.prop('disabled', false);
 
-      $.each(data, function (idx, rowData) {
-        if (mapper !== undefined) {
-          rowData = mapper(rowData);
+      $.each(rows, function (idx, row) {
+        if (mapper) {
+          row = mapper(row);
         }
-        addRow(rowData);
+        self.addRow(row);
       });
 
-      elm.layout().trigger('load');
+      this.element.layout();
+
+      this._trigger('selectionchange', null, { selected: [] });
+      return this;
+    },
+
+    selectAll: function () {
+      this._setAllSelected(true);
+      this.selAll.prop('checked', true);
+      this._trigger('selectionchange', null, { selected: this.getSelected() });
+    },
+
+    _buildRowSelect: function (rowData) {
+      var self = this, check;
+
+      check = $('<input type="checkbox"/>')
+        .addClass('cdt-list-row-selector')
+        .data('row-attributes', rowData)
+        .click(function (e) {
+          e.stopPropagation();
+          self._updateSelAll();
+          self._trigger('selectionchange', e, { selected: self.getSelected() });
+        })
+
+      return $('<td/>')
+        .addClass('ui-widget-content left-col')
+        .append(check)
+        .click(function (e) {
+          e.stopPropagation();
+          check.prop('checked', !check.prop('checked'));
+          self._updateSelAll();
+          self._trigger('selectionchange', e, { selected: self.getSelected() });
+        });
+    },
+
+    _setAllSelected: function (selected) {
+      this.tbody.find('.cdt-list-row-selector').prop('checked', selected);
+    },
+
+    _addHeader: function (config) {
+      var hdr = $('<th/>')
+        .addClass('ui-widget-header')
+        .addClass(config.autoExpand ? 'auto-expand' : '')
+        .append(config.lbl)
+        .appendTo(this.headers);
+
+      if (config.align) {
+        CDT.util.align(hdr, config.align);
+      }
+
+      // NOTE: autoExpand will override width
+      if (config.width) {
+        hdr.width(config.width);
+      }
+    },
+
+    _updateSelAll: function () {
+      this.selAll.prop('checked',
+        this.tbody.find('.cdt-list-row-selector:not(:checked)').length ===  0
+      );
     }
 
-    function selectAll() {
-      setAllSelected(true);
-    }
+  });
 
-    function setAllSelected(selected) {
-      tbody.find('.cdt-list-row-selector').prop('checked', selected);
-      elm.trigger('selection-change');
-    }
-
-    selAll = $('<input type="checkbox"/>').click(function () {
-      setAllSelected($(this).is(':checked'));
-    });
-    headers.append($('<th/>').addClass('ui-widget-header left-col').append(selAll));
-
-    // Apply list layout
-    elm.layout('columnLayout');
-
-    // TODO Instead of extending elm either the methods need to attached as data
-    //      or the jQuery prototype needs to be expanded with list functions
-    return $.extend(elm, {
-      addColumn: addColumn,
-      addColumns: addColumns,
-      clearSelected: clearSelected,
-      getSelected: getSelected,
-      populate: populate,
-      selectAll: selectAll
-    });
-  };
-
-  /*
-   * Private function to normalize the arguments given to a lists addColumn
-   * method into a config object.
+  /**
+   * Create a new list widget
    */
-  function normalizeAddColumnArgs(lbl, renderer, autoExpand) {
-    var config;
-    if ($.isPlainObject(lbl)) {
-      return lbl;
-    }
-
-    // Old style parameters were passed, use them to create a config object
-    config = {
-      lbl: lbl,
-      autoExpand: autoExpand || false
-    };
-    
-    if (typeof renderer === 'string') {
-      config.dataIdx = renderer;
-    } else {
-      config.renderer = renderer;
-    }
-    return config;
-  }
+  exports.list = function (cfg) {
+    return $('<div/>').list(cfg);
+  };
 
 } (jQuery, CDT, CDT.ns('CDT.widget')));
