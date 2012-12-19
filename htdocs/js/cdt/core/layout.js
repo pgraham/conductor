@@ -6,9 +6,10 @@
 (function ( $ ) {
   "use strict";
 
-  function fillWith (container, sel) {
-    var toFill = typeof sel === 'string' ? container.children(sel) : sel,
-        height = container.height(),
+  function doFill(container, sel, type) {
+    var toGrow = typeof sel === 'string' ? container.children(sel) : sel,
+        ucType = type.charAt(0).toUpperCase() + type.slice(1),
+        fillAmount = container[type](),
         allocated = 0,
         remaining,
         fill;
@@ -24,23 +25,33 @@
             $this.css('position') === 'relative') &&
           $this.css('float') === 'none')
       {
-        allocated += $this.outerHeight(true);
+        allocated += $this[ 'outer' + ucType ](true);
       }
     });
 
-    remaining = height - allocated;
-    fill = remaining / toFill.length;
-    toFill.each(function () {
-      $(this).outerHeight(fill, true);
+    remaining = fillAmount - allocated;
+    fill = Math.floor(remaining / toGrow.filter(':visible').length);
+    toGrow.each(function () {
+      $(this)[ 'outer' + ucType ](fill, true);
     });
 
-    toFill
+    return toGrow;
+  }
+
+  function vFill (container, sel) {
+    doFill(container, sel, 'height')
       .css('overflow', 'auto')
       .css('overflow-x', 'hidden');
   }
 
+  function hFill (container, sel) {
+    doFill(container, sel, 'width');
+  }
+
   $.layouts = {
-    fillWith: fillWith
+    fillWith: vFill,
+    'v-fill': vFill,
+    'h-fill': hFill
   };
 
   $.fn.layout = function (type, params) {
@@ -86,7 +97,7 @@
 
   // Add a resize handler to the window which applies all layout functions
   $(window).resize(function () {
-    $(document).layout();
+    $('body').layout();
   });
 
 } ( jQuery ));
