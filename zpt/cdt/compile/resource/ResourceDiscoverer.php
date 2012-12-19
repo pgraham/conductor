@@ -56,7 +56,12 @@ class ResourceDiscoverer {
     $groupParts = explode('.', $group);
     $groupBaseName = array_pop($groupParts);
     $groupBasePath = str_replace('.', '/', $group);
-    $groupDir = new DirectoryIterator("$this->_resourceDir/$groupBasePath");
+    $groupPath = "$this->_resourceDir/$groupBasePath";
+    if (!file_exists($groupPath)) {
+      return array();
+    }
+
+    $groupDir = new DirectoryIterator($groupPath);
     foreach ($groupDir as $f) {
 
       if ($f->isDot()) {
