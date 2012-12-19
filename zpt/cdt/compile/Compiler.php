@@ -5,9 +5,9 @@
  */
 namespace zpt\cdt\compile;
 
+use \zeptech\anno\AnnotationFactory;
 use \zeptech\anno\Annotations;
 use \zeptech\dynamic\Configurator;
-use \zeptech\orm\generator\model\Parser as ModelParser;
 use \zeptech\orm\generator\PersisterGenerator;
 use \zeptech\orm\generator\TransformerGenerator;
 use \zeptech\orm\generator\ValidatorGenerator;
@@ -19,6 +19,9 @@ use \zpt\cdt\html\NotAPageDefinitionException;
 use \zpt\cdt\i18n\ModelDisplayParser;
 use \zpt\cdt\i18n\ModelMessages;
 use \zpt\cdt\rest\ServiceRequestDispatcher;
+use \zpt\orm\model\parser\DefaultNamingStrategy;
+use \zpt\orm\model\parser\ModelParser;
+use \zpt\orm\model\ModelCache;
 use \zpt\pct\CodeTemplateParser;
 use \zpt\util\File;
 use \zpt\util\String;
@@ -33,6 +36,18 @@ use \SplClassLoader;
  * @author Philip Graham <philip@zeptech.ca>
  */
 class Compiler {
+
+  private $modelParser;
+  private $modelCache;
+  private $namingStrategy;
+  private $annotationFactory;
+
+  private $persisterGen;
+  private $transformerGen;
+  private $validatorGen;
+  private $infoGen;
+  private $crudGen;
+  private $queryBuilderGen;
 
   /* Configuration compiler. */
   private $_configurationCompiler;
@@ -68,6 +83,20 @@ class Compiler {
    * Create a new site compiler.
    */
   public function __construct() {
+    $this->annotationFactory = new AnnotationFactory();
+    $this->namingStrategy = new DefaultNamingStrategy();
+    $this->modelCache = new ModelCache();
+    $this->modelParser = new ModelParser();
+
+    $this->namingStrategy->setAnnotationFactory($this->annotationFactory);
+
+    $this->modelCache->setModelParser($this->modelParser);
+
+    $this->modelParser->setAnnotationFactory($this->annotationFactory);
+    $this->modelParser->setNamingStrategy($this->namingStrategy);
+    $this->modelParser->setModelCache($this->modelCache);
+    $this->modelParser->init();
+
     $this->_tmplParser = new CodeTemplateParser();
 
     $this->_configurationCompiler = new ConfigurationCompiler();
@@ -426,6 +455,7 @@ class Compiler {
   //      for now because it is accessed from the scope of an anonymous
   //      function.
   public function _compileModelDir($pathInfo, $models, $ns, $urlBase = '') {
+    $log = fopen("$pathInfo[target]/php.err", 'w');
     if (!file_exists($models)) {
       // Nothing to do here
       return;
@@ -434,12 +464,6 @@ class Compiler {
     $target = $pathInfo['target'];
 
     // TODO These should be class variables
-    $persisterGen = new PersisterGenerator($target);
-    $transformerGen = new TransformerGenerator($target);
-    $validatorGen = new ValidatorGenerator($target);
-    $infoGen = new ModelMessages($target);
-    $crudGen = new CrudService($target);
-    $queryBuilderGen = new QueryBuilder($target); 
     $dir = new DirectoryIterator($models);
     foreach ($dir as $model) {
       if ($model->isDot() || $model->isDir()) {
@@ -458,16 +482,16 @@ class Compiler {
       // Only try and parse entities.  This allows other types of related
       // classes, such as gatekeepers, to be included in the model directory.
       if (isset($annos['Entity'])) {
-        $model = ModelParser::getModel($modelClass);
+        $model = $this->modelParser->parse($modelClass);
 
-        $persisterGen->generate($modelClass);
-        $transformerGen->generate($modelClass);
-        $validatorGen->generate($modelClass);
-        $infoGen->generate($modelClass);
-        $queryBuilderGen->generate($modelClass);
+        $this->persisterGen->generate($modelClass);
+        $this->transformerGen->generate($modelClass);
+        $this->validatorGen->generate($modelClass);
+        $this->infoGen->generate($modelClass);
+        $this->queryBuilderGen->generate($modelClass);
 
         if ( !isset($annos['nocrud']) ) {
-          $crudGen->generate($modelClass);
+          $this->crudGen->generate($modelClass);
 
           $actorName = $model->getActor();
           $crudSrvc = "zeptech\\dynamic\\crud\\$actorName";
@@ -506,7 +530,22 @@ class Compiler {
   }
 
   private function _initCompiler($pathInfo, $env) {
-    $this->_htmlProvider = new HtmlProvider($pathInfo['target'], $env);
+    $target = $pathInfo['target'];
+    $this->persisterGen = new PersisterGenerator($target);
+    $this->transformerGen = new TransformerGenerator($target);
+    $this->validatorGen = new ValidatorGenerator($target);
+    $this->infoGen = new ModelMessages($target);
+    $this->crudGen = new CrudService($target);
+    $this->queryBuilderGen = new QueryBuilder($target); 
+
+    $this->persisterGen->setModelCache($this->modelCache);
+    $this->transformerGen->setModelCache($this->modelCache);
+    $this->validatorGen->setModelCache($this->modelCache);
+    $this->infoGen->setModelCache($this->modelCache);
+    $this->crudGen->setModelCache($this->modelCache);
+    $this->queryBuilderGen->setModelCache($this->modelCache);
+
+    $this->_htmlProvider = new HtmlProvider($target, $env);
 
     $this->_modulesPath = "$pathInfo[root]/modules";
 

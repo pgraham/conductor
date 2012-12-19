@@ -98,6 +98,7 @@ class Loader {
     self::registerNamespace('zpt\pct', "$cdtLib/php-code-templates");
     self::registerNamespace('zeptech\rest', "$cdtLib/php-rest-server");
     self::registerNamespace('zeptech\orm', "$cdtLib/clarinet");
+    self::registerNamespace('zpt\orm', "$cdtLib/clarinet");
     self::registerNamespace('zeptech\dynamic', $target);
 
     // Register loaders for the site's modules
