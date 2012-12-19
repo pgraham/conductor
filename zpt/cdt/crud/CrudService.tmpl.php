@@ -48,12 +48,16 @@ class ${actorClass} {
 
     try {
       $persister = Persister::get($model);
-      $persister->create($model);
+      $id = $persister->create($model);
 
-      $response->setData(array( 'msg' => array(
-        'text' => $this->_info->createSuccessMsg(),
-        'type' => 'info'
-      )));
+      $response->setData(array(
+        'success' => true,
+        'id'  => $id,
+        'msg' => array(
+          'text' => $this->_info->createSuccessMsg(),
+          'type' => 'info'
+        )
+      ));
     } catch (Exception $e) {
       $this->_handleException($e, $response);
     }
@@ -192,6 +196,7 @@ class ${actorClass} {
       $persister->update($model);
 
       $response->setData(array(
+        'success' => true,
         'msg' => array(
           'text' => $this->_info->updateSuccessMsg(),
           'type' => 'info'
@@ -227,6 +232,7 @@ class ${actorClass} {
       $persister->delete($model);
 
       $response->setData(array(
+        'success' => true,
         'msg' => array(
           'text' => $this->_info->deleteSuccessMsg(),
           'type' => 'info'
