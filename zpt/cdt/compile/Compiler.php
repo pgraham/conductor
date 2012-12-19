@@ -385,13 +385,18 @@ class Compiler {
   }
 
   protected function _compileJslibDir($pathInfo, $dir) {
+    $jslibOut = "$pathInfo[target]/htdocs/jslib";
     $jslibs = new DirectoryIterator($dir);
     foreach ($jslibs as $jslib) {
-      if ($jslib->isDot() || !$jslib->isDir()) {
+      if ($jslib->isDot()) {
         continue;
       }
 
-      $this->_jslibCompiler->compile($jslib->getPathname(), $pathInfo);
+      if ($jslib->isDir()) {
+        $this->_jslibCompiler->compile($jslib->getPathname(), $pathInfo);
+      } else {
+        copy($jslib->getPathname(), "$jslibOut/{$jslib->getFilename()}");
+      }
     }
   }
 

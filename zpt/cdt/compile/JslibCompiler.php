@@ -34,10 +34,6 @@ class JslibCompiler {
 
     switch ($jslibName) {
 
-      case 'datejs':
-      $this->compileDateJs($pathInfo, $jslibPath, $jslibOut);
-      break;
-
       case 'file-uploader':
       $this->compileFileUploader($pathInfo, $jslibPath, $jslibOut);
       break;
@@ -66,10 +62,6 @@ class JslibCompiler {
       $this->compileJWysiwyg($pathInfo, $jslibPath, $jslibOut);
       break;
 
-      case 'raphael':
-      $this->compileRaphael($pathInfo, $jslibPath, $jslibOut);
-      break;
-
       case 'webshims':
       $this->compileWebshims($pathInfo, $jslibPath, $jslibOut);
       break;
@@ -80,10 +72,6 @@ class JslibCompiler {
       //      the jslib
       break;
     }
-  }
-
-  protected function compileDateJs($pathInfo, $jslibSrc, $jslibOut) {
-    copy("$jslibSrc/build/date.js", "$jslibOut/date.js");
   }
 
   protected function compileFileUploader($pathInfo, $jslibSrc, $jslibOut) {
@@ -238,10 +226,6 @@ class JslibCompiler {
       'jquery.wysiwyg.bg.png',
       'jquery.wysiwyg.gif'
     ));
-  }
-
-  protected function compileRaphael($pathInfo, $jslibSrc, $jslibOut) {
-    copy("$jslibSrc/raphael-min.js", "$jslibOut/raphael.js");
   }
 
   protected function compileWebshims($pathInfo, $jslibSrc, $jslibOut) {

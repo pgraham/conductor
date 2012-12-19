@@ -73,8 +73,9 @@ class ${actorClass} {
 
     // Javascript libraries
     // -------------------------------------------------------------------------
-    // DateJS
-    Element::js('${jslibPath}/datejs/date.js')->addToHead();
+    // Non-jquery
+    Element::js('${jslibPath}/date.js')->addToHead();
+    Element::js('${jslibPath}/temple.js')->addToHead();
 
     // JQuery - If dev mode non-minimized version is included
     $this->_loadJQuery();
@@ -106,7 +107,7 @@ class ${actorClass} {
     ${done}
 
     ${if:jsappsupport}
-      Element::js('${jslibPath}/raphael/raphael.js')->addToHead();
+      Element::js('${jslibPath}/raphael.js')->addToHead();
 
       ${each:widgetCss as sheet}
         Element::css('${cssPath}/${sheet}')->addToHead();
@@ -168,7 +169,11 @@ class ${actorClass} {
   private function _includeJsLibs() {
     ${each:jslibs as jslib}
       ${if:jslib = raphael}
-        Element::js(_P('/jslib/raphael/raphael.js'))->addToHead();
+        Element::js(_P('/jslib/raphael.js'))->addToHead();
+      ${elseif:jslib = arboreal}
+        Element::js(_P('/jslib/arboreal.js'))->addToHead();
+      ${elseif:jslib = markdown}
+        Element::js(_P('/jslib/markdown.js'))->addToHead();
       ${fi}
     ${done}
   }
