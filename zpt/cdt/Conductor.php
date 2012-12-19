@@ -201,7 +201,8 @@ class Conductor {
         
       } catch (Exception $e) {
         File::dirunlock("$root/target");
-        throw new Exception($e);
+        echo "<pre>{$e->getTraceAsString()}</pre>\n";
+        throw new Exception($e->getMessage(), $e->getCode(), $e);
       }
     }
 
@@ -309,16 +310,14 @@ class Conductor {
       echo $response;
 
     } catch (AuthException $e) {
-      error_log($e->getMessage());
-      error_log($e->getTraceAsString());
+      self::logException($e);
 
       header('HTTP/1.1 401 Unauthorized');
       // TODO Add appropriate WWW-Authenticate header
       echo "You are not authorized to $action the requested resource.";
 
     } catch (Exception $e) {
-      error_log($e->getMessage());
-      error_log($e->getTraceAsString());
+      self::logException($e);
       header('HTTP/1.1 500 Internal Server Error');
 
       $msg = $e->getMessage();
@@ -333,5 +332,24 @@ class Conductor {
     if (!self::$_initialized) {
       throw new Exception('Conductor has not yet been initialized');
     }
+  }
+
+  private static function logException(Exception $e) {
+    $msg = $e->getMessage();
+    $code = $e->getCode();
+    $prev = $e->getPrevious();
+
+    if ($code) {
+      error_log("$code: $msg");
+    } else {
+      error_log($msg);
+    }
+    error_log($e->getTraceAsString());
+    
+    if ($prev) {
+      error_log("Caused by:");
+      self::logException($prev);
+    }
+
   }
 }
