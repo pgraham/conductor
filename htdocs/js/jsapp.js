@@ -10,7 +10,7 @@ CDT.ns('CDT.app');
 
   var tabs, menu, msgManager;
 
-  eventuality(CDT.app);
+  observable(CDT.app);
 
   CDT.app.addView = function (id, lbl, elm, closeable) {
     if (tabs === undefined) {
@@ -140,11 +140,10 @@ CDT.ns('CDT.app');
       })
       .bind('tabsshow', function (event, ui) {
         $(ui.panel).layout();
-        CDT.app.fire({
-          type: 'view-change',
+        CDT.app.trigger('view-change', [ {
           id: ui.panel.id,
           ui: ui
-        });
+        } ]);
       })
       .bind('tabsselect', function (event, ui) {
         CDT.app.clearMessages();

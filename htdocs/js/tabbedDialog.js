@@ -39,11 +39,11 @@ CDT.tabbedDialog = function (spec) {
   }
   tabs.tabs();
 
-  that = eventuality({});
+  that = observable({});
 
   close = function () {
     dialog.dialog('close');
-    that.fire('close');
+    that.trigger('close');
   }
   that.close = close;
 

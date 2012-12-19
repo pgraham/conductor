@@ -12,24 +12,19 @@
   }
 
   CDT.data.createStore = function (srvc, idProperty) {
-    var that, loaded, items, addHandler;
+    var that, loaded, items, total, addHandler;
 
     idProperty = idProperty || 'id';
 
-    that = {};
-    eventuality(that);
+    that = observable({});
 
     // Override the on() method to immediately invoke any added load handlers if
     // the store is already loaded
     addHandler = that.on;
-    that.on = function (type, method, parameters) {
-      var func = typeof method === 'string'
-        ? this[method]
-        : method;
-
-      addHandler(type, method, parameters);
+    that.on = function (type, handler) {
+      addHandler(type, handler);
       if (type === 'load' && loaded) {
-        func.apply(this, parameters || [ { type: 'load', items: items } ]);
+        handler.apply(this, [ 'load', { items: items, total: total } ]);
       }
       return this;
     };
@@ -39,15 +34,13 @@
 
       loaded = false;
 
+      that.trigger('beforeload');
       srvc.retrieve(spf, function (response) {
         items = response.data;
+        total = response.total;
 
         loaded = true;
-        that.fire({
-          type: 'load',
-          items: items,
-          total: response.total
-        });
+        that.trigger('load', [ { items: items, total: total } ]);
       });
     };
 
