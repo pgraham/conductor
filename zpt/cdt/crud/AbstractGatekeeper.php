@@ -14,7 +14,7 @@
  */
 namespace zpt\cdt\crud;
 
-use \zeptech\orm\runtime\ActorFactory;
+use \zeptech\orm\runtime\Transformer;
 use \zpt\cdt\exception\AuthException;
 
 
@@ -32,33 +32,29 @@ abstract class AbstractGatekeeper implements Gatekeeper {
 
   public function checkCanCreate($model) {
     if (!$this->canCreate($model)) {
-      throw new AuthException(AuthException::NOT_AUTHORIZED,
-        $this->msg($model, 'create'));
+      throw $this->newAuthException($model, 'create');
     }
   }
 
   public function checkCanDelete($model) {
     if (!$this->canDelete($model)) {
-      throw new AuthException(AuthException::NOT_AUTHORIZED,
-        $this->msg($model, 'delete'));
+      throw $this->newAuthException($model, 'delete');
     }
   }
 
   public function checkCanRead($model) {
     if (!$this->canRead($model)) {
-      throw new AuthException(AuthException::NOT_AUTHORIZED,
-      $this->msg($model, 'read'));
+      throw $this->newAuthException($model, 'read');
     }
   }
 
   public function checkCanWrite($model) {
     if (!$this->canWrite($model)) {
-      throw new AuthException(AuthException::NOT_AUTHORIZED,
-      $this->msg($model, 'write'));
+      throw $this->newAuthException($model, 'write');
     }
   }
 
-  protected function msg($model, $action) {
+  protected function newAuthException($model, $action) {
     $transformer = Transformer::get($model);
     $id = $transformer->getId($model);
     $msg = "Unable to $action " . get_class($model);
@@ -67,6 +63,8 @@ abstract class AbstractGatekeeper implements Gatekeeper {
     }
 
     $msg .= ": Permission Denied";
-    return $msg;
+
+    // TODO Throw a RestException instead
+    return new AuthException(AuthException::NOT_AUTHORIZED, $msg);
   }
 }
