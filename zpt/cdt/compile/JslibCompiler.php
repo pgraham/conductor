@@ -42,6 +42,10 @@ class JslibCompiler {
       $this->compileGalleria($pathInfo, $jslibPath, $jslibOut);
       break;
 
+      case 'highlight':
+      $this->simpleCompile($jslibPath, $jslibOut);
+      break;
+
       case 'jquery-cookie':
       $this->compileJQueryCookie($pathInfo, $jslibPath, $jslibOut);
       break;
@@ -75,7 +79,7 @@ class JslibCompiler {
   }
 
   protected function compileFileUploader($pathInfo, $jslibSrc, $jslibOut) {
-    $this->_copyFiles("$jslibSrc/client", $jslibOut, array(
+    $this->copyFiles("$jslibSrc/client", $jslibOut, array(
       'fileuploader.js',
       'fileuploader.css',
       'loading.gif'
@@ -83,7 +87,7 @@ class JslibCompiler {
   }
 
   protected function compileGalleria($pathInfo, $jslibSrc, $jslibOut) {
-    $this->_copyFiles("$jslibSrc/src", $jslibOut, array('galleria.js'));
+    $this->copyFiles("$jslibSrc/src", $jslibOut, array('galleria.js'));
 
     $themesDir = new DirectoryIterator("$jslibSrc/src/themes");
     foreach ($themesDir as $theme) {
@@ -99,7 +103,7 @@ class JslibCompiler {
         mkdir($themeOut, 0755, true);
       }
 
-      $this->_copyFiles($themeSrc, $themeOut, array(
+      $this->copyFiles($themeSrc, $themeOut, array(
         "galleria.$themeName.js",
         "galleria.$themeName.css",
         "$themeName-loader.gif",
@@ -113,7 +117,7 @@ class JslibCompiler {
   }
 
   protected function compileJQueryOpenId($pathInfo, $jslibSrc, $jslibOut) {
-    $this->_copyFiles($jslibSrc, $jslibOut, array(
+    $this->copyFiles($jslibSrc, $jslibOut, array(
       'jquery.openid.js',
       'openid.css',
       'login.html',
@@ -132,7 +136,7 @@ class JslibCompiler {
   }
 
   protected function compileJQuerySelectBox($pathInfo, $jslibSrc, $jslibOut) {
-    $this->_copyFiles($jslibSrc, $jslibOut, array(
+    $this->copyFiles($jslibSrc, $jslibOut, array(
       'jquery.selectBox.min.js',
       'jquery.selectBox.css',
       'jquery.selectBox-arrow.gif'
@@ -205,22 +209,22 @@ class JslibCompiler {
     // Default theme, it will get compiled, but may never be used
     $themeSrc = "$jslibSrc/themes/base";
     $themeOut = "$jslibOut/themes/base";
-    $this->_compileTheme($themeSrc, $themeOut);
+    $this->compileTheme($themeSrc, $themeOut);
 
     // -- JQueryUI themes may eventually only be a part of a larger theme,
     //    in which case this should be moved into a theme specific portion
     //    of compilation
 
     // Compile predefined conductor themes
-    $this->_compileThemeDir("$pathInfo[lib]/conductor/resources/themes",
+    $this->compileThemeDir("$pathInfo[lib]/conductor/resources/themes",
       "$jslibOut/themes");
 
     // Compile site specific themes
-    $this->_compileThemeDir("$pathInfo[src]/themes", "$jslibOut/themes");
+    $this->compileThemeDir("$pathInfo[src]/themes", "$jslibOut/themes");
   }
 
   protected function compileJWysiwyg($pathInfo, $jslibSrc, $jslibOut) {
-    $this->_copyFiles($jslibSrc, $jslibOut, array(
+    $this->copyFiles($jslibSrc, $jslibOut, array(
       'jquery.wysiwyg.js',
       'jquery.wysiwyg.css',
       'jquery.wysiwyg.bg.png',
@@ -253,7 +257,7 @@ LOAD;
     $resourceCompiler->compile("$jslibSrc/shims", "$jslibOut/shims");
   }
 
-  private function _compileTheme($src, $out) {
+  private function compileTheme($src, $out) {
     if (!file_exists($out)) {
       mkdir($out, 0755, true);
     }
@@ -265,19 +269,10 @@ LOAD;
       mkdir("$out/images");
     }
 
-    $imgs = new DirectoryIterator("$src/images");
-    foreach ($imgs as $img) {
-      if ($img->isDot() || $img->isDir()) {
-        continue;
-      }
-
-      copy(
-        "$src/images/{$img->getFilename()}",
-        "$out/images/{$img->getFilename()}");
-    }
+    $this->copyDirectory("$src/images", "$out/images");
   }
 
-  private function _compileThemeDir($dir, $out) {
+  private function compileThemeDir($dir, $out) {
     if (!file_exists($dir)) {
       return;
     }
@@ -290,13 +285,53 @@ LOAD;
 
       $src = "$dir/{$theme->getBasename()}";
       $themeOut = "$out/{$theme->getBasename()}";
-      $this->_compileTheme($src, $themeOut);
+      $this->compileTheme($src, $themeOut);
     }
   }
 
-  private function _copyFiles($src, $out, array $files) {
-    foreach ($files as $file) {
-      copy("$src/$file", "$out/$file");
+  private function copyDirectory($src, $out) {
+    if (!file_exists($src)) {
+      return;
     }
+
+    if (!file_exists($out)) {
+      mkdir($out, 0755, true);
+    }
+
+    $files = new DirectoryIterator($src);
+    foreach ($files as $file) {
+      if (!$file->isDot() && !$file->isDir()) {
+        copy($file->getPathname(), "$out/{$file->getFilename()}");
+      }
+    }
+  }
+
+  private function copyFiles($src, $out, array $files) {
+    foreach ($files as $file) {
+      if (file_exists("$src/$file")) {
+        $dir = dirname("$out/$file");
+        if (!file_exists($dir)) {
+          mkdir($dir, 0755, true);
+        }
+        copy("$src/$file", "$out/$file");
+      }
+    }
+  }
+
+  /**
+   * Do a simple compile which consists of a js and a css file named the same
+   * as the lib and some optional files that are just simply copied from source
+   * to distination.
+   */
+  private function simpleCompile($src, $out, array $files = null) {
+    if ($files === null) {
+      $files = array();
+    }
+
+    $jslib = basename($src);
+    $files[] = "$jslib.js";
+    $files[] = "$jslib.css";
+
+    $this->copyFiles($src, $out, $files);
   }
 }
