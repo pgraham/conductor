@@ -26,6 +26,7 @@ use \zeptech\orm\runtime\Persister;
 use \zpt\cdt\compile\Compiler;
 use \zpt\cdt\di\Injector;
 use \zpt\cdt\exception\AuthException;
+use \zpt\cdt\rest\AuthExceptionHandler;
 use \zpt\cdt\rest\InjectedRestServer;
 use \zpt\util\File;
 use \zpt\util\DirectoryLockTimeoutException;
@@ -284,6 +285,10 @@ class Conductor {
 
     try {
       $server = new InjectedRestServer();
+      $server->registerExceptionHandler(
+        'zpt\cdt\exception\AuthException',
+        new AuthExceptionHandler()
+      );
       $configurator = new ServerConfigurator();
       $configurator->configure($server);
 
@@ -308,13 +313,6 @@ class Conductor {
         header($header);
       }
       echo $response;
-
-    } catch (AuthException $e) {
-      self::logException($e);
-
-      header('HTTP/1.1 401 Unauthorized');
-      // TODO Add appropriate WWW-Authenticate header
-      echo "You are not authorized to $action the requested resource.";
 
     } catch (Exception $e) {
       self::logException($e);
