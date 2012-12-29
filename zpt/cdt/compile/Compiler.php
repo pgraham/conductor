@@ -455,7 +455,6 @@ class Compiler {
   //      for now because it is accessed from the scope of an anonymous
   //      function.
   public function _compileModelDir($pathInfo, $models, $ns, $urlBase = '') {
-    $log = fopen("$pathInfo[target]/php.err", 'w');
     if (!file_exists($models)) {
       // Nothing to do here
       return;
