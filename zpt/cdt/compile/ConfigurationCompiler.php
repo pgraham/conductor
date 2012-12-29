@@ -25,7 +25,7 @@ class ConfigurationCompiler {
   private $_pathInfo;
   private $_namespace;
 
-  private $_templatParser;
+  private $_tmplParser;
 
   /**
    * Compile the site Configurator implementation for the site located at the
