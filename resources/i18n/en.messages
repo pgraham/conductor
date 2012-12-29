@@ -1,15 +1,15 @@
 auth.notAuthorized=You are not authorized to perform the requested action.
 auth.notLoggedIn=You are not logged in.
 
-error.generic=The server encountered an unexpected condition which prevented it\
-    from fulfilling the request.
-
 http.status.header.401=Unauthorized
 http.status.header.403=Forbidden
+http.status.header.500=Internal Server Error
 http.status.message.401=You are not authorized to perform the requested action.
 http.status.message.403=The server understood the request, but is refusing to\
     fulfill it. Authorization will not help and the request SHOULD NOT be\
     repeated.
+http.status.message.500=The server encountered an unexpected condition which\
+    prevented it from fulfilling the request.
 
 users.password.currentInvalid=The supplied current password is incorrect.
 users.password.failure=Unable to update password.

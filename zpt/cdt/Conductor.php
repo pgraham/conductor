@@ -28,6 +28,7 @@ use \zpt\cdt\di\Injector;
 use \zpt\cdt\exception\AuthException;
 use \zpt\cdt\rest\AuthExceptionHandler;
 use \zpt\cdt\rest\InjectedRestServer;
+use \zpt\cdt\rest\LocalizedDefaultExceptionHandler;
 use \zpt\cdt\rest\PdoExceptionHandler;
 use \zpt\cdt\rest\ValidationExceptionHandler;
 use \zpt\util\File;
@@ -285,55 +286,47 @@ class Conductor {
     // Make sure that a generated mapping configurator exists
     $pathInfo = self::getPathInfo();
 
-    try {
-      $server = new InjectedRestServer();
-      $server->registerExceptionHandler(
-        'zpt\cdt\exception\AuthException',
-        new AuthExceptionHandler()
-      );
-      $server->registerExceptionHandler(
-        'zeptech\orm\runtime\PdoExceptionWrapper',
-        new PdoExceptionHandler()
-      );
-      $server->registerExceptionHandler(
-        'zeptech\orm\runtime\ValidationException',
-        new ValidationExceptionHandler()
-      );
-      $configurator = new ServerConfigurator();
-      $configurator->configure($server);
+    $server = new InjectedRestServer();
+    $server->registerExceptionHandler(
+      'Exception',
+      new LocalizedDefaultExceptionHandler()
+    );
+    $server->registerExceptionHandler(
+      'zpt\cdt\exception\AuthException',
+      new AuthExceptionHandler()
+    );
+    $server->registerExceptionHandler(
+      'zeptech\orm\runtime\PdoExceptionWrapper',
+      new PdoExceptionHandler()
+    );
+    $server->registerExceptionHandler(
+      'zeptech\orm\runtime\ValidationException',
+      new ValidationExceptionHandler()
+    );
+    $configurator = new ServerConfigurator();
+    $configurator->configure($server);
 
-      $urlInfo = parse_url($_SERVER['REQUEST_URI']);
-      $resource = _AbsP($urlInfo['path']);
-      $action = $_SERVER['REQUEST_METHOD'];
+    $urlInfo = parse_url($_SERVER['REQUEST_URI']);
+    $resource = _AbsP($urlInfo['path']);
+    $action = $_SERVER['REQUEST_METHOD'];
 
-      if (isset($_SERVER['HTTP_ACCEPT'])) {
-        $server->setAcceptType($_SERVER['HTTP_ACCEPT']);
-      } else {
-        $server->setAcceptType('*/*');
-      }
-
-      // Process the request
-      $server->handleRequest($action, $resource);
-
-      // Get the response before setting the headers as retrieving the response
-      // may add additional headers to the response, e.g. if a Content-Type
-      // header is added it will be added at this time.
-      $response = $server->getResponse();
-      foreach ($server->getResponseHeaders() AS $header) {
-        header($header);
-      }
-      echo $response;
-
-    } catch (Exception $e) {
-      self::logException($e);
-      header('HTTP/1.1 500 Internal Server Error');
-
-      $msg = $e->getMessage();
-      if (!$msg) {
-        $msg = _L('error.generic');
-      }
-      echo $msg;
+    if (isset($_SERVER['HTTP_ACCEPT'])) {
+      $server->setAcceptType($_SERVER['HTTP_ACCEPT']);
+    } else {
+      $server->setAcceptType('*/*');
     }
+
+    // Process the request
+    $server->handleRequest($action, $resource);
+
+    // Get the response before setting the headers as retrieving the response
+    // may add additional headers to the response, e.g. if a Content-Type
+    // header is added it will be added at this time.
+    $response = $server->getResponse();
+    foreach ($server->getResponseHeaders() AS $header) {
+      header($header);
+    }
+    echo $response;
   }
 
   private static function _ensureInitialized() {
