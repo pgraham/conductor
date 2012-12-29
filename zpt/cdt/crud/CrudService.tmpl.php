@@ -46,21 +46,17 @@ class ${actorClass} {
     $model = $transformer->fromArray($params);
     $this->_gatekeeper->checkCanCreate($model);
 
-    try {
-      $persister = Persister::get($model);
-      $id = $persister->create($model);
+    $persister = Persister::get($model);
+    $id = $persister->create($model);
 
-      $response->setData(array(
-        'success' => true,
-        'id'  => $id,
-        'msg' => array(
-          'text' => $this->_info->createSuccessMsg(),
-          'type' => 'info'
-        )
-      ));
-    } catch (Exception $e) {
-      $this->_handleException($e, $response);
-    }
+    $response->setData(array(
+      'success' => true,
+      'id'  => $id,
+      'msg' => array(
+        'text' => $this->_info->createSuccessMsg(),
+        'type' => 'info'
+      )
+    ));
   }
 
   /**
@@ -103,25 +99,21 @@ class ${actorClass} {
     }
 
     // Retrieve the models that match the given spf
-    try {
-      $c = $qb->getCriteria();
-      $models = $persister->retrieve($c);
-      $total = $persister->count($c);
+    $c = $qb->getCriteria();
+    $models = $persister->retrieve($c);
+    $total = $persister->count($c);
 
-      $data = array();
-      foreach ($models AS $model) {
-        if ($this->_gatekeeper->canRead($model)) {
-          $data[] = $transformer->asArray($model);
-        }
+    $data = array();
+    foreach ($models AS $model) {
+      if ($this->_gatekeeper->canRead($model)) {
+        $data[] = $transformer->asArray($model);
       }
-
-      $response->setData(array(
-        'data' => $data,
-        'total' => $total
-      ));
-    } catch (Exception $e) {
-      $this->_handleException($e, $response);
     }
+
+    $response->setData(array(
+      'data' => $data,
+      'total' => $total
+    ));
   }
 
   /**
@@ -135,12 +127,7 @@ class ${actorClass} {
 
     $id = $request->getParameter('id');
 
-    try {
-      $model = $persister->getById($id);
-    } catch (Exception $e) {
-      $this->_handleException($e, $response);
-      return;
-    }
+    $model = $persister->getById($id);
 
     if ($model === null) {
       $this->_notFound($response);
@@ -155,12 +142,8 @@ class ${actorClass} {
     // since we want any thrown AuthException to bubble.
     $this->_gatekeeper->checkCanRead($model);
 
-    try {
-      $transformer = Transformer::get('${model}');
-      $response->setData($transformer->asArray($model));
-    } catch (Exception $e) {
-      $this->_handleException($e, $response);
-    }
+    $transformer = Transformer::get('${model}');
+    $response->setData($transformer->asArray($model));
   }
 
   /**
@@ -173,12 +156,7 @@ class ${actorClass} {
     $id = $request->getParameter('id');
     $params = (array) $request->getData();
 
-    try {
-      $model = $persister->getById($id);
-    } catch (Exception $e) {
-      $this->_handleException($e, $response);
-      return;
-    }
+    $model = $persister->getById($id);
 
     if ($model === null) {
       $this->_notFound($e);
@@ -189,22 +167,18 @@ class ${actorClass} {
     // since we want any thrown AuthException to bubble.
     $this->_gatekeeper->checkCanWrite($model);
 
-    try {
-      $transformer = Transformer::get('${model}');
-      $transformer->fromArray($params, $model);
+    $transformer = Transformer::get('${model}');
+    $transformer->fromArray($params, $model);
 
-      $persister->update($model);
+    $persister->update($model);
 
-      $response->setData(array(
-        'success' => true,
-        'msg' => array(
-          'text' => $this->_info->updateSuccessMsg(),
-          'type' => 'info'
-        )
-      ));
-    } catch (Exception $e) {
-      $this->_handleException($e, $response);
-    }
+    $response->setData(array(
+      'success' => true,
+      'msg' => array(
+        'text' => $this->_info->updateSuccessMsg(),
+        'type' => 'info'
+      )
+    ));
   }
 
   /**
@@ -219,69 +193,23 @@ class ${actorClass} {
     $c = new Criteria();
     $c->addEquals('${idColumn}', $id);
 
-    try {
-      $model = $persister->retrieveOne($c);
-    } catch (Exception $e) {
-      $this->_handleException($e, $response);
-      return;
-    }
+    $model = $persister->retrieveOne($c);
 
     $this->_gatekeeper->checkCanDelete($model);
 
-    try {
-      $persister->delete($model);
+    $persister->delete($model);
 
-      $response->setData(array(
-        'success' => true,
-        'msg' => array(
-          'text' => $this->_info->deleteSuccessMsg(),
-          'type' => 'info'
-        )
-      ));
-    } catch (Exception $e) {
-      $this->_handleException($e, $response);
-    }
+    $response->setData(array(
+      'success' => true,
+      'msg' => array(
+        'text' => $this->_info->deleteSuccessMsg(),
+        'type' => 'info'
+      )
+    ));
   }
 
   public function setGatekeeper(Gatekeeper $gatekeeper) {
     $this->_gatekeeper = $gatekeeper;
-  }
-
-  private function _handleException($e, $response) {
-    // TODO Eliminate CrudException by migrating functionality here or into
-    //      adapted Exceptions as appropriate
-    $crudException = new CrudException($e);
-
-    $hdr = $e->getResponseHeader();
-    $msg = $e->getResponseMessage();
-
-    // Override the default header and message if a specific cause is
-    // determinable
-    if ($e->isDuplicate()) {
-      $msg = $this->_info->duplicateMsg($msg['field'], $msg['value']);
-
-    } else if ($e->isInvalidFilter()) {
-      $msg = $this->_info->invalidFilterMsg($msg['filter']);
-
-    } else if ($e->isInvalidSort()) {
-      $msg = $this->_info->invalidSortMsg($msg['sort']);
-
-    } else if ($e->isNotNullViolation()) {
-      $msg = $this->_info->notNullMsg($msg['field']);
-
-    } else if (is_array($msg)) {
-      $msg = array(
-        'msg' => $this->_info->invalidEntityMsg(),
-        'msgs' => $msg
-      );
-
-    } else if ($msg === null) {
-      $msg = $this->_info->genericErrorMsg($action, $plural);
-    }
-
-    $response->header($hdr);
-    $response->setData($msg);
-
   }
 
 }

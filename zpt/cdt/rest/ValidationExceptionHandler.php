@@ -17,15 +17,15 @@ namespace zpt\cdt\rest;
 use \zeptech\rest\ExceptionHandler;
 use \zeptech\rest\Request;
 use \zeptech\rest\Response;
-use \zeptech\rest\RestException;
+use \zpt\cdt\i18n\ModelMessages;
 use \Exception;
 
 /**
- * REST server exception handler for AuthExceptions. Builds a 401 response.
+ * REST server exception handler for ValidationExceptions.
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class AuthExceptionHandler implements ExceptionHandler
+class ValidationExceptionHandler implements ExceptionHandler
 {
 
     public function handleException(
@@ -34,13 +34,24 @@ class AuthExceptionHandler implements ExceptionHandler
         Response $response
     ) {
 
-      // TODO Move this logic somewhere so that it can be reused
-      $response->clearHeaders();
+      $modelMessages = ModelMessages::get($e->getModelClass);
 
-      $hdrMsg = _L('http.status.header.401');
-      $msg = _L('http.status.message.401');
+      $msgs = $e->getMessages();
+      if (count($msgs) === 1) {
+        $msg = $msgs[0];
+      } else {
+        $msg = array(
+          'msg' => $modelMessages->invalidEntityMsg(),
+          'msgs' => $msgs
+        );
+      }
 
-      $response->header("HTTP/1.1 401 $hdrMsg");
+      $hdrMsg = _L('http.status.header.403');
+
+      $response->header("HTTP/1.1 403 $hdrMsg");
       $response->setData($msg);
+
     }
+
 }
+

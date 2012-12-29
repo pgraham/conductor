@@ -28,6 +28,8 @@ use \zpt\cdt\di\Injector;
 use \zpt\cdt\exception\AuthException;
 use \zpt\cdt\rest\AuthExceptionHandler;
 use \zpt\cdt\rest\InjectedRestServer;
+use \zpt\cdt\rest\PdoExceptionHandler;
+use \zpt\cdt\rest\ValidationExceptionHandler;
 use \zpt\util\File;
 use \zpt\util\DirectoryLockTimeoutException;
 use \Exception;
@@ -288,6 +290,14 @@ class Conductor {
       $server->registerExceptionHandler(
         'zpt\cdt\exception\AuthException',
         new AuthExceptionHandler()
+      );
+      $server->registerExceptionHandler(
+        'zeptech\orm\runtime\PdoExceptionWrapper',
+        new PdoExceptionHandler()
+      );
+      $server->registerExceptionHandler(
+        'zeptech\orm\runtime\ValidationException',
+        new ValidationExceptionHandler()
       );
       $configurator = new ServerConfigurator();
       $configurator->configure($server);
