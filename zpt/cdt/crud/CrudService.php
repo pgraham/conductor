@@ -48,6 +48,7 @@ class CrudService extends AbstractModelGenerator {
     }
     
     return array(
+      'auth'             => $model->getAuth(),
       'gatekeeper'       => $model->getGatekeeper(),
       'gatekeeperBeanId' => str_replace('\\', '_', $model->getGatekeeper()),
       'singular'         => $modelStrings->getSingular(),

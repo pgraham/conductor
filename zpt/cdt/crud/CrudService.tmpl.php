@@ -11,7 +11,9 @@ use \zeptech\rest\Request;
 use \zeptech\rest\Response;
 use \zpt\cdt\crud\CrudException;
 use \zpt\cdt\crud\Gatekeeper;
+use \zpt\cdt\exception\AuthException;
 use \zpt\cdt\i18n\ModelMessages;
+use \zpt\cdt\AuthProvider;
 use \zpt\cdt\Conductor;
 use \StdClass;
 
@@ -28,6 +30,9 @@ class ${actorClass} {
   /** @Injected(ref = ${gatekeeperBeanId}) */
   private $_gatekeeper;
 
+  /** @Injected */
+  private $authProvider;
+
   private $_info;
 
   public function __construct() {
@@ -39,6 +44,10 @@ class ${actorClass} {
    * @Uri ${url}
    */
   public function create(Request $request, Response $response) {
+    ${if:auth ISSET}
+      $this->checkAuth('write');
+    ${fi}
+
     $transformer = Transformer::get('${model}');
 
     $params = (array) $request->getData();
@@ -66,6 +75,10 @@ class ${actorClass} {
    * @Uri ${url}
    */
   public function retrieve(Request $request, Response $response) {
+    ${if:auth ISSET}
+      $this->checkAuth('read');
+    ${fi}
+
     $persister = Persister::get('${model}');
     $transformer = Transformer::get('${model}');
     $qb = QueryBuilder::get('${model}');
@@ -123,6 +136,10 @@ class ${actorClass} {
    * @Uri ${url}/{id}
    */
   public function retrieveOne(Request $request, Response $response) {
+    ${if:auth ISSET}
+      $this->checkAuth('read');
+    ${fi}
+
     $persister = Persister::get('${model}');
 
     $id = $request->getParameter('id');
@@ -151,6 +168,10 @@ class ${actorClass} {
    * @Uri ${url}/{id}
    */
   public function update(Request $request, Response $response) {
+    ${if:auth ISSET}
+      $this->checkAuth('write');
+    ${fi}
+
     $persister = Persister::get('${model}');
 
     $id = $request->getParameter('id');
@@ -186,6 +207,10 @@ class ${actorClass} {
    * @Uri ${url}/{id}
    */
   public function delete(Request $request, Response $response) {
+    ${if:auth ISSET}
+      $this->checkAuth('write');
+    ${fi}
+
     $persister = Persister::get('${model}');
 
     $id = $request->getParameter('id');
@@ -208,8 +233,21 @@ class ${actorClass} {
     ));
   }
 
+  public function setAuthProvider(AuthProvider $authProvider) {
+    $this->authProvider = $authProvider;
+  }
+
   public function setGatekeeper(Gatekeeper $gatekeeper) {
     $this->_gatekeeper = $gatekeeper;
   }
+
+  ${if:auth ISSET}
+    private function checkAuth($level) {
+      if (!$this->authProvider->hasPermission('${auth}', $level)) {
+        $msg = _L('auth.NotAuthorized');
+        throw new AuthException(AuthException::NOT_AUTHORIZED, $msg);
+      }
+    }
+  ${fi}
 
 }
