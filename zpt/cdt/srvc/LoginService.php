@@ -83,20 +83,20 @@ class LoginService {
       $this->_authProvider->login($username, $password);
     }
 
-    $this->_redirectIf();
-
-    // If not redirected then this is an AJAX request so return a JSON
-    // response
-    if ($this->_authProvider->getSession->getUser() === null) {
-      $response->setData(array(
-        'success' => false,
-        'msg' => 'Invalid username or password'
-      ));
+    if ($this->isAsyncRequest()) {
+      if ($this->_authProvider->getSession->getUser() === null) {
+        $response->setData(array(
+          'success' => false,
+          'msg' => 'Invalid username or password'
+        ));
+      } else {
+        $response->setData(array(
+          'success' => true,
+          'msg' => null
+        ));
+      }
     } else {
-      $response->setData(array(
-        'success' => true,
-        'msg' => null
-      ));
+      $this->redirectToReferer();
     }
   }
 
@@ -107,39 +107,32 @@ class LoginService {
   public function logout(Request $request, Response $response) {
     $this->_authProvider->logout();
 
-    $this->_redirectIf();
-
-    $response->setData(array('success' => true));
+    if ($this->isAsyncRequest()) {
+      $response->setData(array('success' => true));
+    } else {
+      $this->redirectToReferer();
+    }
   }
 
   public function setAuthProvider($authProvider) {
     $this->_authProvider = $authProvider;
   }
 
-  /*
-   * Redirect to the given URL (or HTTP_REFERER if not provided) if the current
-   * request is not asynchronous.
-   */
-  private function _redirectIf($url = null) {
-    $asyncRequest = false;
-    if (isset($_SERVER['HTTP_X_REQUESTED_WITH'])) {
-      $requestType = strtolower($_SERVER['HTTP_X_REQUESTED_WITH']);
-      if ($requestType == 'xmlhttprequest') {
-        $asyncRequest = true;
-      }
-    }
-
-    if (!$asyncRequest) {
-      if ($url === null) {
-        if (isset($_SERVER['HTTP_REFERER'])) {
-          $url = $_SERVER['HTTP_REFERER'];
-        } else {
-          $url = _P('/');
-        }
-      }
-
-      header("Location: $url");
-      exit;
-    }
+  /* Determine if the current request is asynchronous. */
+  private function isAsyncRequest() {
+    return isset($_SERVER['HTTP_X_REQUESTED_WITH'])
+        && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
   }
+
+  /* Sets a Location header to redirect the browser to the referring page. */
+  private function redirectToReferer() {
+    $this->redirect($_SERVER['HTTP_REFERER'] ?: _P('/'));
+  }
+
+  /* Sets a Location header to redirect the browser to the given URL. */
+  private function redirect($url) {
+    header("Location: $url");
+    exit;
+  }
+
 }
