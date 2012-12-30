@@ -43,6 +43,11 @@ class ConfigurationCompiler {
     $this->_parseNamespace($xmlCfg);
     $this->_parseDb($xmlCfg);
 
+    $logDir = null;
+    if (isset($xmlCfg->logDir)) {
+      $logDir = (string) $xmlCfg->logDir;
+    }
+
     $tmplSrc = __DIR__ . '/Configurator.tmpl.php';
     $tmplOut = "{$this->_pathInfo['target']}/zeptech/dynamic/Configurator.php";
 
@@ -52,7 +57,8 @@ class ConfigurationCompiler {
       'webRootLen' => strlen($this->_pathInfo['webRoot']),
       'namespace' => $this->_namespace,
       'dbConfig' => $this->_db,
-      'env' => $env
+      'env' => $env,
+      'logDir' => $logDir
     );
 
     $tmpl = $this->_tmplParser->parse(file_get_contents($tmplSrc));

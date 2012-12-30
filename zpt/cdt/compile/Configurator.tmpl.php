@@ -17,7 +17,8 @@ class Configurator {
       'pathInfo' => $pathInfo,
       'namespace' => ${php:namespace},
       'db_config' => ${php:dbConfig},
-      'env' => ${php:env}
+      'env' => ${php:env},
+      'logDir' => '${logDir}'
     );
   }
 }

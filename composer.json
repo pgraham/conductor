@@ -1,5 +1,6 @@
 {
   "require": {
-    "leafo/lessphp": "0.3.8"
+    "leafo/lessphp": "0.3.8",
+    "monolog/monolog": "1.2.1"
   }
 }

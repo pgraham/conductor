@@ -14,6 +14,9 @@
  */
 namespace zpt\cdt;
 
+use \Monolog\Logger;
+use \Monolog\Handler\RotatingFileHandler;
+use \Monolog\Handler\StreamHandler;
 use \oboe\head\Javascript;
 use \oboe\head\Link;
 use \oboe\Element;
@@ -285,6 +288,14 @@ class Conductor {
   public static function processRequest() {
     // Make sure that a generated mapping configurator exists
     $pathInfo = self::getPathInfo();
+
+    $log = new Logger('conductor');
+
+    if (self::isDevMode()) {
+      $log->pushHandler(new RotatingFileHandler($pathInfo['target'] . '/cdt.log', 1));
+    } else {
+      $log->pushHandler(new StreamHandler(self::$_config['logDir'] . '/' . self::$_config['namespace'] . '.' . self::$_config['env'] . '.log'));
+    }
 
     $server = new InjectedRestServer();
     $server->registerExceptionHandler(
