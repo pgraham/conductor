@@ -84,7 +84,7 @@ class LoginService {
     }
 
     if ($this->isAsyncRequest()) {
-      if ($this->_authProvider->getSession->getUser() === null) {
+      if ($this->_authProvider->getSession()->getUser() === null) {
         $response->setData(array(
           'success' => false,
           'msg' => 'Invalid username or password'
