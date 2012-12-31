@@ -8,7 +8,9 @@
  */
 (function ($, undefined) {
 
-  function attemptLogin(credentials, ajaxSettings) {
+  var noAuthQueue = [];
+
+  function attemptLogin(credentials) {
     $('body').working();
     $.ajax({
       url: _p('/login'),
@@ -16,9 +18,12 @@
       data: credentials,
       success: function (data) {
         if (data.success) {
-          $.ajax(ajaxSettings);
+          $.each(noAuthQueue, function () {
+            $.ajax(this);
+          });
+          noAuthQueue = [];
         } else {
-          showLogin(ajaxSettings, data.msg);
+          showLogin(data.msg);
         }
       },
       complete: function () {
@@ -47,7 +52,7 @@
       .dialog({
         buttons: {
           'Ok': function () {
-            attemptLogin($(this).serialize(), ajaxSettings);
+            attemptLogin($(this).serialize());
             $(this).dialog('close').dialog('destroy').remove();
           },
           'Cancel': function () {
@@ -70,7 +75,7 @@
 
     $('body').ajaxError(function (event, jqXHR, ajaxSettings, thrownError) {
       if (jqXHR.status === 401) {
-        showLogin(ajaxSettings);
+        queueNoAuth(ajaxSettings);
       }
     });
   });
