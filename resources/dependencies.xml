@@ -7,4 +7,8 @@
         class="zpt\cdt\AuthProvider"
         initMethod="init" />
 
+  <bean id="session" class="zpt\cdt\Session" initMethod="init">
+    <property name="authProvider" ref="authProvider" />
+  </bean>
+
 </beans>
