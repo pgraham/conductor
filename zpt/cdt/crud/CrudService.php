@@ -49,6 +49,7 @@ class CrudService extends AbstractModelGenerator {
     
     return array(
       'auth'             => $model->getAuth(),
+      'cdtOrderTokenKey' => 'updateOrderToken_' . str_replace('\\', '_', get_class($model)),
       'gatekeeper'       => $model->getGatekeeper(),
       'gatekeeperBeanId' => str_replace('\\', '_', $model->getGatekeeper()),
       'singular'         => $modelStrings->getSingular(),

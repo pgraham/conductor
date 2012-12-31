@@ -72,6 +72,12 @@
         });
       },
       update: function (id, params, cb) {
+        // Add an ordering token to the request so the updates sent in
+        // succession that arrive at the server in the wrong order will be
+        // handled correctly, ie, the later one will arrive first and be
+        // processed while the earlier one will arrive second and be ignored.
+        params.cdtOrderToken = new Date().getTime();
+
         $.ajax({
           url: baseUrl + '/' + id,
           type: 'POST',

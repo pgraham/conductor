@@ -14,7 +14,7 @@ use \zpt\cdt\crud\Gatekeeper;
 use \zpt\cdt\exception\AuthException;
 use \zpt\cdt\i18n\ModelMessages;
 use \zpt\cdt\AuthProvider;
-use \zpt\cdt\Conductor;
+use \zpt\cdt\Session;
 use \StdClass;
 
 /**
@@ -32,6 +32,9 @@ class ${actorClass} {
 
   /** @Injected */
   private $authProvider;
+
+  /** @Injected */
+  private $session;
 
   private $_info;
 
@@ -172,11 +175,23 @@ class ${actorClass} {
       $this->checkAuth('write');
     ${fi}
 
-    $persister = Persister::get('${model}');
-
     $id = $request->getParameter('id');
     $params = (array) $request->getData();
 
+    if (isset($params['cdtOrderToken'])) {
+      $curTokKey = "${cdtOrderTokenKey}_$id";
+      $curTok = $this->session->get($curTokKey);
+      if ($curTok === null || $curTok < $params['cdtOrderToken']) {
+        $this->session->set($curTokKey, $params['cdtOrderToken']);
+      } else {
+        $response->setData(array(
+          'success' => true
+        ));
+        return;
+      }
+    }
+
+    $persister = Persister::get('${model}');
     $model = $persister->getById($id);
 
     if ($model === null) {
@@ -239,6 +254,11 @@ class ${actorClass} {
 
   public function setGatekeeper(Gatekeeper $gatekeeper) {
     $this->_gatekeeper = $gatekeeper;
+  }
+
+  public function setSession(Session $session)
+  {
+      $this->session = $session;
   }
 
   ${if:auth ISSET}
