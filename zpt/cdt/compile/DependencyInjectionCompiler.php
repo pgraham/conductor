@@ -62,6 +62,10 @@ class DependencyInjectionCompiler {
           $bean['id'] = $beanDef['id'];
           $bean['class'] = $beanDef['class'];
 
+          if (isset($beanDef['initMethod'])) {
+            $bean['init'] = (string) $beanDef['initMethod'];
+          }
+
           $props = array();
           if (isset($beanDef->property)) {
             $propDefs = $beanDef->property;
@@ -71,17 +75,7 @@ class DependencyInjectionCompiler {
               $prop['name'] = (string) $propDef['name'];
 
               if (isset($propDef['value'])) {
-                $val = $propDef['value'];
-                if (is_numeric($val)) {
-                  $val = (float) $val;
-                } else if (strtolower($val) === 'true') {
-                  $val = true;
-                } else if (strtolower($val) === 'false') {
-                  $val = false;
-                }
-                $prop['val'] = $val;
-                
-                $props[] = $prop;
+                $prop['val'] = $this->getScalar((string) $propDef['value']);
               } else if (isset($propDef['ref'])) {
                 $prop['ref'] = (string) $propDef['ref'];
               } else if (isset($propDef['type'])) {
@@ -93,6 +87,22 @@ class DependencyInjectionCompiler {
             }
           }
           $bean['props'] = $props;
+
+          $ctorArgs = array();
+          if (isset($beanDef->ctorArg)) {
+            $ctor = $beanDef->ctorArg;
+
+            foreach ($ctor as $arg) {
+              if (isset($arg['value'])) {
+                $ctorArgs[] = $this->getScalar((string) $arg['value']);
+              } else if (isset($arg['ref'])) {
+                $ctorArgs[] = '$' . ((string) $arg['ref']);
+              } else {
+                // TODO Warn about an invalid bean definition
+              }
+            }
+          }
+          $bean['ctor'] = $ctorArgs;
 
           $this->_beans[] = $bean;
         }
@@ -108,5 +118,19 @@ class DependencyInjectionCompiler {
 
   public function setTemplateParser($templateParser) {
     $this->_tmplParser = $templateParser;
+  }
+
+  private function getScalar($val)
+  {
+      if (is_numeric($val)) {
+          return (float) $val;
+      } else if (strtolower($val) === 'true') {
+          return true;
+      } else if (strtolower($val) === 'false') {
+          return false;
+      } else if (strtolower($val) === 'null') {
+          return null;
+      }
+      return $val;
   }
 }

@@ -139,10 +139,8 @@ class Conductor {
    * the libraries, connecting to the database and initializing clarinet.
    *
    * @param string $root The path to the root of the website.
-   * @param boolean $authenticate Whether or not to authenticate a session,
-   *   default true.  The only time this is false is during a deploy compile.
    */
-  public static function init($root, $authenticate = true) {
+  public static function init($root) {
     if (self::$_initialized) {
       return;
     }
@@ -246,11 +244,6 @@ class Conductor {
     // Initialize Dependency injection
     $configurator = new InjectionConfigurator();
     $configurator->configure();
-
-    // Authenticate.
-    if ($authenticate) {
-      Injector::getBean('authProvider')->init();
-    }
 
     // Initialize localization
     // TODO Make the language determination smart.  Should be retrieved from the

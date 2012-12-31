@@ -3,6 +3,8 @@
 
   <bean id="configValueProvider" class="zpt\cdt\ConfigValueProvider" />
 
-  <bean id="authProvider" class="zpt\cdt\AuthProvider" />
+  <bean id="authProvider"
+        class="zpt\cdt\AuthProvider"
+        initMethod="init" />
 
 </beans>
