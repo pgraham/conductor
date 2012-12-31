@@ -26,9 +26,9 @@
 
     // Remove current message.
     // TODO Allow stacking
-    $('.cdt-msg').slideUp('fast', function () { $(this).remove(); });
+    $('.cdt-msg.app-msg').slideUp('fast', function () { $(this).remove(); });
 
-    elm = $('<div class="cdt-msg ui-corner-top"/>')
+    elm = $('<div class="cdt-msg app-msg ui-corner-top"/>')
       .addClass(opts.type)
       .html(message)
       .attr('title', 'Click to dismiss').tooltip()

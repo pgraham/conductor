@@ -27,14 +27,22 @@
     });
   }
 
-  function showLogin(ajaxSettings, msg) {
-    msg = msg || "You must login in order to perform the requested action.";
+  function queueNoAuth(ajaxSettings) {
+    noAuthQueue.push(ajaxSettings);
+    if (noAuthQueue.length === 1) {
+      showLogin();
+    }
+  }
+
+  function showLogin(msg) {
+
+    msg = msg || _L('auth.authRequired');
 
     $('<form class="login"/>')
-      .append('<div class="message error">' + msg + '</div>')
-      .append('<label for="uname">Username</label>')
+      .append('<div class="cdt-msg error">' + msg + '</div>')
+      .append('<label for="uname">' + _L('lbl.username') + '</label>')
       .append('<input type="text" name="uname" id="uname"/>')
-      .append('<label for="pw">Password</label>')
+      .append('<label for="pw">' + _L('lbl.password') + '</label>')
       .append('<input type="password" name="pw" id="pw"/>')
       .dialog({
         buttons: {
@@ -45,6 +53,15 @@
           'Cancel': function () {
             window.location.reload(true);
           }
+        },
+        hide: 'fade',
+        modal: true,
+        show: 'fade',
+        title: _L('auth.authRequired.title'),
+        width: 500,
+        open: function (event, ui) {
+          var w = $(this).width();
+          $(this).children('input').outerWidth(w);
         }
       });
   }

@@ -1,5 +1,7 @@
 auth.notAuthorized=You are not authorized to perform the requested action.
 auth.notLoggedIn=You are not logged in.
+auth.authRequired=You must login in order to perform the requested action.
+auth.authRequired.title=Authentication Required
 
 http.status.header.401=Unauthorized
 http.status.header.403=Forbidden
@@ -10,6 +12,9 @@ http.status.message.403=The server understood the request, but is refusing to\
     repeated.
 http.status.message.500=The server encountered an unexpected condition which\
     prevented it from fulfilling the request.
+
+lbl.username=Username
+lbl.password=Password
 
 users.password.currentInvalid=The supplied current password is incorrect.
 users.password.failure=Unable to update password.
