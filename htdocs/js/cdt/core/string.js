@@ -25,4 +25,8 @@
     return this.replace(/^\s+|\s+$/g, '');
   };
 
+  exports.ucfirst = function () {
+    return this.charAt(0).toUpperCase() + this.substr(1);
+  };
+
 } (String.prototype));
