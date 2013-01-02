@@ -39,7 +39,15 @@ class L10N {
    */
   public static function get($key) {
     $getFn = self::$_getFn;
-    return $getFn($key);
+    $str = $getFn($key);
+
+    $args = func_get_args();
+    array_shift($args);
+    if (count($args) > 0) {
+      array_unshift($args, $str);
+      $str = call_user_func_array(array('zpt\util\String', 'format'), $args);
+    }
+    return $str;
   }
 
   /**
