@@ -11,6 +11,18 @@
     CDT.data = {};
   }
 
+  function buildErrorHandler(cb) {
+    return function (jqXHR, textStatus, errorThrown) {
+      cb({
+        success: false,
+        msg: {
+          text: errorThrown,
+          type: 'error'
+        }
+      });
+    };
+  }
+
   CDT.data.crudProxy = function (baseUrl) {
     var baseUrl = _p(baseUrl), cache = {};
 
@@ -23,7 +35,8 @@
           contentType: 'application/json',
           processData: false,
           dataType: 'json',
-          success: cb
+          success: cb,
+          error: buildErrorHandler(cb)
         });
       },
       remove: function (id, cb) {
@@ -35,9 +48,7 @@
             delete cache[id];
             cb({ success: true });
           },
-          error: function (jqXHR, textStatus, errorThrown) {
-            cb({ success: false });
-          }
+          error: buildErrorHandler(cb)
         });
       },
       retrieve: function (spf, cb) {
@@ -88,7 +99,8 @@
           success: function (response) {
             delete cache[id];
             cb(response);
-          }
+          },
+          error: buildErrorHandler(cb)
         });
       }
     };
