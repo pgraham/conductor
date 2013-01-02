@@ -28,10 +28,11 @@ class ModelMessages extends AbstractModelGenerator {
   protected function getValuesForModel(Model $model) {
     $modelDisplay = new ModelDisplayParser($model);
 
-    return array(
-      'sigular' => $modelDisplay->getSingular(),
+    $values = array(
+      'singular' => $modelDisplay->getSingular(),
       'plural'  => $modelDisplay->getPlural(),
       'article' => $modelDisplay->getArticle()
     );
+    return $values;
   }
 }
