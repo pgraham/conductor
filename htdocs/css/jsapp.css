@@ -85,34 +85,6 @@
   vertical-align: middle;
 }
 
-.ui-widget .input-label {
-  margin-right: 20px;
-}
-
-.ui-widget select {
-  padding: .4em 1em;
-  line-height: 1.4;
-  width: 250px;
-}
-.ui-widget input.text,
-.ui-widget input.password {
-  padding: 2px 3px;
-  height: 24px;
-}
-
-.ui-widget input.text.working {
-  background-image: url(../img/working-small.gif);
-  background-repeat: no-repeat;
-  background-position: right center;
-  padding-right: 20px;
-}
-
-.ui-widget input.text.invalid,
-.ui-widget input.password.invalid,
-.ui-widget .ui-spinner.invalid {
-  border: 1px solid #C50000;
-}
-
 .ui-button-small.ui-button-text-only .ui-button-text,
 .ui-button-small.ui-button-icons-only .ui-button-text {
   padding: .1em 1em;

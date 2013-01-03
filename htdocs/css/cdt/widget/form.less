@@ -1,63 +1,69 @@
 .cdt-form {
-  fieldset {
-    > label {
-      display: block;
+  label {
+    display: block;
+  }
+
+  .cdt-formfield {
+    display: block;
+    margin-bottom: 5px;
+    padding: 2px 3px;
+  }
+
+  .cdt-formfield-fill-width {
+    width: 100%;
+
+    /* 100% width accounting for padding/margin
+     * http://stackoverflow.com/a/1033745/321575
+     */
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+  }
+
+  .ui-spinner {
+    width: 100px;
+
+    input {
+      margin: 0;
     }
+  }
 
-    > .cdt-formfield {
-      display: block;
-      margin-bottom: 5px;
-      padding: 2px 3px;
-    }
+  .list-input {
 
-    > .cdt-formfield-fill-width {
-      width: 100%;
+    padding-top: 3px;
 
-      /* 100% width accounting for padding/margin
-       * http://stackoverflow.com/a/1033745/321575
-       */
-      box-sizing: border-box;
-      -moz-box-sizing: border-box;
-      -webkit-box-sizing: border-box;
-    }
+    ol {
+      
+      list-style: decimal outside none;
+      margin-left: 1.5em;
 
-    > .ui-spinner {
-      width: 100px;
+      li {
+        padding: 3px 0;
 
-      input {
-        margin: 0;
-      }
-    }
-
-    > .list-input {
-
-      padding-top: 3px;
-
-      ol {
-        
-        list-style: decimal outside none;
-        margin-left: 1.5em;
-
-        li {
-          padding: 3px 0;
-
-          input {
-            display: inline-block;
-            height: 18px;
-            padding: 2px 3px;
-          }
-
-          button {
-            margin: 0 0 0 3px;
-          }
-
+        input {
+          display: inline-block;
+          height: 18px;
+          padding: 2px 3px;
         }
-      }
 
-      button {
-        height: 24px;
-        margin-left: 1.5em;
+        button {
+          margin: 0 0 0 3px;
+        }
+
       }
+    }
+
+    button {
+      height: 24px;
+      margin-left: 1.5em;
+    }
+  }
+
+  input.text,
+  input.password,
+  .ui-spinner {
+    &.invalid {
+      border: 1px solid #C50000;
     }
   }
 }
