@@ -13,6 +13,8 @@ http.status.message.403=The server understood the request, but is refusing to\
 http.status.message.500=The server encountered an unexpected condition which\
     prevented it from fulfilling the request.
 
+lbl.cancel=cancel
+lbl.changepwd=change password
 lbl.username=Username
 lbl.password=Password
 
@@ -22,6 +24,7 @@ users.password.failureReason=Unable to update password: {0}
 users.password.noPassword=No new password was supplied.
 users.password.noMatch=Passwords do not match.
 users.password.success=Successfully updated your password.
+users.password.updating=Updating password...
 
 # Generic strings
 label.date=Date

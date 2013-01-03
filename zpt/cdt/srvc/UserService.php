@@ -77,7 +77,10 @@ class UserService extends BaseRequestHandler implements BeanRequestHandler {
 
     $response->setData(array(
       'success' => count($fieldMsgs) === 0,
-      'msg' => $msg,
+      'msg' => array(
+        'text' => $msg,
+        'type' => count($fieldMsgs) === 0 ? 'info' : 'error'
+      ),
       'fieldMsgs' => $fieldMsgs
     ));
   }

@@ -32,14 +32,14 @@
       }
     },
 
-    addPassword: function (name, lbl, opts) {
-      var password = CDT.widget.formfield.password(name, opts);
-      return this._addInput(name, lbl, password, opts);
-    },
-
     addListInput: function (name, lbl, opts) {
       var listInput = CDT.widget.formfield.listInput(name, opts);
       return this._addInput(name, lbl, listInput, opts);
+    },
+
+    addPassword: function (name, lbl, opts) {
+      var password = CDT.widget.formfield.password(name, opts);
+      return this._addInput(name, lbl, password, opts);
     },
 
     addSpinner: function (name, lbl, opts) {
@@ -125,19 +125,24 @@
   });
 
   exports.formBuilder = function (opts) {
+    opts = opts || {};
     var elm = $('<form />').form(opts);
 
     return {
       addInput: function (name, lbl, opts) {
-        elm.form('addTextInput', name, lbl, opts);
+        elm.form('addTextInput', name, lbl, opts || {});
         return this;
       },
       addListInput: function (name, lbl, opts) {
-        elm.form('addListInput', name, lbl, opts);
+        elm.form('addListInput', name, lbl, opts || {});
+        return this;
+      },
+      addPassword: function (name, lbl, opts) {
+        elm.form('addPassword', name, lbl, opts || {});
         return this;
       },
       addTextArea: function (name, lbl, opts) {
-        elm.form('addTextArea', name, lbl, opts);
+        elm.form('addTextArea', name, lbl, opts || {});
         return this;
       },
       build: function () {
