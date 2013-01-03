@@ -39,7 +39,7 @@
         dialogClass: 'cdt-changepassword-dialog',
         modal: true,
         resizable: false,
-        title: _L('lbl.changepwd'),
+        title: _L('lbl.changepwd').ucfirst(),
         width: 605,
         zIndex: 1
       });
