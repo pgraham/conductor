@@ -21,14 +21,14 @@
       pwForm.submit(function (response) {
         indicator.remove();
         if (response.success) {
-          elm.dialog('close').dialog('destroy').remove();
+          elm.dialog('close');
           cmp.trigger('passwordupdate', response);
         }
       });
     };
 
     btns[_L('lbl.cancel').ucfirst()] = function () {
-      elm.dialog('close').dialog('destroy').remove();
+      elm.dialog('close');
     };
 
     elm = $('<div class="change-password"/>')
@@ -37,11 +37,16 @@
         autoOpen: false,
         buttons: btns,
         dialogClass: 'cdt-changepassword-dialog',
+        hide: 400,
         modal: true,
         resizable: false,
+        show: 400,
         title: _L('lbl.changepwd').ucfirst(),
         width: 605,
-        zIndex: 1
+        zIndex: 1,
+        close: function () {
+          $(this).dialog('destroy').remove();
+        }
       });
 
     return $.extend(cmp, {

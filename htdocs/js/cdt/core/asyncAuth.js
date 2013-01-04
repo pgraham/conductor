@@ -22,9 +22,9 @@
           window.location.reload(true);
         }
       },
-      hide: 'fade',
+      hide: 400,
       modal: true,
-      show: 'fade',
+      show: 400,
       title: _L('auth.authRequired.title'),
       width: 500,
       open: function (event, ui) {
