@@ -7,7 +7,7 @@
     _create: function () {
       this.element.addClass('cdt-toolbar');
 
-      this._buttons = [];
+      this._buttons = {};
       if (this.options.buttons) {
         this.addButtons(this.options.buttons);
       }
@@ -32,7 +32,12 @@
           break;
         }
       } else {
-        btn = $('<button/>').button(btnCfg).click(btnCfg.handler);
+        btn = $('<button/>')
+          .button(btnCfg)
+          .click(btnCfg.handler)
+          .attr('title', btnCfg.tooltip ? btnCfg.tooltip : '')
+          .tooltip();
+
         this.element.append(btn);
         this._buttons[btnCfg.label] = btn;
       }
@@ -52,6 +57,15 @@
       return this;
     },
 
+    clear: function () {
+      var self = this;
+      $.each(this._buttons, function (idx) {
+        self.removeButton(idx);
+      });
+      this._buttons = {};
+      return this;
+    },
+
     disable: function (btnId) {
       this.setEnabled(btnId, false);
     },
@@ -62,6 +76,11 @@
 
     getButton: function (btnId) {
       return this._buttons[btnId];
+    },
+
+    removeButton: function (btnId) {
+      this._buttons[btnId].button('destroy').remove();
+      delete this._buttons[btnId];
     },
 
     setEnabled: function (btnId, enabled) {
