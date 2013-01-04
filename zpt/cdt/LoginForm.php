@@ -1,7 +1,7 @@
 <?php
 /**
  * =============================================================================
- * Copyright (c) 2010, Philip Graham
+ * Copyright (c) 2013, Philip Graham
  * All rights reserved.
  *
  * This file is part of Conductor and is licensed by the Copyright holder under
@@ -11,7 +11,6 @@
  * =============================================================================
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
- * @package conductor/widget
  */
 namespace zpt\cdt;
 
@@ -27,12 +26,6 @@ use \oboe\Element;
  * @author Philip Graham <philip@zeptech.ca>
  */
 class LoginForm extends Composite {
-
-  /**
-   * Constant to use with constructor to specify that the form should be
-   * submitted asynchronously.
-   */
-  const ASYNC = true;
 
   /**
    * Create a new login form.

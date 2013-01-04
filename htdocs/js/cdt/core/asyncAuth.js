@@ -8,7 +8,31 @@
  */
 (function ($, undefined) {
 
-  var noAuthQueue = [];
+  var noAuthQueue = [], dialog;
+
+  $(document).ready(function () {
+    dialog = $('form.login').dialog({
+      autoOpen: false,
+      buttons: {
+        'Ok': function () {
+          attemptLogin($(this).serialize());
+          $(this).dialog('close');
+        },
+        'Cancel': function () {
+          window.location.reload(true);
+        }
+      },
+      hide: 'fade',
+      modal: true,
+      show: 'fade',
+      title: _L('auth.authRequired.title'),
+      width: 500,
+      open: function (event, ui) {
+        var w = $(this).width();
+        $(this).children('input').outerWidth(w);
+      }
+    });
+  });
 
   function attemptLogin(credentials) {
     $('body').working();
@@ -40,35 +64,7 @@
   }
 
   function showLogin(msg) {
-
-    msg = msg || _L('auth.authRequired');
-
-    $('<form class="login"/>')
-      .append('<div class="cdt-msg error">' + msg + '</div>')
-      .append('<label for="uname">' + _L('lbl.username') + '</label>')
-      .append('<input type="text" name="uname" id="uname"/>')
-      .append('<label for="pw">' + _L('lbl.password') + '</label>')
-      .append('<input type="password" name="pw" id="pw"/>')
-      .dialog({
-        buttons: {
-          'Ok': function () {
-            attemptLogin($(this).serialize());
-            $(this).dialog('close').dialog('destroy').remove();
-          },
-          'Cancel': function () {
-            window.location.reload(true);
-          }
-        },
-        hide: 'fade',
-        modal: true,
-        show: 'fade',
-        title: _L('auth.authRequired.title'),
-        width: 500,
-        open: function (event, ui) {
-          var w = $(this).width();
-          $(this).children('input').outerWidth(w);
-        }
-      });
+    dialog.dialog('open').find('.cdt-msg').text(msg || _L('auth.authRequired'));
   }
 
   $(document).ready(function () {

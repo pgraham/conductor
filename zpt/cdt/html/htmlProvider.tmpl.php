@@ -8,6 +8,7 @@ use \zpt\cdt\di\Injector;
 use \zpt\cdt\html\Page;
 use \zpt\cdt\L10N;
 use \zpt\cdt\LoginForm;
+use \zpt\cdt\LoginFormAsync;
 
 /**
  * This is a generated class that populates a conductor\Page instance.
@@ -135,6 +136,10 @@ class ${actorClass} {
       $page->setTemplate($tmpl);
     ${fi}
     $page->bodyAdd($this->getFragment($query));
+
+    // Add an asynchronous login form that will be initially hidden so that it
+    // can be autocompleted by the browser.
+    $page->bodyAdd(new LoginFormAsync());
   }
 
   public function getFragment($query) {
