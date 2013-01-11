@@ -116,9 +116,25 @@
       .data('icon-mouse', mouse);
 
     return $.extend(elm, {
-      iconAnimate: function (attrs, duration) {
-        path.animate(attrs, duration);
-        outline.animate(attrs, duration);
+      iconAnimate: function (attrs, duration, easing) {
+        duration = duration || $.fx.speeds._default;
+        if (!$.isNumeric(duration)) {
+          if (duration === 'normal' || duration === 'default') {
+            duration = '_default';
+          }
+          duration = $.fx.speeds[duration];
+        }
+
+        easing = easing || 'linear';
+
+        if (!$.isPlainObject(attrs)) {
+          attrs = {
+            transform: path.attr('transform') + attrs
+          };
+        }
+
+        path.animate(attrs, duration, easing);
+        outline.animate(attrs, duration, easing);
         return elm;
       }
     });
