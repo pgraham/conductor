@@ -27,6 +27,7 @@
     var baseUrl = _p(baseUrl), cache = {};
 
     return {
+      cache: cache,
       create: function (params, cb) {
         $.ajax({
           url: baseUrl,
