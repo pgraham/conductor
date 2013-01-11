@@ -3,19 +3,40 @@
 
   var dict = ${json:strings};
 
+  function noValue(key) {
+    return 'XXXXXXXX ' + key + ' XXXXXXXX';
+  }
+
+  function formatValue(val, args) {
+    return String.prototype.format.apply(val, args);
+  }
+
   if (global._L === undefined) {
     global._L = function () {
-      var str, key, args = Array.prototype.slice.call(arguments);
+      var key, args = Array.prototype.slice.call(arguments);
 
       key = args.shift();
 
       if (dict[key] === undefined) {
-        return 'XXXXXXXX ' + key + ' XXXXXXXX';
+        return noValue(key);
+      } else {
+        return formatValue(dict[key].raw, args);
       }
-
-      str = dict[key].md;
-      str = String.prototype.format.apply(str, args);
-      return str;
-    }
+    };
   }
+
+  if (global._MD === undefined) {
+    global._MD = function () {
+      var key, args = Array.prototype.slice.call(arguments);
+
+      key = args.shift();
+
+      if (dict[key] === undefined) {
+        return noValue(key);
+      } else {
+        return formatValue(dict[key].md, args);
+      }
+    };
+  }
+
 } (window));
