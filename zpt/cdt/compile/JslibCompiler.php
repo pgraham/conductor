@@ -34,6 +34,12 @@ class JslibCompiler {
 
     switch ($jslibName) {
 
+      case 'epiceditor':
+      $this->simpleCompile($jslibPath, $jslibOut);
+      $this->copyDirectory("$jslibPath/images", "$jslibOut/images");
+      $this->copyDirectory("$jslibPath/themes", "$jslibOut/themes");
+      break;
+
       case 'file-uploader':
       $this->compileFileUploader($pathInfo, $jslibPath, $jslibOut);
       break;
@@ -300,7 +306,16 @@ LOAD;
 
     $files = new DirectoryIterator($src);
     foreach ($files as $file) {
-      if (!$file->isDot() && !$file->isDir()) {
+      if ($file->isDot()) {
+        continue;
+      }
+
+      if ($file->isDir()) {
+        $this->copyDirectory(
+          $file->getPathname(),
+          "$out/{$file->getFilename()}"
+        );
+      } else {
         copy($file->getPathname(), "$out/{$file->getFilename()}");
       }
     }
