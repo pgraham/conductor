@@ -1,0 +1,34 @@
+.cdt-collapsible-collapsed, .cdt-collapsible-expanded {
+  position: relative;
+  top: 0;
+  left: 0;
+
+  padding-right: 30px;
+}
+
+.cdt-collapsible-collapsed .cdt-collapsible-content {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  > :first-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  > :not(:first-child) {
+    display: none;
+  }
+}
+
+.cdt-collapsible-actions {
+  position: absolute;
+  right: 0;
+  top: 0;
+
+  button.ui-button {
+    display: block;
+    width: 24px;
+    height: 24px;
+  }
+}
