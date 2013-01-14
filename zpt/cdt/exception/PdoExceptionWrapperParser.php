@@ -93,23 +93,28 @@ class PdoExceptionWrapperParser
      *
      * @return array
      */
-    public function getResponseMessage() {
-        return $this->_responseMessage;
+    public function getResponseInfo()
+    {
+        return $this->responseInfo;
     }
 
-    public function isDuplicate() {
+    public function isDuplicate()
+    {
         return $this->isDuplicate;
     }
 
-    public function isInvalidFilter() {
+    public function isInvalidFilter()
+    {
         return $this->isInvalidFilter;
     }
 
-    public function isInvalidSort() {
+    public function isInvalidSort()
+    {
         return $this->isInvalidSort;
     }
     
-    public function isNotNullViolation() {
+    public function isNotNullViolation()
+    {
         return $this->isNotNullViolation;
     }
 }
