@@ -1,143 +1,126 @@
 /**
  * CDT.icon
  */
-(function ($, CDT, R, undefined) {
+(function (exports, $, R, undefined) {
   "use strict";
 
-  var DEFAULT_OPTS = {
-        width: 32,
-        height: 32,
-        fill: '#000',
-        stroke: 'none',
+  var DEFAULT_OPTS, OUTLINE_OPTS;
 
-        // An additional path that outlines the path is added and made available        // as the 'icon-outline' data attribute.  The outline is invisible by
-        // default.  This can be controlled using the outline options.  See
-        // OUTLINE_OPTS for supported options.
-        outline: null
-      },
+  DEFAULT_OPTS = {
+    width: 32,
+    height: 32,
+    fill: '#000',
+    stroke: 'none',
 
-      OUTLINE_OPTS = {
-        stroke: '#fff',
-        'stroke-width': 1,
-        'stroke-linejoin': 'round',
-        opacity: 0,
-        showOnHover: false
-      },
-      
-      ICON_PATHS = {
-        'question-mark': 'M16,1.466C7.973,1.466,1.466,7.973,1.466,16c0,8.027,6.507,14.534,14.534,14.534c8.027,0,14.534-6.507,14.534-14.534C30.534,7.973,24.027,1.466,16,1.466z M17.328,24.371h-2.707v-2.596h2.707V24.371zM17.328,19.003v0.858h-2.707v-1.057c0-3.19,3.63-3.696,3.63-5.963c0-1.034-0.924-1.826-2.134-1.826c-1.254,0-2.354,0.924-2.354,0.924l-1.541-1.915c0,0,1.519-1.584,4.137-1.584c2.487,0,4.796,1.54,4.796,4.136C21.156,16.208,17.328,16.627,17.328,19.003z',
-        'dollar-sign': 'M16,1.466C7.973,1.466,1.466,7.973,1.466,16c0,8.027,6.507,14.534,14.534,14.534c8.027,0,14.534-6.507,14.534-14.534C30.534,7.973,24.027,1.466,16,1.466z M17.255,23.88v2.047h-1.958v-2.024c-3.213-0.44-4.621-3.08-4.621-3.08l2.002-1.673c0,0,1.276,2.223,3.586,2.223c1.276,0,2.244-0.683,2.244-1.849c0-2.729-7.349-2.398-7.349-7.459c0-2.2,1.738-3.785,4.137-4.159V5.859h1.958v2.046c1.672,0.22,3.652,1.1,3.652,2.993v1.452h-2.596v-0.704c0-0.726-0.925-1.21-1.959-1.21c-1.32,0-2.288,0.66-2.288,1.584c0,2.794,7.349,2.112,7.349,7.415C21.413,21.614,19.785,23.506,17.255,23.88z',
-        'check': 'M2.379,14.729 5.208,11.899 12.958,19.648 25.877,6.733 28.707,9.561 12.958,25.308z',
-        'mail': 'M28.516,7.167H3.482l12.517,7.108L28.516,7.167zM16.74,17.303C16.51,17.434,16.255,17.5,16,17.5s-0.51-0.066-0.741-0.197L2.5,10.06v14.773h27V10.06L16.74,17.303z',
-        'view': 'M29.772,26.433l-7.126-7.126c0.96-1.583,1.523-3.435,1.524-5.421C24.169,8.093,19.478,3.401,13.688,3.399C7.897,3.401,3.204,8.093,3.204,13.885c0,5.789,4.693,10.481,10.484,10.481c1.987,0,3.839-0.563,5.422-1.523l7.128,7.127L29.772,26.433zM7.203,13.885c0.006-3.582,2.903-6.478,6.484-6.486c3.579,0.008,6.478,2.904,6.484,6.486c-0.007,3.58-2.905,6.476-6.484,6.484C10.106,20.361,7.209,17.465,7.203,13.885z',
-        'caret-down': 'M1,13.625l12,9c1,1,5,1,6,0l12-9c0-3.5-1.5-5-5-5l-10,7.5l-10-7.5c-3.5,0-5,1.5-5,5Z',
-        'caret-up': 'M1,18.375l12,-9c1,-1,5,-1,6,0l12,9c0,3.5,-1.5,5-5,5l-10,-7.5l-10,7.5c-3.5,0,-5,-1.5,-5,-5Z',
-        'caret-right': 'M13.625,1l9,12c1,1,1,5,0,6l-9,12c-3.5,0,-5,-1.5,-5,-5l7.5,-10l-7.5,-10c0,-3.5,1.5,-5,5,-5Z',
-        'caret-left': 'M18.375,1l-9,12c-1,1,-1,5,0,6l9,12c3.5,0,5,-1.5,5,-5l-7.5,-10l7.5,-10c0,-3.5,-1.5,-5,-5,-5Z',
-        'globe': 'm15.47,8.993c-0.08,0,-0.168,0.033,-0.258,0.084c0.211,-0.062,0.31,-0.084,0.258,-0.084m5.226,1.019l0.052,-0.764l-0.806,0.05l0.106,0.714h0.648M6.751,15.56c-0.163,-0.153,-0.054,-0.817,-0.054,-0.817c0,0,-2.425,-1.274,-5.064,-2.04c-0.326,-0.094,-0.161,-0.765,0.161,-1.019l-0.107,-0.716c-0.053,-0.356,0.539,-2.091,1.132,-2.242c0.593,-0.154,-0.054,1.019,-0.054,1.019l-0.592,0.357c0,0,0.7,0.816,0.862,0.816c0.161,0,0.431,-0.409,0.431,-0.409l-0.754,-0.509l0.7,-0.307l0.044,-0.269l0.118,-0.038l1.16,-1.756c0.801,-0.328,1.786,-0.734,1.912,-0.794c0.216,-0.101,1.724,-0.968,1.993,-1.172c0.27,-0.205,0.861,-0.153,1.077,-0.153c0.217,0,0.539,-0.103,0.593,-0.665c0.054,-0.561,0.27,-0.663,0.432,-0.509c0.162,0.151,-0.162,0.408,0.215,0.509c0.377,0.103,0.7,0.358,0.97,0.103c0.197,-0.187,-0.067,-0.399,-0.244,-0.56h2.991l0.324,-0.92l-0.701,-0.102l-2.587,-0.255v-0.307l-0.206,0.035c0.28,-1.539,1.943,-1.285,0.691,-2.176c-0.076,-0.055,-1.172,1.726,-1.451,1.692c-0.505,-0.067,-1.157,-0.072,-1.296,0.092c-0.185,0.217,0.413,-0.746,0.927,-1.038c-0.613,0.181,-1.712,-0.378,-3.694,1.022c-0.67,0.474,-2.352,2.392,-3.044,3.13c-2.924,3.452,-3.16,6.405,-3.16,6.536c0,0.255,0.619,0.399,0.672,0.706c0.054,0.304,-1.023,1.326,-1.023,1.836c0,0.234,-0.539,2.781,0.645,5.968c1.051,3.023,3.084,5.689,3.346,5.856l0.749,-0.397c0,0,-1.239,-2.194,-1.292,-2.398c-0.053,-0.204,1.401,-3.163,2.102,-3.059c0.7,0.099,0.539,0.306,0.97,0.05c0.431,-0.254,0.7,-2.347,1.185,-2.55c0.485,-0.205,1.023,-0.46,0.97,-0.97c-0.056,-0.512,-1.888,-1.429,-2.049,-1.582m11.691,-14.997l-1.455,-0.51l0.27,0.817l1.185,-0.307m-5.442,1.888c0.162,0,3.394,-2.142,3.071,-2.193c-0.323,-0.05,-0.376,0,-1.24,-0.102c-0.861,-0.102,-1.778,1.224,-1.993,1.429c-0.216,0.204,-0.143,0.866,0.161,0.866m14.834,15.381l0.417,-0.541l-0.417,-0.147l-0.313,0.393l-0.365,0.541l0.312,0.147l0.365,-0.393m1.824,1.771l-0.104,-0.788h-0.677l-0.053,0.59l-0.627,-0.098l-0.155,-0.639l-0.313,-0.197l-0.365,0.442l-0.365,-0.098l-0.105,0.343l0.418,0.1v3.194l1.475,0.355c-0.034,0.058,-0.059,0.109,-0.068,0.135c-0.105,0.345,0.416,0.494,0.781,0.345c0.135,-0.054,0.985,-0.381,1.255,-1.023c0.376,-0.894,0.618,-2.18,0.684,-2.597l-0.165,-0.361l-1.043,0.394l-0.575,-0.099h0.002m-0.522,-13.082c-2.386,-3.617,-8.117,-5.981,-8.117,-5.981l-1.476,0.773l-0.21,-0.343l-0.521,-0.197v0.443l0.469,0.394l-0.312,0.147l-1.2,0.098l-2.711,1.475l0.26,1.18l-0.314,0.099l-0.155,0.245l0.886,1.326l0.052,0.443l-0.73,0.147v0.884l-0.417,0.098l0.052,0.689l-3.547,2.459l0.104,1.375c0.26,0.345,2.295,2.41,2.295,2.41c0,0,2.346,0.097,2.867,-0.196c0.522,-0.295,0.156,0.295,0.313,0.443c0.155,0.148,0.209,1.18,0.364,1.278c0.157,0.098,0,0.687,0.209,0.886c0.209,0.195,0.209,2.556,0.209,2.556c0,0,1.252,2.113,1.252,2.654c0,0.541,-0.053,0.491,0.939,0.442c0.991,-0.048,1.199,-0.442,1.408,-0.589c0.209,-0.147,0.209,-0.492,0.417,-0.788c0.21,-0.296,0.574,-1.425,1.044,-1.818c0.468,-0.395,1.721,-0.69,1.824,-1.377c0.104,-0.689,0.573,-1.23,0.573,-1.23l2.255,-2.385l-0.063,0.32l-0.052,1.228l0.678,-0.245l-0.052,-1.328l-0.243,-0.257l0.034,-0.038c0,0,-0.157,-0.295,-0.365,-0.295c-0.209,0,-1.461,0.295,-1.669,0.246c-0.209,-0.05,-1.096,-2.41,-1.252,-2.506c-0.157,-0.098,-1.147,-1.722,-1.147,-1.722c0,0,2.293,2.753,2.658,3.835c0.212,0.63,1.008,0.043,1.655,-0.614l0.171,0.418l0.416,-0.099l-0.052,-0.491h0.469v0.737l-0.156,0.394l-0.053,0.638l0.418,0.394l0.209,-0.343l0.676,-0.64l0.783,-0.393l0.21,0.393l0.104,0.541l-0.209,0.589l-0.417,0.344l-0.209,0.885v0.442l-0.469,-0.295l-0.052,-0.933l-0.678,0.05l-0.312,0.835l0.469,0.689l1.095,0.148l0.886,-0.837l0.104,-1.621l0.395,-0.521c0.257,0.66,0.441,1.351,0.441,1.996c0,0.706,0.559,-0.356,0.285,-2.509c0,0,-0.429,-5.113,-2.792,-7.476zm-10.428,2.118l-2.815,-0.1l1.198,-0.983h0.626l0.991,0.688v0.395m3.443,-0.344v0.442h-1.199l0.104,0.296l-0.731,0.099l-0.051,0.244l-0.521,-0.097l-0.939,-0.198l0.157,-0.245l0.157,-0.296l0.521,-0.541l0.209,0.394l0.781,-0.05l0.417,-0.443l1.617,0.295l-0.522,0.099m0.104,-0.64l-0.626,0.098l-0.103,-0.443l0.781,-0.098l0.105,-0.442l0.574,0.59l-0.731,0.294v0.001m3.026,15.289l-0.365,0.295l0.052,0.738h0.469v-0.637l0.419,-0.542v-1.13l-0.262,-0.051l-0.312,1.328l0,0m-3.494,-1.474c0,0,-0.365,0.095,0.051,0.245c0.417,0.149,2.086,-2.408,2.086,-2.408l-1.409,0.885l-0.729,1.278h0.001m-2.839,9.422l-0.312,-0.297l-0.626,-0.099l-0.103,0.298l-0.834,-0.098l-0.052,-0.395h-0.626l-0.678,0.395h-1.198l-0.104,-0.297l-1.928,-0.199l-0.313,0.298l-0.781,-0.197l-0.105,-0.694l-0.365,-0.051l-0.417,0.745l-1.407,-0.05c0.252,0.118,2.353,1.373,5.576,1.634c4.274,0.346,6.307,-0.692,6.307,-0.692l-0.156,-0.15l-1.877,-0.148v-0.001l0,0z',
-        'shuffle': 'M21.786,20.654c-0.618-0.195-1.407-0.703-2.291-1.587c-0.757-0.742-1.539-1.698-2.34-2.741c-0.191,0.256-0.382,0.51-0.574,0.77c-0.524,0.709-1.059,1.424-1.604,2.127c1.904,2.31,3.88,4.578,6.809,4.952v2.701l7.556-4.362l-7.556-4.362V20.654zM9.192,11.933c0.756,0.741,1.538,1.697,2.339,2.739c0.195-0.262,0.39-0.521,0.587-0.788c0.52-0.703,1.051-1.412,1.592-2.11c-2.032-2.463-4.133-4.907-7.396-5.025h-3.5v3.5h3.5C6.969,10.223,7.996,10.735,9.192,11.933zM21.786,10.341v2.535l7.556-4.363l-7.556-4.363v2.647c-1.904,0.219-3.425,1.348-4.751,2.644c-2.196,2.183-4.116,5.167-6.011,7.538c-1.867,2.438-3.741,3.888-4.712,3.771h-3.5v3.5h3.5c2.185-0.029,3.879-1.266,5.34-2.693c2.194-2.184,4.116-5.167,6.009-7.538C19.205,12.003,20.746,10.679,21.786,10.341z',
-        'triangle-right': 'M6.684,25.682L24.316,15.5L6.684,5.318V25.682z',
-        'triangle-down': 'M5.318,6.684L15.5,24.316L25.682,6.684H5.318z',
-        'triangle-left': 'M24.316,5.318L6.684,15.5l17.632,10.182V5.318L24.316,5.318z',
-        'triangle-up': 'M25.682,24.316L15.5,6.684L5.318,24.316H25.682z',
-        'cross': 'M24.778,21.419 19.276,15.917 24.777,10.415 21.949,7.585 16.447,13.087 10.945,7.585 8.117,10.415 13.618,15.917 8.116,21.419 10.946,24.248 16.447,18.746 21.948,24.248z',
-        'download': 'M16,1.466C7.973,1.466,1.466,7.973,1.466,16c0,8.027,6.507,14.534,14.534,14.534c8.027,0,14.534-6.507,14.534-14.534C30.534,7.973,24.027,1.466,16,1.466zM16,28.792c-1.549,0-2.806-1.256-2.806-2.806s1.256-2.806,2.806-2.806c1.55,0,2.806,1.256,2.806,2.806S17.55,28.792,16,28.792zM16,21.087l-7.858-6.562h3.469V5.747h8.779v8.778h3.468L16,21.087z',
-        'pensil': 'M25.31,2.872l-3.384-2.127c-0.854-0.536-1.979-0.278-2.517,0.576l-1.334,2.123l6.474,4.066l1.335-2.122C26.42,4.533,26.164,3.407,25.31,2.872zM6.555,21.786l6.474,4.066L23.581,9.054l-6.477-4.067L6.555,21.786zM5.566,26.952l-0.143,3.819l3.379-1.787l3.14-1.658l-6.246-3.925L5.566,26.952z',
-        'gear': 'M31.229,17.736c0.064-0.571,0.104-1.148,0.104-1.736s-0.04-1.166-0.104-1.737l-4.377-1.557c-0.218-0.716-0.504-1.401-0.851-2.05l1.993-4.192c-0.725-0.91-1.549-1.734-2.458-2.459l-4.193,1.994c-0.647-0.347-1.334-0.632-2.049-0.849l-1.558-4.378C17.165,0.708,16.588,0.667,16,0.667s-1.166,0.041-1.737,0.105L12.707,5.15c-0.716,0.217-1.401,0.502-2.05,0.849L6.464,4.005C5.554,4.73,4.73,5.554,4.005,6.464l1.994,4.192c-0.347,0.648-0.632,1.334-0.849,2.05l-4.378,1.557C0.708,14.834,0.667,15.412,0.667,16s0.041,1.165,0.105,1.736l4.378,1.558c0.217,0.715,0.502,1.401,0.849,2.049l-1.994,4.193c0.725,0.909,1.549,1.733,2.459,2.458l4.192-1.993c0.648,0.347,1.334,0.633,2.05,0.851l1.557,4.377c0.571,0.064,1.148,0.104,1.737,0.104c0.588,0,1.165-0.04,1.736-0.104l1.558-4.377c0.715-0.218,1.399-0.504,2.049-0.851l4.193,1.993c0.909-0.725,1.733-1.549,2.458-2.458l-1.993-4.193c0.347-0.647,0.633-1.334,0.851-2.049L31.229,17.736zM16,20.871c-2.69,0-4.872-2.182-4.872-4.871c0-2.69,2.182-4.872,4.872-4.872c2.689,0,4.871,2.182,4.871,4.872C20.871,18.689,18.689,20.871,16,20.871z'
-
-      };
-
-  CDT.icon = function (iconName, pathOpts) {
-    var elm, paper, path, outline, outlineOpts, mouse, tx, ty, sx, sy,
-        outlineFadeInAnim, outlineFadeOutAnim;
-
-    pathOpts = $.extend({}, DEFAULT_OPTS, pathOpts);
-    outlineOpts = $.extend({}, OUTLINE_OPTS, pathOpts.outline);
-    delete pathOpts.outline;
-
-    elm = $('<span class="cdt-icon"/>');
-
-    paper = R(elm[0], pathOpts.width, pathOpts.height);
-
-    // Add the path
-    path = paper.path(ICON_PATHS[iconName]).attr(pathOpts);
-    outline = paper.path(ICON_PATHS[iconName]).attr(outlineOpts);
-
-    // Calculate scale factor and necessary translation based on desired image
-    // size.  Scale factor is based on original size of 32x32.
-    tx = pathOpts.width / 2 - 16;
-    ty = pathOpts.height / 2 - 16;
-    sx = pathOpts.width / 32;
-    sy = pathOpts.height / 32;
-
-    var transform = 't' + tx + ',' + ty + 's' + sx + ',' + sy;
-
-    // Scale the path to the desired size and translate it to the middle of the
-    // canvas
-    // TODO Scale the path definition so that consumers don't need to worry
-    //      about preserving this transformation when applying their own
-    path.transform(transform);
-    outline.transform(transform);
-
-    // Add an invisible rectangle the same size as the canvas to allow
-    // mouse events to have a bigger landing area.
-    mouse = paper.rect(0, 0, pathOpts.width, pathOpts.height).attr({
-      fill: '#000',
-      opacity: 0
-    });
-
-    // If the outline showOnHover option is true add a hover handler which will
-    // fade in the outline path on hover
-    if (outlineOpts.showOnHover) {
-      outlineFadeInAnim = R.animation({ opacity: 1 }, 200);
-      outlineFadeOutAnim = R.animation({ opacity: 0 }, 200);
-
-      mouse.hover(
-        function () {
-          outline
-            .stop(outlineFadeOutAnim)
-            .animate(outlineFadeInAnim);
-        },
-        function () {
-          outline
-            .stop(outlineFadeInAnim)
-            .animate(outlineFadeOutAnim);
-        }
-      );
-    }
-
-    elm
-      .data('icon-paper', paper)
-      .data('icon-path', path)
-      .data('icon-outline', outline)
-      .data('icon-transform', transform) // Save original transform that is can 
-                                         // be preserved when adding additional
-                                         // transformations.
-      .data('icon-mouse', mouse);
-
-    return $.extend(elm, {
-      iconAnimate: function (attrs, duration, easing) {
-        duration = duration || $.fx.speeds._default;
-        if (!$.isNumeric(duration)) {
-          if (duration === 'normal' || duration === 'default') {
-            duration = '_default';
-          }
-          duration = $.fx.speeds[duration];
-        }
-
-        easing = easing || 'linear';
-
-        if (!$.isPlainObject(attrs)) {
-          attrs = {
-            transform: path.attr('transform') + attrs
-          };
-        }
-
-        path.animate(attrs, duration, easing);
-        outline.animate(attrs, duration, easing);
-        return elm;
-      }
-    });
+    // An additional path that outlines the path is added and made available        // as the 'icon-outline' data attribute.  The outline is invisible by
+    // default.  This can be controlled using the outline options.  See
+    // OUTLINE_OPTS for supported options.
+    outline: null
   };
 
-} (jQuery, CDT, Raphael));
+  OUTLINE_OPTS = {
+    stroke: '#fff',
+    'stroke-width': 1,
+    'stroke-linejoin': 'round',
+    opacity: 0,
+    showOnHover: false
+  };
+      
+  $.widget('ui.icon', {
+    options: $.extend({}, DEFAULT_OPTS),
+
+    _create: function () {
+      var self = this, tx, ty, sx, sy, outlineFadeInAnim, outlineFadeOutAnim;
+
+      self.options.outline = $.extend({}, OUTLINE_OPTS, self.options.outline);
+
+      self.element.addClass('cdt-icon');
+
+      self.paper = R(self.element[0], self.options.width, self.options.height);
+
+      // Add the path
+      self.path = self.paper.path().attr(self.options);
+      self.outline = self.paper.path(self.options.path)
+        .attr(self.options.outline);
+
+      // Calculate scale factor and necessary translation based on desired image
+      // size.  Scale factor is based on original size of 32x32.
+      tx = self.options.width / 2 - 16;
+      ty = self.options.height / 2 - 16;
+      sx = self.options.width / 32;
+      sy = self.options.height / 32;
+
+      self.transform = 't' + tx + ',' + ty + 's' + sx + ',' + sy;
+
+      // Scale the path to the desired size and translate it to the middle of
+      // the canvas
+      // TODO Scale the path definition so that consumers don't need to worry
+      //      about preserving this transformation when applying their own
+      self.path.transform(self.transform);
+      self.outline.transform(self.transform);
+
+      // Add an invisible rectangle the same size as the canvas to allow
+      // mouse events to have a bigger landing area.
+      self.mouse = self.paper.rect(
+        0,
+        0,
+        self.options.width,
+        self.options.height
+      );
+      self.mouse.attr({ fill: '#000', opacity: 0 });
+
+      // If the outline showOnHover option is true add a hover handler which
+      // will fade in the outline path on hover
+      if (self.options.outline.showOnHover) {
+        outlineFadeInAnim = R.animation({ opacity: 1 }, 200);
+        outlineFadeOutAnim = R.animation({ opacity: 0 }, 200);
+
+        self.mouse.hover(
+          function () {
+            self.outline
+              .stop(outlineFadeOutAnim)
+              .animate(outlineFadeInAnim);
+          },
+          function () {
+            self.outline
+              .stop(outlineFadeInAnim)
+              .animate(outlineFadeOutAnim);
+          }
+        );
+      }
+
+    self.element
+      .data('icon-paper', self.paper)
+      .data('icon-path', self.path)
+      .data('icon-outline', self.outline)
+      .data('icon-transform', self.transform) // Save original transform that is can 
+                                         // be preserved when adding additional
+                                         // transformations.
+      .data('icon-mouse', self.mouse);
+    },
+
+    animate: function (attrs, duration, easing) {
+      duration = duration || $.fx.speeds._default;
+      if (!$.isNumeric(duration)) {
+        if (duration === 'normal' || duration === 'default') {
+          duration = '_default';
+        }
+        duration = $.fx.speeds[duration];
+      }
+
+      easing = easing || 'linear';
+
+      if (!$.isPlainObject(attrs)) {
+        attrs = { transform: self.transform + attrs };
+      }
+
+      self.path.animate(attrs, duration, easing);
+      self.outline.animate(attrs, duration, easing);
+    }
+  });
+
+  exports.icon = function (opts) {
+    return $('<span/>').icon(opts || {});
+  };
+
+} (CDT.ns('CDT.widget'), jQuery, Raphael));
