@@ -100,6 +100,8 @@
     },
 
     animate: function (attrs, duration, easing) {
+      var self = this;
+
       duration = duration || $.fx.speeds._default;
       if (!$.isNumeric(duration)) {
         if (duration === 'normal' || duration === 'default') {
