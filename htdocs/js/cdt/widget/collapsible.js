@@ -149,7 +149,7 @@
           position: 'absolute',
           top: self.element.position().top,
           left: self.element.position().left,
-          width: self.element.innerWidth(),
+          width: self.element.width(),
           zIndex: 1
         });
       } else {
