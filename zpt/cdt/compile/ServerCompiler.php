@@ -65,16 +65,16 @@ class ServerCompiler {
       'uris' => $uris
     );
 
-    $beans = DependencyParser::parse($hdlr);
-    if ($beans !== null && count($beans) > 0) {
-      $mapping['beans'] = $beans;
+    $beans = DependencyParser::parse('', $hdlr);
+    if ($beans['props'] !== null && count($beans['props']) > 0) {
+      $mapping['beans'] = $beans['props'];
     }
     $this->_mappings[] = $mapping;
   }
 
   public function compile($pathInfo) {
     $tmplSrc = __DIR__ . '/ServerConfigurator.php';
-    $tmplOut = "$pathInfo[target]/zeptech/dynamic/ServerConfigurator.php";
+    $tmplOut = "$pathInfo[target]/zpt/dyn/ServerConfigurator.php";
 
     $values = array(
       'mappings' => $this->_mappings,

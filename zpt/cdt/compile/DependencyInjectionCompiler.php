@@ -14,7 +14,12 @@
  */
 namespace zpt\cdt\compile;
 
+use \zeptech\orm\generator\PersisterGenerator;
+use \zeptech\orm\generator\TransformerGenerator;
+use \zeptech\orm\generator\ValidatorGenerator;
+use \zeptech\orm\QueryBuilder;
 use \zpt\cdt\di\DependencyParser;
+use \zpt\cdt\i18n\ModelMessages;
 
 /**
  * This class compiles a script which initializes the dependency injection
@@ -31,18 +36,16 @@ class DependencyInjectionCompiler {
   private $_tmplParser;
 
   public function addBean($id, $class, $props = array()) {
+    $bean = DependencyParser::parse($id, $class);
+
     // Merge annotation configured beans with spefied bean property values.
     // Specified property values override annotation configuration.
-    $props = array_merge(
-      DependencyParser::parse($class),
+    $bean['props'] = array_merge(
+      $bean['props'],
       $props
     );
 
-    $this->_beans[] = array(
-      'id' => $id,
-      'class' => $class,
-      'props' => $props
-    );
+    $this->_beans[] = $bean;
   }
 
   public function addFile($file) {
@@ -58,9 +61,15 @@ class DependencyInjectionCompiler {
           LIBXML_NOCDATA);
 
         foreach ($cfg->bean as $beanDef) {
-          $bean = array();
           $bean['id'] = $beanDef['id'];
           $bean['class'] = $beanDef['class'];
+
+          // Parse any annotation configuration or marker interfaces before
+          // applying XML configuration
+          $bean = DependencyParser::parse(
+            (string) $beanDef['id'],
+            (string) $beanDef['class']
+          );
 
           if (isset($beanDef['initMethod'])) {
             $bean['init'] = (string) $beanDef['initMethod'];
@@ -86,12 +95,13 @@ class DependencyInjectionCompiler {
               $props[] = $prop;
             }
           }
-          $bean['props'] = $props;
+          $bean['props'] = array_merge($bean['props'], $props);
 
           $ctorArgs = array();
           if (isset($beanDef->ctorArg)) {
             $ctor = $beanDef->ctorArg;
 
+            // TODO Is order guaranteed by XML parser?
             foreach ($ctor as $arg) {
               if (isset($arg['value'])) {
                 $ctorArgs[] = $this->getScalar((string) $arg['value']);
@@ -111,9 +121,18 @@ class DependencyInjectionCompiler {
 
     // Build the InjectionConfiguration script
     $srcPath = __DIR__ . '/InjectionConfigurator.php';
-    $outPath = "$pathInfo[target]/zeptech/dynamic/InjectionConfigurator.php";
+    $outPath = "$pathInfo[target]/zpt/dyn/InjectionConfigurator.php";
     $tmpl = $this->_tmplParser->parse(file_get_contents($srcPath));
-    $tmpl->save($outPath, array('beans' => $this->_beans));
+
+    $values = array(
+      'persisterNs' => PersisterGenerator::$actorNamespace,
+      'validatorNs' => ValidatorGenerator::$actorNamespace,
+      'transformerNs' => TransformerGenerator::$actorNamespace,
+      'queryBuilderNs' => QueryBuilder::$actorNamespace,
+      'messagesNs' => ModelMessages::$actorNamespace,
+      'beans' => $this->_beans
+    );
+    $tmpl->save($outPath, $values);
   }
 
   public function setTemplateParser($templateParser) {

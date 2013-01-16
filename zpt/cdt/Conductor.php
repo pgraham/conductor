@@ -20,9 +20,9 @@ use \Monolog\Handler\StreamHandler;
 use \oboe\head\Javascript;
 use \oboe\head\Link;
 use \oboe\Element;
-use \zeptech\dynamic\Configurator;
-use \zeptech\dynamic\InjectionConfigurator;
-use \zeptech\dynamic\ServerConfigurator;
+use \zpt\dyn\Configurator;
+use \zpt\dyn\InjectionConfigurator;
+use \zpt\dyn\ServerConfigurator;
 use \zeptech\orm\runtime\Clarinet;
 use \zeptech\orm\runtime\Criteria;
 use \zeptech\orm\runtime\Persister;
@@ -299,9 +299,11 @@ class Conductor {
       'zpt\cdt\exception\AuthException',
       new AuthExceptionHandler()
     );
+    $pdoExceptionHandler = new PdoExceptionHandler();
+    $pdoExceptionHandler->setMessagesFactory(Injector::getBean('messagesFactory'));
     $server->registerExceptionHandler(
       'zeptech\orm\runtime\PdoExceptionWrapper',
-      new PdoExceptionHandler()
+      $pdoExceptionHandler
     );
     $server->registerExceptionHandler(
       'zeptech\orm\runtime\ValidationException',

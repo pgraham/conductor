@@ -3,10 +3,7 @@ namespace ${actorNs};
 
 use \zeptech\orm\runtime\Criteria;
 use \zeptech\orm\runtime\PdoExceptionWrapper;
-use \zeptech\orm\runtime\Persister;
-use \zeptech\orm\runtime\Transformer;
 use \zeptech\orm\runtime\ValidationException;
-use \zeptech\orm\QueryBuilder;
 use \zeptech\rest\Request;
 use \zeptech\rest\Response;
 use \zpt\cdt\crud\CrudException;
@@ -15,6 +12,7 @@ use \zpt\cdt\exception\AuthException;
 use \zpt\cdt\i18n\ModelMessages;
 use \zpt\cdt\AuthProvider;
 use \zpt\cdt\Session;
+use \zpt\pct\ActorFactory;
 use \StdClass;
 
 /**
@@ -27,20 +25,26 @@ use \StdClass;
  */
 class ${actorClass} { 
 
-  /** @Injected(ref = ${gatekeeperBeanId}) */
-  private $_gatekeeper;
-
   /** @Injected */
   private $authProvider;
+
+  /** @Injected(ref = ${gatekeeperBeanId}) */
+  private $gatekeeper;
+
+  /** @Injected */
+  private $messagesFactory;
+
+  /** @Injected */
+  private $persisterFactory;
+
+  /** @Injected */
+  private $queryBuilderFactory;
 
   /** @Injected */
   private $session;
 
-  private $_info;
-
-  public function __construct() {
-    $this->_info = ModelMessages::get('${model}');
-  }
+  /** @Injected */
+  private $transformerFactory;
 
   /**
    * @Method post
@@ -51,21 +55,22 @@ class ${actorClass} {
       $this->checkAuth('write');
     ${fi}
 
-    $transformer = Transformer::get('${model}');
+    $transformer = $this->transformerFactory->get('${model}');
 
     $params = (array) $request->getData();
 
     $model = $transformer->fromArray($params);
-    $this->_gatekeeper->checkCanCreate($model);
+    $this->gatekeeper->checkCanCreate($model);
 
-    $persister = Persister::get($model);
+    $persister = $this->persisterFactory->get($model);
     $id = $persister->create($model);
 
+    $info = $this->messagesFactory->get('${model}');
     $response->setData(array(
       'success' => true,
       'id'  => $id,
       'msg' => array(
-        'text' => $this->_info->createSuccessMsg(),
+        'text' => $info->createSuccessMsg(),
         'type' => 'info'
       )
     ));
@@ -82,9 +87,9 @@ class ${actorClass} {
       $this->checkAuth('read');
     ${fi}
 
-    $persister = Persister::get('${model}');
-    $transformer = Transformer::get('${model}');
-    $qb = QueryBuilder::get('${model}');
+    $persister = $this->persisterFactory->get('${model}');
+    $transformer = $this->transformerFactory->get('${model}');
+    $qb = $this->queryBuilderFactory->get('${model}');
 
     $query = $request->getQuery();
     $spf = isset($query['spf'])
@@ -121,7 +126,7 @@ class ${actorClass} {
 
     $data = array();
     foreach ($models AS $model) {
-      if ($this->_gatekeeper->canRead($model)) {
+      if ($this->gatekeeper->canRead($model)) {
         $data[] = $transformer->asArray($model);
       }
     }
@@ -143,7 +148,7 @@ class ${actorClass} {
       $this->checkAuth('read');
     ${fi}
 
-    $persister = Persister::get('${model}');
+    $persister = $this->persisterFactory->get('${model}');
 
     $id = $request->getParameter('id');
 
@@ -160,9 +165,9 @@ class ${actorClass} {
 
     // Don't do this inside of a try block that catches generic exception
     // since we want any thrown AuthException to bubble.
-    $this->_gatekeeper->checkCanRead($model);
+    $this->gatekeeper->checkCanRead($model);
 
-    $transformer = Transformer::get('${model}');
+    $transformer = $this->transformerFactory->get('${model}');
     $response->setData($transformer->asArray($model));
   }
 
@@ -191,7 +196,7 @@ class ${actorClass} {
       }
     }
 
-    $persister = Persister::get('${model}');
+    $persister = $this->persisterFactory->get('${model}');
     $model = $persister->getById($id);
 
     if ($model === null) {
@@ -201,17 +206,18 @@ class ${actorClass} {
       
     // Don't do this inside of a try block that catches generic exception
     // since we want any thrown AuthException to bubble.
-    $this->_gatekeeper->checkCanWrite($model);
+    $this->gatekeeper->checkCanWrite($model);
 
-    $transformer = Transformer::get('${model}');
+    $transformer = $this->transformerFactory->get('${model}');
     $transformer->fromArray($params, $model);
 
     $persister->update($model);
 
+    $info = $this->messagesFactory->get('${model}');
     $response->setData(array(
       'success' => true,
       'msg' => array(
-        'text' => $this->_info->updateSuccessMsg(),
+        'text' => $info->updateSuccessMsg(),
         'type' => 'info'
       )
     ));
@@ -226,7 +232,7 @@ class ${actorClass} {
       $this->checkAuth('write');
     ${fi}
 
-    $persister = Persister::get('${model}');
+    $persister = $this->persisterFactory->get('${model}');
 
     $id = $request->getParameter('id');
 
@@ -235,31 +241,64 @@ class ${actorClass} {
 
     $model = $persister->retrieveOne($c);
 
-    $this->_gatekeeper->checkCanDelete($model);
+    $this->gatekeeper->checkCanDelete($model);
 
     $persister->delete($model);
 
+    $info = $this->messagesFactory->get('${model}');
     $response->setData(array(
       'success' => true,
       'msg' => array(
-        'text' => $this->_info->deleteSuccessMsg(),
+        'text' => $info->deleteSuccessMsg(),
         'type' => 'info'
       )
     ));
   }
+
+  /*
+   * ===========================================================================
+   * Dependency injection setters.
+   * ===========================================================================
+   */
 
   public function setAuthProvider(AuthProvider $authProvider) {
     $this->authProvider = $authProvider;
   }
 
   public function setGatekeeper(Gatekeeper $gatekeeper) {
-    $this->_gatekeeper = $gatekeeper;
+    $this->gatekeeper = $gatekeeper;
+  }
+
+  public function setMessagesFactory(ActorFactory $messagesFactory)
+  {
+      $this->messagesFactory = $messagesFactory;
+  }
+
+  public function setPersisterFactory(ActorFactory $persisterFactory)
+  {
+      $this->persisterFactory = $persisterFactory;
+  }
+
+  public function setQueryBuilderFactory(ActorFactory $queryBuilderFactory)
+  {
+      $this->queryBuilderFactory = $queryBuilderFactory;
   }
 
   public function setSession(Session $session)
   {
       $this->session = $session;
   }
+
+  public function setTransformerFactory(ActorFactory $transformerFactory)
+  {
+    $this->transformerFactory = $transformerFactory;
+  }
+
+  /*
+   * ===========================================================================
+   * Private helpers.
+   * ===========================================================================
+   */
 
   ${if:auth ISSET}
     private function checkAuth($level) {

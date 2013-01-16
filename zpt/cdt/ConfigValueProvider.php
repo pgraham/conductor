@@ -16,6 +16,7 @@ namespace zpt\cdt;
 
 use \zeptech\orm\runtime\Criteria;
 use \zeptech\orm\runtime\Persister;
+use \zpt\pct\ActorFactory;
 
 /**
  * This class retrieves configuration values from the database.
@@ -24,11 +25,14 @@ use \zeptech\orm\runtime\Persister;
  */
 class ConfigValueProvider {
 
-  // TODO Inject this.
-  private $_persister;
+  private $persisterFactory;
 
-  public function __construct() {
-    $this->_persister = Persister::get('zpt\cdt\model\ConfigValue');
+  private $persister;
+
+  public function init() {
+    $this->persister = $this->persisterFactory->get(
+      'zpt\cdt\model\ConfigValue'
+    );
   }
 
   /**
@@ -49,5 +53,10 @@ class ConfigValueProvider {
 
     $obj = $rows[0];
     return $obj->getValue();
+  }
+
+  public function setPersisterFactory(ActorFactory $persisterFactory)
+  {
+      $this->persisterFactory = $persisterFactory;
   }
 }

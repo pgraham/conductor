@@ -49,7 +49,7 @@ class ConfigurationCompiler {
     }
 
     $tmplSrc = __DIR__ . '/Configurator.tmpl.php';
-    $tmplOut = "{$this->_pathInfo['target']}/zeptech/dynamic/Configurator.php";
+    $tmplOut = "{$this->_pathInfo['target']}/zpt/dyn/Configurator.php";
 
     $values = array(
       'pathInfo' => $this->_pathInfo->getArrayCopy(),

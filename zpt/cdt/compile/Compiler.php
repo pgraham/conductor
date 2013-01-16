@@ -7,7 +7,6 @@ namespace zpt\cdt\compile;
 
 use \zeptech\anno\AnnotationFactory;
 use \zeptech\anno\Annotations;
-use \zeptech\dynamic\Configurator;
 use \zeptech\orm\generator\PersisterGenerator;
 use \zeptech\orm\generator\TransformerGenerator;
 use \zeptech\orm\generator\ValidatorGenerator;
@@ -19,10 +18,12 @@ use \zpt\cdt\html\NotAPageDefinitionException;
 use \zpt\cdt\i18n\ModelDisplayParser;
 use \zpt\cdt\i18n\ModelMessages;
 use \zpt\cdt\rest\ServiceRequestDispatcher;
+use \zpt\dyn\Configurator;
 use \zpt\orm\model\parser\DefaultNamingStrategy;
 use \zpt\orm\model\parser\ModelParser;
 use \zpt\orm\model\ModelCache;
 use \zpt\pct\CodeTemplateParser;
+use \zpt\pct\DefaultActorNamingStrategy;
 use \zpt\util\File;
 use \zpt\util\String;
 use \DirectoryIterator;
@@ -384,8 +385,9 @@ class Compiler {
         continue;
       }
 
-      $inst = HtmlProvider::get($viewClass);
-      $instClass = get_class($inst);
+      $namingStrategy = new DefaultActorNamingStrategy();
+      $instClass = HtmlProvider::$actorNamespace . "\\" .
+        $namingStrategy->getActorName($viewClass);
       $this->_diCompiler->addBean($beanId, $instClass);
 
       $args = array( "'$beanId'" );
@@ -489,18 +491,23 @@ class Compiler {
         $this->infoGen->generate($modelClass);
         $this->queryBuilderGen->generate($modelClass);
 
+        // Add model gatekeeper as a bean
+        $gatekeeper = $model->getGatekeeper();
+        if ($gatekeeper) {
+          // TODO Use naming strategy to generate beanId
+          $gatekeeperBeanId = str_replace('\\', '_', $gatekeeper);
+          $this->_diCompiler->addBean($gatekeeperBeanId,
+            $gatekeeper);
+        }
+
         if ( !isset($annos['nocrud']) ) {
           $this->crudGen->generate($modelClass);
 
           $actorName = $model->getActor();
-          $crudSrvc = "zeptech\\dynamic\\crud\\$actorName";
+          $crudSrvc = "zpt\\dyn\\crud\\$actorName";
           $beanId = $actorName . "_crudService";
           $this->_diCompiler->addBean($beanId, $crudSrvc);
 
-          $gatekeeper = $model->getGatekeeper();
-          $gatekeeperBeanId = str_replace('\\', '_', $gatekeeper);
-          $this->_diCompiler->addBean($gatekeeperBeanId,
-            $gatekeeper);
 
           $this->_serviceCompiler->compileService($crudSrvc, $beanId);
         }

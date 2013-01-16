@@ -38,7 +38,7 @@ class ServiceRequestDispatcher extends AbstractGenerator {
 
   const BEAN_ID_SUFFIX = 'ServiceRequestDispatcher';
 
-  protected static $actorNamespace = 'zeptech\dynamic\rest';
+  public static $actorNamespace = 'zpt\dyn\rest';
 
   protected function getTemplatePath() {
     return __DIR__ . '/ServiceRequestDispatcher.tmpl.php';

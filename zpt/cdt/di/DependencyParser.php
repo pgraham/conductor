@@ -25,12 +25,19 @@ use \ReflectionClass;
  */
 class DependencyParser {
 
-  public static function parse($classDef) {
+  /**
+   * Parse the specified class for DI information.
+   *
+   * @param string $id The id to use for the bean definition.
+   * @param string $classDef The class to parse.
+   * @return array
+   */
+  public static function parse($id, $classDef) {
     if (is_string($classDef)) {
       $classDef = new ReflectionClass($classDef);
     }
 
-    $beans = array();
+    $beanProps = array();
 
     $properties = $classDef->getProperties();
     foreach ($properties as $prop) {
@@ -45,7 +52,7 @@ class DependencyParser {
       $setter = 'set' . ucfirst($propertyName);
       if (!$classDef->hasMethod($setter)) {
         throw new Exception("Injection property does not have a setter " .
-          "($setter): Tried to inject `$beanId` into `" .
+          "($setter): Tried to inject `$propertyName` into `" .
           $classDef->getName() . "`.");
       }
 
@@ -55,7 +62,7 @@ class DependencyParser {
         if (count($params) < 1 || !$params[0]->isArray()) {
           throw new Exception("Collection setters must accept an array");
         }
-        $beans[] = array(
+        $beanProps[] = array(
           'name' => $propertyName,
           'type' => $annos['collection']
         );
@@ -64,7 +71,7 @@ class DependencyParser {
           ? $annos['injected']['ref']
           : $propertyName;
 
-        $beans[] = array(
+        $beanProps[] = array(
           'name' => $propertyName,
           'ref'   => $beanId,
         );
@@ -72,6 +79,16 @@ class DependencyParser {
 
     }
 
-    return $beans;
+    $bean = array(
+      'id' => $id,
+      'class' => $classDef->getName(),
+      'props' => $beanProps
+    );
+
+    if ($classDef->implementsInterface('zpt\cdt\di\InitializingBean')) {
+      $bean['init'] = 'init';
+    }
+
+    return $bean;
   }
 }

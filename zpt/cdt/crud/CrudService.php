@@ -30,7 +30,7 @@ use \zpt\cdt\i18n\ModelDisplayParser;
  */
 class CrudService extends AbstractModelGenerator {
 
-  protected static $actorNamespace = 'zeptech\dynamic\crud';
+  public static $actorNamespace = 'zpt\dyn\crud';
 
   protected function getTemplatePath() {
     return __DIR__ . '/CrudService.tmpl.php';

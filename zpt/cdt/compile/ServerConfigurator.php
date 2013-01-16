@@ -3,7 +3,7 @@
  * Dynamically generated REST server configurator.  Configures a RestServer
  * instance to process all resources provided by this site.
  */
-namespace zeptech\dynamic;
+namespace zpt\dyn;
 
 use \zpt\cdt\di\Injector;
 use \zpt\cdt\rest\InjectedRestServer;

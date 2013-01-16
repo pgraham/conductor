@@ -19,7 +19,7 @@ use \zpt\pct\CodeTemplateParser;
  */
 class ModelMessages extends AbstractModelGenerator {
 
-  protected static $actorNamespace = 'zeptech\dynamic\i18n';
+  public static $actorNamespace = 'zpt\dyn\i18n';
 
   protected function getTemplatePath() {
     return __DIR__ . '/ModelMessages.tmpl.php';

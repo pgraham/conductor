@@ -30,7 +30,7 @@ use \ReflectionClass;
  */
 class HtmlProvider extends AbstractGenerator {
 
-  protected static $actorNamespace = 'zeptech\dynamic\html';
+  public static $actorNamespace = 'zpt\dyn\html';
 
   /* The type of environment for which HtmlProviders will be generated. */
   private $_env;
@@ -136,8 +136,8 @@ class HtmlProvider extends AbstractGenerator {
       $values['hasContent'] = true;
       $values['contentProvider'] = $className;
 
-      $dependencies = DependencyParser::parse($pageDef);
-      $values['dependencies'] = $dependencies;
+      $dependencies = DependencyParser::parse('htmlProvider', $pageDef);
+      $values['dependencies'] = $dependencies['props'];
     }
 
     return $values;

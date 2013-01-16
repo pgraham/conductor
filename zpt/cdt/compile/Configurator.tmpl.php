@@ -4,7 +4,7 @@
  *
  * DO NOT EDIT.
  */
-namespace zeptech\dynamic {
+namespace zpt\dyn {
 
 use \ArrayObject;
 
@@ -23,7 +23,7 @@ class Configurator {
   }
 }
 
-} // End namespace \zeptech\dynamic
+} // End namespace \zpt\dyn
 
 namespace { //global namespace
   // Function for transforming an absolute webpath into a context sensitive one.

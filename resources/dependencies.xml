@@ -1,7 +1,44 @@
 <?xml version="1.0" standalone="yes"?>
 <beans>
 
-  <bean id="configValueProvider" class="zpt\cdt\ConfigValueProvider" />
+  <bean id="actorNamingStrategy" class="zpt\pct\DefaultActorNamingStrategy"/>
+
+  <bean id="persisterFactory" class="zpt\pct\ActorFactory">
+    <ctorArg value="zpt\dyn\orm\persister" />
+    <property name="namingStrategy" ref="actorNamingStrategy"/>
+  </bean>
+
+  <bean id="validatorFactory" class="zpt\pct\ActorFactory">
+    <ctorArg value="zpt\dyn\orm\validator" />
+    <property name="namingStrategy" ref="actorNamingStrategy"/>
+  </bean>
+
+  <bean id="transformerFactory" class="zpt\pct\ActorFactory">
+    <ctorArg value="zpt\dyn\orm\transformer" />
+    <property name="namingStrategy" ref="actorNamingStrategy"/>
+  </bean>
+
+  <bean id="queryBuilderFactory" class="zpt\pct\ActorFactory">
+    <ctorArg value="zpt\dyn\orm\qb" />
+    <property name="cacheEnabled" value="false"/>
+    <property name="namingStrategy" ref="actorNamingStrategy"/>
+  </bean>
+
+  <bean id="messagesFactory" class="zpt\pct\ActorFactory">
+    <ctorArg value="zpt\dyn\i18n"/>
+    <property name="namingStrategy" ref="actorNamingStrategy"/>
+  </bean>
+
+  <bean id="serviceRequestDispatcherFactory" class="zpt\pct\ActorFactory">
+    <ctorArg value="zpt\dyn\rest"/>
+    <property name="namingStrategy" ref="actorNamingStrategy"/>
+  </bean>
+
+  <bean id="configValueProvider"
+        class="zpt\cdt\ConfigValueProvider"
+        initMethod="init">
+    <property name="persisterFactory" ref="persisterFactory"/>
+  </bean>
 
   <bean id="authProvider"
         class="zpt\cdt\AuthProvider"

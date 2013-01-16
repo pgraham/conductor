@@ -99,7 +99,7 @@ class Loader {
     self::registerNamespace('zeptech\rest', "$cdtLib/php-rest-server");
     self::registerNamespace('zeptech\orm', "$cdtLib/clarinet");
     self::registerNamespace('zpt\orm', "$cdtLib/clarinet");
-    self::registerNamespace('zeptech\dynamic', $target);
+    self::registerNamespace('zpt\dyn', $target);
 
     // Register loaders for the site's modules
     if (file_exists("$root/modules")) {

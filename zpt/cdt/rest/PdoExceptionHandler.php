@@ -19,7 +19,7 @@ use \zeptech\rest\Request;
 use \zeptech\rest\Response;
 use \zeptech\rest\RestException;
 use \zpt\cdt\exception\PdoExceptionWrapperParser;
-use \zpt\cdt\i18n\ModelMessages;
+use \zpt\pct\ActorFactory;
 use \Exception;
 
 /**
@@ -30,6 +30,9 @@ use \Exception;
 class PdoExceptionHandler implements ExceptionHandler
 {
 
+    /** @Injected */
+    private $messagesFactory;
+
     public function handleException(
         Exception $e,
         Request $request,
@@ -37,7 +40,7 @@ class PdoExceptionHandler implements ExceptionHandler
     ) {
 
         $exceptionParser = new PdoExceptionWrapperParser($e); 
-        $modelMessages = ModelMessages::get($e->getModelClass());
+        $modelMessages = $this->messagesFactory->get($e->getModelClass());
 
         $response->clearHeaders();
         $hdrMsg = _L('http.status.header.403');
@@ -60,5 +63,10 @@ class PdoExceptionHandler implements ExceptionHandler
 
         $response->header("HTTP/1.1 403 $hdrMsg");
         $response->setData($msg);
+    }
+
+    public function setMessagesFactory(ActorFactory $messagesFactory)
+    {
+        $this->messagesFactory = $messagesFactory;
     }
 }
