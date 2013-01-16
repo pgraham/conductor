@@ -54,7 +54,7 @@
     'h-fill': hFill
   };
 
-  $.fn.layout = function (type, params) {
+  $.fn.layout = function (type, data) {
 
     if (type === null) {
       return this.each(function () {
@@ -71,11 +71,11 @@
 
         if ($.isFunction(type)) {
           fn = function () {
-            type(ctx, params);
+            type.apply(this, [ ctx.width(), ctx.height() ].concat(data));
           };
         } else {
           fn = function () {
-            $.layouts[type](ctx, params);
+            $.layouts[type](ctx, data);
           };
         }
 
@@ -87,7 +87,7 @@
       var ctx = $(this), fn = ctx.data('layout-fn');
 
       if (fn) {
-        fn();
+        fn.call(this);
       }
 
       // Layout all children elements that also have a layout defined
