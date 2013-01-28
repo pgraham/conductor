@@ -4,26 +4,10 @@
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-(function ($, CDT, undefined) {
+(function (exports, $, undefined) {
   "use strict";
 
-  if (CDT.data === undefined) {
-    CDT.data = {};
-  }
-
-  function buildErrorHandler(cb) {
-    return function (jqXHR, textStatus, errorThrown) {
-      cb({
-        success: false,
-        msg: {
-          text: errorThrown,
-          type: 'error'
-        }
-      });
-    };
-  }
-
-  CDT.data.crudProxy = function (baseUrl) {
+  exports.crudProxy = function (baseUrl) {
     var baseUrl = _p(baseUrl), cache = {};
 
     return {
@@ -37,7 +21,7 @@
           processData: false,
           dataType: 'json',
           success: cb,
-          error: buildErrorHandler(cb)
+          error: CDT.data.buildAjaxErrorHandler(cb)
         });
       },
       remove: function (id, cb) {
@@ -49,7 +33,7 @@
             delete cache[id];
             cb({ success: true });
           },
-          error: buildErrorHandler(cb)
+          error: CDT.data.buildAjaxErrorHandler(cb)
         });
       },
       retrieve: function (spf, cb) {
@@ -63,7 +47,8 @@
               cache[entity.id] = entity;
             });
             cb(response);
-          }
+          },
+          error: CDT.data.buildAjaxErrorHandler(cb)
         });
       },
       retrieveOne: function (id, cb) {
@@ -80,15 +65,16 @@
           success: function (response) {
             cache[response.id] = response;
             cb(response);
-          }
+          },
+          error: CDT.data.buildAjaxErrorHandler(cb)
         });
       },
       update: function (id, params, cb) {
-        // Add an ordering token to the request so the updates sent in
-        // succession that arrive at the server in the wrong order will be
+        // Add an ordering token to the request so that updates that are sent in
+        // quick succession and arrive at the server in the wrong order will be
         // handled correctly, ie, the later one will arrive first and be
         // processed while the earlier one will arrive second and be ignored.
-        params.cdtOrderToken = new Date().getTime();
+        params.__ROT = new Date().getTime();
 
         $.ajax({
           url: baseUrl + '/' + id,
@@ -101,10 +87,10 @@
             delete cache[id];
             cb(response);
           },
-          error: buildErrorHandler(cb)
+          error: CDT.data.buildAjaxErrorHandler(cb)
         });
       }
     };
   };
 
-} (jQuery, CDT));
+} (CDT.ns('CDT.data'), jQuery));
