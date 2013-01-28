@@ -153,6 +153,7 @@ class ${actorClass} {
   /**
    * @Method post
    * @Uri ${url}/{id}
+   * @EnforceOrder
    */
   public function update(Request $request, Response $response) {
     ${if:auth ISSET}
@@ -161,19 +162,6 @@ class ${actorClass} {
 
     $id = $request->getParameter('id');
     $params = (array) $request->getData();
-
-    if (isset($params['cdtOrderToken'])) {
-      $curTokKey = "${cdtOrderTokenKey}_$id";
-      $curTok = $this->session->get($curTokKey);
-      if ($curTok === null || $curTok < $params['cdtOrderToken']) {
-        $this->session->set($curTokKey, $params['cdtOrderToken']);
-      } else {
-        $response->setData(array(
-          'success' => true
-        ));
-        return;
-      }
-    }
 
     $persister = $this->persisterFactory->get('${model}');
     $model = $persister->getById($id);

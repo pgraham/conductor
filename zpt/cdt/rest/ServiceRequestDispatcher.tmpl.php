@@ -10,85 +10,71 @@ use \zeptech\rest\Request;
 use \zeptech\rest\Response;
 use \zpt\cdt\di\Injector;
 use \zpt\cdt\rest\BeanRequestHandler;
+use \Exception;
 
 class ${actorClass} extends BaseRequestHandler implements BeanRequestHandler {
 
-  private $_service;
-  private $_mappings;
+  private $service;
+  private $session;
+  private $mappings;
+  private $pdo;
 
   public function __construct() {
-    $this->_mappings = ${php:mappings};
+    $this->mappings = ${php:mappings};
   }
 
   public function getMappings() {
-    return $this->_mappings;
+    return $this->mappings;
   }
 
   public function setService($service) {
-    $this->_service = $service;
+    $this->service = $service;
   }
 
-  ${if:deleteMethods}
-    public function delete(Request $request, Response $response) {
-      $mappingId = $request->getMappingId();
-      switch ($mappingId) {
+  public function setSession($session) {
+    $this->session = $session;
+  }
 
-        ${each:deleteMethods as method}
-          case '${method}':
-          $this->_service->${method}($request, $response);
-          return;
+  public function setPdo($pdo) {
+    $this->pdo = $pdo;
+  }
 
-        ${done}
+  ${each:methodTypes as methodType}
+    public function ${methodType[type]}(Request $request, Response $response) {
+      try {
+        $this->pdo->beginTransaction();
+
+        $mappingId = $request->getMappingId();
+        switch ($mappingId) {
+
+          ${each:methodType[methods] as method}
+            case '${method[name]}':
+            ${if:method[enforceOrder]}
+              if ($request->hasData('__ROT')) {
+                $rot = $request->getData('__ROT');
+                $uriHash = 'rot-' . $request->getUri();
+                $curRot = $this->session->get($uriHash);
+                if ($curRot === null || $curRot < $rot) {
+                  $this->session->set($uriHash, $rot);
+                } else {
+                  $response->setData(array(
+                    'success' => null
+                  ));
+                }
+              }
+
+            ${fi}
+            $this->service->${method[name]}($request, $response);
+            $this->pdo->commit();
+            return;
+
+          ${done}
+        }
+        parent::${methodType[type]}($request, $response);
+      } catch (Exception $e) {
+        $this->pdo->rollback();
+        throw $e;
       }
-      parent::delete($request, $response);
-    }
-  ${fi}
-
-  ${if:getMethods}
-    public function get(Request $request, Response $response) {
-      $mappingId = $request->getMappingId();
-      switch ($mappingId) {
-
-        ${each:getMethods as method}
-          case '${method}':
-          $this->_service->${method}($request, $response);
-          return;
-
-        ${done}
-      }
-      parent::get($request, $response);
-    }
-  ${fi}
-
-  ${if:postMethods}
-    public function post(Request $request, Response $response) {
-      $mappingId = $request->getMappingId();
-      switch ($mappingId) {
-
-        ${each:postMethods as method}
-          case '${method}':
-          $this->_service->${method}($request, $response);
-          return;
-
-        ${done}
-      }
-      parent::post($request, $response);
-    }
-  ${fi}
-
-  ${if:putMethods}
-    public function put(Request $request, Response $response) {
-      $mappingId = $request->getMappingId();
-      switch ($mappingId) {
-
-        ${each:putMethods as method}
-          case '${method}':
-          $this->_service->${method}($request, $response);
-          return;
-
-        ${done}
-      }
-      parent::put($request, $response);
     }
   ${fi}
 }

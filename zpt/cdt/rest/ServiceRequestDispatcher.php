@@ -66,6 +66,17 @@ class ServiceRequestDispatcher extends AbstractGenerator {
       }
 
       $methodName = $method->getName();
+      $methodDef = array(
+        'name' => $methodName,
+        'enforceOrder' => false
+      );
+
+      // This array will be merged into $methodDef for POST and PUT request
+      // methods
+      $enforceOrder = array(
+        'enforceOrder' => isset($methodAnnos['enforceOrder'])
+      );
+
       $httpMethods = explode(' ', $methodAnnos['method']);
       foreach ($httpMethods as $httpMethod) {
 
@@ -78,33 +89,47 @@ class ServiceRequestDispatcher extends AbstractGenerator {
         $httpMethod = strtoupper($httpMethod);
         switch ($httpMethod) {
           case 'DELETE':
-          $deleteMethods[] = $methodName;
+          $deleteMethods[] = $methodDef;
           break;
 
           case 'GET':
-          $getMethods[] = $methodName;
+          $getMethods[] = $methodDef;
           break;
 
           case 'POST':
-          $postMethods[] = $methodName;
+          $postMethods[] = array_merge($methodDef, $enforceOrder);
           break;
 
           case 'PUT':
-          $putMethods[] = $methodName;
+          $putMethods[] = array_merge($methodDef, $enforceOrder);
           break;
 
           default:
-          assert("false /* Unrecognized HTTP method $httpMethod");
+          assert("false /* Unrecognized HTTP method $httpMethod */");
         }
       }
     }
 
     $values = array(
       'mappings'      => $mappings,
-      'deleteMethods' => $deleteMethods,
-      'getMethods'    => $getMethods,
-      'postMethods'   => $postMethods,
-      'putMethods'    => $putMethods
+      'methodTypes'   => array(
+        array(
+          'type' => 'delete',
+          'methods' => $deleteMethods
+        ),
+        array(
+          'type' => 'get',
+          'methods' => $getMethods
+        ),
+        array(
+          'type' => 'post',
+          'methods' => $postMethods
+        ),
+        array(
+          'type' => 'put',
+          'methods' => $putMethods
+        )
+      )
     );
 
     return $values;

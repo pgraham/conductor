@@ -153,8 +153,24 @@ class ServiceCompiler {
         ServiceRequestDispatcher::BEAN_ID_SUFFIX);
       $dispatcherClassName = $this->_serviceRequestDispatcher
         ->getActorClassName($srvcClass);
-      $this->_diCompiler->addBean($dispatcherBeanId, $dispatcherClassName,
-        array( array( 'name' => 'service', 'ref' => $srvcBeanId ) ));
+      $this->_diCompiler->addBean(
+        $dispatcherBeanId,
+        $dispatcherClassName,
+        array(
+          array(
+            'name' => 'service',
+            'ref' => $srvcBeanId
+          ),
+          array(
+            'name' => 'pdo',
+            'ref' => 'pdo'
+          ),
+          array(
+            'name' => 'session',
+            'ref' => 'session'
+          )
+        )
+      );
 
       // Add the dispatcher bean as a RequestHandler
       $this->_serverCompiler->addBean($dispatcherBeanId);
