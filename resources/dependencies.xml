@@ -48,4 +48,6 @@
     <property name="authProvider" ref="authProvider" />
   </bean>
 
+  <bean id="spfParser" class="zpt\cdt\crud\SpfParser"/>
+
 </beans>

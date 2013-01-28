@@ -8,6 +8,7 @@ use \zeptech\rest\Request;
 use \zeptech\rest\Response;
 use \zpt\cdt\crud\CrudException;
 use \zpt\cdt\crud\Gatekeeper;
+use \zpt\cdt\crud\SpfParser;
 use \zpt\cdt\exception\AuthException;
 use \zpt\cdt\i18n\ModelMessages;
 use \zpt\cdt\AuthProvider;
@@ -42,6 +43,9 @@ class ${actorClass} {
 
   /** @Injected */
   private $session;
+
+  /** @Injected */
+  private $spfParser;
 
   /** @Injected */
   private $transformerFactory;
@@ -91,33 +95,8 @@ class ${actorClass} {
     $transformer = $this->transformerFactory->get('${model}');
     $qb = $this->queryBuilderFactory->get('${model}');
 
-    $query = $request->getQuery();
-    $spf = isset($query['spf'])
-      ? json_decode($query['spf'])
-      : new StdClass();
-
-    // Apply paging, sorting and filters to the criteria
-    if (isset($spf->filter)) {
-      foreach ($spf->filter AS $column => $value) {
-        $qb->addFilter($column, $value);
-      }
-    }
-
-    if (isset($spf->sort)) {
-      foreach ($spf->sort AS $sort) {
-        
-        $qb->addSort($sort->field, $sort->dir);
-      }
-    }
-
-    if (isset($spf->page)) {
-      $limit = $spf->page->limit;
-      $offset = isset($spf->page->offset)
-        ? $spf->page->offset
-        : null;
-
-      $qb->setLimit($limit, $offset);
-    }
+    $spf = $this->spfParser->parseRequest($request);
+    $this->spfParser->populateQueryBuilder($spf, $qb);
 
     // Retrieve the models that match the given spf
     $c = $qb->getCriteria();
@@ -287,6 +266,11 @@ class ${actorClass} {
   public function setSession(Session $session)
   {
       $this->session = $session;
+  }
+
+  public function setSpfParser(SpfParser $spfParser)
+  {
+      $this->spfParser = $spfParser;
   }
 
   public function setTransformerFactory(ActorFactory $transformerFactory)
