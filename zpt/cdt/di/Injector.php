@@ -41,7 +41,7 @@ class Injector {
     $namespaces = explode('\\', $className);
     $class = array_pop($namespaces);
 
-    return $class . $suffix;
+    return lcfirst($class) . $suffix;
   }
 
   /**
