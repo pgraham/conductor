@@ -6,6 +6,7 @@ use \zeptech\orm\runtime\PdoExceptionWrapper;
 use \zeptech\orm\runtime\ValidationException;
 use \zeptech\rest\Request;
 use \zeptech\rest\Response;
+use \zeptech\rest\RestException;
 use \zpt\cdt\crud\CrudException;
 use \zpt\cdt\crud\Gatekeeper;
 use \zpt\cdt\crud\SpfParser;
@@ -134,12 +135,7 @@ class ${actorClass} {
     $model = $persister->getById($id);
 
     if ($model === null) {
-      $this->_notFound($response);
-      return;
-
-      // TODO This needs to changed so that the CrudException has a
-      // isNotFound() method and the message is built using a ModelInfo actor.
-      //throw new CrudException('404 Not Found', 'The requested ${singular} does not exist');
+      throw new RestException(404);
     }
 
     // Don't do this inside of a try block that catches generic exception
@@ -167,8 +163,7 @@ class ${actorClass} {
     $model = $persister->getById($id);
 
     if ($model === null) {
-      $this->_notFound($e);
-      return;
+      throw new RestException(404);
     }
       
     // Don't do this inside of a try block that catches generic exception
@@ -200,13 +195,12 @@ class ${actorClass} {
     ${fi}
 
     $persister = $this->persisterFactory->get('${model}');
-
     $id = $request->getParameter('id');
 
-    $c = new Criteria();
-    $c->addEquals('${idColumn}', $id);
-
-    $model = $persister->retrieveOne($c);
+    $model = $persister->getById($id);
+    if ($model === null) {
+      throw new RestException(404);
+    }
 
     $this->gatekeeper->checkCanDelete($model);
 
