@@ -35,8 +35,7 @@ class LocalizedDefaultExceptionHandler implements ExceptionHandler
     ) {
 
       $hdrMsg = _L('http.status.header.500');
-      $reponse->header("HTTP/1.1 500 $hdrMsg");
+      $response->header("HTTP/1.1 500 $hdrMsg");
       $response->setData(_L('http.status.message.500'));
-
     }
 }
