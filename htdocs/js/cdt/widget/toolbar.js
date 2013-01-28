@@ -28,7 +28,7 @@
           break;
 
           default:
-          this.addButton({ label: btnCfg });
+          this.addLabel(btnCfg);
           break;
         }
       } else {
@@ -49,6 +49,11 @@
       $.each(btnCfgs, function (idx, btnCfg) {
         self.addButton(btnCfg);
       });
+      return this;
+    },
+
+    addLabel: function (label) {
+      this.element.append($('<span/>').addClass('label').text(label));
       return this;
     },
 
@@ -89,7 +94,7 @@
   });
 
   exports.toolbar = function (opts) {
-    return $('<div/>').toolbar(opts);
+    return $('<div/>').toolbar(opts || {});
   };
 
 } (jQuery, CDT, CDT.ns('CDT.widget')));
