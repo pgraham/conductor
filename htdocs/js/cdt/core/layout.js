@@ -51,7 +51,11 @@
   $.layouts = {
     fillWith: vFill,
     'v-fill': vFill,
-    'h-fill': hFill
+    'h-fill': hFill,
+    fill: function (container, sel) {
+      vFill(container, sel);
+      hFill(container, sel);
+    }
   };
 
   $.fn.layout = function (type, data) {
