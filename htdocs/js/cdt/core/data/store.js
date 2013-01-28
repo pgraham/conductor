@@ -29,18 +29,23 @@
       return this;
     };
 
-    that.load = function (spf) {
+    that.load = function (spf, cb) {
       spf = spf || {};
+      cb = cb || $.noop;
 
       loaded = false;
 
       that.trigger('beforeload');
       srvc.retrieve(spf, function (response) {
+        var e;
         items = response.data;
         total = response.total;
 
         loaded = true;
-        that.trigger('load', [ { items: items, total: total } ]);
+
+        e = { items: items, total: total };
+        cb.apply(that, [ e ]);
+        that.trigger('load', [ e ]);
       });
     };
 
