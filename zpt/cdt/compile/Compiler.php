@@ -176,6 +176,8 @@ class Compiler {
     $this->_doWithModules(function ($modulePath) use ($diCompiler) {
       $diCompiler->addFile("$modulePath/resources/dependencies.xml");
     });
+
+    $diCompiler->addFile("$pathInfo[src]/resources/dependencies.xml");
   }
 
   protected function compileJslibs($pathInfo, $ns) {
