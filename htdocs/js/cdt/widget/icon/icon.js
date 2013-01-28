@@ -9,6 +9,8 @@
   DEFAULT_OPTS = {
     width: 32,
     height: 32,
+    canvasWidth: 32,
+    canvasHeight: 32,
     fill: '#000',
     stroke: 'none',
 
@@ -32,16 +34,18 @@
     _create: function () {
       var self = this, tx, ty, sx, sy, outlineFadeInAnim, outlineFadeOutAnim;
 
+      self.pathStrs = self.options.paths;
+      if (!$.isPlainObject(self.pathStrs)) {
+        self.pathStrs = { path: self.pathStrs };
+      }
       self.options.outline = $.extend({}, OUTLINE_OPTS, self.options.outline);
 
       self.element.addClass('cdt-icon');
-
-      self.paper = R(self.element[0], self.options.width, self.options.height);
-
-      // Add the path
-      self.path = self.paper.path().attr(self.options);
-      self.outline = self.paper.path(self.options.path)
-        .attr(self.options.outline);
+      self.paper = R(
+        self.element[0],
+        self.options.canvasWidth,
+        self.options.canvasHeight
+      );
 
       // Calculate scale factor and necessary translation based on desired image
       // size.  Scale factor is based on original size of 32x32.
@@ -50,22 +54,27 @@
       sx = self.options.width / 32;
       sy = self.options.height / 32;
 
-      self.transform = 't' + tx + ',' + ty + 's' + sx + ',' + sy;
+      // Add the path
+      self.paths = {};
+      self.outlines = {};
+      $.each(self.pathStrs, function (idx) {
+        var pstr = this;
 
-      // Scale the path to the desired size and translate it to the middle of
-      // the canvas
-      // TODO Scale the path definition so that consumers don't need to worry
-      //      about preserving this transformation when applying their own
-      self.path.transform(self.transform);
-      self.outline.transform(self.transform);
+        pstr = CDT.util.raphael.scalePathString(pstr, sx, sy);
+        // TODO Move path box into center of canvas
+        //pstr = CDT.util.raphael.translatePathString(pstr, tx, ty);
+
+        self.paths[idx] = self.paper.path(pstr).attr(self.options);
+        self.outlines[idx] = self.paper.path(pstr).attr(self.options.outline);
+      });
 
       // Add an invisible rectangle the same size as the canvas to allow
       // mouse events to have a bigger landing area.
       self.mouse = self.paper.rect(
         0,
         0,
-        self.options.width,
-        self.options.height
+        self.options.canvasWidth,
+        self.options.canvasHeight
       );
       self.mouse.attr({ fill: '#000', opacity: 0 });
 
@@ -77,29 +86,38 @@
 
         self.mouse.hover(
           function () {
-            self.outline
-              .stop(outlineFadeOutAnim)
-              .animate(outlineFadeInAnim);
+            $.each(self.pathStrs, function (idx) {
+              self.outlines[idx]
+                .stop(outlineFadeOutAnim)
+                .animate(outlineFadeInAnim);
+            });
           },
           function () {
-            self.outline
-              .stop(outlineFadeInAnim)
-              .animate(outlineFadeOutAnim);
+            $.each(self.pathStrs, function (idx) {
+              self.outlines[idx]
+                .stop(outlineFadeInAnim)
+                .animate(outlineFadeOutAnim);
+            });
           }
         );
       }
 
     self.element
       .data('icon-paper', self.paper)
-      .data('icon-path', self.path)
-      .data('icon-outline', self.outline)
-      .data('icon-transform', self.transform) // Save original transform that is can 
-                                         // be preserved when adding additional
-                                         // transformations.
+      .data('icon-paths', self.paths)
+      .data('icon-outlines', self.outlines)
       .data('icon-mouse', self.mouse);
     },
 
     animate: function (attrs, duration, easing) {
+      var self = this;
+
+      $.each(self.pathStrs, function (idx) {
+        self.animatePath(idx, attrs, duration, easing);
+      });
+    },
+
+    animatePath: function (path, attrs, duration, easing) {
       var self = this;
 
       duration = duration || $.fx.speeds._default;
@@ -113,11 +131,40 @@
       easing = easing || 'linear';
 
       if (!$.isPlainObject(attrs)) {
-        attrs = { transform: self.transform + attrs };
+        attrs = { transform: attrs };
       }
 
-      self.path.animate(attrs, duration, easing);
-      self.outline.animate(attrs, duration, easing);
+      self.paths[path].animate(attrs, duration, easing);
+      self.outlines[path].animate(attrs, duration, easing);
+    },
+
+    pathAttrs: function (attrs) {
+      var self = this;
+
+      $.each(self.pathStrs, function (idx) {
+        self.paths[idx].attr(attrs);
+      });
+
+      if (attrs.outline) {
+        self.outlineAttrs(attrs.outline);
+      }
+    },
+
+    outlineAttrs: function (attrs) {
+      var self = this;
+
+      $.each(self.pathStrs, function (idx) {
+        self.outlines[idx].attr(attrs);
+      });
+    },
+
+    transform: function (tstr) {
+      var self = this;
+
+      $.each(self.pathStrs, function (idx) {
+        self.paths[idx].transform(tstr);
+        self.outlines[idx].transform(tstr);
+      });
     }
   });
 
