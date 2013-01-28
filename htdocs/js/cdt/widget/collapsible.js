@@ -31,7 +31,7 @@
     },
 
     _create: function () {
-      var self = this, actionButtons;
+      var self = this;
 
       self.element.addClass('cdt-collapsible-collapsed');
       self.expanded = $('<div class="cdt-collapsible-expanded"/>');
@@ -85,21 +85,21 @@
         .appendTo(self.expanded)
         .wrap('<div class="cdt-collapsible-actions"/>');
 
-      actionButtons = $();
+      self.actions = {};
       $.each(self.options.actions, function (idx) {
-        actionButtons = actionButtons.add(
-          $('<button/>')
-            .attr('title', this.title || '')
-            .tooltip()
-            .button({
-              lbl: idx,
-              text: false,
-              icons: this.icons
-            })
-            .click(this.handler)
-        );
+        var btn = $('<button/>')
+          .attr('title', this.title || '')
+          .tooltip()
+          .button({
+            label: idx,
+            text: false,
+            icons: this.icons
+          })
+          .click(this.handler)
+
+        self.actions[idx] = btn;
+        self.expanded.find('.cdt-collapsible-actions').append(btn);
       });
-      self.expanded.find('.cdt-collapsible-actions').append(actionButtons);
 
       if (!this.options.layoutTarget) {
         this.options.layoutTarget = this.element.parent();
@@ -118,6 +118,13 @@
       this.content.remove();
 
       this.element.removeClass('cdt-collapsible-collapsed');
+    },
+
+    invokeAction: function (action) {
+      var self = this;
+      self.actions[action].click();
+
+      return this;
     },
 
     _refresh: function () {
