@@ -92,12 +92,12 @@
       this.editor
         .val(this.textEl.text())
         .show()
-        .width(this.element.width())
         .position({
           my: 'left top',
           at: 'left top',
           of: this.textEl
         })
+        .css('right', this.editor.css('left'))
         .hide();
 
       $({})
