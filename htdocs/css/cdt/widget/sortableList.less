@@ -1,0 +1,44 @@
+.cdt-sortable-list {
+  border: 1px solid #555;
+  border-top: none;
+  padding-bottom: 1em;
+
+  background-image: url(../../../img/cdt/widget/filled-bg.png);
+
+  .cdt-sortable-list-item {
+    border-bottom: 1px solid #555;
+
+    cursor: pointer;
+    background-color: #FFF;
+  }
+
+  .cdt-sortable-list-placeholder {
+    margin: 5px 2px;
+    height: 20px;
+    background-color: #FFF;
+
+    & + .cdt-sortable-list-item {
+      border-top: 1px solid #555;
+    }
+  }
+}
+
+.cdt-sortable-list-item {
+  position: relative;
+  top: 0;
+  left: 0;
+  padding: 5px 20px;
+
+  .ui-icon {
+    position: absolute;
+    top: 5px;
+    left: 0px;
+    width: 16px;
+    cursor: move;
+  }
+
+  &.ui-sortable-helper {
+    border: 1px solid #555;
+  }
+}
+
