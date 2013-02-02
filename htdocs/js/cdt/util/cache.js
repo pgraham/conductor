@@ -1,4 +1,4 @@
-(function (exports, undefined) {
+(function (exports, jQuery, undefined) {
 
   function cacheItem(val) {
     var isMiss = !!val;
@@ -21,6 +21,9 @@
         delete cache[key];
         return this;
       },
+      each: function (fn) {
+        $.each(cache, fn);
+      },
       get: function (key) {
         if (!cache[key]) {
           return cacheItem();
@@ -30,8 +33,17 @@
       put: function (key, val) {
         cache[key] = cacheItem(val);
         return this;
+      },
+      values: function () {
+        var vals = [];
+        this.each(function (idx) {
+          if (!this.isMiss()) {
+            vals.push(this.val());
+          }
+        });
+        return vals;
       }
     };
   };
 
-} (CDT.ns('CDT.util')));
+} (CDT.ns('CDT.util'), $));
