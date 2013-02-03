@@ -109,6 +109,7 @@ class ${actorClass} {
 
     ${if:jsappsupport}
       Element::js('${jslibPath}/raphael.js')->addToHead();
+      Element::js('${jsPath}/cdt/raphael-util.js')->addToHead();
 
       ${each:widgetCss as sheet}
         Element::css('${cssPath}/${sheet}')->addToHead();
@@ -174,17 +175,18 @@ class ${actorClass} {
   private function _includeJsLibs() {
     ${each:jslibs as jslib}
       ${if:jslib = arboreal}
-        Element::js(_P('/jslib/arboreal.js'))->addToHead();
+        Element::js('${jslibPath}/arboreal.js')->addToHead();
       ${elseif:jslib = epiceditor}
-        Element::js(_P('/jslib/epiceditor/epiceditor.js'))->addToHead();
-        Element::js(_P('/jslib/epiceditor/epiceditor.css'));
+        Element::js('${jslibPath}/epiceditor/epiceditor.js')->addToHead();
+        Element::js('${jslibPath}/epiceditor/epiceditor.css');
       ${elseif:jslib = highlight}
-        Element::js(_P('/jslib/highlight/highlight.js'))->addToHead();
-        Element::css(_P('/jslib/highlight/highlight.css'))->addToHead();
+        Element::js('${jslibPath}/highlight/highlight.js')->addToHead();
+        Element::css('${jslibPath}/highlight/highlight.css')->addToHead();
       ${elseif:jslib = markdown}
-        Element::js(_P('/jslib/markdown.js'))->addToHead();
+        Element::js('${jslibPath}/markdown.js')->addToHead();
       ${elseif:jslib = raphael}
-        Element::js(_P('/jslib/raphael.js'))->addToHead();
+        Element::js('${jslibPath}/raphael.js')->addToHead();
+        Element::js('${jsPath}/cdt/raphael-util.js')->addToHead();
       ${fi}
     ${done}
 
