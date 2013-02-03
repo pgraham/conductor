@@ -63,7 +63,7 @@ class ${actorClass} {
     ${done}
     ${if:sheets ISSET}
       ${each:sheets as css}
-        Element::css('${cssPath}/${css}')->addToHead();
+        Element::css('${css}')->addToHead();
       ${done}
     ${fi}
 
@@ -129,7 +129,7 @@ class ${actorClass} {
     // Javascripts
     ${if:jscripts ISSET}
       ${each:jscripts as jscript}
-        Element::js('${jsPath}/${jscript}')->addToHead();
+        Element::js('${jscript}')->addToHead();
       ${done}
     ${fi}
 

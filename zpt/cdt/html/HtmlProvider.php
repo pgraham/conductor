@@ -118,8 +118,19 @@ class HtmlProvider extends AbstractGenerator {
       $page->asArray('jslib')
     );
 
-    $values['jscripts'] = $this->_parseScripts($page, $template);
-    $values['sheets'] = $this->_parseStylesheets($page, $template);
+    $values['jscripts'] = array_map(function ($script) {
+      if (substr($script, 0, 1) !== '/') {
+        $script = "/js/$script";
+      }
+      return _P($script);
+    }, $this->_parseScripts($page, $template));
+
+    $values['sheets'] = array_map(function ($sheet) {
+      if (substr($sheet, 0, 1) !== '/') {
+        $sheet = "/css/$sheet";
+      }
+      return _P($sheet);
+    }, $this->_parseStylesheets($page, $template));
 
     $values['fonts'] = array_merge(
       $template->asArray('font'),
