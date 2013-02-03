@@ -70,7 +70,7 @@ class Injector {
 
   public static function inject($obj, array $beans) {
     foreach ($beans as $bean) {
-      $property = $bean['property'];
+      $property = $bean['name'];
       $setter = "set" . ucfirst($property);
 
       if (isset($bean['ref'])) {

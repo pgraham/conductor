@@ -42,10 +42,14 @@
 
   <bean id="authProvider"
         class="zpt\cdt\AuthProvider"
-        initMethod="init" />
+        initMethod="init"/>
+
+  <bean id="defaultGatekeeper" class="zpt\cdt\crud\DefaultGatekeeper">
+    <property name="authProvider" ref="authProvider"/>
+  </bean>
 
   <bean id="session" class="zpt\cdt\Session" initMethod="init">
-    <property name="authProvider" ref="authProvider" />
+    <property name="authProvider" ref="authProvider"/>
   </bean>
 
   <bean id="spfParser" class="zpt\cdt\crud\SpfParser"/>

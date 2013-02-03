@@ -15,6 +15,7 @@ namespace zpt\cdt\html;
 use \zeptech\anno\Annotations;
 use \zpt\cdt\compile\resource\ResourceDiscoverer;
 use \zpt\cdt\di\DependencyParser;
+use \zpt\cdt\di\Injector;
 use \zpt\cdt\Conductor;
 use \zpt\pct\AbstractGenerator;
 use \zpt\util\file\GlobFileLister;
@@ -68,9 +69,9 @@ class HtmlProvider extends AbstractGenerator {
       $template = new Annotations($templateDef);
 
       $values['template'] = $templateClass;
-      $tmplDependencies = DependencyParser::parse($templateDef);
+      $tmplDependencies = DependencyParser::parse(Injector::generateBeanId($templateClass), $templateDef);
       if (count($tmplDependencies) > 0) {
-        $values['tmplDependencies'] = $tmplDependencies;
+        $values['tmplDependencies'] = $tmplDependencies['props'];
       }
     } else {
       $template = new Annotations();
