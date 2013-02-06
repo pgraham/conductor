@@ -74,6 +74,7 @@ class ${actorClass} {
     $response->setData(array(
       'success' => true,
       'id'  => $id,
+      'entity' => $transformer->asArray($model),
       'msg' => array(
         'text' => $info->createSuccessMsg(),
         'type' => 'info'
