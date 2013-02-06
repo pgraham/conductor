@@ -23,32 +23,34 @@ use \zpt\cdt\di\Injector;
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class DefaultGatekeeper extends AbstractGatekeeper implements Gatekeeper {
+class DefaultGatekeeper extends AbstractGatekeeper implements Gatekeeper
+{
 
-  /** @Injected */
-  private $_authProvider;
+    /** @Injected */
+    private $_authProvider;
 
-  public function __construct() {
-    parent::__construct() {
-  }
+    public function canCreate($model)
+    {
+        return $this->_authProvider->hasPermission('cdt-admin');
+    }
 
-  public function canCreate($model) {
-    return $this->_authProvider->hasPermission('cdt-admin');
-  }
+    public function canDelete($model)
+    {
+        return $this->_authProvider->hasPermission('cdt-admin');
+    }
 
-  public function canDelete($model) {
-    return $this->_authProvider->hasPermission('cdt-admin');
-  }
+    public function canRead($model)
+    {
+        return true;
+    }
 
-  public function canRead($model) {
-    return true;
-  }
+    public function canWrite($model)
+    {
+        return $this->_authProvider->hasPermission('cdt-admin');
+    }
 
-  public function canWrite($model) {
-    return $this->_authProvider->hasPermission('cdt-admin');
-  }
-
-  public function setAuthProvider($authProvider) {
-    $this->_authProvider = $authProvider;
-  }
+    public function setAuthProvider($authProvider)
+    {
+        $this->_authProvider = $authProvider;
+    }
 }

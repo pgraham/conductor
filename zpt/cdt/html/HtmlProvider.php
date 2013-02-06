@@ -15,6 +15,7 @@ namespace zpt\cdt\html;
 use \zeptech\anno\Annotations;
 use \zpt\cdt\compile\resource\ResourceDiscoverer;
 use \zpt\cdt\di\DependencyParser;
+use \zpt\cdt\di\Injector;
 use \zpt\cdt\Conductor;
 use \zpt\pct\AbstractGenerator;
 use \zpt\util\file\GlobFileLister;
@@ -68,9 +69,9 @@ class HtmlProvider extends AbstractGenerator {
       $template = new Annotations($templateDef);
 
       $values['template'] = $templateClass;
-      $tmplDependencies = DependencyParser::parse($templateDef);
+      $tmplDependencies = DependencyParser::parse(Injector::generateBeanId($templateClass), $templateDef);
       if (count($tmplDependencies) > 0) {
-        $values['tmplDependencies'] = $tmplDependencies;
+        $values['tmplDependencies'] = $tmplDependencies['props'];
       }
     } else {
       $template = new Annotations();
@@ -117,8 +118,19 @@ class HtmlProvider extends AbstractGenerator {
       $page->asArray('jslib')
     );
 
-    $values['jscripts'] = $this->_parseScripts($page, $template);
-    $values['sheets'] = $this->_parseStylesheets($page, $template);
+    $values['jscripts'] = array_map(function ($script) {
+      if (substr($script, 0, 1) !== '/') {
+        $script = "/js/$script";
+      }
+      return _P($script);
+    }, $this->_parseScripts($page, $template));
+
+    $values['sheets'] = array_map(function ($sheet) {
+      if (substr($sheet, 0, 1) !== '/') {
+        $sheet = "/css/$sheet";
+      }
+      return _P($sheet);
+    }, $this->_parseStylesheets($page, $template));
 
     $values['fonts'] = array_merge(
       $template->asArray('font'),

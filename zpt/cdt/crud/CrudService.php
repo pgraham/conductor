@@ -17,6 +17,7 @@ namespace zpt\cdt\crud;
 use \zeptech\orm\generator\model\Model;
 use \zeptech\orm\generator\model\Parser as ModelParser;
 use \zeptech\orm\generator\AbstractModelGenerator;
+use \zpt\cdt\di\Injector;
 use \zpt\cdt\i18n\ModelDisplayParser;
 
 /**
@@ -46,12 +47,17 @@ class CrudService extends AbstractModelGenerator {
     if (preg_match('/^zpt\\\\mod\\\\([^\\\\]+)\\\\model\\\\/', $classname, $matches)) {
       $url = "/$matches[1]$url";
     }
+
+    $gatekeeper = $model->getGatekeeper();
+    if ($gatekeeper === null) {
+      $gatekeeper = 'zpt\cdt\crud\DefaultGatekeeper';
+    }
     
     return array(
       'auth'             => $model->getAuth(),
       'cdtOrderTokenKey' => 'updateOrderToken_' . str_replace('\\', '_', get_class($model)),
       'gatekeeper'       => $model->getGatekeeper(),
-      'gatekeeperBeanId' => str_replace('\\', '_', $model->getGatekeeper()),
+      'gatekeeperBeanId' => Injector::generateBeanId($gatekeeper),
       'singular'         => $modelStrings->getSingular(),
       'plural'           => $plural,
       'idColumn'         => $model->getId()->getColumn(),

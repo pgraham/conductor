@@ -276,6 +276,16 @@ class Conductor {
   }
 
   /**
+   * Getter for whether or not the site is operating in PRODUCTION mode.
+   *
+   * @return boolean
+   */
+  public static function isProductionMode() {
+    self::_ensureInitialized();
+    return self::$_config['env'] === 'prod';
+  }
+
+  /**
    * Process the request.
    */
   public static function processRequest() {

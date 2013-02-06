@@ -46,7 +46,7 @@ class ConfigValueProvider {
     $c = new Criteria();
     $c->addEquals('name', $name);
 
-    $rows = $this->_persister->retrieve($c);
+    $rows = $this->persister->retrieve($c);
     if (count($rows) === 0) {
       return null;
     }

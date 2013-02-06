@@ -13,6 +13,7 @@ use \zeptech\orm\generator\ValidatorGenerator;
 use \zeptech\orm\QueryBuilder;
 use \zpt\cdt\compile\resource\ResourceCompiler;
 use \zpt\cdt\crud\CrudService;
+use \zpt\cdt\di\Injector;
 use \zpt\cdt\html\HtmlProvider;
 use \zpt\cdt\html\NotAPageDefinitionException;
 use \zpt\cdt\i18n\ModelDisplayParser;
@@ -497,7 +498,7 @@ class Compiler {
         $gatekeeper = $model->getGatekeeper();
         if ($gatekeeper) {
           // TODO Use naming strategy to generate beanId
-          $gatekeeperBeanId = str_replace('\\', '_', $gatekeeper);
+          $gatekeeperBeanId = Injector::generateBeanId($gatekeeper);
           $this->_diCompiler->addBean($gatekeeperBeanId,
             $gatekeeper);
         }
