@@ -94,8 +94,6 @@ class ${actorClass} {
     Element::js('${jslibPath}/jquery-ui/external/globalize.js')->addToHead();
     Element::js('${jslibPath}/jquery-ui/jquery.ui.js')->addToHead();
 
-    $this->_includeJsLibs();
-
     // -------------------------------------------------------------------------
 
     // Client support scripts
@@ -106,6 +104,8 @@ class ${actorClass} {
     ${each:utilScripts as script}
       Element::js('${jsPath}/${script}')->addToHead();
     ${done}
+
+    $this->_includeJsLibs();
 
     ${if:jsappsupport}
       Element::js('${jslibPath}/raphael.js')->addToHead();
