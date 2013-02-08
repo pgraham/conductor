@@ -2,7 +2,9 @@
 (function (exports, $, CDT, undefined) {
 
   $.widget('ui.editable', {
-    options: {},
+    options: {
+      showOnHover: true
+    },
 
     _create: function () {
       var self = this;
@@ -37,6 +39,18 @@
         .click(function () {
           self._showEditor();
         });
+
+      if (this.options.showOnHover) {
+        this.editBtn.fadeTo(0, 0.1);
+        this.element.hover(
+          function () {
+            self.editBtn.stop(true, true).fadeTo('slow', 1);
+          },
+          function () {
+            self.editBtn.stop(true, true).fadeTo('fast', 0.3);
+          }
+        );
+      }
 
       if (this.options.editButtonTooltip) {
         this.editBtn.attr('title', this.options.editButtonTooltip).tooltip();
