@@ -76,7 +76,6 @@ class ${actorClass} {
     // -------------------------------------------------------------------------
     // Non-jquery
     Element::js('${jslibPath}/date.js')->addToHead();
-    Element::js('${jslibPath}/temple.js')->addToHead();
 
     // JQuery - If dev mode non-minimized version is included
     $this->_loadJQuery();
@@ -174,19 +173,17 @@ class ${actorClass} {
 
   private function _includeJsLibs() {
     ${each:jslibs as jslib}
-      ${if:jslib = arboreal}
-        Element::js('${jslibPath}/arboreal.js')->addToHead();
-      ${elseif:jslib = epiceditor}
+      ${if:jslib = epiceditor}
         Element::js('${jslibPath}/epiceditor/epiceditor.js')->addToHead();
         Element::js('${jslibPath}/epiceditor/epiceditor.css');
       ${elseif:jslib = highlight}
         Element::js('${jslibPath}/highlight/highlight.js')->addToHead();
         Element::css('${jslibPath}/highlight/highlight.css')->addToHead();
-      ${elseif:jslib = markdown}
-        Element::js('${jslibPath}/markdown.js')->addToHead();
       ${elseif:jslib = raphael}
         Element::js('${jslibPath}/raphael.js')->addToHead();
         Element::js('${jsPath}/cdt/raphael-util.js')->addToHead();
+      ${else}
+        Element::js('${jslibPath}/${jslib}.js')->addToHead();
       ${fi}
     ${done}
 
