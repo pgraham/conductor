@@ -46,7 +46,7 @@ CDT.ns('CDT.model');
   function buildToggleButton() {
     var toggle, path, collapsed = false;
     
-    toggle = CDT.icon('caret-down')
+    toggle = CDT.widget.icon({ paths: 'caret-down' });
     path = toggle.data('icon-path');
 
     toggle.data('icon-paper').rect(0, 0, 32, 32)
@@ -173,11 +173,15 @@ CDT.ns('CDT.model');
     var elm;
 
     // Create top level configuration section
-    elm = $('<div class="global-config-editor"/>')
-      .append($('<h1/>').text('Global Settings').prepend(CDT.icon('globe', {
-        fill: '#999'
-      })))
-      .data('config-section-depth', 1);
+    elm = $('<div class="global-config-editor"/>').append(
+      $('<h1/>')
+        .text('Global Settings')
+        .prepend(CDT.widget.icon({
+          paths: CDT.icon.globe,
+          fill: '#999'
+        }))
+    )
+    .data('config-section-depth', 1);
 
     elm.on('global-config-updated', function () {
       loadGlobalConfig(elm);
