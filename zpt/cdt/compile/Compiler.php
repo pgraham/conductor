@@ -495,7 +495,7 @@ class Compiler {
 
           $actorName = $model->getActor();
           $crudSrvc = "zpt\\dyn\\crud\\$actorName";
-          $beanId = $actorName . "_crudService";
+          $beanId = Injector::generateBeanId($crudSrvc, 'Crud');
           $this->_diCompiler->addBean($beanId, $crudSrvc);
 
 
