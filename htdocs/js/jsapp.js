@@ -9,6 +9,18 @@
   var tabs, menu, msgManager;
   observable(exports);
 
+  function addTab(id, lbl, elm) {
+    var tab = $('<li/>')
+      .append( $('<a/>').attr('href', '#' + id).text(lbl) )
+
+    tabs.find('ul.ui-tabs-nav').append(tab);
+    elm.attr('id', id).addClass('cdt-app-view').appendTo(tabs);
+
+    tabs.tabs('refresh');
+    if (tabs.tabs('option', 'active') === false) {
+      tabs.tabs('option', 'active', tabs.find('ul.ui-tabs-nav li').index(tab));
+    }
+  }
 
   exports.addView = function (id, lbl, elm, closeable) {
     if (tabs === undefined) {
@@ -21,12 +33,11 @@
       return;
     }
 
-    elm.attr('id', id).addClass('cdt-app-view').appendTo(tabs);
-    tabs.tabs('add', '#' + id, lbl);
+    addTab(id, lbl, elm);
 
     if (closeable) {
-      tabs.find('.ui-tabs-nav li').last().addClass('closeable')
-        .append(
+      var li = tabs.find('.ui-tabs-nav li').last();
+        li.addClass('closeable').append(
           $('<span class="ui-icon ui-icon-close">Remove Tab</span>')
             .addClass('ui-corner-all')
             .css({
@@ -41,9 +52,9 @@
 
               // Show the previous tab, or next tab if this is the first tab
               if (idx === 0) {
-                tabs.tabs('select', idx + 1);
+                tabs.tabs('option', 'active', idx + 1);
               } else {
-                tabs.tabs('select', idx - 1);
+                tabs.tabs('option', 'active', idx - 1);
               }
     
               tab.css({
@@ -54,7 +65,9 @@
               }).animate({
                 height: 0
               }, 'slow', 'easeOutCirc', function () {
-                tabs.tabs('remove', idx);
+                li.remove();
+                elm.remove();
+                tabs.tabs('refresh');
               });
 
             })
@@ -134,17 +147,15 @@
     tabs = $('<div id="cdt-app-container"><ul/></div>')
       .appendTo($('body'))
       .tabs({
-        fx: { opacity: 'toggle', duration: 200 }
-      })
-      .bind('tabsshow', function (event, ui) {
-        $(ui.panel).layout();
-        CDT.app.trigger('view-change', [ {
-          id: ui.panel.id,
-          ui: ui
-        } ]);
-      })
-      .bind('tabsselect', function (event, ui) {
-        CDT.app.clearMessages();
+        fx: { opacity: 'toggle', duration: 200 },
+        activate: function (e, ui) {
+          $(ui.newPanel).layout();
+          CDT.app.trigger( 'viewchange', [ ui ] );
+        },
+        beforeActivate: function (e, ui) {
+          CDT.app.clearMessages();
+          CDT.app.trigger( 'beforeviewchange', [ ui ] );
+        }
       });
 
     // Add global ajax handler to remove any messages before a new AJAX request
