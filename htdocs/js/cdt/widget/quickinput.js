@@ -80,7 +80,7 @@
     open: function () {
       var self = this, w;
 
-      self.input.appendTo('body');
+      self.input.removeClass('detached').appendTo('body');
       w = self._calculateWidth();
       self.input.width(w).position({
         my: 'left top',
