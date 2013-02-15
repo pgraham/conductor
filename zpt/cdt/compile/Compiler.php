@@ -26,7 +26,7 @@ use \zpt\orm\model\ModelCache;
 use \zpt\pct\CodeTemplateParser;
 use \zpt\pct\DefaultActorNamingStrategy;
 use \zpt\util\File;
-use \zpt\util\String;
+use \zpt\util\StringUtils;
 use \DirectoryIterator;
 use \Exception;
 use \ReflectionClass;
@@ -374,7 +374,7 @@ class Compiler {
       if ($tmplBase !== '') {
         $viewNs = str_replace('/', '\\', ltrim($tmplBase, '/'));
         $viewClass = "$viewNs\\$pageId";
-        $beanId = lcfirst(String::toCamelCase($viewNs, '\\', true) . $pageId);
+        $beanId = lcfirst(StringUtils::toCamelCase($viewNs, '\\', true) . $pageId);
       }
       $viewClass = "$ns\\html\\$viewClass";
       $beanId .= 'HtmlProvider';
@@ -397,8 +397,8 @@ class Compiler {
 
       $hdlr = 'zpt\cdt\html\HtmlRequestHandler';
       $tmpls = array();
-      $tmpls[] = "$tmplBase/" . String::fromCamelCase($pageId) . '.html';
-      $tmpls[] = "$tmplBase/" . String::fromCamelCase($pageId) . '.php';
+      $tmpls[] = "$tmplBase/" . StringUtils::fromCamelCase($pageId) . '.html';
+      $tmpls[] = "$tmplBase/" . StringUtils::fromCamelCase($pageId) . '.php';
       if ($pageId === 'Index') {
         if ($tmplBase === '') {
           $tmpls[] = '/';
@@ -410,7 +410,7 @@ class Compiler {
         $this->_serverCompiler->addMapping(
           'zpt\cdt\html\HtmlFragmentRequestHandler',
           $args,
-          array( "$tmplBase/" . String::fromCamelCase($pageId) . '.frag' )
+          array( "$tmplBase/" . StringUtils::fromCamelCase($pageId) . '.frag' )
         );
       }
 
