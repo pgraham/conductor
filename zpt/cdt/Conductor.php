@@ -162,7 +162,7 @@ class Conductor {
       assert_options(ASSERT_QUIET_EVAL, 0);
 
       if (isset($_GET['clean'])) {
-        $dirs = array( 'i18n', 'zeptech', 'htdocs/css', 'htdocs/img',
+        $dirs = array( 'i18n', 'zeptech', 'zpt', 'htdocs/css', 'htdocs/img',
                        'htdocs/js', 'htdocs/jslib');
         $files = array( 'php.error');
 
