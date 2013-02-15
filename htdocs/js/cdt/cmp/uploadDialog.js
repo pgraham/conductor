@@ -1,15 +1,13 @@
-CDT.ns('CDT.cmp');
-
 /**
  * CDT.cmp.uploadDialog(config)
  *
  * @param object config Configuration to pass to the uploader.  Must define
  *   at least an action.
  */
-(function ($, CDT, undefined) {
+(function (exports, $, undefined) {
   "use strict";
 
-  CDT.cmp.uploadDialog = function (config) {
+  exports.uploadDialog = function (config) {
     var elm, uploader;
 
     elm = $('<div class="file-uploader-dialog"/>')
@@ -53,4 +51,4 @@ CDT.ns('CDT.cmp');
     return elm;
   };
 
-} (jQuery, CDT));
+} (CDT.ns('CDT.cmp'), jQuery));
