@@ -1,18 +1,16 @@
-CDT.ns('CDT.app');
-
 /**
  * This javascript provides a basic shell for building a javascript web-app.
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-(function ($, CDT, undefined) {
+(function (exports, $, undefined) {
   "use strict";
 
   var tabs, menu, msgManager;
+  observable(exports);
 
-  observable(CDT.app);
 
-  CDT.app.addView = function (id, lbl, elm, closeable) {
+  exports.addView = function (id, lbl, elm, closeable) {
     if (tabs === undefined) {
       // TODO Queue the view to be added once the document is ready
       return;
@@ -75,16 +73,16 @@ CDT.ns('CDT.app');
     elm.css('top', tabs.find('.ui-tabs-nav').outerHeight(true)).layout();
   };
 
-  CDT.app.showView = function (id) {
+  exports.showView = function (id) {
     tabs.find('.ui-tabs-nav li').each(function (idx) {
       if ($(this).attr('aria-controls') === id) {
-        tabs.tabs('select', idx);
+        tabs.tabs('option', 'active', idx);
         return false;
       }
     });
   };
 
-  CDT.app.addMenuItem = function (item) {
+  exports.addMenuItem = function (item) {
     menu.append(item);
   }
 
@@ -121,11 +119,11 @@ CDT.ns('CDT.app');
     };
   } ());
 
-  CDT.app.addMessage = function (message, type, details) {
+  exports.addMessage = function (message, type, details) {
     msgManager.addMessage(message, type, details);
   };
 
-  CDT.app.clearMessages = function () {
+  exports.clearMessages = function () {
     msgManager.clearMessages();
   };
 
@@ -222,4 +220,4 @@ CDT.ns('CDT.app');
     });
   });
 
-} (jQuery.noConflict(), CDT));
+} (CDT.ns('CDT.app'), jQuery.noConflict()));
