@@ -58,7 +58,11 @@ class ResourceDiscoverer {
     $groupBasePath = str_replace('.', '/', $group);
     $groupPath = "$this->_resourceDir/$groupBasePath";
     if (!file_exists($groupPath)) {
-      return array();
+      if (file_exists("$groupPath.$this->_ext")) {
+        return array("$groupBasePath.$this->_ext");
+      } else {
+        return array();
+      }
     }
 
     $groupDir = new DirectoryIterator($groupPath);
