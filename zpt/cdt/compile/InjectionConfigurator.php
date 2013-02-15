@@ -34,7 +34,6 @@ class InjectionConfigurator {
             $${bean[id]}->set${prop[name]}(Injector::getBeans('${prop[type]}'));
           ${fi}
         ${done}
-
       ${fi}
     ${done}
 
