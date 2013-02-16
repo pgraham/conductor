@@ -25,8 +25,8 @@ use oboe\Element;
  */
 class L10N {
 
-  /* Dynamically created function for retrieving a requested string */
-  private static $_getFn;
+  /* Map of keys */
+  private static $_strs;
 
   /* The currently loaded language */
   private static $_lang;
@@ -38,8 +38,7 @@ class L10N {
    * @return string
    */
   public static function get($key) {
-    $getFn = self::$_getFn;
-    $str = $getFn($key);
+    $str = self::getStr($key);
 
     $args = func_get_args();
     array_shift($args);
@@ -106,14 +105,26 @@ class L10N {
     // Save the loaded language and require the generated strings file.
     require $langFilePath;
     self::$_lang = $lang;
-    self::$_getFn = function ($key) {
-      global $L10N;
-      if (!isset($L10N[$key])) {
-        return "XXXXXXXX $key XXXXXXXX";
-      }
-      return $L10N[$key]['md'];
-    };
+    self::$_strs = $GLOBALS['L10N'] ?: array();
   }
+
+  /**
+   * Determine if a localized string for the specified key exists.
+   *
+   * @param string $key
+   * @return boolean
+   */
+  public static function strExists($key) {
+    return isset(self::$_strs[$key]);
+  }
+
+  private static function getStr($key) {
+    if (!isset(self::$_strs[$key])) {
+      return "XXXXXXXX $key XXXXXXXX";
+    }
+    return self::$_strs[$key]['md'];
+  }
+
 } 
 
 } // End namespace
