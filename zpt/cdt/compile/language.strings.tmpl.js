@@ -1,4 +1,4 @@
-(function (global, undefined) {
+(function (global, $, undefined) {
   "use strict";
 
   var dict = ${json:strings};
@@ -46,4 +46,4 @@
     };
   }
 
-} (window));
+} (window, jQuery));

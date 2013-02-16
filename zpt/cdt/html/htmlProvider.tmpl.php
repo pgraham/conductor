@@ -67,11 +67,6 @@ class ${actorClass} {
       ${done}
     ${fi}
 
-    // Load language script
-    // -------------------------------------------------------------------------
-    $lang = L10N::getLang();
-    Element::js("${jsPath}/$lang.js")->addToHead();
-
     // Javascript libraries
     // -------------------------------------------------------------------------
     // Non-jquery
@@ -94,6 +89,10 @@ class ${actorClass} {
     Element::js('${jslibPath}/jquery-ui/jquery.ui.js')->addToHead();
 
     // -------------------------------------------------------------------------
+
+    // Load language script
+    $lang = L10N::getLang();
+    Element::js("${jsPath}/$lang.js")->addToHead();
 
     // Client support scripts
     Element::js('${jsPath}/base.js')->addToHead();
