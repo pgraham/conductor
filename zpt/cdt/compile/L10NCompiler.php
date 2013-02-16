@@ -98,10 +98,14 @@ class L10NCompiler {
 
         $raw = implode(' ', $val);
         $md = Markdown::parseInline($raw);
-        $result[$key] = array(
-          'md' => $md,
-          'raw' => $raw
-        );
+        if ($raw !== $md) {
+          $result[$key] = array(
+            'md' => $md,
+            'raw' => $raw
+          );
+        } else {
+          $result[$key] = $raw;
+        }
 
         $key = null;
         $val = array();

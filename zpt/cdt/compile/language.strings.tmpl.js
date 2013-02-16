@@ -11,6 +11,13 @@
     return String.prototype.format.apply(val, args);
   }
 
+  function extractValue(type, val) {
+    if ($.isArray(val)) {
+      return val[type];
+    }
+    return val;
+  }
+
   if (global._L === undefined) {
     global._L = function () {
       var key, args = Array.prototype.slice.call(arguments);
@@ -20,7 +27,7 @@
       if (dict[key] === undefined) {
         return noValue(key);
       } else {
-        return formatValue(dict[key].raw, args);
+        return formatValue(extractValue('raw', dict[key]), args);
       }
     };
   }
@@ -34,7 +41,7 @@
       if (dict[key] === undefined) {
         return noValue(key);
       } else {
-        return formatValue(dict[key].md, args);
+        return formatValue(extractValue('md', dict[key]), args);
       }
     };
   }

@@ -35,10 +35,15 @@ class L10N {
    * Get the localized string with the given key.
    *
    * @param string $key The key of the string to retrieve.
+   * @param string $type The type of string to retrieve. Either 'raw' or 'md'.
+   *        Default: raw
    * @return string
    */
-  public static function get($key) {
+  public static function get($key, $type = 'raw') {
     $str = self::getStr($key);
+    if (is_array($str)) {
+      $str = $str[$type];
+    }
 
     $args = func_get_args();
     array_shift($args);
@@ -122,7 +127,7 @@ class L10N {
     if (!isset(self::$_strs[$key])) {
       return "XXXXXXXX $key XXXXXXXX";
     }
-    return self::$_strs[$key]['md'];
+    return self::$_strs[$key];
   }
 
 } 
@@ -132,6 +137,6 @@ class L10N {
 namespace { // global namespace
   /** Alias for L10N::get($key) */
   function _L($key) {
-    return \zpt\cdt\L10N::get($key);
+    return String(\zpt\cdt\L10N::get($key));
   }
 }
