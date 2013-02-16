@@ -110,6 +110,9 @@ class Loader {
         self::registerNamespace("zpt\\mod\\$modName", $mod->getPathName());
       }
     }
+
+    // Load primitive wrapper functions
+    require_once "$cdtLib/reed/zpt/util/prim-wrap.php";
   }
 
   public static function registerNamespace($namespace, $src, $debug = false) {

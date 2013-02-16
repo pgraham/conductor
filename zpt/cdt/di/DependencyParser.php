@@ -37,9 +37,30 @@ class DependencyParser {
       $classDef = new ReflectionClass($classDef);
     }
 
-    $beanProps = array();
+    $bean = array(
+      'id' => $id,
+      'class' => $classDef->getName()
+    );
 
+    if ($classDef->implementsInterface('zpt\cdt\di\InitializingBean')) {
+      $bean['init'] = 'init';
+    }
+
+    $beanProps = array();
+    while ($classDef) {
+      $beanProps = array_merge($beanProps, self::parseClass($classDef));
+      $classDef = $classDef->getParentClass();
+    }
+
+    $bean['props'] = $beanProps;
+
+    return $bean;
+  }
+
+  public static function parseClass($classDef) {
     $properties = $classDef->getProperties();
+
+    $beanProps = array();
     foreach ($properties as $prop) {
       $annos = new Annotations($prop);
       if (!isset($annos['injected'])) {
@@ -76,19 +97,8 @@ class DependencyParser {
           'ref'   => $beanId,
         );
       }
-
     }
 
-    $bean = array(
-      'id' => $id,
-      'class' => $classDef->getName(),
-      'props' => $beanProps
-    );
-
-    if ($classDef->implementsInterface('zpt\cdt\di\InitializingBean')) {
-      $bean['init'] = 'init';
-    }
-
-    return $bean;
+    return $beanProps;
   }
 }

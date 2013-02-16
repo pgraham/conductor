@@ -26,7 +26,7 @@ use \zpt\orm\model\ModelCache;
 use \zpt\pct\CodeTemplateParser;
 use \zpt\pct\DefaultActorNamingStrategy;
 use \zpt\util\File;
-use \zpt\util\String;
+use \zpt\util\StringUtils;
 use \DirectoryIterator;
 use \Exception;
 use \ReflectionClass;
@@ -159,7 +159,6 @@ class Compiler {
     $this->compileServices($pathInfo, $ns);
     $this->compileResources($pathInfo, $ns);
     $this->compileJslibs($pathInfo, $ns);
-    $this->compileModules($pathInfo, $ns);
     $this->compileLanguageFiles($pathInfo, $ns);
     $this->compileHtml($pathInfo, $ns);
 
@@ -251,42 +250,6 @@ class Compiler {
     });
   }
 
-  protected function compileModules($pathInfo, $ns) {
-    $target = "$pathInfo[target]/htdocs";
-    $modDir = "$pathInfo[root]/modules";
-
-    if (!file_exists($modDir)) {
-      return;
-    }
-
-    $modules = array();
-    $dir = new DirectoryIterator($modDir);
-    foreach ($dir as $module) {
-      if ($module->isDot() || !$module->isDir()) {
-        continue;
-      }
-
-      $modDir = $module->getPathname();
-      $modName = $module->getBasename();
-      $modDocs = "$modDir/htdocs";
-
-      $modules[] = $modName;
-
-      // We need to first remove any existing module files otherwise the copy
-      // command will copy the module's htdocs folder into the existing module
-      // target instead of creating a copy of htdocs at the module target
-      $modTarget = "$target/$modName";
-      if (file_exists($modTarget)) {
-        $rmCmd = "rm -r $modTarget";
-        exec($rmCmd);
-      }
-      if (file_exists($modDocs)) {
-        $cpCmd = "cp -a $modDocs $target/$modName";
-        exec($cpCmd);
-      }
-    }
-  }
-
   protected function compileResources($pathInfo, $ns) {
     $resourceOut = "$pathInfo[target]/htdocs";
 
@@ -303,10 +266,34 @@ class Compiler {
         'jsns' => $ns
       ));
 
-    // Compile javascript resources
+    // -------------------------------------------------------------------------
+    // ORDER HERE IS SIGNIFICANT
+    // -------------------------
+    // All resources of the same type (js, css, img) are compiled into the
+    // same so location.  The conductor resources are compiled first followed by
+    // the modules resources with the site resources compiled last.
+    // This allows modules to override conductor resources and the site's
+    // resources to override both conductor and module resources.
+    //
+    // By convention, all conductor resources are placed within a directory
+    // named cdt.  Modules place their resources in a directory specific
+    // directory for that modules and sites place resource in a directory named
+    // the same as the site nickname.
+    //
+    // WARNING: When multiple modules declare the same file the result is
+    //          non-deterministic
+    // -------------------------------------------------------------------------
     $this->_resourceCompiler->compile("$resourceSrc/js", "$resourceOut/js");
     $this->_resourceCompiler->compile("$resourceSrc/css", "$resourceOut/css");
     $this->_resourceCompiler->compile("$resourceSrc/img", "$resourceOut/img");
+
+    $self = $this;
+    $this->_doWithModules(function ($moduleSrc) use ($self, $resourceOut) {
+      $resourceSrc = "$moduleSrc/htdocs";
+      $self->resourceCompile("$resourceSrc/js", "$resourceOut/js");
+      $self->resourceCompile("$resourceSrc/css", "$resourceOut/css");
+      $self->resourceCompile("$resourceSrc/img", "$resourceOut/img");
+    });
 
     // Compile site resources
     // ----------------------
@@ -374,7 +361,7 @@ class Compiler {
       if ($tmplBase !== '') {
         $viewNs = str_replace('/', '\\', ltrim($tmplBase, '/'));
         $viewClass = "$viewNs\\$pageId";
-        $beanId = lcfirst(String::toCamelCase($viewNs, '\\', true) . $pageId);
+        $beanId = lcfirst(StringUtils::toCamelCase($viewNs, '\\', true) . $pageId);
       }
       $viewClass = "$ns\\html\\$viewClass";
       $beanId .= 'HtmlProvider';
@@ -397,8 +384,8 @@ class Compiler {
 
       $hdlr = 'zpt\cdt\html\HtmlRequestHandler';
       $tmpls = array();
-      $tmpls[] = "$tmplBase/" . String::fromCamelCase($pageId) . '.html';
-      $tmpls[] = "$tmplBase/" . String::fromCamelCase($pageId) . '.php';
+      $tmpls[] = "$tmplBase/" . StringUtils::fromCamelCase($pageId) . '.html';
+      $tmpls[] = "$tmplBase/" . StringUtils::fromCamelCase($pageId) . '.php';
       if ($pageId === 'Index') {
         if ($tmplBase === '') {
           $tmpls[] = '/';
@@ -410,7 +397,7 @@ class Compiler {
         $this->_serverCompiler->addMapping(
           'zpt\cdt\html\HtmlFragmentRequestHandler',
           $args,
-          array( "$tmplBase/" . String::fromCamelCase($pageId) . '.frag' )
+          array( "$tmplBase/" . StringUtils::fromCamelCase($pageId) . '.frag' )
         );
       }
 
@@ -508,7 +495,7 @@ class Compiler {
 
           $actorName = $model->getActor();
           $crudSrvc = "zpt\\dyn\\crud\\$actorName";
-          $beanId = $actorName . "_crudService";
+          $beanId = Injector::generateBeanId($crudSrvc, 'Crud');
           $this->_diCompiler->addBean($beanId, $crudSrvc);
 
 
@@ -562,5 +549,10 @@ class Compiler {
       $pathInfo['target']);
     $this->_serviceCompiler->setServiceRequestDispatcher(
       $serviceRequestDispatcher);
+  }
+
+  // Kludge until anonymous function can access $this private methods
+  public function resourceCompile($resourceSrc, $resourceOut) {
+    $this->_resourceCompiler->compile($resourceSrc, $resourceOut);
   }
 }

@@ -1,18 +1,28 @@
-CDT.ns('CDT.app');
-
 /**
  * This javascript provides a basic shell for building a javascript web-app.
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-(function ($, CDT, undefined) {
+(function (exports, $, undefined) {
   "use strict";
 
   var tabs, menu, msgManager;
+  observable(exports);
 
-  observable(CDT.app);
+  function addTab(id, lbl, elm) {
+    var tab = $('<li/>')
+      .append( $('<a/>').attr('href', '#' + id).text(lbl) )
 
-  CDT.app.addView = function (id, lbl, elm, closeable) {
+    tabs.find('ul.ui-tabs-nav').append(tab);
+    elm.attr('id', id).addClass('cdt-app-view').appendTo(tabs);
+
+    tabs.tabs('refresh');
+    if (tabs.tabs('option', 'active') === false) {
+      tabs.tabs('option', 'active', tabs.find('ul.ui-tabs-nav li').index(tab));
+    }
+  }
+
+  exports.addView = function (id, lbl, elm, closeable) {
     if (tabs === undefined) {
       // TODO Queue the view to be added once the document is ready
       return;
@@ -23,12 +33,11 @@ CDT.ns('CDT.app');
       return;
     }
 
-    elm.attr('id', id).addClass('cdt-app-view').appendTo(tabs);
-    tabs.tabs('add', '#' + id, lbl);
+    addTab(id, lbl, elm);
 
     if (closeable) {
-      tabs.find('.ui-tabs-nav li').last().addClass('closeable')
-        .append(
+      var li = tabs.find('.ui-tabs-nav li').last();
+        li.addClass('closeable').append(
           $('<span class="ui-icon ui-icon-close">Remove Tab</span>')
             .addClass('ui-corner-all')
             .css({
@@ -43,9 +52,9 @@ CDT.ns('CDT.app');
 
               // Show the previous tab, or next tab if this is the first tab
               if (idx === 0) {
-                tabs.tabs('select', idx + 1);
+                tabs.tabs('option', 'active', idx + 1);
               } else {
-                tabs.tabs('select', idx - 1);
+                tabs.tabs('option', 'active', idx - 1);
               }
     
               tab.css({
@@ -56,7 +65,9 @@ CDT.ns('CDT.app');
               }).animate({
                 height: 0
               }, 'slow', 'easeOutCirc', function () {
-                tabs.tabs('remove', idx);
+                li.remove();
+                elm.remove();
+                tabs.tabs('refresh');
               });
 
             })
@@ -75,16 +86,16 @@ CDT.ns('CDT.app');
     elm.css('top', tabs.find('.ui-tabs-nav').outerHeight(true)).layout();
   };
 
-  CDT.app.showView = function (id) {
+  exports.showView = function (id) {
     tabs.find('.ui-tabs-nav li').each(function (idx) {
       if ($(this).attr('aria-controls') === id) {
-        tabs.tabs('select', idx);
+        tabs.tabs('option', 'active', idx);
         return false;
       }
     });
   };
 
-  CDT.app.addMenuItem = function (item) {
+  exports.addMenuItem = function (item) {
     menu.append(item);
   }
 
@@ -121,11 +132,11 @@ CDT.ns('CDT.app');
     };
   } ());
 
-  CDT.app.addMessage = function (message, type, details) {
+  exports.addMessage = function (message, type, details) {
     msgManager.addMessage(message, type, details);
   };
 
-  CDT.app.clearMessages = function () {
+  exports.clearMessages = function () {
     msgManager.clearMessages();
   };
 
@@ -136,17 +147,15 @@ CDT.ns('CDT.app');
     tabs = $('<div id="cdt-app-container"><ul/></div>')
       .appendTo($('body'))
       .tabs({
-        fx: { opacity: 'toggle', duration: 200 }
-      })
-      .bind('tabsshow', function (event, ui) {
-        $(ui.panel).layout();
-        CDT.app.trigger('view-change', [ {
-          id: ui.panel.id,
-          ui: ui
-        } ]);
-      })
-      .bind('tabsselect', function (event, ui) {
-        CDT.app.clearMessages();
+        fx: { opacity: 'toggle', duration: 200 },
+        activate: function (e, ui) {
+          $(ui.newPanel).layout();
+          CDT.app.trigger( 'viewchange', [ ui ] );
+        },
+        beforeActivate: function (e, ui) {
+          CDT.app.clearMessages();
+          CDT.app.trigger( 'beforeviewchange', [ ui ] );
+        }
       });
 
     // Add global ajax handler to remove any messages before a new AJAX request
@@ -222,4 +231,4 @@ CDT.ns('CDT.app');
     });
   });
 
-} (jQuery.noConflict(), CDT));
+} (CDT.ns('CDT.app'), jQuery.noConflict()));

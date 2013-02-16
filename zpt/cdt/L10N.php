@@ -45,7 +45,7 @@ class L10N {
     array_shift($args);
     if (count($args) > 0) {
       array_unshift($args, $str);
-      $str = call_user_func_array(array('zpt\util\String', 'format'), $args);
+      $str = call_user_func_array('zpt\util\StringUtils::format', $args);
     }
     return $str;
   }
