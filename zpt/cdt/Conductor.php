@@ -32,6 +32,7 @@ use \zpt\cdt\exception\AuthException;
 use \zpt\cdt\rest\AuthExceptionHandler;
 use \zpt\cdt\rest\InjectedRestServer;
 use \zpt\cdt\rest\LocalizedDefaultExceptionHandler;
+use \zpt\cdt\rest\LocalizedRestExceptionHandler;
 use \zpt\cdt\rest\PdoExceptionHandler;
 use \zpt\cdt\rest\ValidationExceptionHandler;
 use \zpt\util\File;
@@ -301,9 +302,16 @@ class Conductor {
     }
 
     $server = new InjectedRestServer();
+
     $server->registerExceptionHandler(
       'Exception',
       new LocalizedDefaultExceptionHandler()
+    );
+    $server->registerExceptionHandler(
+        'zeptech\rest\RestException',
+        new LocalizedRestExceptionHandler(
+            $server->getExceptionHandler('zeptech\rest\RestException')
+        )
     );
     $server->registerExceptionHandler(
       'zpt\cdt\exception\AuthException',

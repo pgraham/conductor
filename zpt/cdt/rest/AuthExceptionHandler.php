@@ -17,7 +17,6 @@ namespace zpt\cdt\rest;
 use \zeptech\rest\ExceptionHandler;
 use \zeptech\rest\Request;
 use \zeptech\rest\Response;
-use \zeptech\rest\RestException;
 use \Exception;
 
 /**
@@ -34,7 +33,6 @@ class AuthExceptionHandler implements ExceptionHandler
         Response $response
     ) {
 
-      // TODO Move this logic somewhere so that it can be reused
       $response->clearHeaders();
 
       $hdrMsg = _L('http.status.header.401');
