@@ -12,7 +12,7 @@
   }
 
   function extractValue(type, val) {
-    if ($.isArray(val)) {
+    if ($.isPlainObject(val)) {
       return val[type];
     }
     return val;
