@@ -95,7 +95,6 @@ class Loader {
     // clarinet and generated classes
     self::registerNamespace('zpt\util', "$cdtLib/reed");
     self::registerNamespace('zeptech\anno', "$cdtLib/php-annotations");
-    self::registerNamespace('zpt\pct', "$cdtLib/php-code-templates");
     self::registerNamespace('zeptech\rest', "$cdtLib/php-rest-server");
     self::registerNamespace('zeptech\orm', "$cdtLib/clarinet");
     self::registerNamespace('zpt\orm', "$cdtLib/clarinet");

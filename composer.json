@@ -1,6 +1,7 @@
 {
   "require": {
     "leafo/lessphp": "0.3.8",
-    "monolog/monolog": "1.2.1"
+    "monolog/monolog": "1.2.1",
+    "zeptech/code-templates": "1.0.1"
   }
 }

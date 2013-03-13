@@ -1,6 +1,3 @@
-[submodule "lib/php-code-templates"]
-	path = lib/php-code-templates
-	url = /home/pgraham/repos/php-code-templates
 [submodule "lib/php-annotations"]
 	path = lib/php-annotations
 	url = /home/pgraham/repos/php-annotations/
