@@ -8,7 +8,7 @@
       cb({
         success: false,
         msg: {
-          text: errorThrown,
+          text: jqXhr.responseText || jqXhr.responseXML || errorThrown,
           type: 'error'
         }
       });
