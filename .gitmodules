@@ -1,9 +1,3 @@
-[submodule "lib/php-annotations"]
-	path = lib/php-annotations
-	url = /home/pgraham/repos/php-annotations/
-[submodule "lib/clarinet"]
-	path = lib/clarinet
-	url = /home/pgraham/repos/clarinet/
 [submodule "lib/php-rest-server"]
 	path = lib/php-rest-server
 	url = /home/pgraham/repos/php-rest-server/
@@ -13,9 +7,6 @@
 [submodule "lib/jslib/jquery-ui"]
 	path = lib/jslib/jquery-ui
 	url = /home/pgraham/lib/jslib/jquery-ui
-[submodule "lib/reed"]
-	path = lib/reed
-	url = /home/pgraham/repos/reed/
 [submodule "lib/oboe"]
 	path = lib/oboe
 	url = /home/pgraham/repos/oboe/

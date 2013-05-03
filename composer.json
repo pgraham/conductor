@@ -18,6 +18,9 @@
   "require": {
     "leafo/lessphp": "0.3.8",
     "monolog/monolog": "1.2.1",
+
+    "zeptech/utility": "1.0.*",
+    "zeptech/annotations": "1.0.*",
     "zeptech/opal": "1.0.*",
     "zeptech/clarinet": "dev-master"
   }
