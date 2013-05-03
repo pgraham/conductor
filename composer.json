@@ -1,7 +1,24 @@
 {
+  "name": "zeptech/conductor",
+  "type": "library",
+  "description": "Webapp framework",
+  "keywords": [ "framework", "webapp" ],
+  "license": "BSD",
+  "authors": [
+    {
+      "name": "Philip Graham",
+      "email": "philip@zeptech.ca"
+    }
+  ],
+  "autolaod": {
+    "psr-0": {
+      "zpt\\cdt": ""
+    }
+  },
   "require": {
     "leafo/lessphp": "0.3.8",
     "monolog/monolog": "1.2.1",
-    "zeptech/code-templates": "1.0.1"
+    "zeptech/opal": "1.0.*",
+    "zeptech/clarinet": "dev-master"
   }
 }

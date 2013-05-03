@@ -1,2 +1,5 @@
 vendor
 commit.txt
+
+# Vim files
+*.un~
