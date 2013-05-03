@@ -1,6 +1,8 @@
-*.un~
-vendor
 commit.txt
+
+# Composer files
+vendor
+composer.lock
 
 # Vim files
 *.un~

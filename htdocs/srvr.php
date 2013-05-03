@@ -15,10 +15,4 @@ require 'SplClassLoader.php';
 // This file should be located at <site-root>/target/htdocs/srvr.php
 $siteRoot = realpath(__DIR__ . '/../..');
 
-// Register a loader for conductor classes that follow the SPR-0 compliant
-// package structure
-$cdtLdr = new SplClassLoader('zpt\cdt', "$siteRoot/lib/conductor");
-$cdtLdr->register();
-
-// Initiate the environment
-\zpt\cdt\Conductor::init($siteRoot);
+require_once "$siteRoot/vendor/autoload.php";

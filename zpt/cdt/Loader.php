@@ -50,9 +50,6 @@ class Loader {
     $cdtLib = "$cdt/lib";
     $target = "$root/target";
 
-    // Register composer autoloader
-    require "$cdt/vendor/autoload.php";
-
     // Register zeptech autoloaders
     $libPaths = array(
       'oboe' => "$cdtLib/oboe/src"
@@ -93,11 +90,7 @@ class Loader {
 
     // Class loader for php-annotations, php-code-templates, php-rest-server,
     // clarinet and generated classes
-    self::registerNamespace('zpt\util', "$cdtLib/reed");
-    self::registerNamespace('zeptech\anno', "$cdtLib/php-annotations");
     self::registerNamespace('zeptech\rest', "$cdtLib/php-rest-server");
-    self::registerNamespace('zeptech\orm', "$cdtLib/clarinet");
-    self::registerNamespace('zpt\orm', "$cdtLib/clarinet");
     self::registerNamespace('zpt\dyn', $target);
 
     // Register loaders for the site's modules
