@@ -16,3 +16,6 @@ require 'SplClassLoader.php';
 $siteRoot = realpath(__DIR__ . '/../..');
 
 require_once "$siteRoot/vendor/autoload.php";
+
+// Process the request
+\zpt\cdt\Conductor::init($siteRoot);
