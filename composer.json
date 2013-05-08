@@ -22,6 +22,7 @@
     "zeptech/utility": "1.0.*",
     "zeptech/annotations": "1.0.*",
     "zeptech/opal": "1.0.*",
-    "zeptech/clarinet": "dev-master"
+    "zeptech/clarinet": "dev-master",
+    "zeptech/php-rest-server": "dev-master"
   }
 }

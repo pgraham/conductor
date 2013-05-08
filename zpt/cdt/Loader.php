@@ -88,9 +88,7 @@ class Loader {
       }
     }
 
-    // Class loader for php-annotations, php-code-templates, php-rest-server,
-    // clarinet and generated classes
-    self::registerNamespace('zeptech\rest', "$cdtLib/php-rest-server");
+    // Class loader for generated classes
     self::registerNamespace('zpt\dyn', $target);
 
     // Register loaders for the site's modules
