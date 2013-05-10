@@ -14,7 +14,7 @@
  */
 namespace zpt\cdt\rest;
 
-use \zeptech\rest\RestServer;
+use \zpt\rest\RestServer;
 
 /**
  * RestServer that can be configured with a list of BeanRequestHandlers which

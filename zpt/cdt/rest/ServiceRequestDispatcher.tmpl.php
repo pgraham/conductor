@@ -4,10 +4,10 @@
  */
 namespace ${actorNs};
 
-use \zeptech\rest\BaseRequestHandler;
-use \zeptech\rest\RequestHandler;
-use \zeptech\rest\Request;
-use \zeptech\rest\Response;
+use \zpt\rest\BaseRequestHandler;
+use \zpt\rest\RequestHandler;
+use \zpt\rest\Request;
+use \zpt\rest\Response;
 use \zpt\cdt\di\Injector;
 use \zpt\cdt\rest\BeanRequestHandler;
 use \Exception;

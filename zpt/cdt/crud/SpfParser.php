@@ -1,7 +1,7 @@
 <?php
 namespace zpt\cdt\crud;
 
-use \zeptech\rest\Request;
+use \zpt\rest\Request;
 use \StdClass;
 
 /**

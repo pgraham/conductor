@@ -15,10 +15,10 @@
 namespace zpt\cdt\srvc;
 
 use \conductor\Auth;
-use \zeptech\rest\BaseRequestHandler;
-use \zeptech\rest\Request;
-use \zeptech\rest\Response;
-use \zeptech\rest\RestException;
+use \zpt\rest\BaseRequestHandler;
+use \zpt\rest\Request;
+use \zpt\rest\Response;
+use \zpt\rest\RestException;
 use \zpt\cdt\rest\BeanRequestHandler;
 
 /**

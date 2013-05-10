@@ -14,7 +14,7 @@
  */
 namespace zpt\cdt\rest;
 
-use \zeptech\rest\RequestHandler;
+use \zpt\rest\RequestHandler;
 
 /**
  * Interface for RequestHandlers that provide their own mapping information to

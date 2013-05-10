@@ -31,8 +31,8 @@ use \StdClass;
  * generate a RequestHandler implementation that delegates requests to the
  * appropriate method.
  *
- * All service methods must accept accept two parameters, a zeptech\rest\Request
- * object and a zeptech\rest\Response object.
+ * All service methods must accept accept two parameters, a zpt\rest\Request
+ * object and a zpt\rest\Response object.
  */
 class ServiceRequestDispatcher extends AbstractGenerator {
 

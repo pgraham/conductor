@@ -308,9 +308,9 @@ class Conductor {
       new LocalizedDefaultExceptionHandler()
     );
     $server->registerExceptionHandler(
-        'zeptech\rest\RestException',
+        'zpt\rest\RestException',
         new LocalizedRestExceptionHandler(
-            $server->getExceptionHandler('zeptech\rest\RestException')
+            $server->getExceptionHandler('zpt\rest\RestException')
         )
     );
     $server->registerExceptionHandler(

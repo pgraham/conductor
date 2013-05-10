@@ -14,10 +14,10 @@
  */
 namespace zpt\cdt\html;
 
-use \zeptech\rest\BaseRequestHandler;
-use \zeptech\rest\RequestHandler;
-use \zeptech\rest\Request;
-use \zeptech\rest\Response;
+use \zpt\rest\BaseRequestHandler;
+use \zpt\rest\RequestHandler;
+use \zpt\rest\Request;
+use \zpt\rest\Response;
 use \zpt\cdt\di\Injector;
 
 /**

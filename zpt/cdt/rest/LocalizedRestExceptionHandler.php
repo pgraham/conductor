@@ -14,10 +14,10 @@
  */
 namespace zpt\cdt\rest;
 
-use \zeptech\rest\ExceptionHandler;
-use \zeptech\rest\Request;
-use \zeptech\rest\Response;
-use \zeptech\rest\RestExceptionHandler;
+use \zpt\rest\ExceptionHandler;
+use \zpt\rest\Request;
+use \zpt\rest\Response;
+use \zpt\rest\RestExceptionHandler;
 use \zpt\cdt\L10N;
 use \Exception;
 
