@@ -37,9 +37,9 @@ class Loader {
    * autoloaders.
    *
    * @param string $root Root path for the website
-   * @param string $namespace Site source namespace
+   * @param object $loader Composer loader
    */
-  public static function registerDependencies($root) {
+  public static function registerDependencies($root, $loader) {
     if (self::$_loaded) {
       return;
     }
@@ -84,12 +84,12 @@ class Loader {
 
     foreach ($optLibs as $optLib => $optLibPath) {
       if (file_exists("$lib/$optLibPath")) {
-        self::registerNamespace("zpt\\$opLib", "$lib/$optLibPath");
+        $loader->add("zpt\\$optLib", "$lib/$optLibPath");
       }
     }
 
     // Class loader for generated classes
-    self::registerNamespace('zpt\dyn', $target);
+    $loader->add('zpt\dyn', $target);
 
     // Register loaders for the site's modules
     if (file_exists("$root/modules")) {
@@ -97,16 +97,11 @@ class Loader {
       foreach ($dir as $mod) {
         $modName = $mod->getBasename();
 
-        self::registerNamespace("zpt\\mod\\$modName", $mod->getPathName());
+        $loader->add("zpt\\mod\\$modName", $mod->getPathName());
       }
     }
 
     // Load primitive wrapper functions
     require_once "$cdtLib/reed/zpt/util/prim-wrap.php";
-  }
-
-  public static function registerNamespace($namespace, $src, $debug = false) {
-    $ldr = new SplClassLoader($namespace, $src, $debug);
-    $ldr->register();
   }
 }

@@ -15,7 +15,7 @@ require 'SplClassLoader.php';
 // This file should be located at <site-root>/target/htdocs/srvr.php
 $siteRoot = realpath(__DIR__ . '/../..');
 
-require_once "$siteRoot/vendor/autoload.php";
+$loader = require_once "$siteRoot/vendor/autoload.php";
 
 // Process the request
-\zpt\cdt\Conductor::init($siteRoot);
+\zpt\cdt\Conductor::init($siteRoot, $loader);

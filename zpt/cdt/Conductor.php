@@ -140,15 +140,16 @@ class Conductor {
    * the libraries, connecting to the database and initializing clarinet.
    *
    * @param string $root The path to the root of the website.
+   * @param object $loader Composer loader -- see htdocs/srvr.php
    */
-  public static function init($root) {
+  public static function init($root, $loader) {
     if (self::$_initialized) {
       return;
     }
     self::$_initialized = true;
 
     // Register class loaders for conductor's dependencies
-    Loader::registerDependencies($root);
+    Loader::registerDependencies($root, $loader);
 
     // Set dev mode configuration and do a compile if the target directory is
     // writeable.
