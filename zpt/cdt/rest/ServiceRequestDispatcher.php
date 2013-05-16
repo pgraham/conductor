@@ -14,7 +14,7 @@
  */
 namespace zpt\cdt\rest;
 
-use \zeptech\anno\Annotations;
+use \zpt\anno\Annotations;
 use \zpt\cdt\di\Injector;
 use \zpt\pct\AbstractGenerator;
 use \Exception;

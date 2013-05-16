@@ -14,7 +14,7 @@
  */
 namespace zpt\cdt\di;
 
-use \zeptech\anno\Annotations;
+use \zpt\anno\Annotations;
 use \Exception;
 use \ReflectionClass;
 

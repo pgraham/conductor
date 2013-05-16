@@ -5,12 +5,12 @@
  */
 namespace zpt\cdt\compile;
 
-use \zeptech\anno\AnnotationFactory;
-use \zeptech\anno\Annotations;
 use \zeptech\orm\generator\PersisterGenerator;
 use \zeptech\orm\generator\TransformerGenerator;
 use \zeptech\orm\generator\ValidatorGenerator;
 use \zeptech\orm\QueryBuilder;
+use \zpt\anno\AnnotationFactory;
+use \zpt\anno\Annotations;
 use \zpt\cdt\compile\resource\ResourceCompiler;
 use \zpt\cdt\crud\CrudService;
 use \zpt\cdt\di\Injector;

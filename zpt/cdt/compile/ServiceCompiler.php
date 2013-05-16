@@ -5,7 +5,7 @@
  */
 namespace zpt\cdt\compile;
 
-use \zeptech\anno\Annotations;
+use \zpt\anno\Annotations;
 use \zpt\cdt\di\Injector;
 use \zpt\cdt\rest\ServiceRequestDispatcher;
 use \zpt\util\File;

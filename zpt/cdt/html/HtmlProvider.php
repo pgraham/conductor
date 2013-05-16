@@ -12,7 +12,7 @@
  */
 namespace zpt\cdt\html;
 
-use \zeptech\anno\Annotations;
+use \zpt\anno\Annotations;
 use \zpt\cdt\compile\resource\ResourceDiscoverer;
 use \zpt\cdt\di\DependencyParser;
 use \zpt\cdt\di\Injector;
