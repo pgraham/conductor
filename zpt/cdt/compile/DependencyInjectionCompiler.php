@@ -17,7 +17,7 @@ namespace zpt\cdt\compile;
 use \zeptech\orm\generator\PersisterGenerator;
 use \zeptech\orm\generator\TransformerGenerator;
 use \zeptech\orm\generator\ValidatorGenerator;
-use \zeptech\orm\QueryBuilder;
+use \zpt\orm\actor\QueryBuilder;
 use \zpt\cdt\di\DependencyParser;
 use \zpt\cdt\i18n\ModelMessages;
 
