@@ -102,7 +102,6 @@ class Compiler {
     $this->_tmplParser = new CodeTemplateParser();
 
     $this->_configurationCompiler = new ConfigurationCompiler();
-    $this->_configurationCompiler->setTemplateParser($this->_tmplParser);
 
     $this->_diCompiler = new DependencyInjectionCompiler();
     $this->_diCompiler->setTemplateParser($this->_tmplParser);
