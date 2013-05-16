@@ -50,34 +50,6 @@ class Loader {
     $cdtLib = "$cdt/lib";
     $target = "$root/target";
 
-    // Register zeptech autoloaders
-    $libPaths = array(
-      'oboe' => "$cdtLib/oboe/src"
-    );
-
-    foreach ($libPaths as $libName => $libPath) {
-      if (!file_exists($libPath)) {
-        throw new Exception("Unable to find required library $libName." .
-          " Expected to find it at: $libPath");
-      }
-    }
-
-    // Register class loaders for dependencies that follow legacy package
-    // structure
-    spl_autoload_register(function ($classname) use ($libPaths) {
-      $parts = explode("\\", $classname);
-      $lib = array_shift($parts);
-
-      if (!isset($libPaths[$lib])) {
-        return;
-      }
-
-      $path = $libPaths[$lib] . '/' . implode('/', $parts) . '.php';
-      if (file_exists($path)) {
-        require $path;
-      }
-    });
-
     $optLibs = array(
       'pdf' => 'php-pdf'
     );
@@ -102,6 +74,6 @@ class Loader {
     }
 
     // Load primitive wrapper functions
-    require_once "$cdtLib/reed/zpt/util/prim-wrap.php";
+    \zpt\util\primwrap::init();
   }
 }

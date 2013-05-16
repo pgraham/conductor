@@ -7,6 +7,3 @@
 [submodule "lib/jslib/jquery-ui"]
 	path = lib/jslib/jquery-ui
 	url = /home/pgraham/lib/jslib/jquery-ui
-[submodule "lib/oboe"]
-	path = lib/oboe
-	url = /home/pgraham/repos/oboe/
