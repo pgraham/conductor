@@ -10,7 +10,7 @@
       "email": "philip@zeptech.ca"
     }
   ],
-  "autolaod": {
+  "autoload": {
     "psr-0": {
       "zpt\\cdt": ""
     }
