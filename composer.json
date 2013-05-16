@@ -25,6 +25,9 @@
     "zeptech/opal": "1.0.*",
     "zeptech/clarinet": "dev-master",
     "zeptech/php-rest-server": "dev-master"
+  },
+  "require-dev": {
+    "mockery/mockery": "dev-master"
   }
 
 }

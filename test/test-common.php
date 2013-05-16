@@ -16,26 +16,11 @@
  * @package conductor/test
  */
 
-require 'SplClassLoader.php';
+$loader = require __DIR__ . '/../vendor/autoload.php';
 
-// Initialize Mockery
-// -----------------------------------------------------------------------------
-require 'Mockery/Loader.php';
-require 'Hamcrest/Hamcrest.php';
-$loader = new \Mockery\Loader();
-$loader->register();
+class ComposerLoaderContainer {
 
-// Register a loaders for conductor classes and dependencies that follow a SPR-0
-// compliant package structure
-// -----------------------------------------------------------------------------
-$cdtPath = realpath(__DIR__ . '/..');
+	public static $loader;
 
-$cdtLdr = new SplClassLoader('zpt\cdt', $cdtPath);
-$cdtLdr->register();
-
-$reedLdr = new SplClassLoader('zpt\util', "$cdtPath/lib/reed");
-$reedLdr->register();
-
-// Register loaders for dependencies
-// -----------------------------------------------------------------------------
-
+}
+ComposerLoaderContainer::$loader = $loader;
