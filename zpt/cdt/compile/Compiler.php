@@ -148,10 +148,10 @@ class Compiler {
 
     // Compile server dispatcher
     copy(
-      "$pathInfo[lib]/conductor/htdocs/.htaccess",
+      "$pathInfo[root]/vendor/zeptech/conductor/htdocs/.htaccess",
       "$pathInfo[target]/htdocs/.htaccess");
     copy(
-      "$pathInfo[lib]/conductor/htdocs/srvr.php",
+      "$pathInfo[root]/vendor/zeptech/conductor/htdocs/srvr.php",
       "$pathInfo[target]/htdocs/srvr.php");
 
     $this->compileModels($pathInfo, $ns);
