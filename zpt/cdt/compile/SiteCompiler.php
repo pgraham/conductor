@@ -37,7 +37,7 @@ use \SplClassLoader;
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class Compiler {
+class SiteCompiler {
 
 	private $modelParser;
 	private $modelCache;

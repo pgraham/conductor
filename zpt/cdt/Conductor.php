@@ -26,7 +26,7 @@ use \zpt\dyn\ServerConfigurator;
 use \zeptech\orm\runtime\Clarinet;
 use \zeptech\orm\runtime\Criteria;
 use \zeptech\orm\runtime\Persister;
-use \zpt\cdt\compile\Compiler;
+use \zpt\cdt\compile\SiteCompiler;
 use \zpt\cdt\di\Injector;
 use \zpt\cdt\exception\AuthException;
 use \zpt\cdt\rest\AuthExceptionHandler;
@@ -179,7 +179,7 @@ class Conductor {
 
       try {
         if (File::dirlock("$root/target", isset($_GET['forceunlock']))) {
-          $compiler = new Compiler();
+          $compiler = new SiteCompiler();
           $compiler->compile($root);
           File::dirunlock("$root/target");
         } else {
