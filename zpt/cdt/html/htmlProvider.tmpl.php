@@ -1,5 +1,5 @@
 <?php
-namespace ${actorNs};
+namespace /*# actorNs #*/;
 
 use \conductor\Auth;
 use \oboe\struct\FlowContent;
@@ -17,7 +17,7 @@ use \zpt\cdt\LoginFormAsync;
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class ${actorClass} {
+class /*# actorClass #*/ {
 
   /** @Injected */
   private $_authProvider;
@@ -29,111 +29,111 @@ class ${actorClass} {
   private $_pageViewListeners;
 
   public function populate(Page $page, array $query = null) {
-    ${if:env = dev}
+    #{ if env = dev
       $page->setCaptureDebug(true);
-    ${else}
+    #{ else
       $page->setCaptureDebug(false);
-    ${fi}
+    #}
 
-    ${if:title ISSET}
-      $page->setPageTitle('${title}');
-    ${fi}
+    #{ if title ISSET
+      $page->setPageTitle('/*# title #*/');
+    #}
 
-    ${if:template ISSET}
-      $tmpl = new \${template}();
-      ${if:tmplDependencies ISSET}
-        Injector::inject($tmpl, ${php:tmplDependencies});
-      ${fi}
-    ${fi}
+    #{ if template ISSET
+      $tmpl = new \/*# template #*/();
+      #{ if tmplDependencies ISSET
+        Injector::inject($tmpl, /*# php:tmplDependencies #*/);
+      #}
+    #}
 
-    ${if:auth ISSET}
-      if (!$this->_authProvider->hasPermission('${auth}')) {
+    #{ if auth ISSET
+      if (!$this->_authProvider->hasPermission('/*# auth #*/')) {
         $this->_loadLogin();
         exit;
       }
-    ${fi}
+    #}
 
     // Base styles
     // -------------------------------------------------------------------------
-    Element::css('${cssPath}/reset.css')->addToHead();
-    Element::css('${cssPath}/cdt.css')->addToHead();
+    Element::css('/*# cssPath #*//reset.css')->addToHead();
+    Element::css('/*# cssPath #*//cdt.css')->addToHead();
 
-    ${each:coreCss as css}
-      Element::css('${cssPath}/${css}')->addToHead();
-    ${done}
-    ${if:sheets ISSET}
-      ${each:sheets as css}
-        Element::css('${css}')->addToHead();
-      ${done}
-    ${fi}
+    #{ each coreCss as css
+      Element::css('/*# cssPath #*///*# css #*/')->addToHead();
+    #}
+    #{ if sheets ISSET
+      #{ each sheets as css
+        Element::css('/*# css #*/')->addToHead();
+      #}
+    #}
 
     // Javascript libraries
     // -------------------------------------------------------------------------
     // Non-jquery
-    Element::js('${jslibPath}/date.js')->addToHead();
+    Element::js('/*# jslibPath #*//date.js')->addToHead();
 
     // JQuery - If dev mode non-minimized version is included
     $this->_loadJQuery();
 
     // Webshims
-    Element::js('${jslibPath}/webshims/polyfiller.js')->addToHead();
+    Element::js('/*# jslibPath #*//webshims/polyfiller.js')->addToHead();
 
     // JQuery Cookie
-    Element::js('${jslibPath}/jquery-cookie/jquery.cookie.js')->addToHead();
+    Element::js('/*# jslibPath #*//jquery-cookie/jquery.cookie.js')->addToHead();
 
     // JQuery UI
-    Element::css('${jslibPath}/jquery-ui/jquery.ui.css')->addToHead();
-    Element::css('${jslibPath}/jquery-ui/themes/${uitheme}/jquery.ui.theme.css')
+    Element::css('/*# jslibPath #*//jquery-ui/jquery.ui.css')->addToHead();
+    Element::css('/*# jslibPath #*//jquery-ui/themes//*# uitheme #*//jquery.ui.theme.css')
       ->addToHead();
-    Element::js('${jslibPath}/jquery-ui/external/globalize.js')->addToHead();
-    Element::js('${jslibPath}/jquery-ui/jquery.ui.js')->addToHead();
+    Element::js('/*# jslibPath #*//jquery-ui/external/globalize.js')->addToHead();
+    Element::js('/*# jslibPath #*//jquery-ui/jquery.ui.js')->addToHead();
 
     // -------------------------------------------------------------------------
 
     // Load language script
     $lang = L10N::getLang();
-    Element::js("${jsPath}/$lang.js")->addToHead();
+    Element::js("/*# jsPath #*//$lang.js")->addToHead();
 
     // Client support scripts
-    Element::js('${jsPath}/base.js')->addToHead();
-    ${each:coreScripts as script}
-      Element::js('${jsPath}/${script}')->addToHead();
-    ${done}
-    ${each:utilScripts as script}
-      Element::js('${jsPath}/${script}')->addToHead();
-    ${done}
+    Element::js('/*# jsPath #*//base.js')->addToHead();
+    #{ each coreScripts as script
+      Element::js('/*# jsPath #*///*# script #*/')->addToHead();
+    #}
+    #{ each utilScripts as script
+      Element::js('/*# jsPath #*///*# script #*/')->addToHead();
+    #}
 
     $this->_includeJsLibs();
 
-    ${if:jsappsupport}
-      Element::js('${jslibPath}/raphael.js')->addToHead();
-      Element::js('${jsPath}/cdt/raphael-util.js')->addToHead();
+    #{ if jsappsupport
+      Element::js('/*# jslibPath #*//raphael.js')->addToHead();
+      Element::js('/*# jsPath #*//cdt/raphael-util.js')->addToHead();
 
-      ${each:widgetCss as sheet}
-        Element::css('${cssPath}/${sheet}')->addToHead();
-      ${done}
-      Element::css('${cssPath}/jsapp.css')->addToHead();
+      #{ each widgetCss as sheet
+        Element::css('/*# cssPath #*///*# sheet #*/')->addToHead();
+      #}
+      Element::css('/*# cssPath #*//jsapp.css')->addToHead();
 
-      ${each:widgetScripts as script}
-        Element::js('${jsPath}/${script}')->addToHead();
-      ${done}
-      Element::js('${jsPath}/jsapp.js')->addToHead();
-    ${fi}
+      #{ each widgetScripts as script
+        Element::js('/*# jsPath #*///*# script #*/')->addToHead();
+      #}
+      Element::js('/*# jsPath #*//jsapp.js')->addToHead();
+    #}
 
-    ${if:fonts ISSET}
-      Element::css("http://fonts.googleapis.com/css?family=${fonts}")->addToHead();
-    ${fi}
+    #{ if fonts ISSET
+      Element::css("http://fonts.googleapis.com/css?family=/*# fonts #*/")->addToHead();
+    #}
 
     // Javascripts
-    ${if:jscripts ISSET}
-      ${each:jscripts as jscript}
-        Element::js('${jscript}')->addToHead();
-      ${done}
-    ${fi}
+    #{ if jscripts ISSET
+      #{ each jscripts as jscript
+        Element::js('/*# jscript #*/')->addToHead();
+      #}
+    #}
 
-    ${if:template}
+    #{ if template
       $page->setTemplate($tmpl);
-    ${fi}
+    #}
     $page->bodyAdd($this->getFragment($query));
 
     // Add an asynchronous login form that will be initially hidden so that it
@@ -142,19 +142,19 @@ class ${actorClass} {
   }
 
   public function getFragment($query) {
-    ${if:auth ISSET}
-      if (!$this->_authProvider->hasPermission('${auth}')) {
+    #{ if auth ISSET
+      if (!$this->_authProvider->hasPermission('/*# auth #*/')) {
         $this->_loadLogin();
         exit;
       }
-    ${fi}
+    #}
 
     $ctnt = '';
-    ${if:hasContent}
-      $ctntProvider = new \${contentProvider}();
-      Injector::inject($ctntProvider, ${php:dependencies});
+    #{ if hasContent
+      $ctntProvider = new \/*# contentProvider #*/();
+      Injector::inject($ctntProvider, /*# php:dependencies #*/);
       $ctnt = $ctntProvider->getContent($query);
-    ${fi}
+    #}
 
     // Invoke any registered page view listeners
     $this->_onPageView();
@@ -171,20 +171,20 @@ class ${actorClass} {
   }
 
   private function _includeJsLibs() {
-    ${each:jslibs as jslib}
-      ${if:jslib = epiceditor}
-        Element::js('${jslibPath}/epiceditor/epiceditor.js')->addToHead();
-        Element::js('${jslibPath}/epiceditor/epiceditor.css');
-      ${elseif:jslib = highlight}
-        Element::js('${jslibPath}/highlight/highlight.js')->addToHead();
-        Element::css('${jslibPath}/highlight/highlight.css')->addToHead();
-      ${elseif:jslib = raphael}
-        Element::js('${jslibPath}/raphael.js')->addToHead();
-        Element::js('${jsPath}/cdt/raphael-util.js')->addToHead();
-      ${else}
-        Element::js('${jslibPath}/${jslib}.js')->addToHead();
-      ${fi}
-    ${done}
+    #{ each jslibs as jslib
+      #{ if jslib = epiceditor
+        Element::js('/*# jslibPath #*//epiceditor/epiceditor.js')->addToHead();
+        Element::js('/*# jslibPath #*//epiceditor/epiceditor.css');
+      #{ elseif jslib = highlight
+        Element::js('/*# jslibPath #*//highlight/highlight.js')->addToHead();
+        Element::css('/*# jslibPath #*//highlight/highlight.css')->addToHead();
+      #{ elseif jslib = raphael
+        Element::js('/*# jslibPath #*//raphael.js')->addToHead();
+        Element::js('/*# jsPath #*//cdt/raphael-util.js')->addToHead();
+      #{ else
+        Element::js('/*# jslibPath #*///*# jslib #*/.js')->addToHead();
+      #}
+    #}
 
     #{ each: jslibs as jslib
       #{ switch: jslib
@@ -210,11 +210,11 @@ class ${actorClass} {
   }
 
   private function _loadJQuery() {
-    ${if:env = dev}
-      Element::js('${jQueryPath}/jquery.js')->addToHead();
-    ${else}
-      Element::js('${jQueryPath}/jquery.min.js')->addToHead();
-    ${fi}
+    #{ if env = dev
+      Element::js('/*# jQueryPath #*//jquery.js')->addToHead();
+    #{ else
+      Element::js('/*# jQueryPath #*//jquery.min.js')->addToHead();
+    #}
   }
 
   private function _loadLogin() {
