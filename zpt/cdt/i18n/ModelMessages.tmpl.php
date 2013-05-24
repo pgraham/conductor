@@ -1,5 +1,5 @@
 <?php
-namespace ${actorNs};
+namespace /*# actorNs #*/;
 
 /**
  * This is a generated class that provides pre-parsed information about a model
@@ -10,10 +10,10 @@ namespace ${actorNs};
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class ${actorClass} {
+class /*# actorClass #*/ {
 
   public function createSuccessMsg() {
-    return ucfirst($this->_successMsg('created', '${article}')) . '.';
+    return ucfirst($this->_successMsg('created', '/*# article #*/')) . '.';
   }
 
   public function deleteSuccessMsg() {
@@ -21,15 +21,15 @@ class ${actorClass} {
   }
 
   public function duplicateMsg($dupField, $dupValue) {
-    $msg = "${article} ${singular} with $dupField '$dupValue' already exists";
+    $msg = "/*# article #*/ /*# singular #*/ with $dupField '$dupValue' already exists";
     return ucfirst($msg) . '.';
   }
 
   public function genericErrorMsg($action, $plural = false) {
     if ($plural) {
-      $msg = "there was an error $action the ${plural}";
+      $msg = "there was an error $action the /*# plural #*/";
     } else {
-      $msg = "there was an error $action ${article} ${singular}";
+      $msg = "there was an error $action /*# article #*/ /*# singular #*/";
     }
     $msg .= " Please try again later or contact an administrator if the problem"
           . " persists";
@@ -37,33 +37,33 @@ class ${actorClass} {
   }
 
   public function getDisplayName() {
-    return '${singular}';
+    return '/*# singular #*/';
   }
 
   public function getDisplayNamePlural() {
-    return '${plural}';
+    return '/*# plural #*/';
   }
 
   public function getIndefiniteArticle() {
-    return '${article}';
+    return '/*# article #*/';
   } 
 
   public function invalidEntityMsg() {
-    return "The given ${singular} is not valid because:";
+    return "The given /*# singular #*/ is not valid because:";
   }
 
   public function invalidFilterMsg($filter) {
-    $msg = "${plural} do not support '$filter' as a filter field";
+    $msg = "/*# plural #*/ do not support '$filter' as a filter field";
     return ucfirst($msg) . '.';
   }
 
   public function invalidSortMsg($sort) {
-    $msg = "${plural} do not support '$sort' as a sort field";
+    $msg = "/*# plural #*/ do not support '$sort' as a sort field";
     return ucfirst($msg) . '.';
   }
 
   public function notNullMsg($field) {
-    $msg = "the '$field' field of ${article} ${singular} cannot be blank";
+    $msg = "the '$field' field of /*# article #*/ /*# singular #*/ cannot be blank";
     return ucfirst($msg) . '.';
   }
 
@@ -72,7 +72,7 @@ class ${actorClass} {
   }
 
   public function _successMsg($action, $article) {
-    return "successfully $action $article ${singular}";
+    return "successfully $action $article /*# singular #*/";
   }
 
 }
