@@ -1,7 +1,7 @@
 (function (global, $, undefined) {
   "use strict";
 
-  var dict = ${json:strings};
+  var dict = /*# json:strings #*/;
 
   function noValue(key) {
     return 'XXXXXXXX ' + key + ' XXXXXXXX';
