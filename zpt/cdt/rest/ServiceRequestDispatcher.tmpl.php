@@ -2,7 +2,7 @@
 /**
  * This is a generated class - DO NOT EDIT.
  */
-namespace ${actorNs};
+namespace /*# actorNs #*/;
 
 use \zpt\rest\BaseRequestHandler;
 use \zpt\rest\RequestHandler;
@@ -12,7 +12,7 @@ use \zpt\cdt\di\Injector;
 use \zpt\cdt\rest\BeanRequestHandler;
 use \Exception;
 
-class ${actorClass} extends BaseRequestHandler implements BeanRequestHandler {
+class /*# actorClass #*/ extends BaseRequestHandler implements BeanRequestHandler {
 
   private $service;
   private $session;
@@ -20,7 +20,7 @@ class ${actorClass} extends BaseRequestHandler implements BeanRequestHandler {
   private $pdo;
 
   public function __construct() {
-    $this->mappings = ${php:mappings};
+    $this->mappings = /*# php:mappings #*/;
   }
 
   public function getMappings() {
@@ -39,17 +39,17 @@ class ${actorClass} extends BaseRequestHandler implements BeanRequestHandler {
     $this->pdo = $pdo;
   }
 
-  ${each:methodTypes as methodType}
-    public function ${methodType[type]}(Request $request, Response $response) {
+  #{ each methodTypes as methodType
+    public function /*# methodType[type] #*/(Request $request, Response $response) {
       try {
         $this->pdo->beginTransaction();
 
         $mappingId = $request->getMappingId();
         switch ($mappingId) {
 
-          ${each:methodType[methods] as method}
-            case '${method[name]}':
-            ${if:method[enforceOrder]}
+          #{ each methodType[methods] as method
+            case '/*# method[name] #*/':
+            #{ if method[enforceOrder]
               if ($request->hasData('__ROT')) {
                 $rot = $request->getData('__ROT');
                 $uriHash = 'rot-' . $request->getUri();
@@ -63,18 +63,18 @@ class ${actorClass} extends BaseRequestHandler implements BeanRequestHandler {
                 }
               }
 
-            ${fi}
-            $this->service->${method[name]}($request, $response);
+            #}
+            $this->service->/*# method[name] #*/($request, $response);
             $this->pdo->commit();
             return;
 
-          ${done}
+          #}
         }
-        parent::${methodType[type]}($request, $response);
+        parent::/*# methodType[type] #*/($request, $response);
       } catch (Exception $e) {
         $this->pdo->rollback();
         throw $e;
       }
     }
-  ${fi}
+  #}
 }
