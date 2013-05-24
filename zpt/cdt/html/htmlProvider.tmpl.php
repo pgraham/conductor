@@ -174,7 +174,7 @@ class /*# actorClass #*/ {
     #{ each jslibs as jslib
       #{ if jslib = epiceditor
         Element::js('/*# jslibPath #*//epiceditor/epiceditor.js')->addToHead();
-        Element::js('/*# jslibPath #*//epiceditor/epiceditor.css');
+        Element::css('/*# jslibPath #*//epiceditor/epiceditor.css')->addToHead();
       #{ elseif jslib = highlight
         Element::js('/*# jslibPath #*//highlight/highlight.js')->addToHead();
         Element::css('/*# jslibPath #*//highlight/highlight.css')->addToHead();
@@ -183,28 +183,6 @@ class /*# actorClass #*/ {
         Element::js('/*# jsPath #*//cdt/raphael-util.js')->addToHead();
       #{ else
         Element::js('/*# jslibPath #*///*# jslib #*/.js')->addToHead();
-      #}
-    #}
-
-    #{ each: jslibs as jslib
-      #{ switch: jslib
-        #{ case: arboreal }
-        // Element::js(_P('/jslib/arboreal.js'))->addToHead();
-
-        #{ case: epiceditor }
-        // Element::js(_P('/jslib/epiceditor/epiceditor.js'))->addToHead();
-        // Element::js(_P('/jslib/epiceditor/epiceditor.css'));
-
-        #{ case: markdown }
-        // Element::js(_P('/jslib/markdown.js'))->addToHead();
-
-        #{ case: raphael }
-        // Element::js(_P('/jslib/raphael.js'))->addToHead();
-
-        #{ case: highlight }
-        // Element::js(_P('/jslib/highlight/highlight.js'))->addToHead();
-        // Element::css(_P('/jslib/highlight/highlight.css'))->addToHead();
-
       #}
     #}
   }
