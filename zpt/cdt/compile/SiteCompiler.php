@@ -66,6 +66,9 @@ class SiteCompiler {
 	/* Dependency Injection compiler. */
 	private $diCompiler;
 
+	/* Dispatcher compiler */
+	private $dispatcherCompiler;
+
 	/* Html Provider Generator. */
 	private $htmlProvider;
 
@@ -132,6 +135,10 @@ class SiteCompiler {
 		$this->configurationCompiler = $compiler;
 	}
 
+	public function setDispatcherCompiler(Compiler $compiler) {
+		$this->dispatcherCompiler = $compiler;
+	}
+
 	/**
 	 * Compile the website found at the given root path.
 	 *
@@ -160,12 +167,7 @@ class SiteCompiler {
 		$this->initCompiler($pathInfo, $env);
 
 		// Compile server dispatcher
-		copy(
-			"$pathInfo[root]/vendor/zeptech/conductor/htdocs/.htaccess",
-			"$pathInfo[target]/htdocs/.htaccess");
-		copy(
-			"$pathInfo[root]/vendor/zeptech/conductor/htdocs/srvr.php",
-			"$pathInfo[target]/htdocs/srvr.php");
+		$this->dispatcherCompiler->compile($pathInfo, $ns, $env);
 
 		$this->compileModels($pathInfo, $ns);
 		$this->compileServices($pathInfo, $ns);
@@ -540,6 +542,10 @@ class SiteCompiler {
 	private function ensureDependencies() {
 		if ($this->configurationCompiler === null) {
 			$this->configurationCompiler = new ConfigurationCompiler();
+		}
+
+		if ($this->dispatcherCompiler === null) {
+			$this->dispatcherCompiler = new DispatcherCompiler();
 		}
 	}
 
