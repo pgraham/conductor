@@ -13,8 +13,9 @@
  * This file sets up the environment for running tests.
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
- * @package conductor/test
  */
+
+require 'SplClassLoader.php';
 
 $loader = require __DIR__ . '/../vendor/autoload.php';
 $loader->add('zpt\dyn', __DIR__ . '/target');
