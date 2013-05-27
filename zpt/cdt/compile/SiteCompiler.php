@@ -110,8 +110,6 @@ class SiteCompiler {
 
 		$this->tmplParser = new CodeTemplateParser();
 
-		$this->configurationCompiler = new ConfigurationCompiler();
-
 		$this->diCompiler = new DependencyInjectionCompiler();
 		$this->diCompiler->setTemplateParser($this->tmplParser);
 
@@ -130,12 +128,18 @@ class SiteCompiler {
 		$this->resourceCompiler = new ResourceCompiler();
 	}
 
+	public function setConfigurationCompiler(ConfigurationCompiler $compiler) {
+		$this->configurationCompiler = $compiler;
+	}
+
 	/**
 	 * Compile the website found at the given root path.
 	 *
 	 * @param string $root The root path of the website to comile.
 	 */
 	public function compile($root, $env = 'dev') {
+		$this->ensureDependencies();
+
 		// Configuration needs to be compiled first so that the site path
 		// information is available for the rest of the compilation process
 		$this->configurationCompiler->compile($root, $env);
@@ -530,6 +534,12 @@ class SiteCompiler {
 			}
 
 			$fn($module->getPathname());
+		}
+	}
+
+	private function ensureDependencies() {
+		if ($this->configurationCompiler === null) {
+			$this->configurationCompiler = new ConfigurationCompiler();
 		}
 	}
 
