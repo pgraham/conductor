@@ -290,12 +290,12 @@ class SiteCompiler {
 		// resources to override both conductor and module resources.
 		//
 		// By convention, all conductor resources are placed within a directory
-		// named cdt.  Modules place their resources in a directory specific
-		// directory for that modules and sites place resource in a directory named
-		// the same as the site nickname.
+		// named cdt.  Modules place their resources in a directory specific for 
+		// that modules and sites place resource in a directory named the same as 
+		// the site nickname.
 		//
 		// WARNING: When multiple modules declare the same file the result is
-		//					non-deterministic
+		//          non-deterministic
 		// -------------------------------------------------------------------------
 		$this->resourceCompiler->compile("$resourceSrc/js", "$resourceOut/js");
 		$this->resourceCompiler->compile("$resourceSrc/css", "$resourceOut/css");
