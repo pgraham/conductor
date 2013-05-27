@@ -5,6 +5,7 @@
  */
 namespace zpt\cdt\compile\resource;
 
+use \zpt\pct\CodeTemplateParser;
 use \zpt\util\File;
 use \DirectoryIterator;
 
@@ -17,15 +18,26 @@ use \DirectoryIterator;
 class ResourceCompiler {
 
   private $_lessCompiler;
+  private $templateParser;
 
   public function __construct() {
     $this->_lessCompiler = new LessCompiler();
+    $this->templateParser = new CodeTemplateParser();
   }
 
-  public function compile($srcDir, $outDir) {
-    if (!file_exists($srcDir)) {
+  public function compile($src, $target, $values = array()) {
+    if (!file_exists($src)) {
       return;
     }
+
+    if (is_dir($src)) {
+      $this->compileResourceDirectory($src, $target);
+    } else {
+      $this->compileResourceFile($src, $target, $values);
+    }
+  }
+
+  private function compileResourceDirectory($srcDir, $outDir) {
     $dir = new DirectoryIterator($srcDir);
 
     if (!file_exists($outDir)) {
@@ -54,4 +66,10 @@ class ResourceCompiler {
       }
     }
   }
+
+  private function compileResource($src, $target, $values) {
+    $tmpl = $this->templateParser->parse(file_get_contents($src));
+    $tmpl->save($target, $values);
+  }
+
 }

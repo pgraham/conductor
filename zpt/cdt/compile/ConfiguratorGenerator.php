@@ -110,7 +110,8 @@ class ConfiguratorGenerator extends AbstractGenerator {
 			: '/';
 
 		$docRoot = "$root/htdocs";
-		$lib = "$root/lib";
+		$cdtRoot = "$root/vendor/conductor";
+		$lib = "$root/lib"; // Obsolete, this could probably be removed
 		$src = "$root/src";
 		$target = "$root/target";
 
@@ -118,6 +119,7 @@ class ConfiguratorGenerator extends AbstractGenerator {
 			'root' => $root,
 			'webRoot' => $webRoot,
 			'docRoot' => $docRoot,
+			'cdtRoot' => $cdtRoot,
 			'lib' => $lib,
 			'src' => $src,
 			'target' => $target

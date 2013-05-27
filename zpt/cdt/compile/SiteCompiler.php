@@ -127,8 +127,6 @@ class SiteCompiler {
 		$this->serviceCompiler = new ServiceCompiler();
 		$this->serviceCompiler->setDependencyInjectionCompiler($this->diCompiler);
 		$this->serviceCompiler->setServerCompiler($this->serverCompiler);
-
-		$this->resourceCompiler = new ResourceCompiler();
 	}
 
 	public function setConfigurationCompiler(ConfigurationCompiler $compiler) {
@@ -137,6 +135,10 @@ class SiteCompiler {
 
 	public function setDispatcherCompiler(Compiler $compiler) {
 		$this->dispatcherCompiler = $compiler;
+	}
+
+	public function setResourceCompiler(ResourceCompiler $compiler) {
+		$this->resourceCompiler = $compiler;
 	}
 
 	/**
@@ -155,6 +157,7 @@ class SiteCompiler {
 		// This will also register the global functions for working with context
 		// sensitive paths
 		$config = Configurator::getConfig();
+
 		$pathInfo = $config['pathInfo'];
 		$ns = $config['namespace'];
 
@@ -272,8 +275,8 @@ class SiteCompiler {
 		$resourceSrc = "$pathInfo[lib]/conductor/htdocs";
 
 		// Compile base javascript
-		$this->compileResource(
-			"$pathInfo[lib]/conductor/resources/base.tmpl.js",
+		$this->resourceCompiler->compile(
+			"$pathInfo[cdtRoot]/resources/base.tmpl.js",
 			"$resourceOut/js/base.js",
 			array(
 				'rootPath' => $pathInfo['webRoot'],
@@ -519,11 +522,6 @@ class SiteCompiler {
 		}
 	}
 
-	private function compileResource($srcPath, $outPath, $values = array()) {
-		$tmpl = $this->tmplParser->parse(file_get_contents($srcPath));
-		$tmpl->save($outPath, $values);
-	}
-
 	private function doWithModules($fn) {
 		if (!file_exists($this->modulesPath)) {
 			return;
@@ -546,6 +544,10 @@ class SiteCompiler {
 
 		if ($this->dispatcherCompiler === null) {
 			$this->dispatcherCompiler = new DispatcherCompiler();
+		}
+
+		if ($this->resourceCompiler === null) {
+			$this->resourceCompiler = new ResourceCompiler();
 		}
 	}
 
