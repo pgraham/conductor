@@ -220,7 +220,7 @@ class Conductor {
     $namespace = self::$_config['namespace'];
 
     // Register a class loader for the site's base namespace
-    Loader::registerNamespace($namespace, "$root/src");
+    $loader->add($namespace, "$root/src");
 
     // Initiate a database connection
     try {
