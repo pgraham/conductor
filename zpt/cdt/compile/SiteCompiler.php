@@ -28,12 +28,12 @@ use \zpt\cdt\i18n\ModelDisplayParser;
 use \zpt\cdt\i18n\ModelMessages;
 use \zpt\cdt\rest\ServiceRequestDispatcher;
 use \zpt\dyn\Configurator;
+use \zpt\opal\DefaultNamingStrategy as CompanionNamingStrategy;
 use \zpt\orm\actor\QueryBuilder;
-use \zpt\orm\model\parser\DefaultNamingStrategy;
+use \zpt\orm\model\parser\DefaultNamingStrategy as ModelNamingStrategy;
 use \zpt\orm\model\parser\ModelParser;
 use \zpt\orm\model\ModelCache;
 use \zpt\pct\CodeTemplateParser;
-use \zpt\pct\DefaultActorNamingStrategy;
 use \zpt\util\File;
 use \zpt\util\StringUtils;
 use \DirectoryIterator;
@@ -98,7 +98,7 @@ class SiteCompiler {
 	 */
 	public function __construct() {
 		$this->annotationFactory = new AnnotationFactory();
-		$this->namingStrategy = new DefaultNamingStrategy();
+		$this->namingStrategy = new ModelNamingStrategy();
 		$this->modelCache = new ModelCache();
 		$this->modelParser = new ModelParser();
 
@@ -396,9 +396,9 @@ class SiteCompiler {
 				continue;
 			}
 
-			$namingStrategy = new DefaultActorNamingStrategy();
+			$namingStrategy = new CompanionNamingStrategy();
 			$instClass = HtmlProvider::$actorNamespace . "\\" .
-				$namingStrategy->getActorName($viewClass);
+				$namingStrategy->getClassName($viewClass);
 			$this->diCompiler->addBean($beanId, $instClass);
 
 			$args = array( "'$beanId'" );

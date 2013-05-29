@@ -7,8 +7,6 @@ namespace zpt\dyn;
 
 use \zeptech\orm\runtime\PdoWrapper;
 use \zpt\cdt\di\Injector;
-use \zpt\pct\ActorFactoryFactory;
-use \zpt\pct\DefaultActorNamingStrategy;
 
 class InjectionConfigurator {
 
