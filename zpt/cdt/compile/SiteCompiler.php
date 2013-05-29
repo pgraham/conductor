@@ -272,7 +272,7 @@ class SiteCompiler {
 
 		// Compile conductor resources
 		// ---------------------------
-		$resourceSrc = "$pathInfo[lib]/conductor/htdocs";
+		$resourceSrc = "$pathInfo[cdtRoot]/htdocs";
 
 		// Compile base javascript
 		$this->resourceCompiler->compile(
@@ -352,6 +352,10 @@ class SiteCompiler {
 	}
 
 	private function compileHtmlDir($htmlDir, $ns, $tmplBase = '') {
+		if (!file_exists($htmlDir)) {
+			return;
+		}
+
 		$tmplBase = rtrim($tmplBase, '/');
 
 		$dir = new DirectoryIterator($htmlDir);
@@ -423,6 +427,10 @@ class SiteCompiler {
 	}
 
 	protected function compileJslibDir($pathInfo, $dir) {
+		if (!file_exists($dir)) {
+			return;
+		}
+
 		$jslibOut = "$pathInfo[target]/htdocs/jslib";
 		$jslibs = new DirectoryIterator($dir);
 		foreach ($jslibs as $jslib) {
