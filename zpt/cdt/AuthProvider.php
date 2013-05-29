@@ -5,13 +5,13 @@
  */
 namespace zpt\cdt;
 
-use \zeptech\orm\runtime\Criteria;
 use \zeptech\orm\runtime\Persister;
 use \zpt\cdt\auth\Authorize;
 use \zpt\cdt\auth\SessionManager;
 use \zpt\cdt\exception\AuthException;
 use \zpt\cdt\model\User;
 use \zpt\cdt\model\Visitor;
+use \zpt\orm\Criteria;
 
 use \LightOpenId;
 

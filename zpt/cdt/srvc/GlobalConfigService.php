@@ -14,7 +14,6 @@
  */
 namespace zpt\cdt\srvc;
 
-use \zeptech\orm\runtime\Criteria;
 use \zeptech\orm\runtime\Persister;
 use \zeptech\orm\runtime\Transformer;
 use \zpt\rest\BaseRequestHandler;
@@ -23,6 +22,7 @@ use \zpt\rest\Request;
 use \zpt\rest\Response;
 use \zpt\cdt\di\InitializingBean;
 use \zpt\cdt\rest\BeanRequestHandler;
+use \zpt\orm\Criteria;
 use \zpt\pct\ActorFactory;
 
 /**

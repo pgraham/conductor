@@ -7,8 +7,8 @@ namespace zpt\cdt\auth;
 
 use \zpt\cdt\model\Session;
 use \zpt\cdt\model\User;
-use \zeptech\orm\runtime\Clarinet;
-use \zeptech\orm\runtime\Criteria;
+use \zpt\orm\Clarinet;
+use \zpt\orm\Criteria;
 
 /**
  * This class manages session objects.
