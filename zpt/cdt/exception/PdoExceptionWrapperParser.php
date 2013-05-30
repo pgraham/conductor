@@ -14,7 +14,7 @@
  */
 namespace zpt\cdt\exception;
 
-use \zeptech\orm\runtime\PdoExceptionWrapper;
+use \zpt\orm\PdoExceptionWrapper;
 
 /**
  * This class adds additional parsing to the information provided by the

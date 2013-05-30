@@ -1,7 +1,6 @@
 <?php
 namespace /*# actorNs #*/;
 
-use \zeptech\orm\runtime\PdoExceptionWrapper;
 use \zeptech\orm\runtime\ValidationException;
 use \zpt\rest\Request;
 use \zpt\rest\Response;
@@ -14,6 +13,7 @@ use \zpt\cdt\i18n\ModelMessages;
 use \zpt\cdt\AuthProvider;
 use \zpt\cdt\Session;
 use \zpt\orm\Criteria;
+use \zpt\orm\PdoExceptionWrapper;
 use \StdClass;
 
 /**

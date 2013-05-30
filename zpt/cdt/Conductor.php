@@ -321,7 +321,7 @@ class Conductor {
     $pdoExceptionHandler = new PdoExceptionHandler();
     $pdoExceptionHandler->setMessagesFactory(Injector::getBean('messagesFactory'));
     $server->registerExceptionHandler(
-      'zeptech\orm\runtime\PdoExceptionWrapper',
+      'zpt\orm\PdoExceptionWrapper',
       $pdoExceptionHandler
     );
     $server->registerExceptionHandler(

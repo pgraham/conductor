@@ -5,8 +5,8 @@
  */
 namespace zpt\dyn;
 
-use \zeptech\orm\runtime\PdoWrapper;
 use \zpt\cdt\di\Injector;
+use \zpt\orm\PdoWrapper;
 
 class InjectionConfigurator {
 
