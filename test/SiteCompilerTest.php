@@ -59,6 +59,10 @@ class SiteCompilerTest extends TestCase {
 		M::close();
 	}
 
+	/**
+	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
+	 */
 	public function testSiteCompile() {
 		$pathInfo = $this->mockConfig['pathInfo'];
 
