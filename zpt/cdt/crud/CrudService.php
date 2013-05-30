@@ -16,9 +16,9 @@ namespace zpt\cdt\crud;
 
 use \zeptech\orm\generator\model\Model;
 use \zeptech\orm\generator\model\Parser as ModelParser;
-use \zeptech\orm\generator\AbstractModelGenerator;
 use \zpt\cdt\di\Injector;
 use \zpt\cdt\i18n\ModelDisplayParser;
+use \zpt\orm\ModelCompanionGenerator;
 
 /**
  * This class encapsulates information about a CRUD remote service for a model
@@ -29,7 +29,7 @@ use \zpt\cdt\i18n\ModelDisplayParser;
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class CrudService extends AbstractModelGenerator {
+class CrudService extends ModelCompanionGenerator {
 
   public static $actorNamespace = 'zpt\dyn\crud';
 

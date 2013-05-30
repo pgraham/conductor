@@ -6,8 +6,8 @@
 namespace zpt\cdt\i18n;
 
 use \zeptech\orm\generator\model\Model;
-use \zeptech\orm\generator\AbstractModelGenerator;
 use \zpt\pct\CodeTemplateParser;
+use \zpt\orm\ModelCompanionGenerator;
 
 /**
  * This class encapsulates model info required by Conductor for compiling the
@@ -17,7 +17,7 @@ use \zpt\pct\CodeTemplateParser;
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class ModelMessages extends AbstractModelGenerator {
+class ModelMessages extends ModelCompanionGenerator {
 
   public static $actorNamespace = 'zpt\dyn\i18n';
 
