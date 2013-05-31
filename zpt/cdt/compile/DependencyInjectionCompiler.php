@@ -28,7 +28,7 @@ use \zpt\cdt\i18n\ModelMessages;
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class DependencyInjectionCompiler {
+class DependencyInjectionCompiler implements Compiler {
 
   private $_files = array();
   private $_beans = array();
@@ -55,7 +55,7 @@ class DependencyInjectionCompiler {
     }
   }
 
-  public function compile($pathInfo, $ns) {
+  public function compile($pathInfo, $ns, $env = 'dev') {
     foreach ($this->_files as $context) {
       if (file_exists($context)) {
         $cfg = simplexml_load_file($context, 'SimpleXMLElement',
