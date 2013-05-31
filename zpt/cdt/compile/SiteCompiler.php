@@ -122,8 +122,6 @@ class SiteCompiler {
 		$this->serverCompiler->setTemplateParser($this->tmplParser);
 
 		$this->serviceCompiler = new ServiceCompiler();
-		$this->serviceCompiler->setDependencyInjectionCompiler($this->diCompiler);
-		$this->serviceCompiler->setServerCompiler($this->serverCompiler);
 	}
 
 	public function setConfigurationCompiler(ConfigurationCompiler $compiler) {
@@ -546,6 +544,10 @@ class SiteCompiler {
 		}
 	}
 
+	/* 
+	 * Ensure that all injectable dependencies that are not set have a default
+	 * instantiated.
+	 */
 	private function ensureDependencies() {
 		if ($this->configurationCompiler === null) {
 			$this->configurationCompiler = new ConfigurationCompiler();
@@ -564,6 +566,7 @@ class SiteCompiler {
 		}
 	}
 
+	/* Initialize the compiler once configuration has been parsed */
 	private function initCompiler($pathInfo, $env) {
 		$target = $pathInfo['target'];
 		$this->persisterGen = new PersisterGenerator($target);
@@ -584,10 +587,13 @@ class SiteCompiler {
 
 		$this->modulesPath = "$pathInfo[root]/modules";
 
+		// Dependency Injection
 		$serviceRequestDispatcher = new ServiceRequestDispatcher(
 			$pathInfo['target']);
 		$this->serviceCompiler->setServiceRequestDispatcher(
 			$serviceRequestDispatcher);
+		$this->serviceCompiler->setDependencyInjectionCompiler($this->diCompiler);
+		$this->serviceCompiler->setServerCompiler($this->serverCompiler);
 
 		$this->diCompiler->setTemplateParser($this->tmplParser);
 	}
