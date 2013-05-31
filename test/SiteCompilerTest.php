@@ -12,7 +12,7 @@
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
  */
-namespace zpt\cdt\test;
+namespace zpt\cdt;
 
 use \PHPUnit_Framework_TestCase as TestCase;
 use \Mockery as M;
