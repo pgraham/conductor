@@ -147,11 +147,30 @@ class SiteCompilerTest extends TestCase {
 			->once()
 			->andReturnNull();
 
+		$diCompiler = M::mock('zpt\cdt\compile\DependencyInjectionCompiler');
+		$diCompiler
+			->shouldReceive('setTemplateParser')
+			->with(anInstanceOf('zpt\pct\CodeTemplateParser'));
+
+		$diCompiler
+			->shouldReceive('addFile')
+			->with("$pathInfo[cdtRoot]/resources/dependencies.xml")
+			->once();
+		$diCompiler
+			->shouldReceive('addFile')
+			->with("$pathInfo[src]/resources/dependencies.xml")
+			->once();
+		$diCompiler
+			->shouldReceive('compile')
+			->with(anInstanceOf('ArrayObject'), typeOf('string'))
+			->once();
+
 		//$resourceCompiler->shouldReceive('compile');
 
 		$this->compiler->setConfigurationCompiler($configCompiler);
 		$this->compiler->setDispatcherCompiler($mockCompiler);
 		$this->compiler->setResourceCompiler($resourceCompiler);
+		$this->compiler->setDependencyInjectionCompiler($diCompiler);
 		$this->compiler->compile($pathInfo['root']);
 	}
 
