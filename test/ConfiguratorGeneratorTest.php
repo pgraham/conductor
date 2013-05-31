@@ -12,7 +12,7 @@
  *
  * @license http://www.opensource.org/licenses/bsd-license.php
  */
-namespace zpt\cdt\test;
+namespace zpt\cdt;
 
 use \PHPUnit_Framework_TestCase as TestCase;
 
@@ -28,10 +28,10 @@ require_once __DIR__ . '/test-common.php';
 class ConfiguratorGeneratorTest extends TestCase {
 
 	protected function setUp() {
-		if (file_exists(__DIR__ . '/target')) {
-			exec('rm -r ' . __DIR__ . '/target');
+		$target = __DIR__ . '/target';
+		if (file_exists($target)) {
+			exec("rm -r $target");
 		}
-		mkdir(__DIR__ . '/target');
 	}
 
 	public function testConfiguratorGeneration() {
