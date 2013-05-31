@@ -42,7 +42,7 @@ class SiteCompilerTest extends TestCase {
 				'root' => $root,
 				'webRoot' => '/',
 				'docRoot' => "$root/htdocs",
-				'cdtRoot' => "$root/vendor/conductor",
+				'cdtRoot' => "$root/vendor/zeptech/conductor",
 				'lib' => "$root/lib",
 				'src' => "$root/src",
 				'target' => "$root/target"
