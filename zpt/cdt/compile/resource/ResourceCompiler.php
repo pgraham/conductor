@@ -20,9 +20,24 @@ class ResourceCompiler {
 	private $lessCompiler;
 	private $templateParser;
 
-	public function __construct() {
-		$this->lessCompiler = new LessCompiler();
-		$this->templateParser = new CodeTemplateParser();
+	/**
+	 * Create a new resource compiler instance with optional injected 
+	 * dependencies.
+	 *
+	 * @param CodeTemplateParser $templateParser CodeTemplateParser instance. If 
+	 * not provided a default implementation will be instantiated.
+	 * @param LessCompiler $lessCompiler LessCompiler instance. If not provided 
+	 * a default implementation will be instantiated.
+	 */
+	public function __construct($templateParser = null, $lessCompiler = null) {
+		if ($templateParser === null) {
+			$templateParser = new CodeTemplateParser();
+		}
+		if ($lessCompiler === null) {
+			$lessCompiler = new LessCompiler();
+		}
+		$this->lessCompiler = $lessCompiler;
+		$this->templateParser = $templateParser;
 	}
 
 	/**
