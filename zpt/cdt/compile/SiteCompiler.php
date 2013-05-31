@@ -113,9 +113,6 @@ class SiteCompiler {
 
 		$this->tmplParser = new CodeTemplateParser();
 
-		$this->diCompiler = new DependencyInjectionCompiler();
-		$this->diCompiler->setTemplateParser($this->tmplParser);
-
 		$this->jslibCompiler = new JslibCompiler();
 
 		$this->l10nCompiler = new L10NCompiler();
@@ -139,6 +136,10 @@ class SiteCompiler {
 
 	public function setResourceCompiler(ResourceCompiler $compiler) {
 		$this->resourceCompiler = $compiler;
+	}
+
+	public function setDependencyInjectionCompiler(Compiler $compiler) {
+		$this->diCompiler = $compiler;
 	}
 
 	/**
@@ -557,6 +558,10 @@ class SiteCompiler {
 		if ($this->resourceCompiler === null) {
 			$this->resourceCompiler = new ResourceCompiler();
 		}
+
+		if ($this->diCompiler === null) {
+			$this->diCompiler = new DependencyInjectionCompiler();
+		}
 	}
 
 	private function initCompiler($pathInfo, $env) {
@@ -583,6 +588,8 @@ class SiteCompiler {
 			$pathInfo['target']);
 		$this->serviceCompiler->setServiceRequestDispatcher(
 			$serviceRequestDispatcher);
+
+		$this->diCompiler->setTemplateParser($this->tmplParser);
 	}
 
 	// Kludge until anonymous function can access $this private methods
