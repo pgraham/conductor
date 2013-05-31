@@ -188,7 +188,7 @@ class SiteCompiler {
 	protected function collectDependencyXmls($pathInfo) {
 		$diCompiler = $this->diCompiler;
 		$diCompiler->addFile(
-			"$pathInfo[lib]/conductor/resources/dependencies.xml");
+			"$pathInfo[cdtRoot]/resources/dependencies.xml");
 
 		$this->doWithModules(function ($modulePath) use ($diCompiler) {
 			$diCompiler->addFile("$modulePath/resources/dependencies.xml");
