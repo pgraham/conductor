@@ -44,6 +44,7 @@ class DependencyInjectionCompiler {
       $bean['props'],
       $props
     );
+    $bean['ctor'] = array();
 
     $this->_beans[] = $bean;
   }
@@ -120,7 +121,7 @@ class DependencyInjectionCompiler {
     }
 
     // Build the InjectionConfiguration script
-    $srcPath = __DIR__ . '/InjectionConfigurator.php';
+    $srcPath = __DIR__ . '/InjectionConfigurator.tmpl.php';
     $outPath = "$pathInfo[target]/zpt/dyn/InjectionConfigurator.php";
     $tmpl = $this->_tmplParser->parse(file_get_contents($srcPath));
 
