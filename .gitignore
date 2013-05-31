@@ -1,6 +1,5 @@
 commit.txt
 test/target
-test/mock-site
 
 # Composer files
 vendor
