@@ -5,7 +5,7 @@
  * All rights reserved.
  *
  * This file is part of Conductor and is licensed by the Copyright holder under
- * the 3-clause BSD License.  The full text of the license can be found in the
+ * the 3-clause BSD License.	The full text of the license can be found in the
  * LICENSE.txt file included in the root directory of this distribution or at
  * the link below.
  * =============================================================================
@@ -30,41 +30,41 @@ use \zpt\cdt\exception\AuthException;
  */
 abstract class AbstractGatekeeper implements Gatekeeper {
 
-  public function checkCanCreate($model) {
-    if (!$this->canCreate($model)) {
-      throw $this->newAuthException($model, 'create');
-    }
-  }
+	public function checkCanCreate($model) {
+		if (!$this->canCreate($model)) {
+			throw $this->newAuthException($model, 'create');
+		}
+	}
 
-  public function checkCanDelete($model) {
-    if (!$this->canDelete($model)) {
-      throw $this->newAuthException($model, 'delete');
-    }
-  }
+	public function checkCanDelete($model) {
+		if (!$this->canDelete($model)) {
+			throw $this->newAuthException($model, 'delete');
+		}
+	}
 
-  public function checkCanRead($model) {
-    if (!$this->canRead($model)) {
-      throw $this->newAuthException($model, 'read');
-    }
-  }
+	public function checkCanRead($model) {
+		if (!$this->canRead($model)) {
+			throw $this->newAuthException($model, 'read');
+		}
+	}
 
-  public function checkCanWrite($model) {
-    if (!$this->canWrite($model)) {
-      throw $this->newAuthException($model, 'write');
-    }
-  }
+	public function checkCanWrite($model) {
+		if (!$this->canWrite($model)) {
+			throw $this->newAuthException($model, 'write');
+		}
+	}
 
-  protected function newAuthException($model, $action) {
-    $transformer = Transformer::get($model);
-    $id = $transformer->getId($model);
-    $msg = "Unable to $action " . get_class($model);
-    if ($id) {
-      $msg .= " with id $id";
-    }
+	protected function newAuthException($model, $action) {
+		$transformer = Transformer::get($model);
+		$id = $transformer->getId($model);
+		$msg = "Unable to $action " . get_class($model);
+		if ($id) {
+			$msg .= " with id $id";
+		}
 
-    $msg .= ": Permission Denied";
+		$msg .= ": Permission Denied";
 
-    // TODO Throw a RestException instead
-    return new AuthException(AuthException::NOT_AUTHORIZED, $msg);
-  }
+		// TODO Throw a RestException instead
+		return new AuthException(AuthException::NOT_AUTHORIZED, $msg);
+	}
 }
