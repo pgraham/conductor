@@ -17,7 +17,7 @@ use \zpt\cdt\compile\resource\ResourceDiscoverer;
 use \zpt\cdt\di\DependencyParser;
 use \zpt\cdt\di\Injector;
 use \zpt\cdt\Conductor;
-use \zpt\pct\AbstractGenerator;
+use \zpt\opal\CompanionGenerator;
 use \zpt\util\file\GlobFileLister;
 use \DirectoryIterator;
 use \Exception;
@@ -29,9 +29,7 @@ use \ReflectionClass;
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class HtmlProvider extends AbstractGenerator {
-
-	public static $actorNamespace = 'zpt\dyn\html';
+class HtmlProvider extends CompanionGenerator {
 
 	/* The type of environment for which HtmlProviders will be generated. */
 	private $env;
@@ -46,7 +44,11 @@ class HtmlProvider extends AbstractGenerator {
 		$this->env = $env;
 	}
 
-	protected function getTemplatePath() {
+	protected function getCompanionNamespace($defClass) {
+		return 'zpt\dyn\html';
+	}
+
+	protected function getTemplatePath($defClass) {
 		return __DIR__ . '/htmlProvider.tmpl.php';
 	}
 

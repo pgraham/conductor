@@ -14,7 +14,7 @@
  */
 namespace zpt\cdt\compile;
 
-use \zpt\pct\AbstractGenerator;
+use \zpt\opal\CompanionGenerator;
 use \ArrayObject;
 use \Exception;
 
@@ -24,9 +24,7 @@ use \Exception;
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class ConfiguratorGenerator extends AbstractGenerator {
-
-	public static $actorNamespace = 'zpt\dyn';
+class ConfiguratorGenerator extends CompanionGenerator {
 
 	private $root;
 	private $env;
@@ -40,7 +38,11 @@ class ConfiguratorGenerator extends AbstractGenerator {
 		$this->xmlCfg = $xmlCfg;
 	}
 
-	public function getTemplatePath() {
+	public function getCompanionNamespace($defClass) {
+		return 'zpt\dyn';
+	}
+
+	public function getTemplatePath($defClass) {
 		return __DIR__ . '/Configurator.tmpl.php';
 	}
 

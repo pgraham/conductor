@@ -16,7 +16,7 @@ namespace zpt\cdt\rest;
 
 use \zpt\anno\Annotations;
 use \zpt\cdt\di\Injector;
-use \zpt\pct\AbstractGenerator;
+use \zpt\opal\CompanionGenerator;
 use \Exception;
 use \ReflectionClass;
 use \StdClass;
@@ -34,13 +34,15 @@ use \StdClass;
  * All service methods must accept accept two parameters, a zpt\rest\Request
  * object and a zpt\rest\Response object.
  */
-class ServiceRequestDispatcher extends AbstractGenerator {
+class ServiceRequestDispatcher extends CompanionGenerator {
 
 	const BEAN_ID_SUFFIX = 'ServiceRequestDispatcher';
 
-	public static $actorNamespace = 'zpt\dyn\rest';
+	protected function getCompanionNamespace($defClass) {
+		return 'zpt\dyn\rest';
+	}
 
-	protected function getTemplatePath() {
+	protected function getTemplatePath($defClass) {
 		return __DIR__ . '/ServiceRequestDispatcher.tmpl.php';
 	}
 
