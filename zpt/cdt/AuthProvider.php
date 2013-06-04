@@ -23,10 +23,10 @@ use \LightOpenId;
  */
 class AuthProvider {
 
-	private $_session = null;
+	private $session = null;
 
-	private $_openId;
-	private $_visitor;
+	private $openId;
+	private $visitor;
 
 	public function authenticate($username, $password) {
 		$pwHash = md5($password);
@@ -80,7 +80,7 @@ class AuthProvider {
 	 * @return LightOpenId
 	 */
 	public function getOpenId() {
-		return $this->_openId;
+		return $this->openId;
 	}
 
 	/**
@@ -93,7 +93,7 @@ class AuthProvider {
 	 */
 	public function getSession() {
 		$this->init();
-		return $this->_session;
+		return $this->session;
 	}
 
 	/**
@@ -105,7 +105,7 @@ class AuthProvider {
 	 */
 	public function getVisitor() {
 		$this->init();
-		return $this->_visitor;
+		return $this->visitor;
 	}
 
 	/**
@@ -118,8 +118,8 @@ class AuthProvider {
 	public function hasPermission($permName, $level = 'write') {
 		$this->init();
 
-		if ($this->_session->getUser() !== null) {
-			return Authorize::allowed($this->_session->getUser(), $permName, $level);
+		if ($this->session->getUser() !== null) {
+			return Authorize::allowed($this->session->getUser(), $permName, $level);
 		}
 		return false;
 	}
@@ -135,8 +135,8 @@ class AuthProvider {
 	 * request, then initiate a new session with default permissions.
 	 */
 	public function init() {
-		$this->_initSession();
-		$this->_initVisitor();
+		$this->initSession();
+		$this->initVisitor();
 	}
 
 	/**
@@ -154,16 +154,16 @@ class AuthProvider {
 		// appear to be successful since the session would still be associated
 		// with a user.  Another way to consider this is that a login attempt
 		// is an implicit logout, whether the login succeeds or not
-		if ($this->_session->getUser() !== null) {
-			$this->_session = SessionManager::newSession();
+		if ($this->session->getUser() !== null) {
+			$this->session = SessionManager::newSession();
 		}
 
 		$user = $this->authenticate($username, $password);
 		if ($user !== null) {
-			$this->_session->setUser($user);
+			$this->session->setUser($user);
 
-			$persister = Persister::get($this->_session);
-			$persister->save($this->_session);
+			$persister = Persister::get($this->session);
+			$persister->save($this->session);
 		}
 	}
 
@@ -171,7 +171,7 @@ class AuthProvider {
 	 * Logout the current user by deleting the conductor cookie.
 	 */
 	public function logout() {
-		$this->_session = null;
+		$this->session = null;
 		setcookie('conductorsessid', '', time() - 3600, _P('/'));
 	}
 
@@ -207,8 +207,8 @@ class AuthProvider {
 				// is an implicit logout, whether the login succeeds or not.	However,
 				// if a current session is unauthenticated, it will be associated with
 				// the now logged in user.
-				if ($this->_session->getUser() !== null) {
-					$this->_session = SessionManager::newSession();
+				if ($this->session->getUser() !== null) {
+					$this->session = SessionManager::newSession();
 				}
 
 				// Need to assign a user ID to the session
@@ -223,20 +223,20 @@ class AuthProvider {
 					$persister->save($user);
 				}
 
-				$this->_session->setUser($user);
-				$persister = Persister::get($this->_session);
-				$persister->save($this->_session);
+				$this->session->setUser($user);
+				$persister = Persister::get($this->session);
+				$persister->save($this->session);
 
 				// Redirect to the same page if handling a synchronous request so
 				// that a refresh doesn't re-authenticate the same user
 				$this->_redirectIf();
 			} else {
-				$this->_session = $this->_getSession();
+				$this->session = $this->_getSession();
 			}
 
 		}
 
-		$this->_openId = $openId;
+		$this->openId = $openId;
 	}
 
 	/**
@@ -259,13 +259,13 @@ class AuthProvider {
 	}
 
 	/* Initialize the session. */
-	private function _initSession() {
-		if ($this->_session !== null) {
+	private function initSession() {
+		if ($this->session !== null) {
 			return;
 		}
 
 		// Initialize session
-		$this->_session = SessionManager::loadSession(
+		$this->session = SessionManager::loadSession(
 			isset($_COOKIE['conductorsessid'])
 				? $_COOKIE['conductorsessid']
 				: null
@@ -273,9 +273,9 @@ class AuthProvider {
 	}
 
 	/* Initialize the visitor. */
-	private function _initVisitor() {
+	private function initVisitor() {
 		// Initialize visitor
-		if ($this->_visitor !== null) {
+		if ($this->visitor !== null) {
 			return;
 		}
 
@@ -294,18 +294,18 @@ class AuthProvider {
 				// example would be if the visitors table is cleared.  Some failure
 				// cases may also result in a cookie getting out of sync with the
 				// server.	In this case a new visitor ID should be assigned.
-				$visitor = $this->_newVisitor($persister);
+				$visitor = $this->newVisitor($persister);
 			}
 		} else {
-			$visitor = $this->_newVisitor($persister);
+			$visitor = $this->newVisitor($persister);
 		}
 
-		$this->_visitor = $visitor;
+		$this->visitor = $visitor;
 
 	}
 
 	/* Create a new visitor. */
-	private function _newVisitor($persister) {
+	private function newVisitor($persister) {
 		$visitorKey = uniqid('visitor_', true);
 
 		$visitor = new Visitor();
