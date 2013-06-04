@@ -10,6 +10,7 @@ use \zpt\cdt\auth\SessionManager;
 use \zpt\cdt\exception\AuthException;
 use \zpt\cdt\model\User;
 use \zpt\cdt\model\Visitor;
+use \zpt\opal\CompanionLoader;
 use \zpt\orm\Criteria;
 
 use \LightOpenId;

@@ -14,8 +14,8 @@
  */
 namespace zpt\cdt\crud;
 
-use \zeptech\orm\runtime\Transformer;
 use \zpt\cdt\exception\AuthException;
+use \zpt\opal\CompanionLoader;
 
 
 /**
@@ -29,6 +29,15 @@ use \zpt\cdt\exception\AuthException;
  * @author Philip Graham <philip@zeptech.ca>
  */
 abstract class AbstractGatekeeper implements Gatekeeper {
+
+	private $companionLoader;
+
+	public function __construct(CompanionLoader $companionLoader = null) {
+		if ($companionLoader === null) {
+			$companionLoader = new CompanionLoader();
+		}
+		$this->companionLoader = $companionLoader;
+	}
 
 	public function checkCanCreate($model) {
 		if (!$this->canCreate($model)) {
@@ -55,7 +64,11 @@ abstract class AbstractGatekeeper implements Gatekeeper {
 	}
 
 	protected function newAuthException($model, $action) {
-		$transformer = Transformer::get($model);
+		$transformer = $this->companionLoader->get(
+			'zpt\dyn\orm\transformer',
+			$model
+		);
+
 		$id = $transformer->getId($model);
 		$msg = "Unable to $action " . get_class($model);
 		if ($id) {
