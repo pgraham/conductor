@@ -31,9 +31,11 @@ use \zpt\orm\ModelCompanionGenerator;
  */
 class CrudService extends ModelCompanionGenerator {
 
-	public static $actorNamespace = 'zpt\dyn\crud';
+	protected function getCompanionNamespace($defClass) {
+		return 'zpt\dyn\crud';
+	}
 
-	protected function getTemplatePath() {
+	protected function getTemplatePath($defClass) {
 		return __DIR__ . '/CrudService.tmpl.php';
 	}
 

@@ -19,9 +19,11 @@ use \zpt\orm\ModelCompanionGenerator;
  */
 class ModelMessages extends ModelCompanionGenerator {
 
-	public static $actorNamespace = 'zpt\dyn\i18n';
+	protected function getCompanionNamespace($defClass) {
+		return 'zpt\dyn\i18n';
+	}
 
-	protected function getTemplatePath() {
+	protected function getTemplatePath($defClass) {
 		return __DIR__ . '/ModelMessages.tmpl.php';
 	}
 
