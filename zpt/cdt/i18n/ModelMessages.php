@@ -19,20 +19,20 @@ use \zpt\orm\ModelCompanionGenerator;
  */
 class ModelMessages extends ModelCompanionGenerator {
 
-  public static $actorNamespace = 'zpt\dyn\i18n';
+	public static $actorNamespace = 'zpt\dyn\i18n';
 
-  protected function getTemplatePath() {
-    return __DIR__ . '/ModelMessages.tmpl.php';
-  }
+	protected function getTemplatePath() {
+		return __DIR__ . '/ModelMessages.tmpl.php';
+	}
 
-  protected function getValuesForModel(Model $model) {
-    $modelDisplay = new ModelDisplayParser($model);
+	protected function getValuesForModel(Model $model) {
+		$modelDisplay = new ModelDisplayParser($model);
 
-    $values = array(
-      'singular' => $modelDisplay->getSingular(),
-      'plural'  => $modelDisplay->getPlural(),
-      'article' => $modelDisplay->getArticle()
-    );
-    return $values;
-  }
+		$values = array(
+			'singular' => $modelDisplay->getSingular(),
+			'plural'	=> $modelDisplay->getPlural(),
+			'article' => $modelDisplay->getArticle()
+		);
+		return $values;
+	}
 }
