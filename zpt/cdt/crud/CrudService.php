@@ -5,7 +5,7 @@
  * All rights reserved.
  *
  * This file is part of Conductor and is licensed by the Copyright holder under
- * the 3-clause BSD License.  The full text of the license can be found in the
+ * the 3-clause BSD License.	The full text of the license can be found in the
  * LICENSE.txt file included in the root directory of this distribution or at
  * the link below.
  * =============================================================================
@@ -31,37 +31,37 @@ use \zpt\orm\ModelCompanionGenerator;
  */
 class CrudService extends ModelCompanionGenerator {
 
-  public static $actorNamespace = 'zpt\dyn\crud';
+	public static $actorNamespace = 'zpt\dyn\crud';
 
-  protected function getTemplatePath() {
-    return __DIR__ . '/CrudService.tmpl.php';
-  }
+	protected function getTemplatePath() {
+		return __DIR__ . '/CrudService.tmpl.php';
+	}
 
-  protected function getValuesForModel(Model $model) {
-    $modelStrings = new ModelDisplayParser($model);
-    $plural = $modelStrings->getPlural();
+	protected function getValuesForModel(Model $model) {
+		$modelStrings = new ModelDisplayParser($model);
+		$plural = $modelStrings->getPlural();
 
-    $url = "/$plural";
+		$url = "/$plural";
 
-    $classname = $model->getClass();
-    if (preg_match('/^zpt\\\\mod\\\\([^\\\\]+)\\\\model\\\\/', $classname, $matches)) {
-      $url = "/$matches[1]$url";
-    }
+		$classname = $model->getClass();
+		if (preg_match('/^zpt\\\\mod\\\\([^\\\\]+)\\\\model\\\\/', $classname, $matches)) {
+			$url = "/$matches[1]$url";
+		}
 
-    $gatekeeper = $model->getGatekeeper();
-    if ($gatekeeper === null) {
-      $gatekeeper = 'zpt\cdt\crud\DefaultGatekeeper';
-    }
-    
-    return array(
-      'auth'             => $model->getAuth(),
-      'cdtOrderTokenKey' => 'updateOrderToken_' . str_replace('\\', '_', get_class($model)),
-      'gatekeeper'       => $model->getGatekeeper(),
-      'gatekeeperBeanId' => Injector::generateBeanId($gatekeeper),
-      'singular'         => $modelStrings->getSingular(),
-      'plural'           => $plural,
-      'idColumn'         => $model->getId()->getColumn(),
-      'url'              => $url
-    );
-  }
+		$gatekeeper = $model->getGatekeeper();
+		if ($gatekeeper === null) {
+			$gatekeeper = 'zpt\cdt\crud\DefaultGatekeeper';
+		}
+		
+		return array(
+			'auth'						 => $model->getAuth(),
+			'cdtOrderTokenKey' => 'updateOrderToken_' . str_replace('\\', '_', get_class($model)),
+			'gatekeeper'			 => $model->getGatekeeper(),
+			'gatekeeperBeanId' => Injector::generateBeanId($gatekeeper),
+			'singular'				 => $modelStrings->getSingular(),
+			'plural'					 => $plural,
+			'idColumn'				 => $model->getId()->getColumn(),
+			'url'							 => $url
+		);
+	}
 }
