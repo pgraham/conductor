@@ -34,16 +34,16 @@ class HtmlProvider extends AbstractGenerator {
 	public static $actorNamespace = 'zpt\dyn\html';
 
 	/* The type of environment for which HtmlProviders will be generated. */
-	private $_env;
+	private $env;
 
 	/* Filesystem path to htdocs. Used to resolve script groups. */
-	private $_htdocs;
+	private $htdocs;
 
 	public function __construct($outputPath, $env) {
 		parent::__construct($outputPath);
 
-		$this->_htdocs = "$outputPath/htdocs";
-		$this->_env = $env;
+		$this->htdocs = "$outputPath/htdocs";
+		$this->env = $env;
 	}
 
 	protected function getTemplatePath() {
@@ -58,13 +58,13 @@ class HtmlProvider extends AbstractGenerator {
 		}
 
 		$values = array(
-			'env' => $this->_env,
+			'env' => $this->env,
 			'jslibs' => array(),
 			'fonts' => array()
 		);
 
 		if (isset($page['template'])) {
-			$templateClass = $this->_getTemplateClass($page['template'], $className);
+			$templateClass = $this->getTemplateClass($page['template'], $className);
 			$templateDef = new ReflectionClass($templateClass);
 			$template = new Annotations($templateDef);
 
@@ -77,7 +77,7 @@ class HtmlProvider extends AbstractGenerator {
 			$template = new Annotations();
 		}
 		
-		$values['title'] = $this->_parseTitle($page, $template);
+		$values['title'] = $this->parseTitle($page, $template);
 
 		// If the page definition specifies an authorization level then ensure
 		// that it is enforced
@@ -104,12 +104,12 @@ class HtmlProvider extends AbstractGenerator {
 		$values['jslibPath'] = _P('/jslib');
 		$values['cssPath'] = _P('/css');
 
-		$jsResources = new ResourceDiscoverer("$this->_htdocs/js", 'js');
+		$jsResources = new ResourceDiscoverer("$this->htdocs/js", 'js');
 		$values['coreScripts'] = $jsResources->discover('cdt.core');
 		$values['utilScripts'] = $jsResources->discover('cdt.util');
 		$values['widgetScripts'] = $jsResources->discover('cdt.widget');
 
-		$cssResources = new ResourceDiscoverer("$this->_htdocs/css", 'css');
+		$cssResources = new ResourceDiscoverer("$this->htdocs/css", 'css');
 		$values['coreCss'] = $cssResources->discover('cdt.core');
 		$values['widgetCss'] = $cssResources->discover('cdt.widget');
 
@@ -123,14 +123,14 @@ class HtmlProvider extends AbstractGenerator {
 				$script = "/js/$script";
 			}
 			return _P($script);
-		}, $this->_parseScripts($page, $template));
+		}, $this->parseScripts($page, $template));
 
 		$values['sheets'] = array_map(function ($sheet) {
 			if (substr($sheet, 0, 1) !== '/') {
 				$sheet = "/css/$sheet";
 			}
 			return _P($sheet);
-		}, $this->_parseStylesheets($page, $template));
+		}, $this->parseStylesheets($page, $template));
 
 		$values['fonts'] = array_merge(
 			$template->asArray('font'),
@@ -159,7 +159,7 @@ class HtmlProvider extends AbstractGenerator {
 	 * Determine if the given template name is absolute or relative and if
 	 * relative append the namespace of the page class.
 	 */
-	private function _getTemplateClass($template, $pageClass) {
+	private function getTemplateClass($template, $pageClass) {
 		if (strpos($template, '\\') !== false) {
 			return $template;
 		}
@@ -172,8 +172,8 @@ class HtmlProvider extends AbstractGenerator {
 	 * annotations.  Scripts declared without a '.js' extension are considered
 	 * to be script groups.
 	 */
-	private function _parseScripts($page, $template) {
-		$jsResources = new ResourceDiscoverer("$this->_htdocs/js", 'js');
+	private function parseScripts($page, $template) {
+		$jsResources = new ResourceDiscoverer("$this->htdocs/js", 'js');
 
 		$declared = array_merge(
 			$template->asArray('script'),
@@ -196,8 +196,8 @@ class HtmlProvider extends AbstractGenerator {
 	 * annotations.  Stylesheets declared without a '.css' extension are
 	 * considered to be script groups.
 	 */
-	private function _parseStylesheets($page, $template) {
-		$cssResources = new ResourceDiscoverer("$this->_htdocs/css", 'css');
+	private function parseStylesheets($page, $template) {
+		$cssResources = new ResourceDiscoverer("$this->htdocs/css", 'css');
 
 		$declared = array_merge(
 			$template->asArray('css'),
@@ -221,7 +221,7 @@ class HtmlProvider extends AbstractGenerator {
 	/*
 	 * Parse the title from the given sets of page and template annotations.
 	 */
-	private function _parseTitle($page, $template) {
+	private function parseTitle($page, $template) {
 		$title = null;
 		if (isset($page['page']['title'])) {
 			$title = $page['page']['title'];
