@@ -5,7 +5,6 @@
  */
 namespace zpt\cdt;
 
-use \zeptech\orm\runtime\Persister;
 use \zpt\cdt\auth\Authorize;
 use \zpt\cdt\auth\SessionManager;
 use \zpt\cdt\exception\AuthException;
@@ -23,10 +22,17 @@ use \LightOpenId;
  */
 class AuthProvider {
 
-	private $session = null;
-
+	private $companionLoader;
 	private $openId;
+	private $session;
 	private $visitor;
+
+	public function __construct(CompanionLoader $companionLoader = null) {
+		if ($companionLoader === null) {
+			$companionLoader = new CompanionLoader();
+		}
+		$this->companionLoader = $companionLoader;
+	}
 
 	public function authenticate($username, $password) {
 		$pwHash = md5($password);
@@ -35,7 +41,7 @@ class AuthProvider {
 		$c->addEquals('username', $username);
 		$c->addEquals('password', $pwHash);
 
-		$persister = Persister::get('zpt\cdt\model\User');
+		$persister = $this->getPersister('zpt\cdt\model\User');
 		$user = $persister->retrieveOne($c);
 
 		return $user;
@@ -162,7 +168,7 @@ class AuthProvider {
 		if ($user !== null) {
 			$this->session->setUser($user);
 
-			$persister = Persister::get($this->session);
+			$persister = $this->getPersister($this->session);
 			$persister->save($this->session);
 		}
 	}
@@ -212,7 +218,7 @@ class AuthProvider {
 				}
 
 				// Need to assign a user ID to the session
-				$persister = Persister::get('zpt\cdt\model\User');
+				$persister = $this->getPersister('zpt\cdt\model\User');
 				$c = new Criteria();
 				$c->addEquals('oid_identity', $openId->identity);
 				$user = $persister->retrieveOne($c);
@@ -224,7 +230,7 @@ class AuthProvider {
 				}
 
 				$this->session->setUser($user);
-				$persister = Persister::get($this->session);
+				$persister = $this->getPersister($this->session);
 				$persister->save($this->session);
 
 				// Redirect to the same page if handling a synchronous request so
@@ -254,8 +260,12 @@ class AuthProvider {
 		$pwHash = md5($password);
 		$user->setPassword($pwHash);
 
-		$persister = Persister::get($user);
+		$persister = $this->getPersister($user);
 		$persister->save($user);
+	}
+
+	private function getPersister($model) {
+		return $this->companionLoader->get('zpt\dyn\orm\persister', $model);
 	}
 
 	/* Initialize the session. */
@@ -279,7 +289,7 @@ class AuthProvider {
 			return;
 		}
 
-		$persister = Persister::get('zpt\cdt\model\Visitor');
+		$persister = $this->getPersister('zpt\cdt\model\Visitor');
 
 		$visitor = null;
 		if (isset($_COOKIE['visitor_id'])) {

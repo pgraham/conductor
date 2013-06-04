@@ -14,7 +14,6 @@
  */
 namespace zpt\cdt;
 
-use \zeptech\orm\runtime\Persister;
 use \zpt\orm\Criteria;
 use \zpt\pct\ActorFactory;
 

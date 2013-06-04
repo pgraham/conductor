@@ -20,7 +20,6 @@ use \Monolog\Handler\StreamHandler;
 use \oboe\head\Javascript;
 use \oboe\head\Link;
 use \oboe\Element;
-use \zeptech\orm\runtime\Persister;
 use \zpt\dyn\Configurator;
 use \zpt\dyn\InjectionConfigurator;
 use \zpt\dyn\ServerConfigurator;
@@ -76,14 +75,11 @@ class Conductor {
     $c = new Criteria();
     $c->addEquals('name', $name);
 
-    $persister = Persister::get('zpt\cdt\model\ConfigValue');
-    $rows = $persister->retrieve($c);
-    if (count($rows) == 0) {
-      return null;
+    $obj = Clarinet::getOne('zpt\cdt\model\ConfigValue', $c);
+    if ($obj !== null) {
+      return $obj->getValue();
     }
-
-    $obj = $rows[0];
-    return $obj->getValue();
+    return null;
   }
 
   /**
@@ -109,9 +105,7 @@ class Conductor {
     $c = new Criteria();
     $c->addLike('name', $groupConditions);
 
-  
-    $persister = Persister::get('zpt\cdt\model\ConfigValue');
-    $values = $persister->retrieve($c);
+    $values = Clarinet::get('zpt\cdt\model\ConfigValue', $c);
     $idxd = array();
     foreach ($values AS $value) {
       $valName = $value->getName();
@@ -246,6 +240,10 @@ class Conductor {
     // Initialize Dependency injection
     $configurator = new InjectionConfigurator();
     $configurator->configure();
+
+    // TODO Set the CompanionLoader instance used by Clarinet to be the injected
+    //      instance.
+    // Clarinet::setCompanionLoader($companionLoader);
 
     // Initialize localization
     // TODO Make the language determination smart.  Should be retrieved from the

@@ -14,7 +14,6 @@
  */
 namespace zpt\cdt\srvc;
 
-use \zeptech\orm\runtime\Persister;
 use \zeptech\orm\runtime\Transformer;
 use \zpt\rest\BaseRequestHandler;
 use \zpt\rest\RestException;
