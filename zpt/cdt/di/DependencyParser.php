@@ -47,17 +47,21 @@ class DependencyParser {
     }
 
     $beanProps = array();
-    while ($classDef) {
-      $beanProps = array_merge($beanProps, self::parseClass($classDef));
-      $classDef = $classDef->getParentClass();
+    $parent = $classDef;
+    while ($parent) {
+      $beanProps = array_merge($beanProps, self::parseClassProperties($parent));
+      $parent = $parent->getParentClass();
     }
 
     $bean['props'] = $beanProps;
 
+    $ctorArgs = self::parseConstructorArgs($classDef);
+    $bean['ctor'] = $ctorArgs;
+
     return $bean;
   }
 
-  public static function parseClass($classDef) {
+  public static function parseClassProperties($classDef) {
     $properties = $classDef->getProperties();
 
     $beanProps = array();
@@ -100,5 +104,29 @@ class DependencyParser {
     }
 
     return $beanProps;
+  }
+
+  public static function parseConstructorArgs($classDef) {
+    $ctor = $classDef->getConstructor();
+    if ($ctor === null) {
+      return array();
+    }
+
+    $annos = new Annotations($ctor->getDocComment());
+    if (!isset($annos['ctorArg'])) {
+      return array();
+    }
+
+    $args = array();
+    foreach ($annos->asArray('ctorArg') as $ctorArg) {
+      if (isset($ctorArg['value'])) {
+        $args[] = $ctorArg['value'];
+      } else if (isset($ctorArg['ref'])) {
+        $args[] = '$' . $ctorArg['ref'];
+      } else {
+        // TODO Warn about invalid ctorArg annotations
+      }
+    }
+    return $args;
   }
 }
