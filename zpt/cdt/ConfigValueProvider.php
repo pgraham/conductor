@@ -14,8 +14,8 @@
  */
 namespace zpt\cdt;
 
+use \zpt\opal\CompanionLoader;
 use \zpt\orm\Criteria;
-use \zpt\pct\ActorFactory;
 
 /**
  * This class retrieves configuration values from the database.
@@ -24,12 +24,15 @@ use \zpt\pct\ActorFactory;
  */
 class ConfigValueProvider {
 
-  private $persisterFactory;
-
   private $persister;
 
-  public function init() {
-    $this->persister = $this->persisterFactory->get(
+  public function __construct(CompanionLoader $companionLoader = null) {
+    if ($companionLoader === null) {
+      $companionLoader = new CompanionLoader();
+    }
+
+    $this->persister = $companionLoader->get(
+      'zpt\dyn\orm\persister',
       'zpt\cdt\model\ConfigValue'
     );
   }
@@ -52,10 +55,5 @@ class ConfigValueProvider {
 
     $obj = $rows[0];
     return $obj->getValue();
-  }
-
-  public function setPersisterFactory(ActorFactory $persisterFactory)
-  {
-      $this->persisterFactory = $persisterFactory;
   }
 }

@@ -20,8 +20,8 @@ use \zpt\rest\Request;
 use \zpt\rest\Response;
 use \zpt\cdt\di\InitializingBean;
 use \zpt\cdt\rest\BeanRequestHandler;
+use \zpt\opal\CompanionLoader;
 use \zpt\orm\Criteria;
-use \zpt\pct\ActorFactory;
 
 /**
  * This class provides a remote service for retrieving and updating global
@@ -39,29 +39,36 @@ class GlobalConfigService extends BaseRequestHandler
 	/** @Injected */
 	private $authProvider;
 
-	/** @Injected */
-	private $persisterFactory;
-
-	/** @Injected */
-	private $transformerFactory;
-
-	private $persister;
+	private $companionLoader;
 
 	private $mappings;
+
+	/**
+	 * @ctorArg( ref = companionLoader )
+	 */
+	public function __construct(CompanionLoader $companionLoader = null) {
+		if ($companionLoader === null) {
+			$companionLoader = new CompanionLoader();
+		}
+		$this->companionLoader = $companionLoader;
+	}
 
 	public function get(Request $request, Response $response) {
 		$configName = $request->getParameter('name');
 		if ($configName === null) {
 			// Get all global configuration values
-			// TODO - Inject this
-			$persister = $this->persisterFactory->get('zpt\cdt\model\ConfigValue');
+			$persister = $this->companionLoader->get(
+				'zpt\dyn\orm\persister',
+				'zpt\cdt\model\ConfigValue'
+			);
 			$c = new Criteria();
 			$c->addSelect('name')->addSelect('value')
 				->addEquals('editable', true)
 				->addSort('name');
 			$globalConfig = $persister->retrieve($c);
 
-			$transformer = $this->transformerFactory->get(
+			$transformer = $this->companionLoader->get(
+				'zpt\dyn\orm\transformer',
 				'zpt\cdt\model\ConfigValue'
 			);
 			$response->setData($transformer->asCollection($globalConfig));
@@ -84,7 +91,10 @@ class GlobalConfigService extends BaseRequestHandler
 		$c = new Criteria();
 		$c->addEquals('name', $configName);
 
-		$persister = $this->persisterFactory->get('zpt\cdt\model\ConfigValue');
+		$persister = $this->companionLoader->get(
+			'zpt\dyn\orm\persister',
+			'zpt\cdt\model\ConfigValue'
+		);
 		$model = $persister->retrieveOne($c);
 		if ($model === null) {
 			throw new RestException(404);
@@ -109,13 +119,5 @@ class GlobalConfigService extends BaseRequestHandler
 
 	public function setMappings(array $mappings) {
 		$this->mappings = $mappings;
-	}
-
-	public function setPersisterFactory(ActorFactory $persisterFactory) {
-		$this->persisterFactory = $persisterFactory;
-	}
-
-	public function setTransformerFactory(ActorFactory $transformerFactory) {
-		$this->transformerFactory = $transformerFactory;
 	}
 }

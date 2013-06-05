@@ -103,6 +103,8 @@ class DependencyInjectionCompiler implements Compiler {
             $ctor = $beanDef->ctorArg;
 
             // TODO Is order guaranteed by XML parser?
+            // TODO Combine this with logic in dependency parser to eliminate
+            //      duplication
             foreach ($ctor as $arg) {
               if (isset($arg['value'])) {
                 $ctorArgs[] = $this->getScalar((string) $arg['value']);

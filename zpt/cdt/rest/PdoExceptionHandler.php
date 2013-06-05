@@ -19,7 +19,6 @@ use \zpt\rest\Request;
 use \zpt\rest\Response;
 use \zpt\rest\RestException;
 use \zpt\cdt\exception\PdoExceptionWrapperParser;
-use \zpt\pct\ActorFactory;
 use \Exception;
 
 /**
@@ -31,7 +30,7 @@ class PdoExceptionHandler implements ExceptionHandler
 {
 
     /** @Injected */
-    private $messagesFactory;
+    private $companionLoader;
 
     public function handleException(
         Exception $e,
@@ -41,6 +40,10 @@ class PdoExceptionHandler implements ExceptionHandler
 
         $exceptionParser = new PdoExceptionWrapperParser($e); 
         $modelMessages = $this->messagesFactory->get($e->getModelClass());
+        $modelMessages = $this->companionLoader->get(
+            'zpt\dyn\i18n',
+            $e->getModelClass()
+        );
 
         $response->clearHeaders();
         $hdrMsg = _L('http.status.header.403');
@@ -65,8 +68,7 @@ class PdoExceptionHandler implements ExceptionHandler
         $response->setData($msg);
     }
 
-    public function setMessagesFactory(ActorFactory $messagesFactory)
-    {
-        $this->messagesFactory = $messagesFactory;
+    public function setCompanionLoader(CompanionLoader $companionLoader) {
+        $this->companionLoader = $companionLoader;
     }
 }

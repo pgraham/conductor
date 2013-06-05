@@ -22,7 +22,6 @@ use \zpt\opal\CompanionLoader;
  * Base implementation for Gatekeepers.  Implements the four checkCan* methods,
  * Leave the four can*() methods for the implementations.
  *
- * TODO Use Transformer instead of ActorFactory
  * TODO This is not the right package for this class, where does it actually
  *      belong?
  *
