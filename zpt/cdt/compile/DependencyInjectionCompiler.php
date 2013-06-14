@@ -20,6 +20,7 @@ use \zpt\orm\companion\TransformerGenerator;
 use \zpt\orm\companion\ValidatorGenerator;
 use \zpt\cdt\di\DependencyParser;
 use \zpt\cdt\i18n\ModelMessages;
+use \zpt\pct\TemplateResolver;
 
 /**
  * This class compiles a script which initializes the dependency injection
@@ -125,17 +126,11 @@ class DependencyInjectionCompiler implements Compiler {
     // Build the InjectionConfiguration script
     $srcPath = __DIR__ . '/InjectionConfigurator.tmpl.php';
     $outPath = "$pathInfo[target]/zpt/dyn/InjectionConfigurator.php";
-    $tmpl = $this->_tmplParser->parse(file_get_contents($srcPath));
-
     $values = array(
-      'persisterNs' => PersisterGenerator::$actorNamespace,
-      'validatorNs' => ValidatorGenerator::$actorNamespace,
-      'transformerNs' => TransformerGenerator::$actorNamespace,
-      'queryBuilderNs' => QueryBuilder::$actorNamespace,
-      'messagesNs' => ModelMessages::$actorNamespace,
       'beans' => $this->_beans
     );
-    $tmpl->save($outPath, $values);
+    $tmplResolver = new TemplateResolver($this->_tmplParser);
+    $tmplResolver->resolve($srcPath, $outPath, $values);
   }
 
   public function setTemplateParser($templateParser) {
