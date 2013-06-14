@@ -396,8 +396,8 @@ class SiteCompiler {
 			}
 
 			$namingStrategy = new CompanionNamingStrategy();
-			$instClass = HtmlProvider::$actorNamespace . "\\" .
-				$namingStrategy->getClassName($viewClass);
+			$instClass = HtmlProvider::COMPANION_NAMESPACE . "\\" .
+				$namingStrategy->getCompanionClassName($viewClass);
 			$this->diCompiler->addBean($beanId, $instClass);
 
 			$args = array( "'$beanId'" );

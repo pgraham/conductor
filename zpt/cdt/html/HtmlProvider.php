@@ -31,6 +31,8 @@ use \ReflectionClass;
  */
 class HtmlProvider extends CompanionGenerator {
 
+	const COMPANION_NAMESPACE = 'zpt\dyn\html';
+
 	/* The type of environment for which HtmlProviders will be generated. */
 	private $env;
 
