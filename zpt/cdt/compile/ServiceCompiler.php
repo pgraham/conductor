@@ -151,11 +151,13 @@ class ServiceCompiler {
       // configuration
       $dispatcherBeanId = Injector::generateBeanId($srvcClass,
         ServiceRequestDispatcher::BEAN_ID_SUFFIX);
+      $dispatcherNamespace = ServiceRequestDispatcher::COMPANION_NAMESPACE;
       $dispatcherClassName = $this->_serviceRequestDispatcher
-        ->getActorClassName($srvcClass);
+        ->getNamingStrategy()
+        ->getCompanionClassName($srvcClass);
       $this->_diCompiler->addBean(
         $dispatcherBeanId,
-        $dispatcherClassName,
+        "$dispatcherNamespace\\$dispatcherClassName",
         array(
           array(
             'name' => 'service',

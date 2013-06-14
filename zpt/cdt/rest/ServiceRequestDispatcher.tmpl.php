@@ -2,7 +2,7 @@
 /**
  * This is a generated class - DO NOT EDIT.
  */
-namespace /*# actorNs #*/;
+namespace /*# companionNs #*/;
 
 use \zpt\rest\BaseRequestHandler;
 use \zpt\rest\RequestHandler;
@@ -12,7 +12,7 @@ use \zpt\cdt\di\Injector;
 use \zpt\cdt\rest\BeanRequestHandler;
 use \Exception;
 
-class /*# actorClass #*/ extends BaseRequestHandler implements BeanRequestHandler {
+class /*# companionClass #*/ extends BaseRequestHandler implements BeanRequestHandler {
 
   private $service;
   private $session;
