@@ -148,6 +148,6 @@ class DependencyInjectionCompiler implements Compiler {
       } else if (strtolower($val) === 'null') {
           return null;
       }
-      return $val;
+      return "'" . $val . "'";
   }
 }
