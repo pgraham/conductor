@@ -26,6 +26,7 @@ use \zpt\dyn\ServerConfigurator;
 use \zpt\cdt\compile\SiteCompiler;
 use \zpt\cdt\di\Injector;
 use \zpt\cdt\exception\AuthException;
+use \zpt\cdt\exception\TopLevelDebugExceptionHandler;
 use \zpt\cdt\rest\AuthExceptionHandler;
 use \zpt\cdt\rest\InjectedRestServer;
 use \zpt\cdt\rest\LocalizedDefaultExceptionHandler;
@@ -157,6 +158,10 @@ class Conductor {
       assert_options(ASSERT_BAIL, 0);
       assert_options(ASSERT_QUIET_EVAL, 0);
 
+      // Add a dev mode exception handler
+      $exceptionHandler = new TopLevelDebugExceptionHandler();
+      set_exception_handler(array($exceptionHandler, 'handleException'));
+
       if (isset($_GET['clean'])) {
         $dirs = array( 'i18n', 'zeptech', 'zpt', 'htdocs/css', 'htdocs/img',
                        'htdocs/js', 'htdocs/jslib');
@@ -202,8 +207,11 @@ class Conductor {
         
       } catch (Exception $e) {
         File::dirunlock("$root/target");
-        echo "<pre>{$e->getTraceAsString()}</pre>\n";
-        throw new Exception($e->getMessage(), $e->getCode(), $e);
+        throw new Exception(
+          "An exception occured while compiling the site",
+          0,
+          $e
+        );
       }
     }
 
