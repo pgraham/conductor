@@ -1,5 +1,5 @@
 <?php
-namespace /*# actorNs #*/;
+namespace /*# companionNs #*/;
 
 /**
  * This is a generated class that provides pre-parsed information about a model
@@ -10,7 +10,7 @@ namespace /*# actorNs #*/;
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class /*# actorClass #*/ {
+class /*# companionClass #*/ {
 
   public function createSuccessMsg() {
     return ucfirst($this->_successMsg('created', '/*# article #*/')) . '.';

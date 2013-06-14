@@ -1,5 +1,5 @@
 <?php
-namespace /*# actorNs #*/;
+namespace /*# companionNs #*/;
 
 use \conductor\Auth;
 use \oboe\struct\FlowContent;
@@ -17,7 +17,7 @@ use \zpt\cdt\LoginFormAsync;
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class /*# actorClass #*/ {
+class /*# companionClass #*/ {
 
   /** @Injected */
   private $_authProvider;

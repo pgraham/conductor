@@ -1,5 +1,5 @@
 <?php
-namespace /*# actorNs #*/;
+namespace /*# companionNs #*/;
 
 use \zeptech\orm\runtime\ValidationException;
 use \zpt\rest\Request;
@@ -24,7 +24,7 @@ use \StdClass;
  *
  * @Service
  */
-class /*# actorClass #*/ { 
+class /*# companionClass #*/ { 
 
   /** @Injected */
   private $authProvider;
