@@ -76,7 +76,7 @@ class TopLevelDebugExceptionHandler {
 			return "\n\n$trace";
 		}
 
-		return "<pre class=\"exception-trace\">$trace</pre>";
+		return "<div class=\"exception-trace\"><pre>$trace</pre></div>";
 	}
 
 	private function formatStackSeparator($isAsync) {
@@ -98,9 +98,11 @@ class TopLevelDebugExceptionHandler {
 // a CSS resources since that part of compilation may not yet have occured, so 
 // instead the CSS for this page is written here
 $HTML_UNCAUGHT_EXCEPTION_CSS = <<<CSS
+html,body { height: 100%; }
 body {
 	margin: 0;
 	padding: 0;
+	background: -webkit-linear-gradient(top, #FFF, #DDD);
 }
 header {
 	margin-bottom: 1em;
@@ -120,11 +122,12 @@ header {
 	margin: 0 6px;
 }
 .exception-message {
-	margin: 0 0 1.5em;
+	margin: 0;
 	padding: .25em 1em;
 
 	font-family: 'Open Sans', sans-serif;
 	font-size: 1.5em;
+	color: #333;
 
 	background-color: #A51409;
 	background: -webkit-linear-gradient(left, #A51409, #A53429);
@@ -133,14 +136,24 @@ header {
 	box-shadow: 4px 4px 0 0 #333;
 }
 .exception-trace {
-	margin-left: 30px;
-	width: 95%;
-	padding: .5em .5em 1em;
-	border: 1px dashed #AAA;
-	overflow: auto;
+	margin: 5px 1em;
+	padding: 1em;
+	border-bottom: 1px solid #FFF;
+	border-right: 1px solid #FFF;
 
-	font-family: 'Droid Sans Mono', monospace;
-	font-size: .8em;
+	background-color: #555;
+	background: -webkit-linear-gradient(top, #555, #444);
+	box-shadow: 4px 4px 0 0 #333;
+}
+.exception-trace pre {
+	margin: 0;
+	padding-bottom: .5em;
+	white-space: pre-wrap;
+
+	font-family: 'Lekton', monospace;
+	font-size: .9em;
+	line-height: 2em;
+	color: #DDD;
 }
 .exception-stack-separator {
 	margin: 1em 6px 0;
@@ -161,7 +174,7 @@ $HTML_UNCAUGHT_EXCEPTION = <<<HTML
 	<meta charset="utf-8"/>
 	<title>Uncaught Exception</title>
 
-	<link href='http://fonts.googleapis.com/css?family=Droid+Sans+Mono|Open+Sans|Alegreya:700' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Lekton|Open+Sans|Alegreya:700' rel='stylesheet' type='text/css'>
 	<style>
 	$HTML_UNCAUGHT_EXCEPTION_CSS
 	</style>
