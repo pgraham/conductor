@@ -158,9 +158,10 @@ class Conductor {
       assert_options(ASSERT_BAIL, 0);
       assert_options(ASSERT_QUIET_EVAL, 0);
 
-      // Add a dev mode exception handler
+      // Add a dev mode exception handler and error handler
       $exceptionHandler = new TopLevelDebugExceptionHandler();
       set_exception_handler(array($exceptionHandler, 'handleException'));
+      set_error_handler(array($exceptionHandler, 'handleError'));
 
       if (isset($_GET['clean'])) {
         $dirs = array( 'i18n', 'zeptech', 'zpt', 'htdocs/css', 'htdocs/img',

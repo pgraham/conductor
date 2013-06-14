@@ -15,6 +15,7 @@
 namespace zpt\cdt\exception;
 
 use \zpt\util\StringUtils;
+use \ErrorException;
 use \Exception;
 
 /**
@@ -23,6 +24,11 @@ use \Exception;
  * @author Philip Graham <philip@zeptech.ca>
  */
 class TopLevelDebugExceptionHandler {
+
+	private static $FATAL = array(
+		E_USER_ERROR,
+		E_RECOVERABLE_ERROR
+	);
 
 	private $htmlTemplate;
 
@@ -33,6 +39,12 @@ class TopLevelDebugExceptionHandler {
 	public function handleException($exception) {
 		$isAsync = isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
 							strtolower($_SER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+
+		if ($exception instanceof ErrorException) {
+			$title = 'Fatal Error';
+		} else {
+			$title = 'Uncaught ' . get_class($exception);
+		}
 
 		$stack = array();
 
@@ -50,7 +62,17 @@ class TopLevelDebugExceptionHandler {
 			return;
 		}
 
-		echo StringUtils::format($this->htmlTemplate, $msg);
+		echo StringUtils::format($this->htmlTemplate, $title, $msg);
+	}
+
+	public function handleError($errno, $errstr, $errfile, $errline) {
+		if (!in_array($errno, self::$FATAL)) {
+			// This error will not terminate script execution, continue with normal 
+			// error handling
+			return false;
+		}
+
+		throw new ErrorException($errstr, $errno, 0, $errfile, $errline);
 	}
 
 	private function getStack(Exception $e, $isAsync) {
@@ -123,11 +145,11 @@ header {
 }
 .exception-message {
 	margin: 0;
-	padding: .25em 1em;
+	padding: .5em 1em;
 
-	font-family: 'Open Sans', sans-serif;
+	font-family: 'Oxygen', sans-serif;
 	font-size: 1.5em;
-	color: #333;
+	color: #DDD;
 
 	background-color: #A51409;
 	background: -webkit-linear-gradient(left, #A51409, #A53429);
@@ -172,13 +194,13 @@ $HTML_UNCAUGHT_EXCEPTION = <<<HTML
 <html lang="en">
 <head>
 	<meta charset="utf-8"/>
-	<title>Uncaught Exception</title>
+	<title>{0}</title>
 
-	<link href='http://fonts.googleapis.com/css?family=Lekton|Open+Sans|Alegreya:700' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Lekton|Oxygen|Alegreya:700' rel='stylesheet' type='text/css'>
 	<style>
 	$HTML_UNCAUGHT_EXCEPTION_CSS
 	</style>
 <body>
-	<header>Uncaught Exception</header>
-	{0};
+	<header>{0}</header>
+	{1};
 HTML;
