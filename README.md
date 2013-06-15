@@ -1,5 +1,5 @@
 # Conductor
-> Drivin' that train, high on cocaine
+> Drivin that train...
 
 Conductor is a webapp framework for PHP+Javascript providing specific support
 for single page Javascript heavy applications.
