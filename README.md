@@ -7,11 +7,13 @@ for single page Javascript heavy applications.
 ## Install
 
  -  add as a conductor dependency.
+
         {
             "require": {
                 "zeptech/conductor": "dev-master"
             }
         }
+        
  -  TODO run vendor/zeptech/conductor/bin/install -- This will create a skeleton
     structure for your site
 
