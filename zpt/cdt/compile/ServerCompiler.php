@@ -25,9 +25,6 @@ use \zpt\cdt\di\Injector;
  */
 class ServerCompiler {
 
-  /* List of generated request handlers */
-  private $_actors = array();
-
   /* List of request handlers */
   private $_mappings = array();
 
@@ -35,14 +32,6 @@ class ServerCompiler {
   private $_beans = array();
 
   private $_tmplParser;
-
-  public function addActor($generator, $def, $uris) {
-    $this->_actors[] = array(
-      'generator' => $generator,
-      'definition' => $def,
-      'uris' => $uris
-    );
-  }
 
   public function addBean($beanId) {
     $this->_beans[] = $beanId;
@@ -78,7 +67,6 @@ class ServerCompiler {
 
     $values = array(
       'mappings' => $this->_mappings,
-      'actors' => $this->_actors,
       'beans' => $this->_beans
     );
     $tmpl = $this->_tmplParser->parse(file_get_contents($tmplSrc));
