@@ -9,9 +9,9 @@ use \zpt\cdt\crud\CrudException;
 use \zpt\cdt\crud\Gatekeeper;
 use \zpt\cdt\crud\SpfParser;
 use \zpt\cdt\exception\AuthException;
-use \zpt\cdt\i18n\ModelMessages;
 use \zpt\cdt\AuthProvider;
 use \zpt\cdt\Session;
+use \zpt\opal\CompanionLoader;
 use \zpt\orm\Criteria;
 use \zpt\orm\PdoExceptionWrapper;
 use \StdClass;
@@ -38,6 +38,31 @@ class /*# companionClass #*/ {
   /** @Injected */
   private $spfParser;
 
+  private $companionLoader;
+  private $persister;
+  private $transformer;
+  private $messages;
+
+  /**
+   * @ctorArg ref = companionLoader
+   */
+  public function __construct(CompanionLoader $companionLoader) {
+    $this->companionLoader = $companionLoader;
+
+    $this->persister = $companionLoader->get(
+      'zpt\dyn\orm\persister',
+      '/*# model #*/'
+    );
+    $this->transformer = $companionLoader->get(
+      'zpt\dyn\orm\transformer',
+      '/*# model #*/'
+    );
+    $this->messages = $companionLoader->get(
+      'zpt\dyn\i18n',
+      '/*# model #*/'
+    );
+  }
+
   /**
    * @Method post
    * @Uri /*# url #*/
@@ -47,23 +72,19 @@ class /*# companionClass #*/ {
       $this->checkAuth('write');
     #}
 
-    $transformer = $this->transformerFactory->get('/*# model #*/');
-
     $params = (array) $request->getData();
 
-    $model = $transformer->fromArray($params);
+    $model = $this->transformer->fromArray($params);
     $this->gatekeeper->checkCanCreate($model);
 
-    $persister = $this->persisterFactory->get($model);
-    $id = $persister->create($model);
+    $id = $this->persister->create($model);
 
-    $info = $this->messagesFactory->get('/*# model #*/');
     $response->setData(array(
       'success' => true,
       'id'  => $id,
-      'entity' => $transformer->asArray($model),
+      'entity' => $this->transformer->asArray($model),
       'msg' => array(
-        'text' => $info->createSuccessMsg(),
+        'text' => $this->messages->createSuccessMsg(),
         'type' => 'info'
       )
     ));
@@ -80,22 +101,24 @@ class /*# companionClass #*/ {
       $this->checkAuth('read');
     #}
 
-    $persister = $this->persisterFactory->get('/*# model #*/');
-    $transformer = $this->transformerFactory->get('/*# model #*/');
-    $qb = $this->queryBuilderFactory->get('/*# model #*/');
+    $qb = $this->companionLoader->get(
+      'zpt\dyn\orm\qb',
+      '/*# model #*/',
+      false
+    );
 
     $spf = $this->spfParser->parseRequest($request);
     $this->spfParser->populateQueryBuilder($spf, $qb);
 
     // Retrieve the models that match the given spf
     $c = $qb->getCriteria();
-    $models = $persister->retrieve($c);
-    $total = $persister->count($c);
+    $models = $this->persister->retrieve($c);
+    $total = $this->persister->count($c);
 
     $data = array();
     foreach ($models AS $model) {
       if ($this->gatekeeper->canRead($model)) {
-        $data[] = $transformer->asArray($model);
+        $data[] = $this->transformer->asArray($model);
       }
     }
 
@@ -116,11 +139,9 @@ class /*# companionClass #*/ {
       $this->checkAuth('read');
     #}
 
-    $persister = $this->persisterFactory->get('/*# model #*/');
-
     $id = $request->getParameter('id');
 
-    $model = $persister->getById($id);
+    $model = $this->persister->getById($id);
 
     if ($model === null) {
       throw new RestException(404);
@@ -130,8 +151,7 @@ class /*# companionClass #*/ {
     // since we want any thrown AuthException to bubble.
     $this->gatekeeper->checkCanRead($model);
 
-    $transformer = $this->transformerFactory->get('/*# model #*/');
-    $response->setData($transformer->asArray($model));
+    $response->setData($this->transformer->asArray($model));
   }
 
   /**
@@ -147,8 +167,7 @@ class /*# companionClass #*/ {
     $id = $request->getParameter('id');
     $params = (array) $request->getData();
 
-    $persister = $this->persisterFactory->get('/*# model #*/');
-    $model = $persister->getById($id);
+    $model = $this->persister->getById($id);
 
     if ($model === null) {
       throw new RestException(404);
@@ -158,16 +177,14 @@ class /*# companionClass #*/ {
     // since we want any thrown AuthException to bubble.
     $this->gatekeeper->checkCanWrite($model);
 
-    $transformer = $this->transformerFactory->get('/*# model #*/');
-    $transformer->fromArray($params, $model);
+    $this->transformer->fromArray($params, $model);
 
-    $persister->update($model);
+    $this->persister->update($model);
 
-    $info = $this->messagesFactory->get('/*# model #*/');
     $response->setData(array(
       'success' => true,
       'msg' => array(
-        'text' => $info->updateSuccessMsg(),
+        'text' => $this->messages->updateSuccessMsg(),
         'type' => 'info'
       )
     ));
@@ -182,23 +199,21 @@ class /*# companionClass #*/ {
       $this->checkAuth('write');
     #}
 
-    $persister = $this->persisterFactory->get('/*# model #*/');
     $id = $request->getParameter('id');
 
-    $model = $persister->getById($id);
+    $model = $this->persister->getById($id);
     if ($model === null) {
       throw new RestException(404);
     }
 
     $this->gatekeeper->checkCanDelete($model);
 
-    $persister->delete($model);
+    $this->persister->delete($model);
 
-    $info = $this->messagesFactory->get('/*# model #*/');
     $response->setData(array(
       'success' => true,
       'msg' => array(
-        'text' => $info->deleteSuccessMsg(),
+        'text' => $this->messages->deleteSuccessMsg(),
         'type' => 'info'
       )
     ));
