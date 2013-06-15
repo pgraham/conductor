@@ -22,7 +22,7 @@ namespace zpt\cdt\html;
  * @author Philip Graham <philip@zeptech.ca>
  * @package conductor
  */
-class Page extends \oboe\Page {
+class Page extends \zpt\oobo\Page {
 
   /*
    * =========================================================================

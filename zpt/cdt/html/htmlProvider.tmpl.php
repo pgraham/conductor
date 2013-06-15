@@ -2,8 +2,8 @@
 namespace /*# companionNs #*/;
 
 use \conductor\Auth;
-use \oboe\struct\FlowContent;
-use \oboe\Element;
+use \zpt\oobo\struct\FlowContent;
+use \zpt\oobo\Element;
 use \zpt\cdt\di\Injector;
 use \zpt\cdt\html\Page;
 use \zpt\cdt\L10N;

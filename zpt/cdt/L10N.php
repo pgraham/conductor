@@ -14,7 +14,7 @@
  */
 namespace zpt\cdt {
 
-use oboe\Element;
+use \zpt\oobo\Element;
 
 /**
  * This class provides localized content.  If no language file is present for

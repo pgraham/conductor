@@ -14,8 +14,8 @@
  */
 namespace zpt\cdt;
 
-use \oboe\Composite;
-use \oboe\Element;
+use \zpt\oobo\Composite;
+use \zpt\oobo\Element;
 
 /**
  * This class encapsulates an asynchronous login form that is added to a page

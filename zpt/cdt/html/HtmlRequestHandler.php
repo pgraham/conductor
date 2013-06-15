@@ -14,8 +14,8 @@
  */
 namespace zpt\cdt\html;
 
-use \oboe\struct\FlowContent;
-use \oboe\Element;
+use \zpt\oobo\struct\FlowContent;
+use \zpt\oobo\Element;
 use \zpt\anno\Annotations;
 use \zpt\cdt\di\Injector;
 use \zpt\rest\BaseRequestHandler;

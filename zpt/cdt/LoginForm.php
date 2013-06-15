@@ -14,9 +14,9 @@
  */
 namespace zpt\cdt;
 
-use \oboe\attr\CanSubmit;
-use \oboe\Composite;
-use \oboe\Element;
+use \zpt\oobo\attr\CanSubmit;
+use \zpt\oobo\Composite;
+use \zpt\oobo\Element;
 
 /**
  * This class encapsulates a stylable login form.

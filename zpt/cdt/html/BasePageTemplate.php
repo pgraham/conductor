@@ -14,7 +14,7 @@
  */
 namespace zpt\cdt\html;
 
-use \oboe\Element;
+use \zpt\oobo\Element;
 
 /**
  * Base implementations of a PageTemplate.

@@ -15,8 +15,8 @@
  */
 namespace zpt\cdt\html;
 
-use \oboe\Body;
-use \oboe\Element;
+use \zpt\oobo\Body;
+use \zpt\oobo\Element;
 
 /**
  * This class uses PHP output buffering to capture any output that occurs
