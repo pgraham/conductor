@@ -27,7 +27,7 @@ class InjectionConfigurator {
           #{ if prop[ref] ISSET
             $/*# bean[id] #*/->set/*# prop[name] #*/(Injector::getBean('/*# prop[ref] #*/'));
           #{ elseif prop[val] ISSET
-            $/*# bean[id] #*/->set/*# prop[name] #*/(/*# prop[val] #*/);
+            $/*# bean[id] #*/->set/*# prop[name] #*/(/*# php:prop[val] #*/);
           #{ elseif prop[type] ISSET
             $/*# bean[id] #*/->set/*# prop[name] #*/(Injector::getBeans('/*# prop[type] #*/'));
           #}

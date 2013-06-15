@@ -108,7 +108,7 @@ class DependencyInjectionCompiler implements Compiler {
             //      duplication
             foreach ($ctor as $arg) {
               if (isset($arg['value'])) {
-                $ctorArgs[] = $this->getScalar((string) $arg['value']);
+                $ctorArgs[] = $this->getScalar((string) $arg['value'], true);
               } else if (isset($arg['ref'])) {
                 $ctorArgs[] = '$' . ((string) $arg['ref']);
               } else {
@@ -137,7 +137,7 @@ class DependencyInjectionCompiler implements Compiler {
     $this->_tmplParser = $templateParser;
   }
 
-  private function getScalar($val)
+  private function getScalar($val, $quoteStrings = false)
   {
       if (is_numeric($val)) {
           return (float) $val;
@@ -148,6 +148,6 @@ class DependencyInjectionCompiler implements Compiler {
       } else if (strtolower($val) === 'null') {
           return null;
       }
-      return "'" . $val . "'";
+      return $quoteStrings ? "'" . $val . "'" : $val;
   }
 }
