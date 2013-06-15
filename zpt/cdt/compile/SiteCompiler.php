@@ -198,7 +198,7 @@ class SiteCompiler {
 
 	protected function compileJslibs($pathInfo, $ns) {
 		$this->compileJslibDir($pathInfo, "$pathInfo[lib]/jslib");
-		$this->compileJslibDir($pathInfo, "$pathInfo[lib]/conductor/lib/jslib");
+		$this->compileJslibDir($pathInfo, "$pathInfo[cdtRoot]/lib/jslib");
 	}
 
 	/**
@@ -225,7 +225,7 @@ class SiteCompiler {
 		$compiler = $this;
 
 		// Compile conductor language files
-		$this->compileLanguageDir("$pathInfo[lib]/conductor/resources/i18n");
+		$this->compileLanguageDir("$pathInfo[cdtRoot]/resources/i18n");
 
 		// Compile module language files
 		$this->doWithModules(function ($modulePath) use ($compiler) {
@@ -243,7 +243,7 @@ class SiteCompiler {
 		// Compile Conductor models
 		$this->compileModelDir(
 			$pathInfo,
-			"$pathInfo[lib]/conductor/zpt/cdt/model",
+			"$pathInfo[cdtRoot]/zpt/cdt/model",
 			'zpt\\cdt\\model');
 
 		// Compile Site models
@@ -328,7 +328,7 @@ class SiteCompiler {
 	protected function compileServices($pathInfo, $ns) {
 		// Compile Conductor services
 		$this->serviceCompiler->compile(
-			"$pathInfo[lib]/conductor/zpt/cdt/srvc",
+			"$pathInfo[cdtRoot]/zpt/cdt/srvc",
 			'zpt\\cdt\\srvc'
 		);
 
