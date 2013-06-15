@@ -14,11 +14,12 @@
  */
 namespace zpt\cdt\rest;
 
+use \zpt\cdt\exception\PdoExceptionWrapperParser;
 use \zpt\rest\ExceptionHandler;
 use \zpt\rest\Request;
 use \zpt\rest\Response;
 use \zpt\rest\RestException;
-use \zpt\cdt\exception\PdoExceptionWrapperParser;
+use \zpt\opal\CompanionLoader;
 use \Exception;
 
 /**
@@ -29,8 +30,11 @@ use \Exception;
 class PdoExceptionHandler implements ExceptionHandler
 {
 
-    /** @Injected */
     private $companionLoader;
+
+    public function __construct(CompanionLoader $companionLoader) {
+        $this->companionLoader = $companionLoader;
+    }
 
     public function handleException(
         Exception $e,
@@ -39,7 +43,6 @@ class PdoExceptionHandler implements ExceptionHandler
     ) {
 
         $exceptionParser = new PdoExceptionWrapperParser($e); 
-        $modelMessages = $this->messagesFactory->get($e->getModelClass());
         $modelMessages = $this->companionLoader->get(
             'zpt\dyn\i18n',
             $e->getModelClass()
@@ -66,9 +69,5 @@ class PdoExceptionHandler implements ExceptionHandler
 
         $response->header("HTTP/1.1 403 $hdrMsg");
         $response->setData($msg);
-    }
-
-    public function setCompanionLoader(CompanionLoader $companionLoader) {
-        $this->companionLoader = $companionLoader;
     }
 }

@@ -325,8 +325,9 @@ class Conductor {
       'zpt\cdt\exception\AuthException',
       new AuthExceptionHandler()
     );
-    $pdoExceptionHandler = new PdoExceptionHandler();
-    $pdoExceptionHandler->setMessagesFactory(Injector::getBean('messagesFactory'));
+    $pdoExceptionHandler = new PdoExceptionHandler(
+      Injector::getBean('companionLoader')
+    );
     $server->registerExceptionHandler(
       'zpt\orm\PdoExceptionWrapper',
       $pdoExceptionHandler
