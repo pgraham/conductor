@@ -1,14 +1,14 @@
 CDT = {};
-${if:jsns ISSET}
-  ${jsns} = {};
-${fi}
+#{ if jsns ISSET
+  /*# jsns #*/ = {};
+#}
 
 function _p(path) {
-  ${if:rootPath = /}
+  #{ if rootPath = /
     return path;
-  ${else}
-    return '${rootPath}' + path;
-  ${fi}
+  #{ else
+    return '/*# rootPath #*/' + path;
+  #}
 }
 
 if (window._L === undefined) {
