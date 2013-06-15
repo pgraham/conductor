@@ -45,7 +45,6 @@ class DependencyInjectionCompiler implements Compiler {
       $bean['props'],
       $props
     );
-    $bean['ctor'] = array();
 
     $this->_beans[] = $bean;
   }
@@ -54,74 +53,71 @@ class DependencyInjectionCompiler implements Compiler {
     if (file_exists($file)) {
       $this->_files[] = $file;
     }
+
+    $cfg = simplexml_load_file($file, 'SimpleXMLElement',
+      LIBXML_NOCDATA);
+
+    foreach ($cfg->bean as $beanDef) {
+      $bean['id'] = $beanDef['id'];
+      $bean['class'] = $beanDef['class'];
+
+      // Parse any annotation configuration or marker interfaces before
+      // applying XML configuration
+      $bean = DependencyParser::parse(
+        (string) $beanDef['id'],
+        (string) $beanDef['class']
+      );
+
+      if (isset($beanDef['initMethod'])) {
+        $bean['init'] = (string) $beanDef['initMethod'];
+      }
+
+      $props = array();
+      if (isset($beanDef->property)) {
+        $propDefs = $beanDef->property;
+
+        foreach ($propDefs as $propDef) {
+          $prop = array();
+          $prop['name'] = (string) $propDef['name'];
+
+          if (isset($propDef['value'])) {
+            $prop['val'] = $this->getScalar((string) $propDef['value']);
+          } else if (isset($propDef['ref'])) {
+            $prop['ref'] = (string) $propDef['ref'];
+          } else if (isset($propDef['type'])) {
+            $prop['type'] = (string) $propDef['type'];
+          } else {
+            // TODO Warn about an invalid bean definition
+          }
+          $props[] = $prop;
+        }
+      }
+      $bean['props'] = array_merge($bean['props'], $props);
+
+      $ctorArgs = array();
+      if (isset($beanDef->ctorArg)) {
+        $ctor = $beanDef->ctorArg;
+
+        // TODO Is order guaranteed by XML parser?
+        // TODO Combine this with logic in dependency parser to eliminate
+        //      duplication
+        foreach ($ctor as $arg) {
+          if (isset($arg['value'])) {
+            $ctorArgs[] = $this->getScalar((string) $arg['value'], true);
+          } else if (isset($arg['ref'])) {
+            $ctorArgs[] = '$' . ((string) $arg['ref']);
+          } else {
+            // TODO Warn about an invalid bean definition
+          }
+        }
+      }
+      $bean['ctor'] = $ctorArgs;
+
+      $this->_beans[] = $bean;
+    }
   }
 
   public function compile($pathInfo, $ns, $env = 'dev') {
-    foreach ($this->_files as $context) {
-      if (file_exists($context)) {
-        $cfg = simplexml_load_file($context, 'SimpleXMLElement',
-          LIBXML_NOCDATA);
-
-        foreach ($cfg->bean as $beanDef) {
-          $bean['id'] = $beanDef['id'];
-          $bean['class'] = $beanDef['class'];
-
-          // Parse any annotation configuration or marker interfaces before
-          // applying XML configuration
-          $bean = DependencyParser::parse(
-            (string) $beanDef['id'],
-            (string) $beanDef['class']
-          );
-
-          if (isset($beanDef['initMethod'])) {
-            $bean['init'] = (string) $beanDef['initMethod'];
-          }
-
-          $props = array();
-          if (isset($beanDef->property)) {
-            $propDefs = $beanDef->property;
-
-            foreach ($propDefs as $propDef) {
-              $prop = array();
-              $prop['name'] = (string) $propDef['name'];
-
-              if (isset($propDef['value'])) {
-                $prop['val'] = $this->getScalar((string) $propDef['value']);
-              } else if (isset($propDef['ref'])) {
-                $prop['ref'] = (string) $propDef['ref'];
-              } else if (isset($propDef['type'])) {
-                $prop['type'] = (string) $propDef['type'];
-              } else {
-                // TODO Warn about an invalid bean definition
-              }
-              $props[] = $prop;
-            }
-          }
-          $bean['props'] = array_merge($bean['props'], $props);
-
-          $ctorArgs = array();
-          if (isset($beanDef->ctorArg)) {
-            $ctor = $beanDef->ctorArg;
-
-            // TODO Is order guaranteed by XML parser?
-            // TODO Combine this with logic in dependency parser to eliminate
-            //      duplication
-            foreach ($ctor as $arg) {
-              if (isset($arg['value'])) {
-                $ctorArgs[] = $this->getScalar((string) $arg['value'], true);
-              } else if (isset($arg['ref'])) {
-                $ctorArgs[] = '$' . ((string) $arg['ref']);
-              } else {
-                // TODO Warn about an invalid bean definition
-              }
-            }
-          }
-          $bean['ctor'] = $ctorArgs;
-
-          $this->_beans[] = $bean;
-        }
-      }
-    }
 
     // Build the InjectionConfiguration script
     $srcPath = __DIR__ . '/InjectionConfigurator.tmpl.php';

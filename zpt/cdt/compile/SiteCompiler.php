@@ -168,6 +168,11 @@ class SiteCompiler {
 		// Initiate the compiler
 		$this->initCompiler($pathInfo, $env);
 
+		// Add XML dependency files before any annotation configured beans get 
+		// added as annotation configured beans may depend on XML configured beans 
+		// but the converse should not be true and is not supported
+		$this->collectDependencyXmls($pathInfo);
+
 		// Compile server dispatcher
 		$this->dispatcherCompiler->compile($pathInfo, $ns, $env);
 
@@ -178,7 +183,6 @@ class SiteCompiler {
 		$this->compileLanguageFiles($pathInfo, $ns);
 		$this->compileHtml($pathInfo, $ns);
 
-		$this->collectDependencyXmls($pathInfo);
 		$this->diCompiler->compile($pathInfo, $ns);
 
 		$this->serverCompiler->compile($pathInfo);
