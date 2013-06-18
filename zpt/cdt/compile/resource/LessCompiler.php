@@ -12,14 +12,14 @@ use \lessc;
  * location.
  */
 class LessCompiler {
-  
-  private $_lessc;
+	
+	private $lessc;
 
-  public function __construct() {
-    $this->_lessc = new lessc();
-  }
+	public function __construct() {
+		$this->lessc = new lessc();
+	}
 
-  public function compile($src, $dest) {
-    file_put_contents($dest, $this->_lessc->compile(file_get_contents($src)));
-  }
+	public function compile($src, $dest) {
+		file_put_contents($dest, $this->lessc->compile(file_get_contents($src)));
+	}
 }
