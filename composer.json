@@ -18,6 +18,7 @@
   "minimum-stability": "dev",
   "require": {
     "leafo/lessphp": "0.3.9",
+    "myclay/minify": "dev-master",
     "monolog/monolog": "1.2.1",
 
     "zeptech/utility": "1.1.*",
