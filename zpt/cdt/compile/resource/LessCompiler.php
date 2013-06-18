@@ -5,6 +5,7 @@
  */
 namespace zpt\cdt\compile\resource;
 
+use \CSSmin;
 use \lessc;
 
 /**
@@ -13,13 +14,18 @@ use \lessc;
  */
 class LessCompiler {
 	
+	private $cssMin;
 	private $lessc;
 
 	public function __construct() {
+		$this->cssMin = new CSSmin(false);
 		$this->lessc = new lessc();
 	}
 
 	public function compile($src, $dest) {
-		file_put_contents($dest, $this->lessc->compile(file_get_contents($src)));
+		$less = file_get_contents($src);
+		$css = $this->lessc->compile($less);
+		$minified = $this->cssMin->run($css);
+		file_put_contents($dest, $minified);
 	}
 }
