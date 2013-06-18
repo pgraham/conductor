@@ -18,7 +18,7 @@ class LessCompiler {
 	private $lessc;
 
 	public function __construct() {
-		$this->cssMin = new CSSmin(false);
+		$this->cssMin = new CSSmin(false /* Don't change php mem settings */);
 		$this->lessc = new lessc();
 	}
 
