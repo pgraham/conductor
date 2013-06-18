@@ -106,17 +106,10 @@ class Conductor {
     $c = new Criteria();
     $c->addLike('name', $groupConditions);
 
-    $values = Clarinet::get('zpt\cdt\model\ConfigValue', $c);
-    $idxd = array();
-    foreach ($values AS $value) {
-      $valName = $value->getName();
-
-      $valName = substr($valName, strpos($valName, '.') + 1);
-
-      $idxd[$valName] = $value;
-    }
-
-    return $idxd;
+    return Clarinet::getAll('zpt\cdt\model\ConfigValue', function ($entity) {
+      $name = $entity->getName();
+      return substr($name, strpos($name, '.') + 1);
+    }, $c);
   }
 
   /**
