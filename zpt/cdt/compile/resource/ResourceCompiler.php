@@ -7,6 +7,7 @@ namespace zpt\cdt\compile\resource;
 
 use \zpt\pct\CodeTemplateParser;
 use \zpt\util\File;
+use \CSSmin;
 use \DirectoryIterator;
 
 /**
@@ -17,6 +18,7 @@ use \DirectoryIterator;
  */
 class ResourceCompiler {
 
+	private $cssMin;
 	private $lessCompiler;
 	private $templateParser;
 
@@ -28,16 +30,23 @@ class ResourceCompiler {
 	 * not provided a default implementation will be instantiated.
 	 * @param LessCompiler $lessCompiler LessCompiler instance. If not provided 
 	 * a default implementation will be instantiated.
+	 * @param CssCompiler $cssCompiler CssCompiler instance. If no provided 
+	 * a default implementation will be instantiated.
 	 */
-	public function __construct($templateParser = null, $lessCompiler = null) {
+	public function __construct(
+		$templateParser = null,
+		$lessCompiler = null
+	) {
 		if ($templateParser === null) {
 			$templateParser = new CodeTemplateParser();
 		}
 		if ($lessCompiler === null) {
 			$lessCompiler = new LessCompiler();
 		}
-		$this->lessCompiler = $lessCompiler;
 		$this->templateParser = $templateParser;
+		$this->lessCompiler = $lessCompiler;
+
+		$this->cssMin = new CSSmin(false /* Don't change php mem settings */);
 	}
 
 	/**
@@ -81,11 +90,15 @@ class ResourceCompiler {
 				continue;
 			}
 
-			// PHP5.3.6: $ext = $resource->getExtension();
-			$ext = pathinfo($fname, PATHINFO_EXTENSION);
+			$ext = $resource->getExtension();
 			$basename = $resource->getBasename(".$ext");
 			$pathname = $resource->getPathname();
-			if ($ext === 'less') {
+
+			if ($ext === 'css') {
+				$css = file_get_contents($resource->getPathname());
+				$minified = $this->cssMin->run($css);
+				file_put_contents("$outDir/$fname", $minified);
+			} else if ($ext === 'less') {
 				$this->lessCompiler->compile($pathname, "$outDir/$basename.css");
 			} else {
 				copy($resource->getPathname(), "$outDir/$fname");
