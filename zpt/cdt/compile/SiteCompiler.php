@@ -184,10 +184,10 @@ class SiteCompiler {
 
 		$this->compileModels($pathInfo, $ns);
 		$this->compileServices($pathInfo, $ns);
+		$this->compileHtml($pathInfo, $ns);
 		$this->compileResources($pathInfo, $ns);
 		$this->compileJslibs($pathInfo, $ns);
 		$this->compileLanguageFiles($pathInfo, $ns);
-		$this->compileHtml($pathInfo, $ns);
 
 		$this->diCompiler->compile($pathInfo, $ns);
 
