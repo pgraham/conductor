@@ -32,6 +32,34 @@ class ResourceDiscoverer {
 
   /**
    * Discover all of the files that create the given group, or groups.
+   * Discovered files are ordered according to the following rules.  All files 
+   * mentioned in the ordering rules are assumed to have the appropriate 
+   * extension for the resource type. So when discovering CSS resources `__init` 
+   * really refers to `__init.css`.
+   *
+   *  1.  If it exists, a file named either `__setup` or `__init` will be
+   *      combined first. If both exist `__init` will be added first.
+   *
+   *  2.  This is followed by any subgroups.  Sub groups are simply directories 
+   *      within the group directory. The ordering process is recursive so sub 
+   *      groups will follow the same ordering rules and can themselves contain 
+   *      subgroups.
+   *
+   *  3.  If it exists subgroups will be followed by a script named
+   *      `__post-sub`.
+   *
+   *  4.  This will followed by all files with the resource type extension 
+   *      except for a file that has the same name as the base name of the
+   *      group.
+   *
+   *  5.  If it a exists, a file with the same name as the base name of the 
+   *      group and the appropriate resource extension.
+   *
+   *  6.  Subgroups and normal resource files will be ordered alphabetically by 
+   *      their basename. N.B. This is currently done with a SORT_TYPE_REGULAR
+   *      to the PHP function sort and ksort, however this should not be relied
+   *      on *at this point* as the rules surrounding this ordering will likely
+   *      be revised in a later release.
    *
    * @param string|array $groups Either the name of a single group to discover
    *   or an array of group names.
@@ -50,7 +78,8 @@ class ResourceDiscoverer {
     $subGroups = array();
     $files = array();
 
-    $setup = null;
+    $setup = array();
+    $postSub = null;
     $init = null;
 
     $groupParts = explode('.', $group);
@@ -79,13 +108,14 @@ class ResourceDiscoverer {
       } else {
         $fname = $f->getBasename();
         if (pathinfo($fname, PATHINFO_EXTENSION) === $this->_ext) {
-          
           if ($fname === "__init.$this->_ext") {
-            $setup = $fname;
-
+            $setup['init'] = $fname;
+          } else if ($fname === "__setup.$this->_ext") {
+            $setup['setup'] = $fname;
+          } else if ($fname === "__post-sub.$this->_ext") {
+            $postSub = $fname;
           } else if ($fname === "$groupBaseName.$this->_ext") {
             $init = $fname;
-
           } else {
             $files[] = $fname;
           }
@@ -93,8 +123,11 @@ class ResourceDiscoverer {
       }
     }
 
-    if ($setup !== null) {
-      $ordered[] = "$groupBasePath/$setup";
+    if (array_key_exists('init', $setup)) {
+      $ordered[] = "$groupBasePath/$setup[init]";
+    }
+    if (array_key_exists('setup', $setup)) {
+      $ordered[] = "$groupBasePath/$setup[setup]";
     }
     ksort($subGroups);
     foreach ($subGroups as $name => $subGroup) {
@@ -103,6 +136,11 @@ class ResourceDiscoverer {
       $ordered = array_merge($ordered, $subGroup);
     }
 
+    if ($postSub !== null) {
+      $ordered[] = "$groupBasePath/$postSub";
+    }
+
+    sort($files);
     foreach ($files as $file) {
       $ordered[] = "$groupBasePath/$file";
     }
