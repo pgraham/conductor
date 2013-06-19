@@ -50,6 +50,36 @@ class ResourceCompiler {
 	}
 
 	/**
+	 * Combine a compiled resource group. Given the path to a target directory 
+	 * that contains compiled resources, this function will compile a group of 
+	 * resources of a specified type. The group is specified using a notation 
+	 * similar to Java's package notation. E.g:
+	 *
+	 *     $resourceCompiler->combineGroup($target, 'css', 'my.group');
+	 *
+	 * will combine all CSS files at `$target/css/my/group`. For more information 
+	 * on how the order in which files are grouped see the
+	 * {@link ResourceDiscoverer} class.
+	 *
+	 * @param string $target The target directory where the compiled resource are 
+	 * found.
+	 * @param string $resourceType The type of resource to combine.
+	 * @param string $group The resource group to combine.
+	 */
+	public function combineGroup($target, $type, $group) {
+		$resourceDiscoverer = new ResourceDiscoverer("$target/$type", $type);
+
+		$files = $resourceDiscoverer->discover($group);
+
+		$out = "$target/$type/$group.$type";
+		$fp = fopen($out, 'w');
+		foreach ($files as $file) {
+			fwrite($fp, file_get_contents("$target/$type/$file"));
+		}
+		fclose($fp);
+	}
+
+	/**
 	 * Compile the resource(s) found in the given source path to the specified 
 	 * target path. If the specified source is a code template then an array of 
 	 * substitution values _must_ be provided.
