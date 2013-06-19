@@ -148,10 +148,11 @@ class SiteCompiler {
 	 * Compile the website found at the given root path.
 	 *
 	 * @param string $root The root path of the website to comile.
+	 * @param ComposerAutoloader $loader The composer autoloader.
 	 * @param string $env The target environment. One of the ENV_* constants of 
 	 *   this class.
 	 */
-	public function compile($root, $env = 'dev') {
+	public function compile($root, $loader, $env = 'dev') {
 		$this->ensureDependencies();
 
 		// Configuration needs to be compiled first so that the site path
@@ -168,8 +169,7 @@ class SiteCompiler {
 
 		// The rest of the compilation process will require the site's namespace
 		// to be registered so that class files can be reflected.
-		$ldr = new SplClassLoader($ns, $pathInfo['src']);
-		$ldr->register();
+		$loader->add($ns, $pathInfo['src']);
 
 		// Initiate the compiler
 		$this->initCompiler($pathInfo, $env);
