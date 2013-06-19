@@ -113,9 +113,14 @@ class HtmlProvider extends CompanionGenerator {
 		$values['utilScripts'] = $jsResources->discover('cdt.util');
 		$values['widgetScripts'] = $jsResources->discover('cdt.widget');
 
-		$cssResources = new ResourceDiscoverer("$this->htdocs/css", 'css');
-		$values['coreCss'] = $cssResources->discover('cdt.core');
-		$values['widgetCss'] = $cssResources->discover('cdt.widget');
+		if ($this->env === 'dev') {
+			$cssResources = new ResourceDiscoverer("$this->htdocs/css", 'css');
+			$values['coreCss'] = $cssResources->discover('cdt.core');
+			$values['widgetCss'] = $cssResources->discover('cdt.widget');
+		} else {
+			$values['coreCss'] = array('cdt.core.css');
+			$values['widgetCss'] = array('cdt.widget.css');
+		}
 
 		$values['jslibs'] = array_merge(
 			$template->asArray('jslib'),
@@ -213,10 +218,18 @@ class HtmlProvider extends CompanionGenerator {
 			if (substr($stylesheet, -4) === '.css') {
 				$resolved[] = $stylesheet;
 			} else {
-				$resolved = array_merge(
-					$resolved,
-					$cssResources->discover($stylesheet)
-				);
+
+				// TODO Until resource combination is provided for all groups declared
+				//      in HTML definitions only used combined script if it is known to
+				//      be combined during compile.
+				if ($this->env === 'dev' || !String($stylesheet)->startsWith('cdt.')) {
+					$resolved = array_merge(
+						$resolved,
+						$cssResources->discover($stylesheet)
+					);
+				} else {
+					$resolved[] = "$stylesheet.css";
+				}
 			}
 		}
 		return $resolved;

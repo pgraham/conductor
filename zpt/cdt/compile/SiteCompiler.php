@@ -48,6 +48,10 @@ use \SplClassLoader;
  */
 class SiteCompiler {
 
+	const ENV_DEV = 'dev';
+	const ENV_STAGE = 'stage';
+	const ENV_PROD = 'prod';
+
 	private $modelParser;
 	private $modelCache;
 	private $namingStrategy;
@@ -144,6 +148,8 @@ class SiteCompiler {
 	 * Compile the website found at the given root path.
 	 *
 	 * @param string $root The root path of the website to comile.
+	 * @param string $env The target environment. One of the ENV_* constants of 
+	 *   this class.
 	 */
 	public function compile($root, $env = 'dev') {
 		$this->ensureDependencies();
@@ -273,6 +279,12 @@ class SiteCompiler {
 	protected function compileResources($pathInfo, $ns) {
 		$resourceOut = "$pathInfo[target]/htdocs";
 
+		// -------------------------------------------------------------------------
+		// Phase 1
+		// -------
+		// Copy, resolve and minify javascript css and img resources.
+		// -------------------------------------------------------------------------
+
 		// Compile conductor resources
 		// ---------------------------
 		$resourceSrc = "$pathInfo[cdtRoot]/htdocs";
@@ -321,6 +333,19 @@ class SiteCompiler {
 		$this->resourceCompiler->compile("$resourceSrc/js", "$resourceOut/js");
 		$this->resourceCompiler->compile("$resourceSrc/css", "$resourceOut/css");
 		$this->resourceCompiler->compile("$resourceSrc/img", "$resourceOut/img");
+
+		// -------------------------------------------------------------------------
+		// Phase 2: Grouping
+		// -----------------
+		// In non-dev mode, the target directory resources will be combined into 
+		// larger resources based on grouping rules. For now only specific resource
+		// groups are combined but over time rules may emerge that allow this to be
+		// done universally.
+		// -------------------------------------------------------------------------
+
+		$this->resourceCompiler->combineGroup($resourceOut, 'css', 'cdt.core');
+		$this->resourceCompiler->combineGroup($resourceOut, 'css', 'cdt.widget');
+		$this->resourceCompiler->combineGroup($resourceOut, 'css', 'cdt.cmp');
 	}
 
 	protected function compileHtml($pathInfo, $ns) {
