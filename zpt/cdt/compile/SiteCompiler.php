@@ -39,7 +39,6 @@ use \zpt\util\StringUtils;
 use \DirectoryIterator;
 use \Exception;
 use \ReflectionClass;
-use \SplClassLoader;
 
 /**
  * This class compiles a site.

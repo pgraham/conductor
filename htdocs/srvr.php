@@ -23,9 +23,6 @@
  * @author Philip Graham <philip@zeptech.ca>
  */
 
-// SplClassLoader needs to be available in the PHP include path
-require 'SplClassLoader.php';
-
 // This file should be located at <site-root>/target/htdocs/srvr.php
 $siteRoot = realpath(__DIR__ . '/../..');
 
