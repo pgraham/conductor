@@ -6,5 +6,5 @@ vendor
 composer.lock
 
 # Vim files
-*.un~
-*.swo
+.*.un~
+.*.sw*
