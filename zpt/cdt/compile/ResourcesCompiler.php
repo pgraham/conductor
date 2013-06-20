@@ -25,9 +25,26 @@ use \DirectoryIterator;
 class ResourcesCompiler implements Compiler {
 
 	private $resourceCompiler;
+	private $resourceGroups;
 
 	public function __construct() {
 		$this->resourceCompiler = new ResourceCompiler();
+
+		$this->resourceGroups = array();
+		$this->addResourceGroup('css', 'cdt.core');
+		$this->addResourceGroup('css', 'cdt.widget');
+		$this->addResourceGroup('css', 'cdt.cmp');
+	}
+
+	public function addResourceGroup($type, $group) {
+		if (!isset($this->resourceGroups[$type])) {
+			$this->resourceGroups[$type] = array( $group );
+			return;
+		}
+
+		if (!in_array($group, $this->resourceGroups[$type])) {
+			$this->resourceGroups[$type][] = $group;
+		}
 	}
 
 	public function compile($pathInfo, $ns, $env = 'dev') {
@@ -96,9 +113,7 @@ class ResourcesCompiler implements Compiler {
 		$this->resourceCompiler->compile("$resourceSrc/img", "$resourceOut/img");
 	}
 
-	public function combineResourceGroups($pathInfo, $ns, $env) {
-		$resourceOut = "$pathInfo[target]/htdocs";
-
+	public function combineResourceGroups($resources) {
 		// -------------------------------------------------------------------------
 		// Phase 2: Grouping
 		// -----------------
@@ -108,10 +123,10 @@ class ResourcesCompiler implements Compiler {
 		// done universally.
 		// -------------------------------------------------------------------------
 
-		if ($env !== SiteCompiler::ENV_DEV) {
-			$this->resourceCompiler->combineGroup($resourceOut, 'css', 'cdt.core');
-			$this->resourceCompiler->combineGroup($resourceOut, 'css', 'cdt.widget');
-			$this->resourceCompiler->combineGroup($resourceOut, 'css', 'cdt.cmp');
+		foreach ($this->resourceGroups as $type => $groups) {
+			foreach ($groups as $group) {
+				$this->resourceCompiler->combineGroup($resources, $type, $group);
+			}
 		}
 	}
 }

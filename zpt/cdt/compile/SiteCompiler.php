@@ -181,7 +181,11 @@ class SiteCompiler {
 		$this->compileServices($pathInfo, $ns);
 		$this->resourcesCompiler->compile($pathInfo, $ns, $env);
 		$this->compileHtml($pathInfo, $ns);
-		$this->resourcesCompiler->combineResourceGroups($pathInfo, $ns, $env);
+		if ($env !== self::ENV_DEV) {
+			$this->resourcesCompiler->combineResourceGroups(
+				"$pathInfo[target]/htdocs"
+			);
+		}
 
 		$this->compileJslibs($pathInfo, $ns);
 		$this->compileLanguageFiles($pathInfo, $ns);
