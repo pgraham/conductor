@@ -84,8 +84,8 @@ class SiteCompiler {
 	/* Path to the site's modules directory. */
 	private $modulesPath;
 
-	/* Resource compiler. */
-	private $resourceCompiler;
+	/* Resources compiler. */
+	private $resourcesCompiler;
 
 	/* REST server configurator compiler. */
 	private $serverCompiler;
@@ -135,10 +135,6 @@ class SiteCompiler {
 		$this->dispatcherCompiler = $compiler;
 	}
 
-	public function setResourceCompiler(ResourceCompiler $compiler) {
-		$this->resourceCompiler = $compiler;
-	}
-
 	public function setDependencyInjectionCompiler(Compiler $compiler) {
 		$this->diCompiler = $compiler;
 	}
@@ -183,8 +179,10 @@ class SiteCompiler {
 
 		$this->compileModels($pathInfo, $ns);
 		$this->compileServices($pathInfo, $ns);
+		$this->resourcesCompiler->compile($pathInfo, $ns, $env);
 		$this->compileHtml($pathInfo, $ns);
-		$this->compileResources($pathInfo, $ns);
+		$this->resourcesCompiler->combineResourceGroups($pathInfo, $ns, $env);
+
 		$this->compileJslibs($pathInfo, $ns);
 		$this->compileLanguageFiles($pathInfo, $ns);
 
@@ -273,78 +271,6 @@ class SiteCompiler {
 				"/$modName"
 			);
 		});
-	}
-
-	protected function compileResources($pathInfo, $ns) {
-		$resourceOut = "$pathInfo[target]/htdocs";
-
-		// -------------------------------------------------------------------------
-		// Phase 1
-		// -------
-		// Copy, resolve and minify javascript css and img resources.
-		// -------------------------------------------------------------------------
-
-		// Compile conductor resources
-		// ---------------------------
-		$resourceSrc = "$pathInfo[cdtRoot]/htdocs";
-
-		// Compile base javascript
-		$this->resourceCompiler->compile(
-			"$pathInfo[cdtRoot]/resources/base.tmpl.js",
-			"$resourceOut/js/base.js",
-			array(
-				'rootPath' => $pathInfo['webRoot'],
-				'jsns' => $ns
-			));
-
-		// -------------------------------------------------------------------------
-		// ORDER HERE IS SIGNIFICANT
-		// -------------------------
-		// All resources of the same type (js, css, img) are compiled into the
-		// same so location.	The conductor resources are compiled first followed by
-		// the modules resources with the site resources compiled last.
-		// This allows modules to override conductor resources and the site's
-		// resources to override both conductor and module resources.
-		//
-		// By convention, all conductor resources are placed within a directory
-		// named cdt.  Modules place their resources in a directory specific for 
-		// that modules and sites place resource in a directory named the same as 
-		// the site nickname.
-		//
-		// WARNING: When multiple modules declare the same file the result is
-		//          non-deterministic
-		// -------------------------------------------------------------------------
-		$this->resourceCompiler->compile("$resourceSrc/js", "$resourceOut/js");
-		$this->resourceCompiler->compile("$resourceSrc/css", "$resourceOut/css");
-		$this->resourceCompiler->compile("$resourceSrc/img", "$resourceOut/img");
-
-		$self = $this;
-		$this->doWithModules(function ($moduleSrc) use ($self, $resourceOut) {
-			$resourceSrc = "$moduleSrc/htdocs";
-			$self->resourceCompile("$resourceSrc/js", "$resourceOut/js");
-			$self->resourceCompile("$resourceSrc/css", "$resourceOut/css");
-			$self->resourceCompile("$resourceSrc/img", "$resourceOut/img");
-		});
-
-		// Compile site resources
-		// ----------------------
-		$resourceSrc = "$pathInfo[src]/resources";
-		$this->resourceCompiler->compile("$resourceSrc/js", "$resourceOut/js");
-		$this->resourceCompiler->compile("$resourceSrc/css", "$resourceOut/css");
-		$this->resourceCompiler->compile("$resourceSrc/img", "$resourceOut/img");
-
-		// -------------------------------------------------------------------------
-		// Phase 2: Grouping
-		// -----------------
-		// In non-dev mode, the target directory resources will be combined into 
-		// larger resources based on grouping rules. For now only specific resource
-		// groups are combined but over time rules may emerge that allow this to be
-		// done universally.
-		// -------------------------------------------------------------------------
-
-		$this->resourceCompiler->combineGroup($resourceOut, 'css', 'cdt.core');
-		$this->resourceCompiler->combineGroup($resourceOut, 'css', 'cdt.widget');
-		$this->resourceCompiler->combineGroup($resourceOut, 'css', 'cdt.cmp');
 	}
 
 	protected function compileHtml($pathInfo, $ns) {
@@ -585,12 +511,12 @@ class SiteCompiler {
 			$this->dispatcherCompiler = new DispatcherCompiler();
 		}
 
-		if ($this->resourceCompiler === null) {
-			$this->resourceCompiler = new ResourceCompiler();
-		}
-
 		if ($this->diCompiler === null) {
 			$this->diCompiler = new DependencyInjectionCompiler();
+		}
+
+		if ($this->resourcesCompiler === null) {
+			$this->resourcesCompiler = new ResourcesCompiler();
 		}
 	}
 
@@ -624,10 +550,5 @@ class SiteCompiler {
 		$this->serviceCompiler->setServerCompiler($this->serverCompiler);
 
 		$this->diCompiler->setTemplateParser($this->tmplParser);
-	}
-
-	// Kludge until anonymous function can access $this private methods
-	public function resourceCompile($resourceSrc, $resourceOut) {
-		$this->resourceCompiler->compile($resourceSrc, $resourceOut);
 	}
 }
