@@ -19,7 +19,6 @@ use \zpt\anno\Annotations;
 use \zpt\cdt\compile\resource\ResourceCompiler;
 use \zpt\cdt\crud\CrudService;
 use \zpt\cdt\di\Injector;
-use \zpt\cdt\html\HtmlProvider;
 use \zpt\cdt\html\NotAPageDefinitionException;
 use \zpt\cdt\i18n\ModelDisplayParser;
 use \zpt\cdt\i18n\ModelMessages;
@@ -72,8 +71,8 @@ class SiteCompiler {
 	/* Dispatcher compiler */
 	private $dispatcherCompiler;
 
-	/* Html Provider Generator. */
-	private $htmlProvider;
+	/* Html Compiler */
+	private $htmlCompiler;
 
 	/* Javascript library compiler. */
 	private $jslibCompiler;
@@ -180,7 +179,7 @@ class SiteCompiler {
 		$this->compileModels($pathInfo, $ns);
 		$this->compileServices($pathInfo, $ns);
 		$this->resourcesCompiler->compile($pathInfo, $ns, $env);
-		$this->compileHtml($pathInfo, $ns);
+		$this->htmlCompiler->compile($pathInfo, $ns, $env);
 		if ($env !== self::ENV_DEV) {
 			$this->resourcesCompiler->combineResourceGroups(
 				"$pathInfo[target]/htdocs"
@@ -277,12 +276,6 @@ class SiteCompiler {
 		});
 	}
 
-	protected function compileHtml($pathInfo, $ns) {
-		// Build html mappers
-		$htmlDir = "$pathInfo[src]/$ns/html";
-		$this->compileHtmlDir($htmlDir, $ns);
-	}
-
 	protected function compileServices($pathInfo, $ns) {
 		// Compile Conductor services
 		$this->serviceCompiler->compile(
@@ -306,81 +299,6 @@ class SiteCompiler {
 			"$pathInfo[src]/$ns/srvc",
 			"$ns\\srvc"
 		);
-	}
-
-	private function compileHtmlDir($htmlDir, $ns, $tmplBase = '') {
-		if (!file_exists($htmlDir)) {
-			return;
-		}
-
-		$tmplBase = rtrim($tmplBase, '/');
-
-		$dir = new DirectoryIterator($htmlDir);
-		foreach ($dir as $pageDef) {
-			$fname = $pageDef->getBasename();
-			if ($pageDef->isDot() || substr($fname, 0, 1) === '.') {
-				continue;
-			}
-
-			if ($pageDef->isDir()) {
-				$dirTmplBase = $tmplBase . '/' . $fname;
-				$this->compileHtmlDir($pageDef->getPathname(), $ns, $dirTmplBase);
-				continue;
-			}
-
-			if (!File::checkExtension($fname, 'php')) {
-				continue;
-			}
-
-			$pageId = $pageDef->getBasename('.php');
-
-			$viewClass = $pageId;
-			$beanId = lcfirst($pageId);
-			if ($tmplBase !== '') {
-				$viewNs = str_replace('/', '\\', ltrim($tmplBase, '/'));
-				$viewClass = "$viewNs\\$pageId";
-				$beanId = lcfirst(StringUtils::toCamelCase($viewNs, '\\', true) . $pageId);
-			}
-			$viewClass = "$ns\\html\\$viewClass";
-			$beanId .= 'HtmlProvider';
-
-			try {
-				$this->htmlProvider->generate($viewClass);
-			} catch (NotAPageDefinitionException $e) {
-				// This is likely because the file is not a page definition so just
-				// continue.
-				error_log($e->getMessage());
-				continue;
-			}
-
-			$namingStrategy = new CompanionNamingStrategy();
-			$instClass = HtmlProvider::COMPANION_NAMESPACE . "\\" .
-				$namingStrategy->getCompanionClassName($viewClass);
-			$this->diCompiler->addBean($beanId, $instClass);
-
-			$args = array( "'$beanId'" );
-
-			$hdlr = 'zpt\cdt\html\HtmlRequestHandler';
-			$tmpls = array();
-			$tmpls[] = "$tmplBase/" . StringUtils::fromCamelCase($pageId) . '.html';
-			$tmpls[] = "$tmplBase/" . StringUtils::fromCamelCase($pageId) . '.php';
-			if ($pageId === 'Index') {
-				if ($tmplBase === '') {
-					$tmpls[] = '/';
-				} else {
-					$tmpls[] = $tmplBase;
-				}
-			} else {
-				// Add a mapping for retrieving only page fragment
-				$this->serverCompiler->addMapping(
-					'zpt\cdt\html\HtmlFragmentRequestHandler',
-					$args,
-					array( "$tmplBase/" . StringUtils::fromCamelCase($pageId) . '.frag' )
-				);
-			}
-
-			$this->serverCompiler->addMapping($hdlr, $args, $tmpls);
-		}
 	}
 
 	protected function compileJslibDir($pathInfo, $dir) {
@@ -522,6 +440,13 @@ class SiteCompiler {
 		if ($this->resourcesCompiler === null) {
 			$this->resourcesCompiler = new ResourcesCompiler();
 		}
+
+		if ($this->htmlCompiler === null) {
+			$this->htmlCompiler = new HtmlCompiler(
+				$this->diCompiler,
+				$this->serverCompiler
+			);
+		}
 	}
 
 	/* Initialize the compiler once configuration has been parsed */
@@ -540,8 +465,6 @@ class SiteCompiler {
 		$this->infoGen->setModelCache($this->modelCache);
 		$this->crudGen->setModelCache($this->modelCache);
 		$this->queryBuilderGen->setModelCache($this->modelCache);
-
-		$this->htmlProvider = new HtmlProvider($target, $env);
 
 		$this->modulesPath = "$pathInfo[root]/modules";
 
