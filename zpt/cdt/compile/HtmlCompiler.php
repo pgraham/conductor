@@ -70,7 +70,7 @@ class HtmlCompiler implements Compiler {
 				continue;
 			}
 
-			$pageId = $pageDef->getBasename('.php');
+			$pageId = String($pageDef->getBasename('.php'));
 
 			$viewClass = $pageId;
 			$beanId = lcfirst($pageId);
@@ -99,9 +99,9 @@ class HtmlCompiler implements Compiler {
 
 			$hdlr = 'zpt\cdt\html\HtmlRequestHandler';
 			$tmpls = array();
-			$tmpls[] = "$tmplBase/" . String($pageId)->fromCamelCase() . '.html';
-			$tmpls[] = "$tmplBase/" . String($pageId)->fromCamelCase() . '.php';
-			if ($pageId === 'Index') {
+			$tmpls[] = "$tmplBase/" . $pageId->fromCamelCase() . '.html';
+			$tmpls[] = "$tmplBase/" . $pageId->fromCamelCase() . '.php';
+			if ((string) $pageId === 'Index') {
 				if ($tmplBase === '') {
 					$tmpls[] = '/';
 				} else {
@@ -112,7 +112,7 @@ class HtmlCompiler implements Compiler {
 				$this->serverCompiler->addMapping(
 					'zpt\cdt\html\HtmlFragmentRequestHandler',
 					$args,
-					array( "$tmplBase/" . String($pageId)->fromCamelCase() . '.frag')
+					array( "$tmplBase/" . $pageId->fromCamelCase() . '.frag')
 				);
 			}
 
