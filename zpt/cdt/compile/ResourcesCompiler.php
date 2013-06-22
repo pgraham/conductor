@@ -47,6 +47,12 @@ class ResourcesCompiler implements Compiler {
 		}
 	}
 
+	public function addResourceGroups($type, $groups) {
+		foreach ($groups as $group) {
+			$this->addResourceGroup($type, $group);
+		}
+	}
+
 	public function compile($pathInfo, $ns, $env = 'dev') {
 		$resourceOut = "$pathInfo[target]/htdocs";
 

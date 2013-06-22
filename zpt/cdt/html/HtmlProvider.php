@@ -222,7 +222,7 @@ class HtmlProvider extends CompanionGenerator {
 				// TODO Until resource combination is provided for all groups declared
 				//      in HTML definitions only used combined script if it is known to
 				//      be combined during compile.
-				if ($this->env === 'dev' || !String($stylesheet)->startsWith('cdt.')) {
+				if ($this->env === 'dev') {
 					$resolved = array_merge(
 						$resolved,
 						$cssResources->discover($stylesheet)

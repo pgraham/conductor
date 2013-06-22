@@ -15,6 +15,7 @@
 namespace zpt\cdt\compile;
 
 use \zpt\cdt\html\HtmlProvider;
+use \zpt\cdt\html\PageResourceParser;
 use \zpt\opal\DefaultNamingStrategy;
 use \zpt\util\File;
 use \DirectoryIterator;
@@ -27,15 +28,18 @@ use \DirectoryIterator;
 class HtmlCompiler implements Compiler {
 
 	private $diCompiler;
+	private $resourcesCompiler;
 	private $serverCompiler;
 
 	private $htmlProvider;
 
 	public function __construct(
 		DependencyInjectionCompiler $diCompiler,
+		ResourcesCompiler $resourcesCompiler,
 		ServerCompiler $serverCompiler
 	) {
 		$this->diCompiler = $diCompiler;
+		$this->resourcesCompiler = $resourcesCompiler;
 		$this->serverCompiler = $serverCompiler;
 	}
 
@@ -89,6 +93,10 @@ class HtmlCompiler implements Compiler {
 				error_log($e->getMessage());
 				continue;
 			}
+
+			$pageResourceParser = new PageResourceParser($viewClass);
+			$cssGroups = $pageResourceParser->getCssGroups();
+			$this->resourcesCompiler->addResourceGroups('css', $cssGroups);
 
 			$namingStrategy = new DefaultNamingStrategy();
 			$instClass = HtmlProvider::COMPANION_NAMESPACE . '\\' .

@@ -444,6 +444,7 @@ class SiteCompiler {
 		if ($this->htmlCompiler === null) {
 			$this->htmlCompiler = new HtmlCompiler(
 				$this->diCompiler,
+				$this->resourcesCompiler,
 				$this->serverCompiler
 			);
 		}
