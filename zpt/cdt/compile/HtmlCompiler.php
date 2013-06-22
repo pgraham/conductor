@@ -46,12 +46,12 @@ class HtmlCompiler implements Compiler {
 		$this->compileHtmlDir($htmlDir, $ns, $env);
 	}
 
-	private function compileHtmlDir($dir, $ns, $env, $tmplBase = '') {
+	private function compileHtmlDir($dir, $ns, $env, $webBase = '') {
 		if (!file_exists($dir)) {
 			return;
 		}
 
-		$tmplBase = rtrim($tmplBase, '/');
+		$webBase = rtrim($webBase, '/');
 
 		$dir = new DirectoryIterator($dir);
 		foreach ($dir as $pageDef) {
@@ -61,7 +61,7 @@ class HtmlCompiler implements Compiler {
 			}
 
 			if ($pageDef->isDir()) {
-				$dirTmplBase = $tmplBase . '/' . $fname;
+				$dirTmplBase = $webBase . '/' . $fname;
 				$this->compileHtmlDir($pageDef->getPathname(), $ns, $env, $dirTmplBase);
 				continue;
 			}
@@ -74,8 +74,8 @@ class HtmlCompiler implements Compiler {
 
 			$viewClass = $pageId;
 			$beanId = lcfirst($pageId);
-			if ($tmplBase !== '') {
-				$viewNs = str_replace('/', '\\', ltrim($tmplBase, '/'));
+			if ($webBase !== '') {
+				$viewNs = str_replace('/', '\\', ltrim($webBase, '/'));
 				$viewClass = "$viewNs\\$pageId";
 				$beanId = lcfirst(String($viewNs)->toCamelCase('\\', true) . $pageId);
 			}
@@ -99,20 +99,20 @@ class HtmlCompiler implements Compiler {
 
 			$hdlr = 'zpt\cdt\html\HtmlRequestHandler';
 			$tmpls = array();
-			$tmpls[] = "$tmplBase/" . $pageId->fromCamelCase() . '.html';
-			$tmpls[] = "$tmplBase/" . $pageId->fromCamelCase() . '.php';
+			$tmpls[] = "$webBase/" . $pageId->fromCamelCase() . '.html';
+			$tmpls[] = "$webBase/" . $pageId->fromCamelCase() . '.php';
 			if ((string) $pageId === 'Index') {
-				if ($tmplBase === '') {
+				if ($webBase === '') {
 					$tmpls[] = '/';
 				} else {
-					$tmpls[] = $tmplBase;
+					$tmpls[] = $webBase;
 				}
 			} else {
 				// Add a mapping for retrieving only page fragment
 				$this->serverCompiler->addMapping(
 					'zpt\cdt\html\HtmlFragmentRequestHandler',
 					$args,
-					array( "$tmplBase/" . $pageId->fromCamelCase() . '.frag')
+					array( "$webBase/" . $pageId->fromCamelCase() . '.frag')
 				);
 			}
 
