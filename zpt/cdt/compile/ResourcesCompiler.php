@@ -73,7 +73,8 @@ class ResourcesCompiler implements Compiler {
 			array(
 				'rootPath' => $pathInfo['webRoot'],
 				'jsns' => $ns
-			));
+			)
+		);
 
 		// -------------------------------------------------------------------------
 		// ORDER HERE IS SIGNIFICANT
@@ -92,8 +93,17 @@ class ResourcesCompiler implements Compiler {
 		// WARNING: When multiple modules declare the same file the result is
 		//          non-deterministic
 		// -------------------------------------------------------------------------
+
+		// Style sheets have the webRoot passed in so that less resources can 
+		// contain paths that get compiled for either separate file inclusion in dev 
+		// mode or combined file mode.
+		$cssValues = array( 'webRoot' => "'$pathInfo[webRoot]'");
 		$this->resourceCompiler->compile("$resourceSrc/js", "$resourceOut/js");
-		$this->resourceCompiler->compile("$resourceSrc/css", "$resourceOut/css");
+		$this->resourceCompiler->compile(
+			"$resourceSrc/css",
+			"$resourceOut/css",
+			$cssValues
+		);
 		$this->resourceCompiler->compile("$resourceSrc/img", "$resourceOut/img");
 
 		$modulesPath = "$pathInfo[root]/modules";
@@ -106,7 +116,7 @@ class ResourcesCompiler implements Compiler {
 
 				$resourceSrc = "{$module->getPathname()}/htdocs";
 				$this->resourceCompile("$resourceSrc/js", "$resourceOut/js");
-				$this->resourceCompile("$resourceSrc/css", "$resourceOut/css");
+				$this->resourceCompile("$resourceSrc/css", "$resourceOut/css", $cssValues);
 				$this->resourceCompile("$resourceSrc/img", "$resourceOut/img");
 			}
 		}

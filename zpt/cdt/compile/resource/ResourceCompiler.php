@@ -95,19 +95,21 @@ class ResourceCompiler {
 		}
 
 		if (is_dir($src)) {
-			$this->compileResourceDirectory($src, $target);
+			$this->compileResourceDirectory($src, $target, $values);
 		} else {
 			$this->compileResource($src, $target, $values);
 		}
 	}
 
 	/* Compile a directory of non-code template resources. */
-	private function compileResourceDirectory($srcDir, $outDir) {
+	private function compileResourceDirectory($srcDir, $outDir, $values) {
 		$dir = new DirectoryIterator($srcDir);
 
 		if (!file_exists($outDir)) {
 			mkdir($outDir, 0755, true);
 		}
+
+		$this->lessCompiler->setVariables($values);
 
 		foreach ($dir as $resource) {
 			if ($resource->isDot() || File::isHidden($resource)) {

@@ -28,4 +28,8 @@ class LessCompiler {
 		$minified = $this->cssMin->run($css);
 		file_put_contents($dest, $minified);
 	}
+
+	public function setVariables(array $values) {
+		$this->lessc->setVariables($values);
+	}
 }
