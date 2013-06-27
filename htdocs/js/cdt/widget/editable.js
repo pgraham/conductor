@@ -7,7 +7,7 @@
 		},
 
 		_create: function () {
-			var self = this;
+			var self = this, txt;
 
 			this.editorOpen = false;
 			this.editor = $('<input/>')
@@ -27,8 +27,12 @@
 						self._hideEditor();
 					}
 				});
+			if (this.options.placeholder) {
+				this.editor.attr('placeholder', this.options.placeholder);
+			}
 
-			this.textEl = $('<span/>').text(this.element.text());
+			this.textEl = $('<span/>');
+			this._setText(this.element.text());
 
 			this.editBtn = $('<button/>')
 				.button({
@@ -93,8 +97,18 @@
 				});
 		},
 
+		_setText: function (txt) {
+			if (txt) {
+				this.textEl.text(txt);
+			} else if (this.options.placeholder) {
+				this.textEl.html(
+					'<span class="placeholder">' + this.options.placeholder + '</span>'
+				);
+			}
+		},
+
 		_showEditor: function () {
-			var self = this;
+			var self = this, txt;
 
 			if (this.editorOpen) {
 				return;
@@ -103,8 +117,11 @@
 
 			// Briefly show the editor to size/position it then hide it again so
 			// that its display can be animated
+			txt = this.textEl.contents().filter(function () {
+				return this.nodeType === 3;
+			}).text()
 			this.editor
-				.val(this.textEl.text())
+				.val(txt)
 				.show()
 				.position({
 					my: 'left top',
@@ -132,7 +149,7 @@
 			var self = this, newVal = this.editor.val();
 
 			this.options.save(newVal, function () {
-				self.textEl.text(newVal);
+				self._setText(newVal);
 				self._hideEditor();
 			});
 		}
