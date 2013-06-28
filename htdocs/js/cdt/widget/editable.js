@@ -31,7 +31,7 @@
 				this.editor.attr('placeholder', this.options.placeholder);
 			}
 
-			this.textEl = $('<span/>');
+			this.textEl = $('<span class="editable-text"/>');
 			this._setText(this.element.text());
 
 			this.editBtn = $('<button/>')
