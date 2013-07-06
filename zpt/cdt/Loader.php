@@ -72,8 +72,5 @@ class Loader {
         $loader->add("zpt\\mod\\$modName", $mod->getPathName());
       }
     }
-
-    // Load primitive wrapper functions
-    \zpt\util\primwrap::init();
   }
 }
