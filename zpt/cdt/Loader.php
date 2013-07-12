@@ -16,7 +16,6 @@ namespace zpt\cdt;
 
 use \DirectoryIterator;
 use \Exception;
-use \SplClassLoader;
 
 /**
  * This class is responsible for loading any PHP libraries installed along side

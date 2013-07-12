@@ -19,7 +19,6 @@ use \zpt\anno\Annotations;
 use \zpt\cdt\compile\resource\ResourceCompiler;
 use \zpt\cdt\crud\CrudService;
 use \zpt\cdt\di\Injector;
-use \zpt\cdt\html\HtmlProvider;
 use \zpt\cdt\html\NotAPageDefinitionException;
 use \zpt\cdt\i18n\ModelDisplayParser;
 use \zpt\cdt\i18n\ModelMessages;
@@ -39,7 +38,6 @@ use \zpt\util\StringUtils;
 use \DirectoryIterator;
 use \Exception;
 use \ReflectionClass;
-use \SplClassLoader;
 
 /**
  * This class compiles a site.
@@ -47,6 +45,10 @@ use \SplClassLoader;
  * @author Philip Graham <philip@zeptech.ca>
  */
 class SiteCompiler {
+
+	const ENV_DEV = 'dev';
+	const ENV_STAGE = 'stage';
+	const ENV_PROD = 'prod';
 
 	private $modelParser;
 	private $modelCache;
@@ -69,8 +71,8 @@ class SiteCompiler {
 	/* Dispatcher compiler */
 	private $dispatcherCompiler;
 
-	/* Html Provider Generator. */
-	private $htmlProvider;
+	/* Html Compiler */
+	private $htmlCompiler;
 
 	/* Javascript library compiler. */
 	private $jslibCompiler;
@@ -81,8 +83,8 @@ class SiteCompiler {
 	/* Path to the site's modules directory. */
 	private $modulesPath;
 
-	/* Resource compiler. */
-	private $resourceCompiler;
+	/* Resources compiler. */
+	private $resourcesCompiler;
 
 	/* REST server configurator compiler. */
 	private $serverCompiler;
@@ -132,10 +134,6 @@ class SiteCompiler {
 		$this->dispatcherCompiler = $compiler;
 	}
 
-	public function setResourceCompiler(ResourceCompiler $compiler) {
-		$this->resourceCompiler = $compiler;
-	}
-
 	public function setDependencyInjectionCompiler(Compiler $compiler) {
 		$this->diCompiler = $compiler;
 	}
@@ -144,8 +142,11 @@ class SiteCompiler {
 	 * Compile the website found at the given root path.
 	 *
 	 * @param string $root The root path of the website to comile.
+	 * @param ComposerAutoloader $loader The composer autoloader.
+	 * @param string $env The target environment. One of the ENV_* constants of 
+	 *   this class.
 	 */
-	public function compile($root, $env = 'dev') {
+	public function compile($root, $loader, $env = 'dev') {
 		$this->ensureDependencies();
 
 		// Configuration needs to be compiled first so that the site path
@@ -162,8 +163,7 @@ class SiteCompiler {
 
 		// The rest of the compilation process will require the site's namespace
 		// to be registered so that class files can be reflected.
-		$ldr = new SplClassLoader($ns, $pathInfo['src']);
-		$ldr->register();
+		$loader->add($ns, $pathInfo['src']);
 
 		// Initiate the compiler
 		$this->initCompiler($pathInfo, $env);
@@ -178,10 +178,16 @@ class SiteCompiler {
 
 		$this->compileModels($pathInfo, $ns);
 		$this->compileServices($pathInfo, $ns);
-		$this->compileResources($pathInfo, $ns);
+		$this->resourcesCompiler->compile($pathInfo, $ns, $env);
+		$this->htmlCompiler->compile($pathInfo, $ns, $env);
+		if ($env !== self::ENV_DEV) {
+			$this->resourcesCompiler->combineResourceGroups(
+				"$pathInfo[target]/htdocs"
+			);
+		}
+
 		$this->compileJslibs($pathInfo, $ns);
 		$this->compileLanguageFiles($pathInfo, $ns);
-		$this->compileHtml($pathInfo, $ns);
 
 		$this->diCompiler->compile($pathInfo, $ns);
 
@@ -270,65 +276,6 @@ class SiteCompiler {
 		});
 	}
 
-	protected function compileResources($pathInfo, $ns) {
-		$resourceOut = "$pathInfo[target]/htdocs";
-
-		// Compile conductor resources
-		// ---------------------------
-		$resourceSrc = "$pathInfo[cdtRoot]/htdocs";
-
-		// Compile base javascript
-		$this->resourceCompiler->compile(
-			"$pathInfo[cdtRoot]/resources/base.tmpl.js",
-			"$resourceOut/js/base.js",
-			array(
-				'rootPath' => $pathInfo['webRoot'],
-				'jsns' => $ns
-			));
-
-		// -------------------------------------------------------------------------
-		// ORDER HERE IS SIGNIFICANT
-		// -------------------------
-		// All resources of the same type (js, css, img) are compiled into the
-		// same so location.	The conductor resources are compiled first followed by
-		// the modules resources with the site resources compiled last.
-		// This allows modules to override conductor resources and the site's
-		// resources to override both conductor and module resources.
-		//
-		// By convention, all conductor resources are placed within a directory
-		// named cdt.  Modules place their resources in a directory specific for 
-		// that modules and sites place resource in a directory named the same as 
-		// the site nickname.
-		//
-		// WARNING: When multiple modules declare the same file the result is
-		//          non-deterministic
-		// -------------------------------------------------------------------------
-		$this->resourceCompiler->compile("$resourceSrc/js", "$resourceOut/js");
-		$this->resourceCompiler->compile("$resourceSrc/css", "$resourceOut/css");
-		$this->resourceCompiler->compile("$resourceSrc/img", "$resourceOut/img");
-
-		$self = $this;
-		$this->doWithModules(function ($moduleSrc) use ($self, $resourceOut) {
-			$resourceSrc = "$moduleSrc/htdocs";
-			$self->resourceCompile("$resourceSrc/js", "$resourceOut/js");
-			$self->resourceCompile("$resourceSrc/css", "$resourceOut/css");
-			$self->resourceCompile("$resourceSrc/img", "$resourceOut/img");
-		});
-
-		// Compile site resources
-		// ----------------------
-		$resourceSrc = "$pathInfo[src]/resources";
-		$this->resourceCompiler->compile("$resourceSrc/js", "$resourceOut/js");
-		$this->resourceCompiler->compile("$resourceSrc/css", "$resourceOut/css");
-		$this->resourceCompiler->compile("$resourceSrc/img", "$resourceOut/img");
-	}
-
-	protected function compileHtml($pathInfo, $ns) {
-		// Build html mappers
-		$htmlDir = "$pathInfo[src]/$ns/html";
-		$this->compileHtmlDir($htmlDir, $ns);
-	}
-
 	protected function compileServices($pathInfo, $ns) {
 		// Compile Conductor services
 		$this->serviceCompiler->compile(
@@ -352,81 +299,6 @@ class SiteCompiler {
 			"$pathInfo[src]/$ns/srvc",
 			"$ns\\srvc"
 		);
-	}
-
-	private function compileHtmlDir($htmlDir, $ns, $tmplBase = '') {
-		if (!file_exists($htmlDir)) {
-			return;
-		}
-
-		$tmplBase = rtrim($tmplBase, '/');
-
-		$dir = new DirectoryIterator($htmlDir);
-		foreach ($dir as $pageDef) {
-			$fname = $pageDef->getBasename();
-			if ($pageDef->isDot() || substr($fname, 0, 1) === '.') {
-				continue;
-			}
-
-			if ($pageDef->isDir()) {
-				$dirTmplBase = $tmplBase . '/' . $fname;
-				$this->compileHtmlDir($pageDef->getPathname(), $ns, $dirTmplBase);
-				continue;
-			}
-
-			if (!File::checkExtension($fname, 'php')) {
-				continue;
-			}
-
-			$pageId = $pageDef->getBasename('.php');
-
-			$viewClass = $pageId;
-			$beanId = lcfirst($pageId);
-			if ($tmplBase !== '') {
-				$viewNs = str_replace('/', '\\', ltrim($tmplBase, '/'));
-				$viewClass = "$viewNs\\$pageId";
-				$beanId = lcfirst(StringUtils::toCamelCase($viewNs, '\\', true) . $pageId);
-			}
-			$viewClass = "$ns\\html\\$viewClass";
-			$beanId .= 'HtmlProvider';
-
-			try {
-				$this->htmlProvider->generate($viewClass);
-			} catch (NotAPageDefinitionException $e) {
-				// This is likely because the file is not a page definition so just
-				// continue.
-				error_log($e->getMessage());
-				continue;
-			}
-
-			$namingStrategy = new CompanionNamingStrategy();
-			$instClass = HtmlProvider::COMPANION_NAMESPACE . "\\" .
-				$namingStrategy->getCompanionClassName($viewClass);
-			$this->diCompiler->addBean($beanId, $instClass);
-
-			$args = array( "'$beanId'" );
-
-			$hdlr = 'zpt\cdt\html\HtmlRequestHandler';
-			$tmpls = array();
-			$tmpls[] = "$tmplBase/" . StringUtils::fromCamelCase($pageId) . '.html';
-			$tmpls[] = "$tmplBase/" . StringUtils::fromCamelCase($pageId) . '.php';
-			if ($pageId === 'Index') {
-				if ($tmplBase === '') {
-					$tmpls[] = '/';
-				} else {
-					$tmpls[] = $tmplBase;
-				}
-			} else {
-				// Add a mapping for retrieving only page fragment
-				$this->serverCompiler->addMapping(
-					'zpt\cdt\html\HtmlFragmentRequestHandler',
-					$args,
-					array( "$tmplBase/" . StringUtils::fromCamelCase($pageId) . '.frag' )
-				);
-			}
-
-			$this->serverCompiler->addMapping($hdlr, $args, $tmpls);
-		}
 	}
 
 	protected function compileJslibDir($pathInfo, $dir) {
@@ -561,12 +433,20 @@ class SiteCompiler {
 			$this->dispatcherCompiler = new DispatcherCompiler();
 		}
 
-		if ($this->resourceCompiler === null) {
-			$this->resourceCompiler = new ResourceCompiler();
-		}
-
 		if ($this->diCompiler === null) {
 			$this->diCompiler = new DependencyInjectionCompiler();
+		}
+
+		if ($this->resourcesCompiler === null) {
+			$this->resourcesCompiler = new ResourcesCompiler();
+		}
+
+		if ($this->htmlCompiler === null) {
+			$this->htmlCompiler = new HtmlCompiler(
+				$this->diCompiler,
+				$this->resourcesCompiler,
+				$this->serverCompiler
+			);
 		}
 	}
 
@@ -587,8 +467,6 @@ class SiteCompiler {
 		$this->crudGen->setModelCache($this->modelCache);
 		$this->queryBuilderGen->setModelCache($this->modelCache);
 
-		$this->htmlProvider = new HtmlProvider($target, $env);
-
 		$this->modulesPath = "$pathInfo[root]/modules";
 
 		// Dependency Injection
@@ -600,10 +478,5 @@ class SiteCompiler {
 		$this->serviceCompiler->setServerCompiler($this->serverCompiler);
 
 		$this->diCompiler->setTemplateParser($this->tmplParser);
-	}
-
-	// Kludge until anonymous function can access $this private methods
-	public function resourceCompile($resourceSrc, $resourceOut) {
-		$this->resourceCompiler->compile($resourceSrc, $resourceOut);
 	}
 }

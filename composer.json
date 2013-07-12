@@ -17,6 +17,7 @@
   },
   "minimum-stability": "dev",
   "require": {
+    "php": ">=5.3.6",
     "leafo/lessphp": "0.3.9",
     "mrclay/minify": "dev-master",
     "monolog/monolog": "1.2.1",

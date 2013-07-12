@@ -141,7 +141,8 @@ class Conductor {
 
     // Set dev mode configuration and do a compile if the target directory is
     // writeable.
-    if (is_writable("$root/target")) {
+    $isDevMode = is_writable("$root/target");
+    if ($isDevMode) {
       ini_set('display_errors', 'on');
       ini_set('html_errors', 'on');
       ini_set('error_log', "$root/target/php.error");
@@ -173,7 +174,7 @@ class Conductor {
       try {
         if (File::dirlock("$root/target", isset($_GET['forceunlock']))) {
           $compiler = new SiteCompiler();
-          $compiler->compile($root);
+          $compiler->compile($root, $loader);
           File::dirunlock("$root/target");
         } else {
           // This currently shouldn't happen since the only reason File::dirlock
@@ -185,7 +186,6 @@ class Conductor {
 
         // Since this is dev mode send a response which will allow the user to
         // forcefully unlock the directory
-        // TODO
         $url = $_SERVER['REQUEST_URI'];
         if (strpos($url, '?') !== false) {
           $url .= '&forceunlock';
@@ -193,10 +193,11 @@ class Conductor {
           $url .= '?forceunlock';
         }
 
-        echo "<!DOCTYPE html>\n" .
-             "<html lang=en><head><meta charset=utf-8 /><title>Force unlock</title></head>\n" .
-             "<body><h1>Unable to aquire target lock</h1>\n".
-             "<a href=\"$url\">Click to forcefully remove the lock and continue</a></body></html>\n";
+        echo "<!DOCTYPE html>\n", 
+             "<html lang=en><head><meta charset=utf-8 /><title>Force unlock</title>\n",
+             "<body><h1>Unable to aquire target lock</h1>\n",
+             "<p>If a previous request encountered an error durring the compilation process then the target lock will not have been released. If you've recently fixed a compilation problem and believe that this is the issue then you can ",
+             "<a href=\"$url\">forcefully remove the lock and continue</a></p>\n";
         exit;
         
       } catch (Exception $e) {
@@ -215,8 +216,12 @@ class Conductor {
     $pathInfo = self::$_config['pathInfo'];
     $namespace = self::$_config['namespace'];
 
-    // Register a class loader for the site's base namespace
-    $loader->add($namespace, "$root/src");
+    // Register a class loader for the site's base namespace. This is only
+    // necessary when not running in dev mode because the compilation process
+    // will already have added this otherwise.
+    if (!$isDevMode) {
+      $loader->add($namespace, "$root/src");
+    }
 
     // Initiate a database connection
     try {
