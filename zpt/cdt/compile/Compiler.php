@@ -15,7 +15,7 @@
 namespace zpt\cdt\compile;
 
 /**
- * Interface for classes that perform compilation work as part of a site 
+ * Interface for classes that perform compilation work as part of a site
  * compile.
  *
  * @author Philip Graham <philip@zeptech.ca>

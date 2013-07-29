@@ -199,7 +199,7 @@ class Conductor {
              "<p>If a previous request encountered an error durring the compilation process then the target lock will not have been released. If you've recently fixed a compilation problem and believe that this is the issue then you can ",
              "<a href=\"$url\">forcefully remove the lock and continue</a></p>\n";
         exit;
-        
+
       } catch (Exception $e) {
         File::dirunlock("$root/target");
         throw new Exception(
@@ -377,7 +377,7 @@ class Conductor {
       error_log($msg);
     }
     error_log($e->getTraceAsString());
-    
+
     if ($prev) {
       error_log("Caused by:");
       self::logException($prev);

@@ -1,0 +1,80 @@
+#!/usr/bin/php
+<?php
+/**
+ * =============================================================================
+ * Copyright (c) 2013, Philip Graham
+ * All rights reserved.
+ *
+ * This file is part of Conductor and is licensed by the Copyright holder under
+ * the 3-clause BSD License.	The full text of the license can be found in the
+ * LICENSE.txt file included in the root directory of this distribution or at
+ * the link below.
+ * =============================================================================
+ *
+ * @license http://www.opensource.org/licenses/bsd-license.php
+ */
+
+/**
+ * This script compiles the necessary components for a website that is not
+ * running in debug mode.
+ *
+ * @author Philip Graham <philip@zeptech.ca>
+ */
+require_once __DIR__ . '/common.php';
+
+$vendorDir = composerInit();
+if (!$vendorDir) {
+	echo "Unable to find composer!\n";
+	exit(1);
+}
+
+$target = realpath("$vendorDir/..");
+
+/*
+ * =============================================================================
+ * Declare dependencies.
+ * =============================================================================
+ */
+
+use \zpt\cdt\compile\SiteCompiler;
+use \zpt\cdt\Configuration;
+use \zpt\cdt\Loader;
+
+/*
+ * =============================================================================
+ * Declare dependencies.
+ * =============================================================================
+ */
+
+$usage = <<<USAGE
+cdt-compile env
+	env			The environment for which the site is being compiled. One of `dev`,
+					`stage` or `prod`
+USAGE;
+
+if ($argc < 2) {
+	echo $usage;
+	exit(1);
+}
+
+$env = $argv[1];
+$envs = array(
+	SiteCompiler::ENV_DEV,
+	SiteCompiler::ENV_STAGE,
+	SiteCompiler::ENV_PROD
+);
+if (!in_array($env, $envs)) {
+	echo $usage;
+	exit(1);
+}
+
+Loader::registerDependencies($target);
+
+if (file_exists("$target/target")) {
+	exec("rm -r $target/target");
+}
+
+mkdir ("$target/target", 0755);
+mkdir ("$target/target/htdocs", 0755);
+$compiler = new SiteCompiler();
+$compiler->compile($target, $env);

@@ -143,7 +143,7 @@ class SiteCompiler {
 	 *
 	 * @param string $root The root path of the website to comile.
 	 * @param ComposerAutoloader $loader The composer autoloader.
-	 * @param string $env The target environment. One of the ENV_* constants of 
+	 * @param string $env The target environment. One of the ENV_* constants of
 	 *   this class.
 	 */
 	public function compile($root, $loader, $env = 'dev') {
@@ -168,8 +168,8 @@ class SiteCompiler {
 		// Initiate the compiler
 		$this->initCompiler($pathInfo, $env);
 
-		// Add XML dependency files before any annotation configured beans get 
-		// added as annotation configured beans may depend on XML configured beans 
+		// Add XML dependency files before any annotation configured beans get
+		// added as annotation configured beans may depend on XML configured beans
 		// but the converse should not be true and is not supported
 		$this->collectDependencyXmls($pathInfo);
 
@@ -214,7 +214,7 @@ class SiteCompiler {
 	/**
 	 * Compile The site's language files.
 	 * ----------------------------------
-	 * 
+	 *
 	 * Language file compilation involves parsing properties files and building
 	 * a hash or string for each language and outputting a php script which can
 	 * be parsed quicker than parsing the language properties files at runtime.
@@ -246,7 +246,7 @@ class SiteCompiler {
 		$this->compileLanguageDir("$pathInfo[src]/resources/i18n");
 
 		$this->l10nCompiler->compile($pathInfo);
-		
+
 	}
 
 	protected function compileModels($pathInfo, $ns) {
@@ -420,7 +420,7 @@ class SiteCompiler {
 		}
 	}
 
-	/* 
+	/*
 	 * Ensure that all injectable dependencies that are not set have a default
 	 * instantiated.
 	 */
@@ -458,7 +458,7 @@ class SiteCompiler {
 		$this->validatorGen = new ValidatorGenerator($target);
 		$this->infoGen = new ModelMessages($target);
 		$this->crudGen = new CrudService($target);
-		$this->queryBuilderGen = new QueryBuilder($target); 
+		$this->queryBuilderGen = new QueryBuilder($target);
 
 		$this->persisterGen->setModelCache($this->modelCache);
 		$this->transformerGen->setModelCache($this->modelCache);

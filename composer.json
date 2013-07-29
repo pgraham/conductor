@@ -15,6 +15,12 @@
       "zpt\\cdt": ""
     }
   },
+  "bin": [
+    "bin/cdt-stage",
+    "bin/cdt-deploy",
+    "bin/cdt-export",
+    "bin/cdt-compile"
+  ],
   "minimum-stability": "dev",
   "require": {
     "php": ">=5.3.6",
@@ -26,7 +32,9 @@
     "zeptech/annotations": "1.0.*",
     "zeptech/oobo": "dev-master",
     "zeptech/clarinet": "dev-master",
-    "zeptech/php-rest-server": "dev-master"
+    "zeptech/php-rest-server": "dev-master",
+    "zeptech/dbup": "dev-master",
+    "zeptech/fun-box": "dev-master"
   },
   "require-dev": {
     "mockery/mockery": "dev-master@dev",

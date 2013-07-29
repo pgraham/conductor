@@ -1,0 +1,310 @@
+#!/usr/bin/php
+<?php
+/**
+ * =============================================================================
+ * Copyright (c) 2013, Philip Graham
+ * All rights reserved.
+ *
+ * This file is part of Conductor and is licensed by the Copyright holder under
+ * the 3-clause BSD License.	The full text of the license can be found in the
+ * LICENSE.txt file included in the root directory of this distribution or at
+ * the link below.
+ * =============================================================================
+ *
+ * @license http://www.opensource.org/licenses/bsd-license.php
+ */
+
+/**
+ * This script exports the source files for the given dev site
+ * to the specified target path.
+ *
+ * @author Philip Graham <philip@zeptech.ca>
+ */
+require_once __DIR__ . '/common.php';
+
+$vendorDir = composerInit();
+if (!$vendorDir) {
+	echo "Unable to find composer!\n";
+	exit(1);
+}
+
+/*
+ * =============================================================================
+ * Include necessary FunBox functions.
+ * =============================================================================
+ */
+use \zpt\util\File;
+use \zpt\util\Xml;
+
+ensureFn(
+	'announceWait',
+	'repoUtils'
+);
+
+// Verify input parameters
+// -----------------------------------------------------------------------------
+$usage = <<<USAGE
+site-export input-path [output-path]
+  input-path     Path to the directory that contains the web site
+  output-path    Optional. Path to the directory to which the site
+                 is exported. Defaults to INPUT_PATH/target
+USAGE;
+
+list($input, $output, $env) = parseCmdLn($argc, $argv);
+validateInput($input);
+validateOutput($output);
+
+// Initialize variables
+// -----------------------------------------------------------------------------
+
+// Build paths for site
+
+// Build paths for conductor libs
+$libSrcBase = File::joinPaths($input, 'lib');
+$libOpt = array(
+	File::joinPaths($libSrcBase, 'php-pdf')
+);
+$libOut = File::joinPaths($output, 'lib');
+
+// Build paths for jslibs
+$jslibSrc = new DirectoryIterator(File::joinPaths($libSrcBase, 'jslib'));
+$jslibOutBase = File::joinPaths($libOut, 'jslib');
+
+// Build paths for modules
+$modDir = File::joinPaths($input, 'modules');
+$modOutBase = File::joinPaths($output, 'modules');
+
+// Build paths for conductor.cfg.xml
+$cdtCfgSrc = File::joinPaths($input, 'conductor.cfg.xml');
+$cdtCfgPatch = File::joinPaths($input, "$env.xdiff");
+$cdtCfgOut = File::joinPaths($output, 'conductor.cfg.xml');
+
+// Verify that all repos are clean
+// -----------------------------------------------------------------------------
+if (!is_git_repo_clean($input)) {
+	echo "Unable to export site, $input has uncommited changes.\n";
+	exit(1);
+}
+
+foreach ($libOpt as $repo) {
+	if (file_exists($repo)) {
+		if (!is_git_repo_clean($repo)) {
+			echo "Unable to export site, $repo has uncommited chages.\n";
+			exit(1);
+		}
+	}
+}
+
+foreach ($jslibSrc AS $jslib) {
+	if ($jslib->isDot()) {
+		continue;
+	}
+
+	if (!$jslib->isDir()) {
+		continue;
+	}
+
+	$jslibPath = $jslib->getPathname();
+	if (!repo_is_clean($jslibPath)) {
+		echo "Unable to export site, $jslibPath has uncommited changes.\n";
+		exit(1);
+	}
+}
+
+if (file_exists($modDir)) {
+	$modSrc = new DirectoryIterator($modDir);
+	foreach ($modSrc as $mod) {
+		if ($mod->isDot() || !$mod->isDir()) {
+			continue;
+		}
+
+		$modPath = $mod->getPathname();
+		if (!repo_is_clean($modPath)) {
+			echo "Unable to export site, $modPath has uncommited changes.\n";
+			exit(1);
+		}
+	}
+}
+
+// Remove any existing output
+// -----------------------------------------------------------------------------
+if (file_exists($output)) {
+	exec("rm -rf $output");
+}
+mkdir($output, 0755, true);
+
+// Export site repos
+// -----------------------------------------------------------------------------
+echo "Exporting site from $input to $output\n";
+export_git_repo($input, $output);
+
+mkdir($libOut, 0755);
+foreach ($libSrc AS $repo) {
+	$repoName = basename($repo);
+	echo "Exporting $repoName from $repo to $libOut\n";
+	export_git_repo($repo, $libOut, $repoName);
+}
+
+// Export conductor submodules
+$oldDir = getcwd();
+
+chdir($cdtSrc);
+$submodCmd = "git submodule foreach 'git archive --format=tar --prefix=\$path/ master | tar -x -C $libOut/conductor'";
+echo "Exporting submodules in directory $cdtSrc with cmd:\n\n  $submodCmd\n\n";
+exec($submodCmd);
+chdir($oldDir);
+echo "Done.\n";
+
+// Export optional libraries if present
+foreach ($libOpt as $repo) {
+	if (file_exists($repo)) {
+		$repoName = basename($repo);
+		echo "Exporting $repoName from $repo to $libOut\n";
+		export_git_repo($repo, $libOut, $repoName);
+	}
+}
+
+// Export jslibs
+mkdir($jslibOutBase, 0755);
+foreach ($jslibSrc AS $jslib) {
+	if ($jslib->isDot()) {
+		continue;
+	}
+
+	if (!$jslib->isDir()) {
+		continue;
+	}
+
+	$jslibPath = $jslib->getPathname();
+
+	$jslibOut = File::joinPaths($jslibOutBase, $jslib->getBasename());
+	if (is_repo($jslibPath)) {
+		echo "Exporting jslib repo from $jslibPath to $jslibOut\n";
+		repo_export($jslibPath, $jslibOut);
+	} else {
+		echo "Exporting non-vc jslib from $jslibPath to $jslibOut\n";
+		exec("cp -a $jslibPath $jslibOut");
+	}
+}
+
+if (file_exists($modDir)) {
+	$modSrc = new DirectoryIterator($modDir);
+	mkdir ($modOutBase, 0755);
+	foreach ($modSrc as $mod) {
+		if ($mod->isDot() || !$mod->isDir()) {
+			continue;
+		}
+
+		$modPath = $mod->getPathname();
+		$modOut = File::joinPaths($modOutBase, $mod->getBasename());
+		echo "Exporting module $modPath to $modOut\n";
+		export_git_repo($modPath, $modOut);
+	}
+}
+
+// Perform composer install
+$oldDir = getcwd();
+chdir("$libOut");
+passthru("composer install");
+chdir($oldDir);
+
+// Export conductor configuration, applying staging patch to the XML
+//------------------------------------------------------------------------------
+$cdtCfg = Xml::patch($cdtCfgSrc, $cdtCfgPatch);
+$cdtCfg->save($cdtCfgOut);
+exit(0);
+
+//------------------------------------------------------------------------------
+// Utility functions, used to parse and validate command line parameters
+//------------------------------------------------------------------------------
+
+
+function parseCmdLn($argc, $argv) {
+	global $usage;
+
+	// Parse input parameters
+	if ($argc < 2) {
+		echo $usage, "\n";
+		exit(1);
+	}
+
+	$input = $argv[1];
+
+	if ($argc >= 3) {
+		$output = $argv[2];
+	} else {
+		$output = "$input/target";
+	}
+
+	// Determine the export environment
+	if ($argc >= 4) {
+		$env = $argv[3];
+	} else {
+		$env = 'staging';
+	}
+
+	$input = rtrim($input, '/');
+	$output = rtrim($output, '/');
+
+	return array($input, $output, $env);
+}
+
+function validateInput($input) {
+	global $usage;
+
+	if (!file_exists($input)) {
+		echo "Specified input path does not exist: $input\n";
+		echo $usage, "\n";
+		exit(1);
+	}
+
+	if (!is_dir($input)) {
+		echo "Specified input path is not a directory: $input\n";
+		echo $usage, "\n";
+		exit(1);
+	}
+
+	if (!file_exists("$input/conductor.cfg.xml")) {
+		echo "Specified input path is not a conductor web site: $input\n",
+				 "No conductor.cfg.xml found\n";
+		exit(1);
+	}
+}
+
+function validateOutput($output) {
+	global $usage;
+
+	if (file_exists($output)) {
+
+		if (!is_dir($output)) {
+			echo "Specified output path exists but is not a directory: $output\n";
+			echo $usage, "\n";
+			exit(1);
+		}
+
+		if (!is_writeable($output)) {
+			echo "Cannot write to specified output path: $output\n";
+			echo $usage, "\n";
+			exit(1);
+		}
+
+		if (!is_writeable(dirname($output))) {
+			echo "Cannot create specified output path: $output\n";
+			echo $usage, "\n";
+			exit(1);
+		}
+
+	} else {
+
+		$dir = dirname($output);
+		while (!file_exists($dir)) {
+			$dir = dirname($dir);
+		}
+
+		if (!is_writable($dir)) {
+			echo "Cannot create specified output path: $output\n";
+			exit(1);
+		}
+
+	}
+}
