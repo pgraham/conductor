@@ -184,8 +184,8 @@ if (!is_createable($stageDir)) {
 
 // If the specified staging link doesn't exist WARN the user that they may have
 // to configure their webserver
-if (!file_exists($stagingLink)) {
-  if (!is_createable($stagingLink)) {
+if (!file_exists($stageLink)) {
+  if (!is_createable($stageLink)) {
     echo "Unable to create the specified webserver link.\n";
     echo "Please ";
     if (!checkRoot()) {
@@ -195,7 +195,7 @@ if (!file_exists($stagingLink)) {
   } else {
     echo "WARNING: The specified webserver link does not currently exist and "
       .  "will be created. You may need to configure your webserver to serve the "
-      .  "staged site from:\n\n  $stagingLink\n";
+      .  "staged site from:\n\n  $stageLink\n";
   }
 }
 
