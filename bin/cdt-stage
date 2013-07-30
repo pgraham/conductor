@@ -47,6 +47,7 @@ ensureFn(
   'atomicSymlink',
   'checkRoot',
   'copyDb',
+  'getcmdln',
   'is_createable',
   'passwordPrompt',
   'symlinkInDir'
@@ -127,8 +128,8 @@ if ($cmdln->argc > 1) {
 // Save a timestamp for identifying and associating output files
 $ts = time();
 
-if (isset($cmdln->opts['staging-link'])) {
-  $stageLink = $cmdln->opts['staging-link'];
+if (isset($cmdln->opt['staging-link'])) {
+  $stageLink = $cmdln->opt['staging-link'];
 } else if (isset($domain)) {
   $stageLink = "/srv/www/staging.$domain";
 } else {
@@ -137,22 +138,22 @@ if (isset($cmdln->opts['staging-link'])) {
   exit(1);
 }
 
-$stageDir = isset($cmdln->opts['staging-dir'])
+$stageDir = isset($cmdln->opt['staging-dir'])
   ? $cmdln->opts['staging-dir'] . "/$ts"
   : "/srv/src/$siteNick/staging/$ts";
 
 $prodDir = null;
-if (isset($cmdln->opts['production-dir'])) {
-  $prodDir = $cmdln->opts['production-dir'];
+if (isset($cmdln->opt['production-dir'])) {
+  $prodDir = $cmdln->opt['production-dir'];
 } else if (isset($domain)) {
   $prodDir = "/srv/www/$domain";
 }
 
-$stageDb = isset($cmdln->opts['staging-db'])
+$stageDb = isset($cmdln->opt['staging-db'])
   ? $cmdln->opts['staging-db']
   : $siteNick . '_s';
 
-$prodDb = isset($cmdln->opts['production-db'])
+$prodDb = isset($cmdln->opt['production-db'])
   ? $cmdln->opts['production-db']
   : $siteNick;
 
