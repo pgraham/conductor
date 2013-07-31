@@ -78,4 +78,4 @@ if (file_exists("$target/target")) {
 mkdir ("$target/target", 0755);
 mkdir ("$target/target/htdocs", 0755);
 $compiler = new SiteCompiler();
-$compiler->compile($target, $env);
+$compiler->compile($target, $loader, $env);
