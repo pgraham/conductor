@@ -141,22 +141,6 @@ echo "Exporting site from $input to $output\n";
 export_git_repo($input, $output);
 
 mkdir($libOut, 0755);
-foreach ($libSrc AS $repo) {
-	$repoName = basename($repo);
-	echo "Exporting $repoName from $repo to $libOut\n";
-	export_git_repo($repo, $libOut, $repoName);
-}
-
-// Export conductor submodules
-$oldDir = getcwd();
-
-chdir($cdtSrc);
-$submodCmd = "git submodule foreach 'git archive --format=tar --prefix=\$path/ master | tar -x -C $libOut/conductor'";
-echo "Exporting submodules in directory $cdtSrc with cmd:\n\n  $submodCmd\n\n";
-exec($submodCmd);
-chdir($oldDir);
-echo "Done.\n";
-
 // Export optional libraries if present
 foreach ($libOpt as $repo) {
 	if (file_exists($repo)) {
@@ -206,7 +190,7 @@ if (file_exists($modDir)) {
 
 // Perform composer install
 $oldDir = getcwd();
-chdir("$libOut");
+chdir($output);
 passthru("composer install");
 chdir($oldDir);
 
