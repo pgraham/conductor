@@ -55,8 +55,8 @@ namespace {
 	 *
 	 * @return Path to the composer vendor directory or `false` if not found.
 	 */
-	function composerInit($baseDir = null) {
-		return zpt\cdt\bin\BinCommon::composerInit($baseDir);
+	function getComposerPath($baseDir = null) {
+		return zpt\cdt\bin\BinCommon::getComposerPath($baseDir);
 	}
 
 }
