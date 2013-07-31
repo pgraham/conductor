@@ -227,7 +227,7 @@ if ($failure) {
   return $failure;
 }
 
-$compileCmd = String("$stageDir/bin/cdt-compile {0}")
+$compileCmd = String("$stageDir/vendor/bin/cdt-compile {0}")
   ->format(SiteCompiler::ENV_STAGE);
 $failure = false;
 passthru($compileCmd, $failure);
