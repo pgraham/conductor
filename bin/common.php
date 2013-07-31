@@ -26,15 +26,14 @@ namespace zpt\cdt\bin {
 			'../../../autoload.php'
 		);
 
-		public static function composerInit($baseDir = null) {
+		public static function getComposerPath($baseDir = null) {
 			if ($baseDir === null) {
 				$baseDir = __DIR__;
 			}
 			foreach (self::$autoloadFiles as $file) {
 				$path = "$baseDir/$file";
 				if (file_exists($path)) {
-					include $path;
-					return dirname($path);
+					return dirname(realpath($path));
 				}
 			}
 			return false;

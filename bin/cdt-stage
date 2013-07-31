@@ -26,21 +26,41 @@
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
+use \zpt\cdt\compile\SiteCompiler;
+
 require_once __DIR__ . '/common.php';
 
-$vendorDir = composerInit();
-if (!$vendorDir) {
+$composerPath = getComposerPath();
+if (!$composerPath) {
   echo "Unable to find composer!\n";
   exit(1);
 }
+
+$loader = include "$composerPath/autoload.php";
+
+/*
+ * =============================================================================
+ * Determine site root
+ * =============================================================================
+ */
+$devDir = dirname($composerPath);
+
+// Determine the site root relative to the vendor directory.
+if (!file_exists("$devDir/conductor.cfg.xml")) {
+  // Unable to location conductor configuration file.
+  echo "Unable to locate conductor configuration file in $devDir\n";
+  exit(1);
+}
+
+// The site's nickname is the name of the dev dir.  This will be used to
+// generate defaults for missing options
+$siteNick = basename($devDir);
 
 /*
  * =============================================================================
  * Include necessary FunBox functions.
  * =============================================================================
  */
-
-use \zpt\cdt\compile\SiteCompiler;
 
 ensureFn(
   'announceWait',
@@ -57,24 +77,6 @@ if (!checkRoot()) {
   echo "This script must be run as root.\n";
   exit(1);
 }
-
-/*
- * =============================================================================
- * Determine site root
- * =============================================================================
- */
-
-// Determine the site root relative to the vendor directory.
-$devDir = realpath("$vendorDir/..");
-if (!file_exists("$devDir/conductor.cfg.xml")) {
-  // Unable to location conductor configuration file.
-  echo "Unable to locate conductor configuration file in $devDir\n";
-  exit(1);
-}
-
-// The site's nickname is the name of the dev dir.  This will be used to
-// generate defaults for missing options
-$siteNick = basename($devDir);
 
 /*
  * =============================================================================

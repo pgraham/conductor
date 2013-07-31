@@ -22,13 +22,14 @@
  */
 require_once __DIR__ . '/common.php';
 
-$vendorDir = composerInit();
-if (!$vendorDir) {
+$composerPath = getComposerPath();
+if (!$composerPath) {
 	echo "Unable to find composer!\n";
 	exit(1);
 }
 
-$target = realpath("$vendorDir/..");
+$loader = include "$composerPath/autoload.php";
+$target = dirname($composerPath);
 
 /*
  * =============================================================================
@@ -68,7 +69,7 @@ if (!in_array($env, $envs)) {
 	exit(1);
 }
 
-Loader::registerDependencies($target);
+Loader::registerDependencies($target, $loader);
 
 if (file_exists("$target/target")) {
 	exec("rm -r $target/target");

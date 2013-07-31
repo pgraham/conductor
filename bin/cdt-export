@@ -22,11 +22,13 @@
  */
 require_once __DIR__ . '/common.php';
 
-$vendorDir = composerInit();
-if (!$vendorDir) {
+$composerPath = getComposerPath();
+if (!$composerPath) {
 	echo "Unable to find composer!\n";
 	exit(1);
 }
+
+$loader = include "$composerPath/autoload.php";
 
 /*
  * =============================================================================
