@@ -194,6 +194,9 @@ chdir($output);
 passthru("composer install");
 chdir($oldDir);
 
+// Initialize conductor's submodules
+init_git_repo_submodules("$output/vendor/zeptech/conductor");
+
 // Export conductor configuration, applying staging patch to the XML
 //------------------------------------------------------------------------------
 $cdtCfg = Xml::patch($cdtCfgSrc, $cdtCfgPatch);
