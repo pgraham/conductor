@@ -300,7 +300,7 @@ if (file_exists("$stageDir/modules")) {
 
     $stmt = $pdo->query(
       "SELECT `value`
-       FROM `config_values`
+       FROM $stageDb.`config_values`
        WHERE `name` = 'module-$moduleName-alter'");
 
     $moduleVersion = (int) $stmt->fetchColumn();
@@ -314,7 +314,7 @@ if (file_exists("$stageDir/modules")) {
 
 // Do conductor alters
 $stmt = $pdo->query(
-  "SELECT `value` FROM `config_values` WHERE `name` = 'cdt-alter'");
+  "SELECT `value` FROM $stageDb.`config_values` WHERE `name` = 'cdt-alter'");
 $cdtVersion = (int) $stmt->fetchColumn();
 $cdtAlterPath = "$stageDir/lib/conductor/resources/sql";
 applyDatabaseAlters('root', $dbPass, $stageDb, $cdtVersion, $cdtAlterPath);
