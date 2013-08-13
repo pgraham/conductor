@@ -316,7 +316,7 @@ if (file_exists("$stageDir/modules")) {
 $stmt = $pdo->query(
   "SELECT `value` FROM $stageDb.`config_values` WHERE `name` = 'cdt-alter'");
 $cdtVersion = (int) $stmt->fetchColumn();
-$cdtAlterPath = "$stageDir/lib/conductor/resources/sql";
+$cdtAlterPath = "$stageDir/vendor/zeptech/conductor/resources/sql";
 applyDatabaseAlters('root', $dbPass, $stageDb, $cdtVersion, $cdtAlterPath);
 
 // 5. Set permissions on special files and directories
