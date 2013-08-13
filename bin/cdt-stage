@@ -64,6 +64,7 @@ $siteNick = basename($devDir);
 
 ensureFn(
   'announceWait',
+  'applyDatabaseAlters',
   'atomicSymlink',
   'checkRoot',
   'copyDb',
