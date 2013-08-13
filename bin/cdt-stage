@@ -239,16 +239,16 @@ if ($failure) {
 // Copy production xdiff to staging directory so that it is available for
 // deployment
 /*
-copy("$devDir/production.xdiff", "$targetDir/production.xdiff");
-chmod("$targetDir/production.xdiff", 0600);
+copy("$devDir/production.xdiff", "$stageDir/production.xdiff");
+chmod("$stageDir/production.xdiff", 0600);
  */
 
 // Create a symlink for htdocs
-symlinkInDir($targetDir, 'target/htdocs', 'htdocs');
+symlinkInDir($stageDir, 'target/htdocs', 'htdocs');
 
 // 2. Update Staging Database
 // -----------------------------------------------------------------------------
-copyDb($prodDb, $stagingDb, 'root', $dbPass);
+copyDb($prodDb, $stageDb, 'root', $dbPass);
 
 // 3. If a usr content directory exists, copy any existing content from the
 //    production deployment
@@ -256,9 +256,9 @@ copyDb($prodDb, $stagingDb, 'root', $dbPass);
 if (file_exists("$devDir/htdocs/usr")) {
 
   if (file_exists("$productionLink/htdocs/usr")) {
-    passthru("cp -a $productionLink/htdocs/usr $targetDir/htdocs/");
+    passthru("cp -a $productionLink/htdocs/usr $stageDir/htdocs/");
   } else {
-    mkdir("$targetDir/htdocs/usr", 0755, true);
+    mkdir("$stageDir/htdocs/usr", 0755, true);
   }
 
 }
@@ -266,9 +266,9 @@ if (file_exists("$devDir/htdocs/usr")) {
 if (file_exists("$devDir/target/usr")) {
 
   if (file_exists("$productionLink/target/usr")) {
-    passthru("cp -a $productionLink/target/usr $targetDir/");
+    passthru("cp -a $productionLink/target/usr $stageDir/");
   } else {
-    mkdir("$targetDir/usr", 0755, true);
+    mkdir("$stageDir/usr", 0755, true);
   }
 
 }
@@ -283,17 +283,17 @@ if (file_exists("$devDir/target/usr")) {
 
 // Do site alters
 $stmt = $pdo->query(
-  "SELECT `value` FROM `config_values` WHERE `name` = 'site-alter'");
+  "SELECT `value` FROM $stageDb.`config_values` WHERE `name` = 'site-alter'");
 $siteVersion = (int) $stmt->fetchColumn();
-$siteAlterPath = "$targetDir/src/sql";
+$siteAlterPath = "$stageDir/src/sql";
 if (file_exists($siteAlterPath)) {
-  applyDatabaseAlters('root', $dbPass, $stagingDb, $siteVersion,
+  applyDatabaseAlters('root', $dbPass, $stageDb, $siteVersion,
     $siteAlterPath);
 }
 
 // Do module alters
-if (file_exists("$targetDir/modules")) {
-  $modules = new DirectoryIterator("$targetDir/modules");
+if (file_exists("$stageDir/modules")) {
+  $modules = new DirectoryIterator("$stageDir/modules");
   foreach ($modules as $module) {
     $moduleName = $module->getBasename();
 
@@ -303,9 +303,9 @@ if (file_exists("$targetDir/modules")) {
        WHERE `name` = 'module-$moduleName-alter'");
 
     $moduleVersion = (int) $stmt->fetchColumn();
-    $moduleAlterPath = "$targetDir/modules/$moduleName/sql";
+    $moduleAlterPath = "$stageDir/modules/$moduleName/sql";
     if (file_exists($moduleAlterPath)) {
-      applyDatabaseAlters('root', $dbPass, $stagingDb, $moduleVersion,
+      applyDatabaseAlters('root', $dbPass, $stageDb, $moduleVersion,
         $moduleAlterPath);
     }
   }
@@ -315,24 +315,24 @@ if (file_exists("$targetDir/modules")) {
 $stmt = $pdo->query(
   "SELECT `value` FROM `config_values` WHERE `name` = 'cdt-alter'");
 $cdtVersion = (int) $stmt->fetchColumn();
-$cdtAlterPath = "$targetDir/lib/conductor/resources/sql";
-applyDatabaseAlters('root', $dbPass, $stagingDb, $cdtVersion, $cdtAlterPath);
+$cdtAlterPath = "$stageDir/lib/conductor/resources/sql";
+applyDatabaseAlters('root', $dbPass, $stageDb, $cdtVersion, $cdtAlterPath);
 
 // 5. Set permissions on special files and directories
 // -----------------------------------------------------------------------------
-if (file_exists("$targetDir/htdocs/usr")) {
-  chgrp("$targetDir/htdocs/usr", 'www-data');
-  chmod("$targetDir/htdocs/usr", 0775);
+if (file_exists("$stageDir/htdocs/usr")) {
+  chgrp("$stageDir/htdocs/usr", 'www-data');
+  chmod("$stageDir/htdocs/usr", 0775);
 }
 
-if (file_exists("$targetDir/usr")) {
-  chgrp("$targetDir/usr", 'www-data');
-  chmod("$targetDir/usr", 0775);
+if (file_exists("$stageDir/usr")) {
+  chgrp("$stageDir/usr", 'www-data');
+  chmod("$stageDir/usr", 0775);
 }
 
 // 6. Link compiled website into web server
 // -----------------------------------------------------------------------------
-atomicSymlink($stagingLink, $targetDir);
+atomicSymlink($stageLink, $stageDir);
 
 // Return 0 to indicate success
 return 0;
