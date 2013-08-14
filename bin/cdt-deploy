@@ -200,7 +200,7 @@ try {
 // 1. Compile site
 // -----------------------------------------------------------------------------
 $exportCmd = String(__DIR__ . "/cdt-export {0} {1} {2}")
-  ->format($devDir, $productionDir, SiteCompiler::ENV_PROD);
+  ->format($devDir, $productionDir, 'production');
 $failure = false;
 passthru($exportCmd, $failure);
 if ($failure) {
@@ -222,16 +222,16 @@ symlinkInDir($productionDir, 'target/htdocs', 'htdocs');
 
 // Copy user content to new deployment
 if (file_exists("$productionLink/htdocs/usr")) {
-  passthru("cp -a $productionLink/htdocs/usr $targetDir/htdocs/");
+  passthru("cp -a $productionLink/htdocs/usr $productionDir/htdocs/");
 } else {
-  mkdir("$targetDir/htdocs/usr", 0755, true);
+  mkdir("$productionDir/htdocs/usr", 0755, true);
 }
 
 // Copy user content to new deployment
 if (file_exists("$productionLink/usr")) {
-  passthru("cp -a $productionLink/usr $targetDir/");
+  passthru("cp -a $productionLink/usr $productionDir/");
 } else {
-  mkdir("$targetDir/usr", 0755, true);
+  mkdir("$productionDir/usr", 0755, true);
 }
 
 // 4. Apply development alters
@@ -295,7 +295,10 @@ if (file_exists("$productionDir/usr")) {
 // -----------------------------------------------------------------------------
 
 // Copy in symlinks in current production htdocs into target/htdocs
-$productionHtdocs = new DirectoryIterator("$productionLink/htdocs");
+$productionSrc = realpath($productionLink);
+$productionSrc = realpath("$productionSrc/..");
+
+$productionHtdocs = new DirectoryIterator("$productionSrc/htdocs");
 foreach ($productionHtdocs as $htdoc) {
   if (!$htdoc->isLink()) {
     continue;
