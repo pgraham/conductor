@@ -249,6 +249,7 @@ symlinkInDir($stageDir, 'target/htdocs', 'htdocs');
 
 // 2. Update Staging Database
 // -----------------------------------------------------------------------------
+echo "Copying $prodDb to $stageDb\n";
 copyDb($prodDb, $stageDb, 'root', $dbPass);
 
 // 3. If a usr content directory exists, copy any existing content from the
@@ -333,7 +334,7 @@ if (file_exists("$stageDir/usr")) {
 
 // 6. Link compiled website into web server
 // -----------------------------------------------------------------------------
-atomicSymlink($stageLink, $stageDir);
+atomicSymlink($stageLink, "$stageDir/htdocs");
 
 // Return 0 to indicate success
 return 0;
