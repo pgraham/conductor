@@ -197,13 +197,20 @@ class SiteCompiler {
 	protected function collectDependencyXmls($pathInfo) {
 		$diCompiler = $this->diCompiler;
 		$diCompiler->addFile(
-			"$pathInfo[cdtRoot]/resources/dependencies.xml");
+			"$pathInfo[cdtRoot]/resources/dependencies.xml"
+		);
 
 		$this->doWithModules(function ($modulePath) use ($diCompiler) {
-			$diCompiler->addFile("$modulePath/resources/dependencies.xml");
+			$diPath = "$modulePath/resources/dependencies.xml";
+			if (file_exists($diPath)) {
+				$diCompiler->addFile($diPath);
+			}
 		});
 
-		$diCompiler->addFile("$pathInfo[src]/resources/dependencies.xml");
+		$siteDiPath = "$pathInfo[src]/resources/dependencies.xml";
+		if (file_exists($siteDiPath)) {
+			$diCompiler->addFile($siteDiPath);
+		}
 	}
 
 	protected function compileJslibs($pathInfo, $ns) {
