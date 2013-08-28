@@ -77,6 +77,7 @@ class TopLevelDebugExceptionHandler {
 
 	private function getStack(Exception $e, $isAsync) {
 			$msg = $this->formatMessage($e->getMessage(), $isAsync);
+			$msg.= $this->formatOrigin($e->getFile(), $e->getLine(), $isAsync);
 			$msg.= $this->formatTrace($e->getTraceAsString(), $isAsync);
 
 			if (!$isAsync) {
@@ -91,6 +92,14 @@ class TopLevelDebugExceptionHandler {
 		}
 
 		return "<p class=\"exception-message\">$msg</p>";
+	}
+
+	private function formatOrigin($file, $line, $isAsync) {
+		if ($isAsync) {
+			return "\n\nOriginated at $file:$line";
+		}
+
+		return "<p class=\"exception-origin\">Originated at $file:$line</p>";
 	}
 
 	private function formatTrace($trace, $isAsync) {
@@ -157,8 +166,20 @@ header {
 	border-right: 1px solid #FFF;
 	box-shadow: 4px 4px 0 0 #333;
 }
+.exception-origin {
+	margin: 5px 1em 0;
+	padding: 1em;
+	border-right: 1px solid #FFF;
+
+	background-color: #555;
+	box-shadow: 4px 4px 0 0 #333;
+
+	font-family: 'Oxygen', sans-serif;
+	font-size: 1em;
+	color: #FFF;
+}
 .exception-trace {
-	margin: 5px 1em;
+	margin: 0 1em 5px;
 	padding: 1em;
 	border-bottom: 1px solid #FFF;
 	border-right: 1px solid #FFF;
@@ -202,5 +223,5 @@ $HTML_UNCAUGHT_EXCEPTION = <<<HTML
 	</style>
 <body>
 	<header>{0}</header>
-	{1};
+	{1}
 HTML;
