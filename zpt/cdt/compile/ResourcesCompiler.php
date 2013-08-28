@@ -86,16 +86,16 @@ class ResourcesCompiler implements Compiler {
 		// resources to override both conductor and module resources.
 		//
 		// By convention, all conductor resources are placed within a directory
-		// named cdt.  Modules place their resources in a directory specific for 
-		// that modules and sites place resource in a directory named the same as 
+		// named cdt.  Modules place their resources in a directory specific for
+		// that modules and sites place resource in a directory named the same as
 		// the site nickname.
 		//
 		// WARNING: When multiple modules declare the same file the result is
 		//          non-deterministic
 		// -------------------------------------------------------------------------
 
-		// Style sheets have the webRoot passed in so that less resources can 
-		// contain paths that get compiled for either separate file inclusion in dev 
+		// Style sheets have the webRoot passed in so that less resources can
+		// contain paths that get compiled for either separate file inclusion in dev
 		// mode or combined file mode.
 		$cssValues = array( 'webRoot' => "'$pathInfo[webRoot]'");
 		$this->resourceCompiler->compile("$resourceSrc/js", "$resourceOut/js");
@@ -115,9 +115,9 @@ class ResourcesCompiler implements Compiler {
 				}
 
 				$resourceSrc = "{$module->getPathname()}/htdocs";
-				$this->resourceCompile("$resourceSrc/js", "$resourceOut/js");
-				$this->resourceCompile("$resourceSrc/css", "$resourceOut/css", $cssValues);
-				$this->resourceCompile("$resourceSrc/img", "$resourceOut/img");
+				$this->resourceCompiler->compile("$resourceSrc/js", "$resourceOut/js");
+				$this->resourceCompiler->compile("$resourceSrc/css", "$resourceOut/css", $cssValues);
+				$this->resourceCompiler->compile("$resourceSrc/img", "$resourceOut/img");
 			}
 		}
 
@@ -133,7 +133,7 @@ class ResourcesCompiler implements Compiler {
 		// -------------------------------------------------------------------------
 		// Phase 2: Grouping
 		// -----------------
-		// In non-dev mode, the target directory resources will be combined into 
+		// In non-dev mode, the target directory resources will be combined into
 		// larger resources based on grouping rules. For now only specific resource
 		// groups are combined but over time rules may emerge that allow this to be
 		// done universally.
