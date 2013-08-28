@@ -38,7 +38,7 @@ class TopLevelDebugExceptionHandler {
 
 	public function handleException($exception) {
 		$isAsync = isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
-							strtolower($_SER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+		    strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
 
 		if ($exception instanceof ErrorException) {
 			$title = 'Fatal Error';
@@ -58,7 +58,7 @@ class TopLevelDebugExceptionHandler {
 		$msg = implode($stackSep, $stack);
 
 		if ($isAsync) {
-			echo $msg;
+			echo "$title:\n$msg";
 			return;
 		}
 
@@ -67,7 +67,7 @@ class TopLevelDebugExceptionHandler {
 
 	public function handleError($errno, $errstr, $errfile, $errline) {
 		if (!in_array($errno, self::$FATAL)) {
-			// This error will not terminate script execution, continue with normal 
+			// This error will not terminate script execution, continue with normal
 			// error handling
 			return false;
 		}
@@ -125,8 +125,8 @@ class TopLevelDebugExceptionHandler {
  * =============================================================================
  */
 
-// It may not be possible to rely on _p to generate a context aware path to 
-// a CSS resources since that part of compilation may not yet have occured, so 
+// It may not be possible to rely on _p to generate a context aware path to
+// a CSS resources since that part of compilation may not yet have occured, so
 // instead the CSS for this page is written here
 $HTML_UNCAUGHT_EXCEPTION_CSS = <<<CSS
 html,body { height: 100%; }

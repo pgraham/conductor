@@ -193,7 +193,7 @@ class Conductor {
           $url .= '?forceunlock';
         }
 
-        echo "<!DOCTYPE html>\n", 
+        echo "<!DOCTYPE html>\n",
              "<html lang=en><head><meta charset=utf-8 /><title>Force unlock</title>\n",
              "<body><h1>Unable to aquire target lock</h1>\n",
              "<p>If a previous request encountered an error durring the compilation process then the target lock will not have been released. If you've recently fixed a compilation problem and believe that this is the issue then you can ",
