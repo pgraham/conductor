@@ -15,6 +15,7 @@
 namespace zpt\cdt\compile;
 
 use \zpt\cdt\html\HtmlProvider;
+use \zpt\cdt\html\NotAPageDefinitionException;
 use \zpt\cdt\html\PageResourceParser;
 use \zpt\opal\DefaultNamingStrategy;
 use \zpt\util\File;

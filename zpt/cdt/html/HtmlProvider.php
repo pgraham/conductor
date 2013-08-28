@@ -80,7 +80,7 @@ class HtmlProvider extends CompanionGenerator {
 		} else {
 			$template = new Annotations();
 		}
-		
+
 		$values['title'] = $this->parseTitle($page, $template);
 
 		// If the page definition specifies an authorization level then ensure
