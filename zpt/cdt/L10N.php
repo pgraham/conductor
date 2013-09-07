@@ -46,7 +46,7 @@ class L10N {
     }
 
     $args = func_get_args();
-    array_shift($args);
+    $args = array_slice($args, 2);
     if (count($args) > 0) {
       array_unshift($args, $str);
       $str = call_user_func_array('zpt\util\StringUtils::format', $args);
@@ -130,7 +130,7 @@ class L10N {
     return self::$_strs[$key];
   }
 
-} 
+}
 
 } // End namespace
 
