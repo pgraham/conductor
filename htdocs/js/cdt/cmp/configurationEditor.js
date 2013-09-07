@@ -46,28 +46,27 @@ CDT.ns('CDT.model');
   function buildToggleButton() {
     var toggle, path, collapsed = false;
     
-    toggle = CDT.widget.icon({ paths: 'caret-down' });
-    path = toggle.data('icon-path');
+    toggle = CDT.widget.icon({ paths: CDT.icon['caret-down'] });
 
     toggle.data('icon-paper').rect(0, 0, 32, 32)
       .attr({ fill: '#000', opacity: 0 })
       .hover(function () {
-        path.stop().animate({
+        toggle.icon('animate', {
           fill: '#999'
         }, 300);
       },
       function () {
-        path.stop().animate({
+        toggle.icon('animate', {
           fill: '#000'
         }, 300);
       })
       .click(function () {
         if (!collapsed) {
-          path.stop().animate({ transform: 'r-90' }, 200);
+          toggle.icon('animate', { transform: 'r-90' }, 200);
           toggle.parent().siblings('.cdt-config-section, .cdt-config-value')
             .slideUp('fast');
         } else {
-          path.stop().animate({ transform: 'r0' }, 200);
+          toggle.icon('animate', { transform: 'r0' }, 200);
           toggle.parent().siblings('.cdt-config-section, .cdt-config-value')
             .slideDown('fast');
         }
