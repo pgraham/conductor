@@ -48,24 +48,24 @@ class UserService extends BaseRequestHandler implements BeanRequestHandler {
 
     $data = $request->getData();
     $fieldMsgs = array();
-    
+
     if (!$this->_authProvider->checkPassword(
         $data[self::CURRENT_PASSWORD_FIELD]))
     {
       $msg = _L('users.password.currentInvalid');
-      $fieldMsgs[self::CURRENT_PASSWORD_FIELD] = $msg;
+      $fieldMsgs[self::CURRENT_PASSWORD_FIELD] = (string) $msg;
     }
 
     $newPw = $data[self::NEW_PASSWORD_FIELD];
     if (!$newPw) {
       $msg = _L('users.password.noPassword');
-      $fieldMsgs[self::NEW_PASSWORD_FIELD] = $msg;
+      $fieldMsgs[self::NEW_PASSWORD_FIELD] = (string) $msg;
     }
 
     $confirm = $data[self::CONFIRM_PASSWORD_FIELD];
     if ($newPw !== $confirm) {
       $msg = _L('users.password.noMatch');
-      $fieldMsgs[self::CONFIRM_PASSWORD_FIELD] = $msg;
+      $fieldMsgs[self::CONFIRM_PASSWORD_FIELD] = (string) $msg;
     }
 
     if (count($fieldMsgs) === 0) {
@@ -78,7 +78,7 @@ class UserService extends BaseRequestHandler implements BeanRequestHandler {
     $response->setData(array(
       'success' => count($fieldMsgs) === 0,
       'msg' => array(
-        'text' => $msg,
+        'text' => (string) $msg,
         'type' => count($fieldMsgs) === 0 ? 'info' : 'error'
       ),
       'fieldMsgs' => $fieldMsgs
