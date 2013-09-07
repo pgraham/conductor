@@ -24,7 +24,7 @@ use \StdClass;
  *
  * @Service
  */
-class /*# companionClass #*/ { 
+class /*# companionClass #*/ {
 
   /** @Injected */
   private $authProvider;
@@ -172,7 +172,7 @@ class /*# companionClass #*/ {
     if ($model === null) {
       throw new RestException(404);
     }
-      
+
     // Don't do this inside of a try block that catches generic exception
     // since we want any thrown AuthException to bubble.
     $this->gatekeeper->checkCanWrite($model);
