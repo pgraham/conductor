@@ -71,6 +71,7 @@ class /*# companionClass #*/ {
     // -------------------------------------------------------------------------
     // Non-jquery
     Element::js('/*# jslibPath #*//date.js')->addToHead();
+    Element::js('/*# jslibPath #*//q/q.min.js')->addToHead();
 
     // JQuery - If dev mode non-minimized version is included
     $this->_loadJQuery();

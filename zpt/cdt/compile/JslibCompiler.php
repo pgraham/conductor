@@ -78,8 +78,7 @@ class JslibCompiler {
 
       // Default, simply copy the library's source files to the target
       default:
-      // TODO Abstract _compileResourceDir into a class and reuse it to compile
-      //      the jslib
+      $this->copyDirectory($jslibPath, $jslibOut);
       break;
     }
   }
