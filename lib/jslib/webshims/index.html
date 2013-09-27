@@ -3,8 +3,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 	<meta charset="utf-8"/>
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=IE7" />
 	<link href="css/styles.css" rel="stylesheet" />
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 	<script>
 		// set options for html5shiv
 		if(!window.html5){
@@ -16,11 +17,7 @@
 	
 	<script src="js-webshim/minified/polyfiller.js"></script>
 	<script src="demo-js/demo.js"></script>
-	<script class="example">
-		$.webshims.setOptions({
-			//we do not use any DOM-/JS-APIs on DOM-ready, so we do not need to delay the ready event <- good against fouc
-			waitReady: false
-		});
+	<script>
 		//load all polyfill features
 		$.webshims.polyfill();
 		
@@ -45,7 +42,7 @@
 				</div>
 				<div class="home-box download-box">
 					<p>
-						<a href="http://github.com/aFarkas/webshim/downloads" class="download-button">
+						<a href="http://corrupt-system.de/webshims-stable.zip" class="download-button">
 							<strong>Download Webshims Lib</strong>
 						</a>
 					</p>
@@ -85,12 +82,12 @@
 				<div class="home-box supported-browser-box">
 					<h3 title="Webshims should work in a lot more browsers/browser versions">tested Browser Support</h3>
 					<ul>
-						<li>IE6+</li>
+						<li>IE7+</li>
 						<li>Firefox 3.6+</li>
-						<li>Safari 4.0+</li>
+						<li>Safari 5.1+</li>
 						<li>Safari for iOS 5+</li>
-						<li>Chrome 16.0+</li>
-						<li>Opera 11.6+</li>
+						<li>Chrome 24.0+</li>
+						<li>Opera 12.1+</li>
 					</ul>
 					
 				</div>
@@ -114,7 +111,7 @@
 					</article>
 					
 					<article>
-						<h3><a href="demos/mediaelement.html">HTML5 mediaelements: audio/video</a></h3>
+						<h3><a href="demos/mediaelement.html">HTML5 mediaelements: audio/video/track</a></h3>
 					</article>
 										
 					<article>
@@ -143,7 +140,7 @@
 				<div class="panel">
 <code class="block">
 &lt;!-- dependencies: jQuery + Modernizr with yepnope --&gt;
-&lt;script src="js/jquery-1.7.1.js"&gt;&lt;/script&gt;
+&lt;script src="js/jquery-1.9.1.js"&gt;&lt;/script&gt;
 &lt;script src="js/modernizr-yepnope-custom.js"&gt;&lt;/script&gt;
 	
 &lt;!-- reference the base script --&gt;
@@ -160,7 +157,7 @@
 	});
 &lt;/script&gt;		
 </code>
-					<p><small>Note: Webshims do not need all Modernizr tests to work. Here you find <a href="http://www.modernizr.com/download/#-canvas-audio-video-input-inputtypes-localstorage-sessionstorage-geolocation-shiv-addtest-prefixed-testprop-testallprops-domprefixes-load">all Modernizr detections, which are used by webshims</a>.</small></p>
+					<p><small>Note: Webshims do not need all Modernizr tests to work. Here you find <a href="http://modernizr.com/download/#-canvas-audio-video-input-inputtypes-localstorage-sessionstorage-geolocation-shiv-cssclasses-addtest-prefixed-testprop-testallprops-prefixes-domprefixes-elem_track-load">all Modernizr detections, which are used by webshims</a>.</small></p>
 				</div>
 	
 				<h3 id="embed-polyfill" class="button">Embedding and configuring the script</h3>
@@ -172,7 +169,7 @@
 					</ul>
 				
 <code class="block">
-&lt;script src="js/jquery-1.7.1.js"&gt;&lt;/script&gt;
+&lt;script src="js/jquery-1.9.1.js"&gt;&lt;/script&gt;
 &lt;script src="js/modernizr-yepnope-custom.js"&gt;&lt;/script&gt;
 &lt;script src="js-webshim/minified/polyfiller.js"&gt;&lt;/script&gt;
 
@@ -198,6 +195,8 @@ $.webshims.polyfill('json-storage geolocation');
 							<li><code>forms</code></li>
 							<li><code>forms-ext</code></li>
 							<li><code>mediaelement</code></li>
+							<li><code>track</code></li>
+							<li><code>filereader</code></li>
 							<li><code>details</code></li>
 						</ul>
 						
@@ -210,7 +209,7 @@ $.webshims.polyfill('json-storage geolocation');
 </code>			
 					<p>If you dont want any log messsages, simply set <code>$.webshims.debug</code> explicitly to <code>false</code>.</p>
 					<h3>Custom Modernizr build</h3>
-					<p>Webshims lib does not need every Modernizr test and supports creating a <a href="http://www.modernizr.com/download/#-canvas-audio-video-input-inputtypes-localstorage-sessionstorage-geolocation-iepp-addtest-prefixed-testprop-testallprops-domprefixes-load">custom Modernizr build</a>. (Webshims lib uses <a href="http://requirejs.org/">requireJS</a> as a script loader, if this is included, if not it uses Modernizr.load/yepnope.) </p>
+					<p>Webshims lib does not need every Modernizr test and supports creating a <a href="http://modernizr.com/download/#-canvas-audio-video-input-inputtypes-localstorage-sessionstorage-geolocation-shiv-cssclasses-addtest-prefixed-testprop-testallprops-prefixes-domprefixes-elem_track-load">custom Modernizr build</a>. (Webshims lib uses <a href="http://requirejs.org/">requireJS</a> or <a href="https://gist.github.com/aFarkas/936413">sssl</a> as a script loader, if this is included, if not it uses Modernizr.load/yepnope.) </p>
 					
 					<h3>changing Options path to shims folder</h3>
 					
@@ -261,15 +260,15 @@ $.webshims.ready('DOM canvas', function(){
 					<p><code>setOptions</code> should always be called before the <code>polyfill</code> method.</p>
 					<p>The available general options are the following:</p>
 					<ul>
-						<li><strong>extendNative</strong> (default: true): Webshims lib will automatically extend DOM-Objects with polyfilled methods and will additionally generate a jQuery plugin with this method name. If extendNative is set to false, webshims lib won't touch any DOM-Objects and will only implement jQuery plugins. Setting this option to false, might be also good for DOM performance.</li>
+						<li><strong>extendNative</strong> (default: false): Webshims lib will automatically extend DOM-Objects with polyfilled methods and will additionally generate a jQuery plugin with this method name. If extendNative is set to false, webshims lib won't touch any DOM-Objects and will only implement jQuery plugins. Setting this option to false, might be also good for DOM performance (<a href="index.html#polyfill-abstractions">see also</a>).</li>
 						<li><strong>basePath</strong> (default: "automatially computed path to the shims folder"): If polyfiller.js was renamed <strong>and</strong> is loaded dynamically, the basePath should be changed manually.</li>
 						<li><strong>waitReady</strong> (default: true): If this option is true, jQuery's ready-event will be delayed until all needed features are ready to use. This option should be set to false, if webshims lib polyfiller.js is loaded async (see also Loading webshims async in the <a href="#polyfill-foucs">loading documentation</a>) or from bottom of the body element. This option can also be set to false, if a website is using only HTML5 markup APIs (pure HTML or $.attr) and do not use any DOM-/JS-APIs on DOM-ready. If this feature is set to false, which might be good against FOUCs, scripted access to polyfilled APIs have to be added inside of a <a href="#polyfill-ready"><code>$.webshims.ready</code></a> callback.</li>
-						<li><strong>disableShivMethods</strong> (default: true): Automatically disables the <a href="https://github.com/aFarkas/html5shiv">shivMethods</a> option of html5shiv, if jQuery 1.7.x is used, which provides a suitable innerShiv method.</li>
+						<li><strong>disableShivMethods</strong> (default: true): Automatically disables the <a href="https://github.com/aFarkas/html5shiv">shivMethods</a> option of html5shiv.</li>
 					</ul>
 <code class="block">
 $.webshims.setOptions("extendNative", false);
 </code>	
-		<p><code>setOptions</code> can also take a single options parameter:</p>			
+		<p><code>setOptions</code> can also take a single options parameter:</p>
 <code class="block">
 $.webshims.setOptions({
 	extendNative: false
@@ -324,27 +323,39 @@ $('video').prop('currentTime', 200);
 </code>
 						</li>
 						<li>
-							<p><strong>calling a DOM method</strong>: While DOM properties have to be accessed through jQuery's <code>$.prop/$.attr</code> methods, DOM methods are added to DOM elements themselves, so you can call them directly:</p>
+							<p><strong>calling a DOM method</strong>: While DOM properties have to be accessed through jQuery's <code>$.prop/$.attr</code> methods, DOM methods can be accesed using $.prop and executed in the context of the DOM element.</p>
 <code class="block">
 // "this" refers to a DOM element, not a jQuery object
-this.checkValidity();
+var fn = $.prop(this, 'checkValidity');
+fn.apply(this);
 </code>
-							<p>Webshims lib also generates a jQuery plugin which wraps the feature, so you can use jQuery too:</p>
+							<p>To make this more easier Webshims lib also generates a jQuery plugin which wraps the featured method, so you can use jQuery too:</p>
 <code class="block">
 $(this).checkValidity();
+
+$(this).callProp('checkValidity'); // $(this).callProp('play');
 </code>
-							<p>If you pass a list of nodes and the method doesn't return anything, the method will be called on each element in this list, otherwise it will be called on the first element.</p>
-							<p>A lot of developers deprecate extending the DOM directly, in those cases the general option <code>extendNative</code> can be set to <code>false</code>.</p>
+							<p>The jQuerified method can also take some arguments, if specified by the spec.</p>
+							
 <code class="block">
-$.webshims.setOptions("extendNative", false);
+$('video').addTextTrack('subtitles', 'just a test', 'en');
+
+$('video').callProp('addTextTrack', ['subtitles', 'just a test', 'en']);	
+</code>							
+							<p>If you pass a list of nodes and the method doesn't return anything, the method will be called on each element in this list, otherwise it will be called on the first element.</p>
+							<p>In case a developer wants to make method calling "feel 100% native", the general option <code>extendNative</code> can be set to <code>true</code>.</p>
+<code class="block">
+$.webshims.setOptions("extendNative", true);
 $.webshims.polyfill('forms');
 //...
-//this.checkValidity() does not work cross-browser anymore use: $(this).checkValidity(); or $(this).callProp('checkValidity');
+this.checkValidity() //$(this).checkValidity(); or $(this).callProp('checkValidity'); can still be used
+
+$('video').get(0).addTextTrack('subtitles', 'just a test', 'en');
 </code>	
 
 						</li>
 						<li>
-							<p><strong>binding to events</strong>: Always use jQuery's <code>bind</code> method to register your event handlers. <code>addEventListener</code> or inline event handler won't work in polyfilled browsers. Most events in the HTML5 specification are so-called simple events. Simple events do not bubble. Due to the fact that developers really like event delegation and jQuery cannot distinguish between the event phases (capturing/propagation), we use event capturing in the native implementation and <code>$.fn.trigger</code> in the shim.</p>
+							<p><strong>binding to events</strong>: Always use jQuery's <code>on</code>, <code>bind</code> method to register your event handlers. <code>addEventListener</code> or inline event handler won't work in polyfilled browsers. Most events in the HTML5 specification are so-called simple events. Simple events do not bubble. Due to the fact that developers really like event delegation and jQuery cannot distinguish between the event phases (capturing/propagation), we use event capturing in the native implementation and <code>$.fn.trigger</code> in the shim.</p>
 							<p>This means that some HTML5 events go down the DOM tree in capable browsers and go up the tree in polyfilled browsers. This can create differences if you are calling <code>event.stopPropagation();</code> or <code>return false;</code> in your event handler. If you only want to prevent the default, don't use <code>return false;</code>, use <code>event.preventDefault();</code> instead.</p>
 						</li>
 						<li>
@@ -364,6 +375,11 @@ $('datalist#list select').prependPolyfill('&lt;option value="new suggestion item
 //animate the width of all date - inputs to a width of 300
 $('input[type="date"]').getShadowElement().animate({width: 300});
 </code>
+							<p><strong>re-rendering shadowelements</strong>: On dynamic websites shadowelements dimensions and/or positions sometimes need to be updated, this can be achieved by triggering the <code>updateshadowdom</code>.</p>
+<code class="block">
+$(document).trigger('updateshadowdom');
+</code>
+							<p><small>Note: The <code>updateshadowdom</code> event is automatically (but 'lazily') triggered on window.resize/emchange events.</small></p>
 						</li>
 					</ul>
 					</div>
@@ -396,20 +412,32 @@ $.webshims.polyfill(polyfillFeatures);
 					<h3>Customize Webshims lib's polyfiller.js</h3>
 					<p>While webshims lib comes with a lot of files, the polyfiller.js file is the only file, which has to be embeded directly in the page. The following tool allows you to customize and minimize the polyfiller.js file. (Simply overwrite the polyfiller.js with your customized version. All other files from the download package should stay.):</p>
 					<form action="http://marijnhaverbeke.nl/uglifyjs" method="post" data-polyfillpath="js-webshim/dev/polyfiller.js">
-			    		<fieldset class="config">
-			    			<label><input type="checkbox" checked disabled /> es5</label> 
-							<label><input type="checkbox" checked id="canvas" /> canvas</label>
-							<label><input type="checkbox" checked id="forms" /> forms/forms-ext</label> 
-							<label><input type="checkbox" checked id="mediaelement" /> mediaelement</label> 
-							<label><input type="checkbox" checked id="localstorage" /> json-storage</label> 
-							<label><input type="checkbox" checked id="geolocation" data-dependent="localstorage" /> geolocation</label> 
+						<fieldset class="config">
+							<legend>webshims config</legend>
+							<label><input type="checkbox" checked disabled /> es5</label> 
+							<label><input type="checkbox" checked id="canvas" data-mod="canvas" /> canvas</label>
+							<label><input type="checkbox" checked id="forms" data-mod="input inputtypes" data-features='["forms", "forms-ext"]' /> forms/forms-ext</label> 
+							<label><input type="checkbox" checked id="mediaelement" data-mod="audio video elem_track" data-features='["mediaelement", "track"]' /> mediaelement/track</label> 
+							<label><input type="checkbox" checked id="json-storage" data-mod="localstorage sessionstorage" /> json-storage</label> 
+							<label><input type="checkbox" checked id="geolocation" data-mod="geolocation" data-dependent="localstorage" /> geolocation</label> 
 							<label><input type="checkbox" checked id="details" /> details</label> 
-			    		</fieldset>
-			    		
-			    		<textarea name="js_code" style="display: none;"></textarea>
+							<p>
+								<input type="submit" value="download custom polyfiller" />
+							</p>	
+						</fieldset>
+						<fieldset class="modernizr">
+							<legend>Modernizr build</legend>
+							<div><label><input type="checkbox" checked data-mod="shiv" /> HTML5shiv (you need HTML5shiv for sectioning elements in IE)</label></div>
+							<div><label><input type="checkbox" checked data-mod="load" /> Modernizr.load/yepnope (you need either yepnope or requirejs)</label></div>
+							<p>
+								<a href="http://modernizr.com/download/#-canvas-audio-video-input-inputtypes-localstorage-sessionstorage-geolocation-shiv-cssclasses-addtest-prefixed-testprop-testallprops-prefixes-domprefixes-elem_track-load" data-base="http://modernizr.com/download/#-cssclasses-addtest-prefixed-testprop-testallprops-prefixes-domprefixes" class="modernizr-builder">Modernizr build link</a>
+								<br />
+								<code class="modernizr-output"></code>
+							</p>
+						</fieldset>
+						<textarea name="js_code" style="display: none;"></textarea>
 						<input type="hidden" name="download" value="polyfiller.js" />
-						<input type="submit" value="download custom polyfiller" />	
-			    	</form>
+					</form>	
 					<h3>Loading webshims async</h3>
 					<p>If webshims lib is loaded async, there are some configurations which have to be changed manually:</p>
 					<ul>
@@ -421,10 +449,10 @@ $.webshims.polyfill(polyfillFeatures);
 &lt;script&gt;
 	Modernizr.load([
 		{
-			load: '//ajax.googleapis.com/ajax/libs/jquery/1.6.3/jquery.js',
+			load: '//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js',
 			complete: function () {
 				if ( !window.jQuery ) {
-					Modernizr.load('/js/libs/jquery-1.6.2.min.js');
+					Modernizr.load('/js/libs/jquery-1.9.1.min.js');
 				}
 			}
 		},

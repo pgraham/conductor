@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>HTML5 form styler</title>
+		
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+		<script src="../../src/extras/mousepress.js"></script>
+		<script src="../../src/extras/modernizr-custom.js"></script>
+		<script src="../../src/polyfiller.js"></script>
+		<script>
+			jQuery(window).load(function(){
+				$('div.styler').each(function(){
+					var frame = $('#'+ $(this).data('for')).get(0).contentWindow;
+					var throttle = function(fn, context, time){
+						var timer;
+						var fn2 = function(){
+							fn.apply(context);
+						};
+						return function(){
+							clearTimeout(timer);
+							timer = setTimeout(fn2, time);
+						};
+					};
+					var change = function(){
+						var isValid = true;
+						var data = {};
+						var buildData = function(elem){
+							var type = $(elem).data('type');
+							var value = $(elem).data('value');
+							if(!data[type]){
+								data[type] = {};
+							}
+							if(!data[type][value]){
+								data[type][value] = {};
+							}
+							return data[type][value];
+						};
+						$('input, select', this).getNativeElement().each(function(){
+							if($(this).is(':invalid')){
+								isValid = false;
+								return false;
+							}
+							var name = $.prop(this, 'name');
+							var value = $(this).val();
+							$(this).closest('fieldset[data-type]').each(function(){
+								var temp = buildData(this);
+								if(temp[name]){
+									buildData(this)[name] += value;
+								} else {
+									buildData(this)[name] = value;
+								}
+								
+							});
+						});
+						if(isValid){
+							frame.postMessage(JSON.stringify(data), '*');
+						}
+						console.log(frame, data, $('input', $('iframe').contents()))
+					};
+					
+					var throttledChange = throttle(change, this, 9);
+					
+					
+					$(this)
+						.on({'input change': throttledChange})
+						.each(change)
+					;
+				});
+			});
+			
+		</script>
+		<script>
+	$.webshims.setOptions({
+		
+		'forms-ext': {
+			widgets: 'number'
+		}
+	});
+			$.webshims.polyfill('forms forms-ext');
+		</script>
+		<style>
+			input[type="range"] {
+				display: none !important;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="styler" data-for="style-show">
+			<fieldset data-type="selector" data-value=".ws-range">
+				<legend>range</legend>
+				<div class="panel">
+					<label>width
+						<input type="number" value="300" required name="width" />
+						<select name="width">
+							<option>px</option>
+							<option>em</option>
+							<option>%</option>
+						</select>
+					</label>
+					<label>
+						background
+						<input type="color" value="#8a8a8" name="background" />
+					</label>
+				</div>
+			</fieldset>
+		</div>
+		
+		<iframe src="range.html" id="style-show"></iframe>
+	</body>
+</html>

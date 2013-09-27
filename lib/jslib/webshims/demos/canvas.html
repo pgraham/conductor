@@ -3,26 +3,17 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 	<meta charset="utf-8"/>
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
 	<link href="../css/styles.css" rel="stylesheet" />
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 	<script src="../js-webshim/minified/extras/modernizr-custom.js"></script>
-	<script>
-		// set options for html5shiv
-		if(!window.html5){
-			window.html5 = {}; 
-		}
-		window.html5.shivMethods = false;
-	</script>
+	
 	<script src="../js-webshim/minified/polyfiller.js"></script>
 	
 	<script class="example">
 		window.FlashCanvasOptions = {
 			disableContextMenu: true
 		};
-		$.webshims.setOptions({
-			//we do not use any DOM-/JS-APIs on DOM-ready, so we do not need to delay the ready event <- good against fouc
-			waitReady: false
-		});
 		
 		//load all polyfill features
 		//or load only a specific feature with $.webshims.polyfill('feature-name');
@@ -87,7 +78,7 @@ $.webshims.setOptions('canvas', {
 </code>
 			<h3>Options for the <code>canvas</code> feature</h3>
 			<ul>
-				<li><strong>type</strong>: <code>"flash"</code> | <code>"falshpro"</code> | <code>"excanvas"</code></li>
+				<li><strong>type</strong>: <code>"flash"</code> | <code>"flashpro"</code> | <code>"excanvas"</code></li>
 			</ul>
 			
 			<aside>

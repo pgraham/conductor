@@ -47,7 +47,7 @@ use \PDO;
  */
 class Conductor {
 
-  const JQUERY_VERSION = '1.7.1';
+  const JQUERY_VERSION = '2.0.3';
 
   /* Conductor configuration */
   private static $_config;

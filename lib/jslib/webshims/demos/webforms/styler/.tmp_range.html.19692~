@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>range example</title>
+		
+		<style>
+			body input[type="range"] {
+				-webkit-appearance: none;
+				-moz-appearance: none;
+				background: #f00;
+			}
+		</style>
+		
+		
+		
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+		<script src="../../src/extras/mousepress.js"></script>
+		<script src="../../src/extras/modernizr-custom.js"></script>
+		<script>
+			
+			(function($){
+				var div = $('<div class="style />');
+				var data = {
+					baseStyles: {
+						'input[type="range"]': '-webkit-appearance: none;'
+					},
+					selecor: {
+						'.ws-range': ['input[type="range"]']
+					}
+				};
+				$(window).on('message', function(e){
+					e = e.originalEvent;
+					var data;
+					if(e.source == window.parent){
+						var css = ''
+						try {
+							data = JSON.parse(e.data);
+						} catch(er){}
+						if(data.selector){
+							$.each(data.selector, function(sel, val){
+								css
+							});
+							console.log(e, data)
+						}
+					}
+					
+					
+				});
+			})(jQuery);
+		</script>
+		<script src="../../src/polyfiller.js"></script>
+		<script>
+			$.webshims.polyfill('forms forms-ext');
+			$.webshims.loader.loadList(['range-ui']);
+		</script>
+	</head>
+	<body>
+		<div class="webshims-example">
+			
+		</div>
+		<div class="native-example">
+			<input type="range" />
+			<script>
+				
+			</script>
+		</div>
+	</body>
+</html>
