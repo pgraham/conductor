@@ -101,7 +101,7 @@ class JslibCompiler {
       }
 
       $themeName = $theme->getBasename();
-      
+
       $themeSrc = $theme->getPathname();
       $themeOut = "$jslibOut/themes/$themeName";
       if (!file_exists($themeOut)) {
@@ -221,7 +221,7 @@ class JslibCompiler {
     //    of compilation
 
     // Compile predefined conductor themes
-    $this->compileThemeDir("$pathInfo[lib]/conductor/resources/themes",
+    $this->compileThemeDir("$pathInfo[cdtRoot]/resources/themes",
       "$jslibOut/themes");
 
     // Compile site specific themes
@@ -239,7 +239,7 @@ class JslibCompiler {
 
   protected function compileWebshims($pathInfo, $jslibSrc, $jslibOut) {
     $jslibSrc = "$jslibSrc/js-webshim/minified";
-    
+
     $modernizrPath = "$jslibSrc/extras/modernizr-custom.js";
     $polyfillerPath = "$jslibSrc/polyfiller.js";
     $load = <<<LOAD
