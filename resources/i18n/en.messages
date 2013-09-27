@@ -16,6 +16,7 @@ http.status.message.500=The server encountered an unexpected condition which\
 lbl.cancel=cancel
 lbl.changepwd=change password
 lbl.logout=logout
+lbl.sending=Sending
 lbl.username=Username
 lbl.password=Password
 
