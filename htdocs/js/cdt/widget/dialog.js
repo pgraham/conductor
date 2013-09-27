@@ -87,4 +87,10 @@
     return elm;
   };
 
+  CDT.dialog.remove = function () {
+    if (current) {
+      current.remove();
+    }
+  };
+
 } (jQuery, CDT));
