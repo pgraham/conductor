@@ -257,8 +257,8 @@ copyDb($prodDb, $stageDb, 'root', $dbPass);
 // -----------------------------------------------------------------------------
 if (file_exists("$devDir/htdocs/usr")) {
 
-  if (file_exists("$productionLink/htdocs/usr")) {
-    passthru("cp -a $productionLink/htdocs/usr $stageDir/htdocs/");
+  if (file_exists("$prodDir/htdocs/usr")) {
+    passthru("cp -a $prodDir/htdocs/usr $stageDir/htdocs/");
   } else {
     mkdir("$stageDir/htdocs/usr", 0755, true);
   }
@@ -267,8 +267,8 @@ if (file_exists("$devDir/htdocs/usr")) {
 
 if (file_exists("$devDir/target/usr")) {
 
-  if (file_exists("$productionLink/target/usr")) {
-    passthru("cp -a $productionLink/target/usr $stageDir/");
+  if (file_exists("$prodDir/target/usr")) {
+    passthru("cp -a $prodDir/target/usr $stageDir/");
   } else {
     mkdir("$stageDir/usr", 0755, true);
   }
