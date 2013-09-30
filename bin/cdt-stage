@@ -117,7 +117,7 @@ USAGE;
 $opts = array(
   'staging-link',
   'staging-dir',
-  'production',
+  'production-dir',
   'staging-db',
   'production-db'
 );
