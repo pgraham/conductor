@@ -19,7 +19,8 @@
     "bin/cdt-stage",
     "bin/cdt-deploy",
     "bin/cdt-export",
-    "bin/cdt-compile"
+    "bin/cdt-compile",
+    "bin/cdt-init"
   ],
   "minimum-stability": "dev",
   "require": {
