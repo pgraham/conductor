@@ -35,6 +35,7 @@ use \zpt\cdt\rest\PdoExceptionHandler;
 use \zpt\cdt\rest\ValidationExceptionHandler;
 use \zpt\orm\Clarinet;
 use \zpt\orm\Criteria;
+use \zpt\util\Db;
 use \zpt\util\File;
 use \zpt\util\DirectoryLockTimeoutException;
 use \Exception;
@@ -233,9 +234,8 @@ class Conductor {
       $user = $dbConfig['db_user'];
       $pass = $dbConfig['db_pass'];
 
-      $dsn = "$driver:dbname=$schema;host=$host";
-      $pdo = new PDO($dsn, $user, $pass);
-      $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+      $pdo = Db::pdoConnect($driver, $user, $pass, $host, $schema, [], [],
+        [ PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION ]);
 
     } catch (PDOException $e) {
       throw new Exception("Unable to connect to database");
