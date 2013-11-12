@@ -6,16 +6,19 @@ for single page Javascript heavy applications.
 
 ## Install
 
- -  add as a conductor dependency.
+ 1. Add as a [Composer](http://getcomposer.org) dependency. (in `composer.json`)
 
         {
             "require": {
                 "zeptech/conductor": "dev-master"
             }
         }
-        
- -  TODO run vendor/zeptech/conductor/bin/install -- This will create a skeleton
-    structure for your site
+
+ 2. Run Composer install: `composer install`
+ 3. Run Conductor initialization script: `./vendor/bin/cdt-init`
+
+    If you get errors about not being able to change groups run the following
+    command: `sudo chgrp -R www-data target`
 
 ## Configuration
 
