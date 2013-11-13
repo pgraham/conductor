@@ -48,7 +48,7 @@ class CdtInitFsStep {
 
 	public function execute($baseDir, $ns, $opts) {
 		$dirs = self::$dirs;
-		$dirs[$ns] = self::$nsDirs;
+		$dirs['src'][$ns] = self::$nsDirs;
 
 		binLogHeader("Creating Conductor Directories");
 		$this->mkDirs($baseDir, $dirs);
@@ -65,27 +65,27 @@ class CdtInitFsStep {
 		binLogSuccess("Done setting permissions.");
 	}
 
-	private function mkDirs($baseDir, $dirs, $logStripPrefix) {
+	private function mkDirs($baseDir, $dirs, $logStripPrefix = null) {
 		if ($logStripPrefix === null) {
-			$logStripPrefix = strlen($base);
+			$logStripPrefix = strlen($baseDir);
 		}
 
 		foreach ($dirs as $key => $value) {
 			if (is_array($value)) {
-				binLogInfo("Creating ". substr($base, $logStripPrefix) . "/$key");
-				mkdir("$base/$key", 0755);
-				$this->mkDirs("$base/$key", $value, $logStripPrefix);
+				binLogInfo("Creating ". substr($baseDir, $logStripPrefix) . "/$key");
+				mkdir("$baseDir/$key", 0755);
+				$this->mkDirs("$baseDir/$key", $value, $logStripPrefix);
 			} else {
-				binLogInfo("Creating ". substr($base, $logStripPrefix) . "/$value");
-				mkdir("$base/$value", 0755);
+				binLogInfo("Creating ". substr($baseDir, $logStripPrefix) . "/$value");
+				mkdir("$baseDir/$value", 0755);
 			}
 		}
 	}
 
 	private function seed($baseDir) {
 		$cdt = "$baseDir/vendor/zeptech/conductor";
-		copy("$cdtDir/htdocs/.htaccess", "$baseDir/target/htdocs/.htaccess");
-		copy("$cdtDir/htdocs/srvr.php", "$baseDir/target/htdocs/srvr.php");
+		copy("$cdt/htdocs/.htaccess", "$baseDir/target/htdocs/.htaccess");
+		copy("$cdt/htdocs/srvr.php", "$baseDir/target/htdocs/srvr.php");
 	}
 
 	private function setPermissions($baseDir) {
@@ -102,7 +102,7 @@ class CdtInitFsStep {
 				binLogError("Unable to change group of $chPerms, you will need to manually change the directory's group to www-data");
 			}
 
-			$perm = is_dir($chPerms) ? 0775 : 0644;
+			$perms = is_dir($chPerms) ? 0775 : 0644;
 			$success = chmod($chPerms, $perms);
 			if (!$success) {
 				binLogError("Unable to change permissions of $chPerms, you will need to manually enable group write for the directory");
