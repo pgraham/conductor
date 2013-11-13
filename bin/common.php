@@ -57,7 +57,7 @@ namespace zpt\cdt\bin {
 				$loader = include "$composerPath/autoload.php";
 				self::$composerLoader = $loader;
 
-				FunBox::init();
+				\FunBox::init();
 			}
 			return self::$composerLoader;
 		}
