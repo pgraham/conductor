@@ -47,8 +47,8 @@ class CdtInitFsStep {
 	];
 
 	public function execute($baseDir, $ns, $opts) {
-		$dirs = clone self::$dirs;
-		$dirs[$ns] = clone self::$nsDirs;
+		$dirs = self::$dirs;
+		$dirs[$ns] = self::$nsDirs;
 
 		binLogHeader("Creating Conductor Directories");
 		$this->mkDirs($baseDir, $dirs);
