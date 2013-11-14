@@ -17,6 +17,7 @@ namespace zpt\cdt\bin;
 use \zpt\dbup\DatabaseUpdater;
 use \zpt\util\PdoExt;
 use \DirectoryIterator;
+use \Exception;
 use \PDO;
 
 ensureFn('generatePassword');

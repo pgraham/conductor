@@ -14,6 +14,7 @@
  */
 namespace zpt\cdt\bin;
 
+use \zpt\util\DB;
 use \zpt\util\PdoExt;
 
 ensureFn('generatePassword');
