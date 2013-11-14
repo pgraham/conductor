@@ -24,7 +24,7 @@ use \zpt\orm\PdoExceptionWrapper;
  */
 class PdoExceptionWrapperParser
 {
-  
+
     const DUP_MSG = '/Duplicate entry \'(.+?)\' for key \'(.+?)\'/';
     const INVALID_FILTER = '/Unknown column \'(.+?)\' in \'where clause\'/';
     const INVALID_SORT = '/Unknown column \'(.+?)\' in \'order clause\'/';
@@ -112,7 +112,7 @@ class PdoExceptionWrapperParser
     {
         return $this->isInvalidSort;
     }
-    
+
     public function isNotNullViolation()
     {
         return $this->isNotNullViolation;
