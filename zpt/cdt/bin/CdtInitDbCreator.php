@@ -14,8 +14,10 @@
  */
 namespace zpt\cdt\bin;
 
+use \zpt\util\db\DatabaseException;
 use \zpt\util\DB;
 use \zpt\util\PdoExt;
+use \PDOException;
 
 /**
  * This class is used to create the databases of a Conductor site.
@@ -45,17 +47,41 @@ class CdtInitDbCreator {
 	}
 
 	public function create() {
-		binLogInfo("Creating production DB $this->prodDbName");
-		$this->pdo->createDatabase($this->prodDbName, DB::UTF8);
-		$this->prodDbCreated = true;
+		try {
+			binLogInfo("Creating production database $this->prodDbName");
+			$this->pdo->createDatabase($this->prodDbName, DB::UTF8);
+			$this->prodDbCreated = true;
+		} catch (DatabaseException $e) {
+			if ($e->databaseAlreadyExists()) {
+				binLogWarning("Database $this->prodDbName already exists", 1);
+			} else {
+				throw $e;
+			}
+		}
 
-		binLogInfo("Creating development DB $this->devDbName");
-		$this->pdo->createDatabase($this->devDbName, DB::UTF8);
-		$this->devDbCreated = true;
+		try {
+			binLogInfo("Creating development DB $this->devDbName");
+			$this->pdo->createDatabase($this->devDbName, DB::UTF8);
+			$this->devDbCreated = true;
+		} catch (DatabaseException $e) {
+			if ($e->databaseAlreadyExists()) {
+				binLogWarning("Database $this->devDbName already exists", 1);
+			} else {
+				throw $e;
+			}
+		}
 
-		binLogInfo("Creating staging DB $this->stageDbName");
-		$this->pdo->createDatabase($this->stageDbName, DB::UTF8);
-		$this->stageDbCreated = true;
+		try {
+			binLogInfo("Creating staging DB $this->stageDbName");
+			$this->pdo->createDatabase($this->stageDbName, DB::UTF8);
+			$this->stageDbCreated = true;
+		} catch (DatabaseException $e) {
+			if ($e->databaseAlreadyExists()) {
+				binLogWarning("Database $this->stageDbName already exists", 1);
+			} else {
+				throw $e;
+			}
+		}
 	}
 
 	public function rollback() {

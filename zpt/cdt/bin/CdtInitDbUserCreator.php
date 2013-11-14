@@ -14,6 +14,7 @@
  */
 namespace zpt\cdt\bin;
 
+use \zpt\util\db\DatabaseException;
 use \zpt\util\DB;
 use \zpt\util\PdoExt;
 
@@ -64,21 +65,45 @@ class CdtInitDbUserCreator {
 		$devDb = $this->dbCreator->getDevelopmentDatabaseName();
 		$stageDb = $this->dbCreator->getStagingDatabaseName();
 
-		binLogInfo("Creating production database user $this->prodDbUser");
-		$this->createCrudUser($this->prodDbUser, $this->prodDbUserPwd);
-		$this->prodDbUserCreated = true;
+		try {
+			binLogInfo("Creating production database user $this->prodDbUser");
+			$this->createCrudUser($this->prodDbUser, $this->prodDbUserPwd);
+			$this->prodDbUserCreated = true;
+		} catch (DatabaseException $e) {
+			if ($e->userAlreadyExists()) {
+				binLogWarning("User $this->prodDbUser already exists", 1);
+			} else {
+				throw $e;
+			}
+		}
 		binLogInfo("Granting CRUD permission to database $prodDb", 1);
 		$this->grantCrudPerms($prodDb, $this->prodDbUser);
 
-		binLogInfo("Creating development database user $this->devDbUser");
-		$this->createCrudUser($this->devDbUser, $this->devDbUserPwd);
-		$this->devDbUserCreated = true;
+		try {
+			binLogInfo("Creating development database user $this->devDbUser");
+			$this->createCrudUser($this->devDbUser, $this->devDbUserPwd);
+			$this->devDbUserCreated = true;
+		} catch (DatabaseException $e) {
+			if ($e->userAlreadyExists()) {
+				binLogWarning("User $this->devDbUser already exists", 1);
+			} else {
+				throw $e;
+			}
+		}
 		binLogInfo("Granting CRUD permission to database $devDb", 1);
 		$this->grantCrudPerms($devDb, $this->devDbUser);
 
-		binLogInfo("Creating staging database user $this->stageDbUser");
-		$this->createCrudUser($this->stageDbUser, $this->stageDbUserPwd);
-		$this->stageDbUserCreated = true;
+		try {
+			binLogInfo("Creating staging database user $this->stageDbUser");
+			$this->createCrudUser($this->stageDbUser, $this->stageDbUserPwd);
+			$this->stageDbUserCreated = true;
+		} catch (DatabaseException $e) {
+			if ($e->userAlreadyExists()) {
+				binLogWarning("User $this->stageDbUser already exists", 1);
+			} else {
+				throw $e;
+			}
+		}
 		binLogInfo("Granting CRUD permission to database $stageDb", 1);
 		$this->grantCrudPerms($stageDb, $this->stageDbUser);
 	}
