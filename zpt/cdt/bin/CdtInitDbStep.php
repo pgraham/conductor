@@ -34,7 +34,7 @@ class CdtInitDbStep {
 		'interactive' => true,
 		'dbdriver' => 'pgsql',
 		'dbhost' => 'localhost',
-		'dbuser' => 'root'
+		'dbuser' => 'postgres'
 	];
 
 	public function execute($baseDir, $ns, $opts) {
