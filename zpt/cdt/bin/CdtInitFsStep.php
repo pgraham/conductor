@@ -60,25 +60,34 @@ class CdtInitFsStep {
 		binLogSuccess("Done.");
 
 		// Change target/ group to www-data and enable group write
-		binLogInfo("Setting Permissions");
+		binLogHeader("Setting Permissions");
 		$this->setPermissions($baseDir);
-		binLogSuccess("Done setting permissions.");
+		binLogSuccess("Done.");
 	}
 
 	private function mkDirs($baseDir, $dirs, $logStripPrefix = null) {
 		if ($logStripPrefix === null) {
 			$logStripPrefix = strlen($baseDir);
 		}
+		$dirSuffix = substr($baseDir, $logStripPrefix);
 
 		foreach ($dirs as $key => $value) {
 			if (is_array($value)) {
-				binLogInfo("Creating ". substr($baseDir, $logStripPrefix) . "/$key");
-				mkdir("$baseDir/$key", 0755);
+				binLogInfo("Creating $dirSuffix/$key");
+				$this->mkDir("$baseDir/$key");
 				$this->mkDirs("$baseDir/$key", $value, $logStripPrefix);
 			} else {
-				binLogInfo("Creating ". substr($baseDir, $logStripPrefix) . "/$value");
-				mkdir("$baseDir/$value", 0755);
+				binLogInfo("Creating $dirSuffix/$value");
+				$this->mkDir("$baseDir/$value");
 			}
+		}
+	}
+
+	private function mkDir($dir) {
+		if (!file_exists($dir)) {
+			mkdir($dir, 0755);
+		} else {
+			binLogWarning("Directory already exists", 1);
 		}
 	}
 

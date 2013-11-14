@@ -63,16 +63,22 @@ class CdtInitDbUserCreator {
 		$devDb = $this->dbCreator->getDevelopmentDatabaseName();
 		$stageDb = $this->dbCreator->getStagingDatabaseName();
 
+		binLogInfo("Creating production database user $this->prodDbUser");
 		$this->createCrudUser($this->prodDbUser, $this->prodDbUserPwd);
 		$this->prodDbUserCreated = true;
+		binLogInfo("Granting CRUD permission to database $prodDb", 1);
 		$this->grantCrudPerms($prodDb, $this->prodDbUser);
 
+		binLogInfo("Creating development database user $this->devDbUser");
 		$this->createCrudUser($this->devDbUser, $this->devDbUserPwd);
 		$this->devDbUserCreated = true;
+		binLogInfo("Granting CRUD permission to database $devDb", 1);
 		$this->grantCrudPerms($devDb, $this->devDbUser);
 
+		binLogInfo("Creating staging database user $this->stageDbUser");
 		$this->createCrudUser($this->stageDbUser, $this->stageDbUserPwd);
 		$this->stageDbUserCreated = true;
+		binLogInfo("Granting CRUD permission to database $stageDb", 1);
 		$this->grantCrudPerms($stageDb, $this->stageDbUser);
 	}
 

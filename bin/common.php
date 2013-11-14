@@ -112,6 +112,14 @@ namespace {
 	}
 
 	/**
+	 * Log a message with a coloured marker and optional indentation.
+	 */
+	function binPrettyLog($msg, $marker, $colour, $depth = 0) {
+		$tabbing = str_repeat('    ', $depth);
+		echo "$tabbing \e[{$colour}m{$marker}\e[0m $msg\n";
+	}
+
+	/**
 	 * Log a header
 	 */
 	function binLogHeader($msg) {
@@ -122,23 +130,39 @@ namespace {
 	 * Log an error message.
 	 */
 	function binLogError($msg, $depth = 0) {
+		binPrettyLog($msg, '✖', 31, $depth);
+		/*
 		$tabbing = str_repeat(' ', $depth);
 		echo "$tabbing \033[31m✖\033[0m $msg\n";
+		*/
 	}
 
 	/**
 	 * Log an info message.
 	 */
 	function binLogInfo($msg, $depth = 0) {
-		$tabbing = str_repeat(' ', $depth);
+		binPrettyLog($msg, '➜', 39, $depth);
+		/*
+		$tabbing = str_repeat('    ', $depth);
 		echo "$tabbing \033[39m➜\033[0m $msg\n";
+		 */
 	}
 
 	/**
 	 * Log a success message.
 	 */
 	function binLogSuccess($msg, $depth = 0) {
-		$tabbing = str_repeat(' ', $depth);
-		echo "$tabbing \e[32m✔\e[0m $msg\n";
+		binPrettyLog($msg, '✔', 32, $depth);
+		//$tabbing = str_repeat(' ', $depth);
+		//echo "$tabbing \e[32m✔\e[0m $msg\n";
+	}
+
+	/**
+	 * Log a warning message.
+	 */
+	function binLogWarning($msg, $depth = 0) {
+		binPrettyLog($msg, '⚠', 93, $depth);
+		//$tabbing = str_repeat(' ', $depth);
+		//echo "$tabbing \e[93m⚠\e[0m $msg\n";
 	}
 }

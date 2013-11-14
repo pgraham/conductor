@@ -37,9 +37,11 @@ class CdtInitDbStep {
 	];
 
 	public function execute($baseDir, $ns, $opts) {
+		binLogHeader("Initializing Conductor Databases");
 		$opts = $this->applyDefaultOptions($opts);
 
 		$pdo = $this->connectToDb($opts);
+		binLogSuccess("Connected to DB.");
 
 		try {
 			$dbCreator = new CdtInitDbCreator($pdo, $ns);

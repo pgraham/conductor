@@ -44,12 +44,15 @@ class CdtInitDbCreator {
 	}
 
 	public function create() {
+		binLogInfo("Creating production DB $this->prodDbName");
 		$this->pdo->createDatabase($this->prodDbName, DB::UTF8);
 		$this->prodDbCreated = true;
 
+		binLogInfo("Creating development DB $this->devDbName");
 		$this->pdo->createDatabase($this->devDbName, DB::UTF8);
 		$this->devDbCreated = true;
 
+		binLogInfo("Creating staging DB $this->stageDbName");
 		$this->pdo->createDatabase($this->stageDbName, DB::UTF8);
 		$this->stageDbCreated = true;
 	}
