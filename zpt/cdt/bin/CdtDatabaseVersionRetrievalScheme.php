@@ -18,7 +18,7 @@ use \zpt\dbup\DatabaseVersionRetrievalScheme;
 use \PDO;
 
 /**
- * Conductor zpt\dbup\CurrentVersionRetrievalScheme implementation.
+ * Conductor zpt\dbup\DatabaseVersionRetrievalScheme implementation.
  *
  * @author Philip Graham <philip@zeptech.ca>
  */

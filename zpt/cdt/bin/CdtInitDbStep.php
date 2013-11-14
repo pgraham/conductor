@@ -59,8 +59,7 @@ class CdtInitDbStep {
 			$dbup = new DatabaseUpdater();
 
 			$versionRetriever = new CdtDatabaseVersionRetrievalScheme();
-			$versionRetriever->setConfigurationPropertyName('cdt-alter');
-			$dbup->setCurrentVersionRetrievalScheme($versionRetriever);
+			$dbup->setDatabaseVersionRetrievalScheme($versionRetriever);
 
 			binLogInfo("Connecting to development database", 1);
 			$db = $pdo->newConnection([ 'database' => "{$ns}_d" ]);
