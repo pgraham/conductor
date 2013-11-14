@@ -36,6 +36,7 @@ class CdtInitStepsParser {
 		$steps = [];
 		$curStep = null;
 		foreach ($args as $arg) {
+			// TODO - WHAT!? This needs to be tested
 			if (in_array($arg, $steps)) {
 				$steps[$arg] = [];
 				$curStep = $arg;
