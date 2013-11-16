@@ -55,8 +55,8 @@ class CdtInitDbStep {
 			$pdo->beginTransaction();
 
 			// Apply database alters
-			// TODO Update DatabaseUpdater to accept a PSR-3 Logger
 			$dbup = new DatabaseUpdater();
+			$dbup->setLogger(new CmdLnPsrLoggerImpl());
 
 			$versionRetriever = new CdtDatabaseVersionRetrievalScheme();
 			$dbup->setDatabaseVersionRetrievalScheme($versionRetriever);

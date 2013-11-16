@@ -27,6 +27,7 @@
     "php": ">=5.4",
     "leafo/lessphp": "0.3.9",
     "mrclay/minify": "dev-master",
+    "psr/log": "1.0.0",
     "monolog/monolog": "1.2.1",
 
     "zeptech/utility": "dev-master",

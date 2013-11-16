@@ -43,7 +43,7 @@ class CdtDatabaseVersionRetrievalScheme
 			$stmt->execute([ 'name' => $this->property ]);
 		} catch (DatabaseException $e) {
 			if ($e->tableDoesNotExist()) {
-				return 0;
+				return null;
 			} else {
 				throw $e;
 			}
