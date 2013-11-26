@@ -14,6 +14,10 @@
  */
 namespace zpt\cdt\compile;
 
+use \Psr\Log\LoggerAwareInterface;
+use \Psr\Log\LoggerInterface;
+use \Psr\Log\NullLogger;
+
 use \zpt\anno\AnnotationFactory;
 use \zpt\anno\Annotations;
 use \zpt\cdt\compile\resource\ResourceCompiler;
@@ -44,11 +48,13 @@ use \ReflectionClass;
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class SiteCompiler {
+class SiteCompiler implements LoggerAwareInterface {
 
 	const ENV_DEV = 'dev';
 	const ENV_STAGE = 'stage';
 	const ENV_PROD = 'prod';
+
+	private $logger;
 
 	private $modelParser;
 	private $modelCache;
@@ -136,6 +142,10 @@ class SiteCompiler {
 
 	public function setDependencyInjectionCompiler(Compiler $compiler) {
 		$this->diCompiler = $compiler;
+	}
+
+	public function setLogger(LoggerInterface $logger) {
+		$this->logger = $logger;
 	}
 
 	/**
@@ -432,6 +442,10 @@ class SiteCompiler {
 	 * instantiated.
 	 */
 	private function ensureDependencies() {
+		if ($this->logger === null) {
+			$this->logger = new NullLogger;
+		}
+
 		if ($this->configurationCompiler === null) {
 			$this->configurationCompiler = new ConfigurationCompiler();
 		}
