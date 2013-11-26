@@ -38,6 +38,7 @@ use \zpt\orm\Criteria;
 use \zpt\util\Db;
 use \zpt\util\File;
 use \zpt\util\DirectoryLockTimeoutException;
+use \zpt\util\PdoExt;
 use \Exception;
 use \PDO;
 
@@ -234,8 +235,14 @@ class Conductor {
       $user = $dbConfig['db_user'];
       $pass = $dbConfig['db_pass'];
 
-      $pdo = Db::pdoConnect($driver, $user, $pass, $host, $schema, [], [],
-        [ PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION ]);
+      $pdo = new PdoExt([
+        'driver' => $driver,
+        'host' => $host,
+        'username' => $user,
+        'password' => $pass,
+        'database' => $schema,
+        'pdoAttributes' => [ PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION ]
+      ]);
 
     } catch (PDOException $e) {
       throw new Exception("Unable to connect to database");
