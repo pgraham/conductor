@@ -9,10 +9,10 @@
 -- password columns since an openId user may not have a username and password.
 --
 
-ALTER TABLE `users` ADD COLUMN `oid_identity` varchar(333) UNIQUE;
+ALTER TABLE "users" ADD COLUMN "oid_identity" varchar(333) UNIQUE;
 
-ALTER TABLE `users` MODIFY COLUMN `username` varchar(128);
-ALTER TABLE `users` MODIFY COLUMN `password` varchar(32);
+ALTER TABLE "users" MODIFY COLUMN "username" varchar(128);
+ALTER TABLE "users" MODIFY COLUMN "password" varchar(32);
 
 -- Update conductor database version
-UPDATE `config_values` SET `value` = '3' WHERE `name` = 'cdt-alter';
+UPDATE "config_values" SET "value" = '3' WHERE "name" = 'cdt-alter';

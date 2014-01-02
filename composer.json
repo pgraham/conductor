@@ -19,14 +19,16 @@
     "bin/cdt-stage",
     "bin/cdt-deploy",
     "bin/cdt-export",
-    "bin/cdt-compile"
+    "bin/cdt-compile",
+    "bin/cdt-init"
   ],
   "minimum-stability": "dev",
   "require": {
-    "php": ">=5.3.6",
+    "php": ">=5.4",
     "leafo/lessphp": "0.3.9",
     "mrclay/minify": "dev-master",
-    "monolog/monolog": "1.2.1",
+    "psr/log": "1.0.0",
+    "monolog/monolog": "1.7.0",
 
     "zeptech/utility": "dev-master",
     "zeptech/annotations": "1.0.*",

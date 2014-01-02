@@ -30,24 +30,11 @@ use \zpt\cdt\compile\SiteCompiler;
 
 require_once __DIR__ . '/common.php';
 
-$composerPath = getComposerPath();
-if (!$composerPath) {
-  echo "Unable to find composer!\n";
-  exit(1);
-}
+$loader = getComposerLoader();
+$devDir = getSiteRootDir();
 
-$loader = include "$composerPath/autoload.php";
-
-/*
- * =============================================================================
- * Determine site root
- * =============================================================================
- */
-$devDir = dirname($composerPath);
-
-// Determine the site root relative to the vendor directory.
+// Make sure conductor configuration file exists
 if (!file_exists("$devDir/conductor.cfg.xml")) {
-  // Unable to location conductor configuration file.
   echo "Unable to locate conductor configuration file in $devDir\n";
   exit(1);
 }

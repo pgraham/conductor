@@ -26,19 +26,50 @@ namespace zpt\cdt\bin {
 			'../../../autoload.php'
 		);
 
+		private static $composerPath;
+		private static $composerLoader;
+		private static $siteRootDir;
+
 		public static function getComposerPath($baseDir = null) {
-			if ($baseDir === null) {
-				$baseDir = __DIR__;
-			}
-			foreach (self::$autoloadFiles as $file) {
-				$path = "$baseDir/$file";
-				if (file_exists($path)) {
-					return dirname(realpath($path));
+			if (self::$composerPath === null) {
+				if ($baseDir === null) {
+					$baseDir = __DIR__;
+				}
+				foreach (self::$autoloadFiles as $file) {
+					$path = "$baseDir/$file";
+					if (file_exists($path)) {
+						self::$composerPath = dirname(realpath($path));
+						break;
+					}
+				}
+
+				if (self::$composerPath === null) {
+					echo "Unable to find composer!\n";
+					exit(1);
 				}
 			}
-			return false;
+			return self::$composerPath;
 		}
 
+		public static function getComposerLoader($baseDir = null) {
+			if (self::$composerLoader === null) {
+				$composerPath = getComposerPath($baseDir);
+				$loader = include "$composerPath/autoload.php";
+				self::$composerLoader = $loader;
+
+				\FunBox::init();
+			}
+			return self::$composerLoader;
+		}
+
+		public static function getSiteRootDir($baseDir = null) {
+			if (self::$siteRootDir === null) {
+				$composerPath = self::getComposerPath($baseDir);
+				$devDir = dirname($composerPath);
+				self::$siteRootDir = $devDir;
+			}
+			return self::$siteRootDir;
+		}
 	}
 }
 
@@ -49,14 +80,89 @@ namespace zpt\cdt\bin {
  */
 namespace {
 
+	use zpt\cdt\bin\BinCommon;
+
 	/**
-	 * This function finds the Composer vendor directory relative to the script
-	 * and includes the Composer autoloader.
+	 * This function finds and returns the Composer vendor directory relative to
+	 * the script.
 	 *
 	 * @return Path to the composer vendor directory or `false` if not found.
 	 */
 	function getComposerPath($baseDir = null) {
-		return zpt\cdt\bin\BinCommon::getComposerPath($baseDir);
+		return BinCommon::getComposerPath($baseDir);
 	}
 
+	/**
+	 * Include the composer loader and return it. Abort script execution if not
+	 * found.
+	 *
+	 * @return Composer loader instance.
+	 */
+	function getComposerLoader() {
+		return BinCommon::getComposerLoader();
+	}
+
+	/**
+	 * Find and return the absolute path to the root of the site.
+	 *
+	 * @return string The root path of the site.
+	 */
+	function getSiteRootDir() {
+		return BinCommon::getSiteRootDir();
+	}
+
+	/**
+	 * Log a message with a coloured marker and optional indentation.
+	 */
+	function binPrettyLog($msg, $marker, $colour, $depth = 0) {
+		$tabbing = str_repeat('    ', $depth);
+		echo "$tabbing \e[{$colour}m{$marker}\e[0m $msg\n";
+	}
+
+	/**
+	 * Log a header
+	 */
+	function binLogHeader($msg) {
+		echo "\n \033[1m« $msg »\033[0m\n";
+	}
+
+	/**
+	 * Log an error message.
+	 */
+	function binLogError($msg, $depth = 0) {
+		binPrettyLog($msg, '✖', 31, $depth);
+		/*
+		$tabbing = str_repeat(' ', $depth);
+		echo "$tabbing \033[31m✖\033[0m $msg\n";
+		*/
+	}
+
+	/**
+	 * Log an info message.
+	 */
+	function binLogInfo($msg, $depth = 0) {
+		binPrettyLog($msg, '➜', 39, $depth);
+		/*
+		$tabbing = str_repeat('    ', $depth);
+		echo "$tabbing \033[39m➜\033[0m $msg\n";
+		 */
+	}
+
+	/**
+	 * Log a success message.
+	 */
+	function binLogSuccess($msg, $depth = 0) {
+		binPrettyLog($msg, '✔', 32, $depth);
+		//$tabbing = str_repeat(' ', $depth);
+		//echo "$tabbing \e[32m✔\e[0m $msg\n";
+	}
+
+	/**
+	 * Log a warning message.
+	 */
+	function binLogWarning($msg, $depth = 0) {
+		binPrettyLog($msg, '⚠', 93, $depth);
+		//$tabbing = str_repeat(' ', $depth);
+		//echo "$tabbing \e[93m⚠\e[0m $msg\n";
+	}
 }
