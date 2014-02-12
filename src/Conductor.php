@@ -17,6 +17,7 @@ namespace zpt\cdt;
 use \Monolog\Logger;
 use \Monolog\Handler\RotatingFileHandler;
 use \Monolog\Handler\StreamHandler;
+
 use \zpt\oobo\head\Javascript;
 use \zpt\oobo\head\Link;
 use \zpt\oobo\Element;
@@ -38,6 +39,7 @@ use \zpt\orm\Criteria;
 use \zpt\util\Db;
 use \zpt\util\File;
 use \zpt\util\DirectoryLockTimeoutException;
+use \zpt\util\PdoExt;
 use \Exception;
 use \PDO;
 
@@ -161,7 +163,7 @@ class Conductor {
       if (isset($_GET['clean'])) {
         $dirs = array( 'i18n', 'zeptech', 'zpt', 'htdocs/css', 'htdocs/img',
                        'htdocs/js', 'htdocs/jslib');
-        $files = array( 'php.error');
+        $files = array( 'php.error' );
 
         foreach ($dirs as $dir) {
           passthru("rm -r $root/target/$dir");
@@ -174,7 +176,16 @@ class Conductor {
 
       try {
         if (File::dirlock("$root/target", isset($_GET['forceunlock']))) {
-          $compiler = new SiteCompiler();
+
+          $log = new Logger('compile');
+          $log->pushHandler(new RotatingFileHandler(
+            "$root/target/compile.log",
+            Logger::DEBUG,
+            1
+          ));
+
+          $compiler = new SiteCompiler($log);
+          $compiler->setLogger($log);
           $compiler->compile($root, $loader);
           File::dirunlock("$root/target");
         } else {
@@ -234,8 +245,14 @@ class Conductor {
       $user = $dbConfig['db_user'];
       $pass = $dbConfig['db_pass'];
 
-      $pdo = Db::pdoConnect($driver, $user, $pass, $host, $schema, [], [],
-        [ PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION ]);
+      $pdo = new PdoExt([
+        'driver' => $driver,
+        'host' => $host,
+        'username' => $user,
+        'password' => $pass,
+        'database' => $schema,
+        'pdoAttributes' => [ PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION ]
+      ]);
 
     } catch (PDOException $e) {
       throw new Exception("Unable to connect to database");
@@ -299,13 +316,14 @@ class Conductor {
     // Make sure that a generated mapping configurator exists
     $pathInfo = self::getPathInfo();
 
+    /*
     $log = new Logger('conductor');
-
     if (self::isDevMode()) {
       $log->pushHandler(new RotatingFileHandler($pathInfo['target'] . '/cdt.log', 1));
     } else {
       $log->pushHandler(new StreamHandler(self::$_config['logDir'] . '/' . self::$_config['namespace'] . '.' . self::$_config['env'] . '.log'));
     }
+     */
 
     $server = new InjectedRestServer();
 

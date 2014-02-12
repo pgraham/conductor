@@ -14,10 +14,10 @@
 -- The column is created with a default value of 1 so that existing
 -- configuration values remain editable.  Once the default of 1 has been
 -- assigned to existing rows, the default is changed to 0 for new rows.
-ALTER TABLE `config_values` ADD COLUMN `editable` SMALLINT NOT NULL DEFAULT 1;
+ALTER TABLE "config_values" ADD COLUMN "editable" SMALLINT NOT NULL DEFAULT 1;
 
-ALTER TABLE `config_values` ALTER `editable` SET DEFAULT 0;
+ALTER TABLE "config_values" ALTER "editable" SET DEFAULT 0;
 
 -- Insert a configuration value for tracking the conductor alters that have
 -- been applied to the database
-INSERT INTO `config_values` (`name`, `value`) VALUES ('cdt-alter', '1');
+INSERT INTO "config_values" ("name", "value") VALUES ('cdt-alter', '1');

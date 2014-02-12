@@ -15,10 +15,11 @@
 namespace zpt\cdt\bin;
 
 use \zpt\dbup\DatabaseVersionRetrievalScheme;
+use \zpt\util\db\DatabaseException;
 use \PDO;
 
 /**
- * Conductor zpt\dbup\CurrentVersionRetrievalScheme implementation.
+ * Conductor zpt\dbup\DatabaseVersionRetrievalScheme implementation.
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
@@ -37,7 +38,16 @@ class CdtDatabaseVersionRetrievalScheme
 	 */
 	public function getVersion(PDO $db) {
 		$stmt = $db->prepare('SELECT value FROM config_values WHERE name = :name');
-		$stmt->execute([ 'name' => $this->property ]);
+
+		try {
+			$stmt->execute([ 'name' => $this->property ]);
+		} catch (DatabaseException $e) {
+			if ($e->tableDoesNotExist()) {
+				return null;
+			} else {
+				throw $e;
+			}
+		}
 
 		$version = $stmt->fetchColumn();
 		if ($version === false) {

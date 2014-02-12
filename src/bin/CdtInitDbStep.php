@@ -17,6 +17,7 @@ namespace zpt\cdt\bin;
 use \zpt\dbup\DatabaseUpdater;
 use \zpt\util\PdoExt;
 use \DirectoryIterator;
+use \Exception;
 use \PDO;
 
 ensureFn('generatePassword');
@@ -33,13 +34,15 @@ class CdtInitDbStep {
 		'interactive' => true,
 		'dbdriver' => 'pgsql',
 		'dbhost' => 'localhost',
-		'dbuser' => 'root'
+		'dbuser' => 'postgres'
 	];
 
 	public function execute($baseDir, $ns, $opts) {
+		binLogHeader("Initializing Conductor Databases");
 		$opts = $this->applyDefaultOptions($opts);
 
 		$pdo = $this->connectToDb($opts);
+		binLogSuccess("Connected to DB.");
 
 		try {
 			$dbCreator = new CdtInitDbCreator($pdo, $ns);
@@ -48,33 +51,24 @@ class CdtInitDbStep {
 			$dbUserCreator = new CdtInitDbUserCreator($pdo, $ns, $dbCreator);
 			$dbUserCreator->create();
 
+			binLogInfo("Applying initial schema to development database");
 			$pdo->beginTransaction();
 
 			// Apply database alters
-			$versionRetriever = new CdtDatabaseVersionRetrievalScheme();
 			$dbup = new DatabaseUpdater();
-			$dbup->setCurrentVersionRetrievalScheme($versionRetriever);
+			$dbup->setLogger(new CmdLnPsrLoggerImpl());
+
+			$versionRetriever = new CdtDatabaseVersionRetrievalScheme();
+			$dbup->setDatabaseVersionRetrievalScheme($versionRetriever);
+
+			binLogInfo("Connecting to development database", 1);
 			$db = $pdo->newConnection([ 'database' => "{$ns}_d" ]);
 
-			$versionRetriever->setConfigurationPropertyName('site-alter');
-			$dbup->update($db, "$baseDir/src/sql");
-
-			if (file_exists("$baseDir/modules")) {
-				$modules = new DirectoryIterator("$baseDir/modules");
-				foreach ($modules as $module) {
-					$moduleName = $module->getBasename();
-
-					$versionRetriever->setConfigurationPropertyName(
-						"module-$moduleName-alter"
-					);
-					$dbup->update($db, "$baseDir/modules/$moduleName/sql");
-				}
-			}
-
-			$versionRetriever->setConfigurationPropertyName('cdt-alter');
+			binLogInfo("Applying alters", 1);
 			$dbup->update($db, "$baseDir/vendor/zeptech/conductor/resources/sql");
 
 			$pdo->commit();
+			binLogSuccess("Done.");
 		} catch (Exception $e) {
 			if ($pdo->inTransaction()) {
 				$pdo->rollback();
@@ -87,29 +81,33 @@ class CdtInitDbStep {
 			if (isset($dbCreator)) {
 				$dbCreator->rollback();
 			}
+
+			throw $e;
 		}
 	}
 
 	private function applyDefaultOptions(array $opts) {
-		array_merge([], self::$defaultOpts, $opts);
+		$opts = array_merge([], self::$defaultOpts, $opts);
 
 		if (!empty($opts['dbpasswd'])) {
 			$dbpasswd = $opts['dbpasswd'];
 		} else {
-			if ($opts['interactive']) {
-				$dbpasswd = passwordPrompt("$dbuser DB password: ");
+			if (!empty($opts['interactive'])) {
+				$dbpasswd = passwordPrompt(" $opts[dbuser] DB password: ");
 			} else {
 				throw new Exception("Database password must be provided for non-interactive init");
 			}
 		}
+		$opts['dbpasswd'] = $dbpasswd;
+		return $opts;
 	}
 
 	private function connectToDb(array $opts) {
 		return new PdoExt([
 			'driver'            => $opts['dbdriver'],
 			'host'              => $opts['dbhost'],
-			'username'          => $opts['username'],
-			'password'          => $opts['password'],
+			'username'          => $opts['dbuser'],
+			'password'          => $opts['dbpasswd'],
 			'pdoAttributes'     => [
 				PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
 			]

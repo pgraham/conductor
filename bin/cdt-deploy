@@ -1,4 +1,4 @@
-#!/usr/bin/php
+#!/usr/bin/env php
 <?php
 /**
  * =============================================================================
@@ -30,20 +30,9 @@ use \zpt\cdt\compile\SiteCompiler;
 
 require_once __DIR__ . '/common.php';
 
-$composerPath = getComposerPath();
-if (!$composerPath) {
-  echo "Unable to find composer!\n";
-  exit(1);
-}
-
-$loader = include "$composerPath/autoload.php";
-
-/*
- * =============================================================================
- * Determine site root
- * =============================================================================
- */
-$devDir = dirname($composerPath);
+getComposerLoader();
+$devDir = getSiteRootDir();
+$siteNick = basename($devDir);
 
 // Determine the site root relative to the vendor directory.
 if (!file_exists("$devDir/conductor.cfg.xml")) {
@@ -51,10 +40,6 @@ if (!file_exists("$devDir/conductor.cfg.xml")) {
   echo "Unable to locate conductor configuration file in $devDir\n";
   exit(1);
 }
-
-// The site's nickname is the name of the dev dir.  This will be used to
-// generate defaults for missing options
-$siteNick = basename($devDir);
 
 /*
  * =============================================================================
@@ -138,8 +123,11 @@ $productionDir = isset($cmdln->opt['production-dir'])
 
 $productionDb = isset($cmdln->opt['production-db'])
   ? $cmdln->opts['production-db']
-  : $siteNick . '_s';
+  : $siteNick;
 
+
+binLogInfo("Deploying to path $productionLink ($productionDir)");
+binLogInfo("Deploying to database $productionDb");
 /*
  * =============================================================================
  * Validate command line
@@ -296,9 +284,11 @@ if (file_exists("$productionDir/usr")) {
 
 // Copy in symlinks in current production htdocs into target/htdocs
 $productionSrc = realpath($productionLink);
-$productionSrc = realpath("$productionSrc/..");
+if (basename($productionSrc) !== 'htdocs') {
+  $productionSrc = "$productionSrc/htdocs";
+}
 
-$productionHtdocs = new DirectoryIterator("$productionSrc/htdocs");
+$productionHtdocs = new DirectoryIterator("$productionSrc");
 foreach ($productionHtdocs as $htdoc) {
   if (!$htdoc->isLink()) {
     continue;

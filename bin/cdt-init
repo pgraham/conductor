@@ -1,4 +1,4 @@
-#!/usr/bin/php
+#!/usr/bin/env php
 <?php
 /**
  * =============================================================================
@@ -42,6 +42,6 @@ $siteNick = basename($devDir);
 try {
 	(new CdtInit($devDir, $siteNick))->execute(array_slice($argv, 1));
 } catch (Exception $e) {
-	echo "Error initializing site DB: {$e->getMessage()}";
+	binLogError("Error initializing site: {$e->getMessage()}\n");
 	exit(1);
 }
