@@ -115,6 +115,9 @@ namespace {
 	 * Log a message with a coloured marker and optional indentation.
 	 */
 	function binPrettyLog($msg, $marker, $colour, $depth = 0) {
+		if (is_array($msg)) {
+			$msg = implode(' ', $msg);
+		}
 		$tabbing = str_repeat('    ', $depth);
 		echo "$tabbing \e[{$colour}m{$marker}\e[0m $msg\n";
 	}
