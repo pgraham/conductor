@@ -5,7 +5,7 @@
  * All rights reserved.
  *
  * This file is part of Conductor and is licensed by the Copyright holder under
- * the 3-clause BSD License.  The full text of the license can be found in the
+ * the 3-clause BSD License.	The full text of the license can be found in the
  * LICENSE.txt file included in the root directory of this distribution or at
  * the link below.
  * =============================================================================
@@ -29,26 +29,26 @@ use \Exception;
  */
 class ConfigurationCompiler {
 
-  private $_db;
-  private $_env;
-  private $_pathInfo;
-  private $_namespace;
+	private $_db;
+	private $_env;
+	private $_pathInfo;
+	private $_namespace;
 
-  private $_tmplParser;
+	private $_tmplParser;
 
-  /**
-   * Compile the site Configurator implementation for the site located at the
-   * given root path.
-   *
-   * @param string $root The root path of site.
-   */
-  public function compile($root, $env) {
-    $cfg = array();
+	/**
+	 * Compile the site Configurator implementation for the site located at the
+	 * given root path.
+	 *
+	 * @param string $root The root path of site.
+	 */
+	public function compile($root, $env) {
+		$cfg = array();
 
-    $xmlCfg = simplexml_load_file("$root/conductor.cfg.xml", 'SimpleXMLElement',
-      LIBXML_NOCDATA);
+		$xmlCfg = simplexml_load_file("$root/conductor.cfg.xml", 'SimpleXMLElement',
+			LIBXML_NOCDATA);
 
-    $generator = new ConfiguratorGenerator($root, $env, $xmlCfg);
-    $generator->generate('Configurator');
-  }
+		$generator = new ConfiguratorGenerator($root, $env, $xmlCfg);
+		$generator->generate('Configurator');
+	}
 }
