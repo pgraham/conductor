@@ -14,17 +14,17 @@
  */
 namespace zpt\cdt\bin;
 
-use \zpt\dbup\DatabaseVersionRetrievalScheme;
-use \zpt\util\db\DatabaseException;
-use \PDO;
+use zpt\db\DatabaseConnection;
+use zpt\dbup\DatabaseVersionManager;
+use zpt\util\db\DatabaseException;
 
 /**
- * Conductor zpt\dbup\DatabaseVersionRetrievalScheme implementation.
+ * Conductor zpt\dbup\DatabaseVersionManager implementation.
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class CdtDatabaseVersionRetrievalScheme
-	implements DatabaseVersionRetrievalScheme
+class CdtDatabaseVersionManager
+	implements DatabaseVersionManager
 {
 
 	private $property = 'cdt-alter';
@@ -33,10 +33,10 @@ class CdtDatabaseVersionRetrievalScheme
 	 * Retrieves the value in the `value` column from the row with a specified
 	 * value in the `name` column from the table `config_values`.
 	 *
-	 * @param PDO $db
+	 * @param DatabaseConnection $db
 	 * @return integer
 	 */
-	public function getVersion(PDO $db) {
+	public function getCurrentVersion(DatabaseConnection $db) {
 		$stmt = $db->prepare('SELECT value FROM config_values WHERE name = :name');
 
 		try {
@@ -53,6 +53,24 @@ class CdtDatabaseVersionRetrievalScheme
 		if ($version === false) {
 			$version = null;
 		}
+	}
+
+	/**
+	 * Sets the value in the `value` column from the row with a specified value in
+	 * the `name` column of the `config_values` table.
+	 *
+	 * @param DatabaseConnection $db
+	 * @param integer $version
+	 */
+	public function setCurrentVersion(DatabaseConnection $db, $version) {
+		if ($version === 1) {
+			$stmt = $db->prepare('INSERT INTO config_values (name, value)
+				VALUES (:name, :val)');
+		} else {
+			$stmt = $db->prepare('UPDATE config_values SET value = :val
+				WHERE name = :name');
+		}
+		$stmt->execute([ 'name' => $this->property, 'val' => $version ]);
 	}
 
 	/**

@@ -58,8 +58,8 @@ class CdtInitDbStep {
 			$dbup = new DatabaseUpdater();
 			$dbup->setLogger(new CmdLnPsrLoggerImpl());
 
-			$versionRetriever = new CdtDatabaseVersionRetrievalScheme();
-			$dbup->setDatabaseVersionRetrievalScheme($versionRetriever);
+			$versionRetriever = new CdtDatabaseVersionManager();
+			$dbup->setDatabaseVersionManager($versionRetriever);
 
 			binLogInfo("Connecting to development database", 1);
 			$db = $pdo->newConnection([ 'database' => "{$ns}_d" ]);
