@@ -245,6 +245,7 @@ class Conductor {
       $user = $dbConfig['db_user'];
       $pass = $dbConfig['db_pass'];
 
+      // TODO Use zpt\db\DatabaseConnection instead
       $pdo = new PdoExt([
         'driver' => $driver,
         'host' => $host,

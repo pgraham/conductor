@@ -47,9 +47,13 @@ class SiteConfiguration
 		$xmlCfg = simplexml_load_file("$root/$path", 'SimpleXMLElement',
 			LIBXML_NOCDATA);
 
+		if (!isset($xmlCfg->namespace)) {
+			throw new ConfigurationException("The site's namespace is not set.");
+		}
+
 		$this->pathInfo = $this->parsePathInfo($root, $xmlCfg);
-		$this->namespace = $this->parseNamespace($xmlCfg);
-		$this->dbConfig = $this->parseDbConfig($xmlCfg);
+		$this->namespace = (string) $xmlCfg->namespace;
+		$this->dbConfig = new DatabaseConfiguration($xmlCfg);
 
 		$logDir = '';
 		if (isset($this->xmlCfg->logDir)) {
@@ -104,42 +108,4 @@ class SiteConfiguration
 		));
 	}
 
-	private function parseNamespace($xmlCfg) {
-		if (!isset($xmlCfg->namespace)) {
-			throw new Exception("The site's namespace is not configured");
-		}
-		return (string) $xmlCfg->namespace;
-	}
-
-	private function parseDbConfig($xmlCfg) {
-		if (!isset($xmlCfg->db)) {
-			throw new Exception('No database configuration found');
-		}
-		$dbConfig = array();
-
-		if (!isset($xmlCfg->db->username)) {
-			throw new Exception('No database username specified');
-		}
-		$dbConfig['db_user'] = (string) $xmlCfg->db->username;
-
-		if (!isset($xmlCfg->db->password)) {
-			throw new Exception('No database password specified');
-		}
-		$dbConfig['db_pass'] = (string) $xmlCfg->db->password;
-
-		if (!isset($xmlCfg->db->schema)) {
-			throw new Exception('No database schema specified');
-		}
-		$dbConfig['db_schema'] = (string) $xmlCfg->db->schema;
-
-		$dbConfig['db_driver'] = (isset($xmlCfg->db->driver))
-			? (string) $xmlCfg->db->driver
-			: 'mysql';
-
-		$dbConfig['db_host'] = (isset($xmlCfg->db->host))
-			? (string) $xmlCfg->db->host
-			: 'localhost';
-
-		return $dbConfig;
-	}
 }

@@ -53,7 +53,7 @@ class ConfiguratorGenerator extends CompanionGenerator {
 			'docRootLen' => strlen($pathInfo['docRoot']),
 			'webRootLen' => strlen($pathInfo['webRoot']),
 			'namespace' => $namespace,
-			'dbConfig' => $dbConfig,
+			'dbConfig' => $dbConfig->asArray(),
 			'env' => $this->cfg->getEnv(),
 			'logDir' => $this->cfg->getLogDir()
 		);
