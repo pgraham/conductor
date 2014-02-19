@@ -14,8 +14,9 @@
  */
 namespace zpt\cdt\compile;
 
-use \ArrayObject;
-use \Exception;
+use zpt\cdt\config\SiteConfiguration;
+use ArrayObject;
+use Exception;
 
 /**
  * This class compiles a Configurator implementation for initiating the
@@ -29,26 +30,21 @@ use \Exception;
  */
 class ConfigurationCompiler {
 
-	private $_db;
-	private $_env;
-	private $_pathInfo;
-	private $_namespace;
-
-	private $_tmplParser;
-
 	/**
 	 * Compile the site Configurator implementation for the site located at the
 	 * given root path.
 	 *
-	 * @param string $root The root path of site.
+	 * @param string $root
+	 *   The root path of site.
+	 * @param string $env
+	 *   The environment for which configuration is being compiled.
 	 */
 	public function compile($root, $env) {
 		$cfg = array();
 
-		$xmlCfg = simplexml_load_file("$root/conductor.cfg.xml", 'SimpleXMLElement',
-			LIBXML_NOCDATA);
+		$config = new SiteConfiguration($root, 'conductor.cfg.xml', $env);
 
-		$generator = new ConfiguratorGenerator($root, $env, $xmlCfg);
+		$generator = new ConfiguratorGenerator($config);
 		$generator->generate('Configurator');
 	}
 }
