@@ -1,7 +1,9 @@
 - Update session manager to delete expired sessions. This needs to be
   re-evaluated.
 
-- Move model parsing and ActorFactory out of clarinet and into a reed package.
-
 - Update clarinet to have classes that implement database specific behaviour for
   supported databases.  Should support MySQL, PostgreSQL and SQLite
+
+- Update CdtInitDbStep to use a zpt\db\DatabaseConnection object. Encapsulate
+  the database updater logic so that it can be used by the CdtInitDbStep and the
+  cdt-update script.

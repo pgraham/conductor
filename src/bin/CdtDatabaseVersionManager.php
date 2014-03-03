@@ -40,7 +40,7 @@ class CdtDatabaseVersionManager
 		$stmt = $db->prepare('SELECT value FROM config_values WHERE name = :name');
 
 		try {
-			$stmt->execute([ 'name' => $this->property ]);
+			$r = $stmt->execute([ 'name' => $this->property ]);
 		} catch (DatabaseException $e) {
 			if ($e->tableDoesNotExist()) {
 				return null;
@@ -49,10 +49,11 @@ class CdtDatabaseVersionManager
 			}
 		}
 
-		$version = $stmt->fetchColumn();
+		$version = $r->fetchColumn();
 		if ($version === false) {
 			$version = null;
 		}
+		return $version;
 	}
 
 	/**

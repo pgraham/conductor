@@ -1,0 +1,101 @@
+#!/usr/bin/env php
+<?php
+/**
+ * =============================================================================
+ * Copyright (c) 2010, Philip Graham
+ * All rights reserved.
+ *
+ * This file is part of Conductor and is licensed by the Copyright holder under
+ * the 3-clause BSD License.  The full text of the license can be found in the
+ * LICENSE.txt file included in the root directory of this distribution or at
+ * the link below.
+ * =============================================================================
+ *
+ * @license http://www.opensource.org/licenses/bsd-license.php
+ */
+
+/**
+ * This script updates the development version of a site to use the latest 
+ * version of conductor and applies any missing module/site/conductor database 
+ * updates.
+ *
+ * @author Philip Graham <philip@zeptech.ca>
+ */
+require_once __DIR__ . '/common.php';
+
+use zpt\cdt\bin\CdtDatabaseVersionManager;
+use zpt\cdt\bin\CmdLnPsrLoggerImpl;
+use zpt\cdt\config\SiteConfiguration;
+use zpt\dbup\DatabaseUpdater;
+use zpt\util\StringUtils;
+
+$loader = getComposerLoader();
+$devDir = getSiteRootDir();
+
+ensureFn('passwordPrompt');
+
+// Make sure conductor configuration file exists
+if (!file_exists("$devDir/conductor.cfg.xml")) {
+  echo "Unable to locate conductor configuration file in $devDir\n";
+  exit(1);
+}
+
+// The site's nickname is the name of the dev dir.  This will be used to
+// generate defaults for missing options
+$siteNick = basename($devDir);
+
+$siteConfig = new SiteConfiguration($devDir, 'conductor.cfg.xml', 'dev');
+
+$dbConfig = $siteConfig->getDbConfig();
+$dbUser = 'root';
+$dbPass = passwordPrompt(StringUtils::format(
+	"Please enter the {driver} {user} password: ",
+	[
+		'driver' => $dbConfig->getDriver(),
+		'user' => $dbUser
+	]
+));
+$db = $dbConfig->connect([
+	'username' => $dbUser,
+	'password' => $dbPass
+]);
+
+$dbUp = new DatabaseUpdater();
+$dbUp->setLogger(new CmdLnPsrLoggerImpl());
+
+$verManager = new CdtDatabaseVersionManager();
+$dbUp->setDatabaseVersionManager($verManager);
+
+$siteAlters = "$devDir/src/sql";
+if (file_exists($siteAlters)) {
+	binLogInfo("Applying Site Alters");
+	$verManager->setConfigurationProperty('site-alter');
+	$dbUp->update($db, $siteAlters);
+}
+
+
+$modulesDir = "$devDir/modules";
+if (file_exists($modulesDir)) {
+	binLogInfo("Applying module alters");
+
+	$modules = new DirectoryIterator($modulesDir);
+	foreach ($modules as $module) {
+		$moduleName = $module->getBasename();
+
+		$moduleAlters = "$modulesDir/$moduleName/sql";
+		if (file_exists($moduleAlters)) {
+			binLogInfo ("Applying alters for $moduleName");
+			$verManager->setConfigurationProperty("module-$moduleName-alter");
+			$dbUp->update($db, "$modulesDir/$moduleName/sql");
+		}
+	}
+}
+
+$cdtAlters = "$devDir/vendor/zeptech/conductor/resources/sql";
+if (file_exists($cdtAlters)) {
+	binLogInfo("Applying Conductor alters");
+	$verManager->setConfigurationProperty('cdt-alter');
+	$dbUp->update($db, "$devDir/vendor/zeptech/conductor/resources/sql");
+}
+
+binLogSuccess("Done updating");

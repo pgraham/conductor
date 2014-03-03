@@ -14,6 +14,8 @@
  */
 namespace zpt\cdt\config;
 
+use zpt\db\DatabaseConnection;
+
 /**
  * This class encapsulates a site's runtime database configuration.
  *
@@ -56,8 +58,6 @@ class DatabaseConfiguration
 		$this->username =  (string) $xmlCfg->db->username;
 		$this->password = (string) $xmlCfg->db->password;
 		$this->schema = (string) $xmlCfg->db->schema;
-
-		return $dbConfig;
 	}
 
 	public function asArray() {
@@ -71,7 +71,17 @@ class DatabaseConfiguration
 		return $dbConfig;
 	}
 
-	public function connect() {
+	public function connect($override = []) {
+		return new DatabaseConnection(array_merge([
+			'driver'   => $this->driver,
+			'host'     => $this->host,
+			'username' => $this->username,
+			'password' => $this->password,
+			'schema'   => $this->schema
+		], $override));
+	}
 
+	public function getDriver() {
+		return $this->driver;
 	}
 }

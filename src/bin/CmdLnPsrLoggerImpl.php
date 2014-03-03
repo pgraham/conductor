@@ -14,7 +14,7 @@
  */
 namespace zpt\cdt\bin;
 
-require_once __DIR__ . '/../../../bin/common.php';
+require_once __DIR__ . '/../../bin/common.php';
 
 use \Psr\Log\LogLevel;
 use \Psr\Log\AbstractLogger;
@@ -56,7 +56,7 @@ class CmdLnPsrLoggerImpl extends AbstractLogger implements LoggerInterface
 			break;
 
 			case LogLevel::DEBUG:
-			if ($showDebug) {
+			if ($this->showDebug) {
 				binLogInfo(StringUtils::format("DEBUG: $message", $context), $depth);
 			}
 			break;
