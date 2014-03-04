@@ -14,34 +14,34 @@
  */
 namespace zpt\cdt\compile;
 
-use \Psr\Log\LoggerAwareInterface;
-use \Psr\Log\LoggerInterface;
-use \Psr\Log\NullLogger;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 
-use \zpt\anno\AnnotationFactory;
-use \zpt\anno\Annotations;
-use \zpt\cdt\compile\resource\ResourceCompiler;
-use \zpt\cdt\crud\CrudService;
-use \zpt\cdt\di\Injector;
-use \zpt\cdt\html\NotAPageDefinitionException;
-use \zpt\cdt\i18n\ModelDisplayParser;
-use \zpt\cdt\i18n\ModelMessages;
-use \zpt\cdt\rest\ServiceRequestDispatcher;
-use \zpt\dyn\Configurator;
-use \zpt\opal\DefaultNamingStrategy as CompanionNamingStrategy;
-use \zpt\orm\companion\PersisterGenerator;
-use \zpt\orm\companion\QueryBuilder;
-use \zpt\orm\companion\TransformerGenerator;
-use \zpt\orm\companion\ValidatorGenerator;
-use \zpt\orm\model\parser\DefaultNamingStrategy as ModelNamingStrategy;
-use \zpt\orm\model\parser\ModelParser;
-use \zpt\orm\model\ModelCache;
-use \zpt\pct\CodeTemplateParser;
-use \zpt\util\File;
-use \zpt\util\StringUtils;
-use \DirectoryIterator;
-use \Exception;
-use \ReflectionClass;
+use zpt\anno\AnnotationFactory;
+use zpt\anno\Annotations;
+use zpt\cdt\compile\resource\ResourceCompiler;
+use zpt\cdt\crud\CrudService;
+use zpt\cdt\di\Injector;
+use zpt\cdt\html\NotAPageDefinitionException;
+use zpt\cdt\i18n\ModelDisplayParser;
+use zpt\cdt\i18n\ModelMessages;
+use zpt\cdt\rest\ServiceRequestDispatcher;
+use zpt\dyn\Configurator;
+use zpt\opal\DefaultNamingStrategy as CompanionNamingStrategy;
+use zpt\orm\companion\PersisterGenerator;
+use zpt\orm\companion\QueryBuilder;
+use zpt\orm\companion\TransformerGenerator;
+use zpt\orm\companion\ValidatorGenerator;
+use zpt\orm\model\parser\DefaultNamingStrategy as ModelNamingStrategy;
+use zpt\orm\model\parser\ModelParser;
+use zpt\orm\model\ModelCache;
+use zpt\pct\CodeTemplateParser;
+use zpt\util\File;
+use zpt\util\StringUtils;
+use DirectoryIterator;
+use Exception;
+use ReflectionClass;
 
 /**
  * This class compiles a site.
