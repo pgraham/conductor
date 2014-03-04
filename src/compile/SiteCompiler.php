@@ -224,7 +224,6 @@ class SiteCompiler implements LoggerAwareInterface {
 	}
 
 	protected function compileJslibs($pathInfo, $ns) {
-		$this->compileJslibDir($pathInfo, "$pathInfo[lib]/jslib");
 		$this->compileJslibDir($pathInfo, "$pathInfo[cdtRoot]/lib/jslib");
 	}
 
