@@ -269,7 +269,7 @@ class SiteCompiler implements LoggerAwareInterface {
 		// Compile Conductor models
 		$this->compileModelDir(
 			$pathInfo,
-			"$pathInfo[cdtRoot]/zpt/cdt/model",
+			"$pathInfo[cdtRoot]/src/model",
 			'zpt\\cdt\\model');
 
 		// Compile Site models
@@ -295,7 +295,7 @@ class SiteCompiler implements LoggerAwareInterface {
 	protected function compileServices($pathInfo, $ns) {
 		// Compile Conductor services
 		$this->serviceCompiler->compile(
-			"$pathInfo[cdtRoot]/zpt/cdt/srvc",
+			"$pathInfo[cdtRoot]/src/srvc",
 			'zpt\\cdt\\srvc'
 		);
 

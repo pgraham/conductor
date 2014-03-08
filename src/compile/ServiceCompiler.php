@@ -121,7 +121,7 @@ class ServiceCompiler {
 
 
         $beanId = str_replace('\\', '_', $srvcClass);
-        $props = array( 
+        $props = array(
           array(
             'name' => 'Mappings',
             'val'  => $mappings
