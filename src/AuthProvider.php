@@ -5,15 +5,18 @@
  */
 namespace zpt\cdt;
 
-use \zpt\cdt\auth\Authorize;
-use \zpt\cdt\auth\SessionManager;
-use \zpt\cdt\exception\AuthException;
-use \zpt\cdt\model\User;
-use \zpt\cdt\model\Visitor;
-use \zpt\opal\CompanionLoader;
-use \zpt\orm\Criteria;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\NullLogger;
+use zpt\cdt\di\InjectedLoggerAwareTrait;
+use zpt\cdt\auth\Authorize;
+use zpt\cdt\auth\SessionManager;
+use zpt\cdt\exception\AuthException;
+use zpt\cdt\model\User;
+use zpt\cdt\model\Visitor;
+use zpt\opal\CompanionLoader;
+use zpt\orm\Criteria;
 
-use \LightOpenId;
+use LightOpenId;
 
 /**
  * This class ensures that the requesting user is assigned to a session.	The
@@ -21,7 +24,8 @@ use \LightOpenId;
  *
  * @author Philip Graham <philip@lightbox.org>
  */
-class AuthProvider {
+class AuthProvider implements LoggerAwareInterface {
+	use InjectedLoggerAwareTrait;
 
 	private $companionLoader;
 	private $openId;
@@ -33,9 +37,13 @@ class AuthProvider {
 			$companionLoader = new CompanionLoader();
 		}
 		$this->companionLoader = $companionLoader;
+
+		// Make sure a logger is available. Avoids null checks throughout the code.
+		$this->logger = new NullLogger();
 	}
 
 	public function authenticate($username, $password) {
+		$this->logger->info("AUTH: Authentication attempt for $username");
 		$pwHash = md5($password);
 
 		$c = new Criteria();
@@ -44,6 +52,12 @@ class AuthProvider {
 
 		$persister = $this->getPersister('zpt\cdt\model\User');
 		$user = $persister->retrieveOne($c);
+
+		if ($user) {
+			$this->logger->info("AUTH: Authentication successful");
+		} else {
+			$this->logger->info("AUTH: Authentication failed");
+		}
 
 		return $user;
 	}
@@ -201,7 +215,7 @@ class AuthProvider {
 			exit;
 
 		} else {
-			
+
 			if ($openId->validate()) {
 				// Ensure a session is set
 				$this->init();
@@ -298,7 +312,7 @@ class AuthProvider {
 
 			$c = new Criteria();
 			$c->addEquals('key', $visitorKey);
-			
+
 			$visitor = $persister->retrieveOne($c);
 			if ($visitor === null) {
 				// It is possible under certain circumstances to get here.	An
