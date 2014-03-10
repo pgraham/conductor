@@ -14,19 +14,20 @@
  */
 namespace zpt\cdt\compile;
 
-use \zpt\cdt\html\HtmlProvider;
-use \zpt\cdt\html\NotAPageDefinitionException;
-use \zpt\cdt\html\PageResourceParser;
-use \zpt\opal\DefaultNamingStrategy;
-use \zpt\util\File;
-use \DirectoryIterator;
+use zpt\cdt\html\HtmlProvider;
+use zpt\cdt\html\NotAPageDefinitionException;
+use zpt\cdt\html\PageResourceParser;
+use zpt\opal\DefaultNamingStrategy;
+use zpt\util\File;
+use DirectoryIterator;
 
 /**
  * This class compiles the site's HtmlProvider companions.
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class HtmlCompiler implements Compiler {
+class HtmlCompiler implements Compiler
+{
 
 	private $diCompiler;
 	private $resourcesCompiler;
