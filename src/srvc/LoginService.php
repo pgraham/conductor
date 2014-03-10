@@ -14,11 +14,13 @@
  */
 namespace zpt\cdt\srvc;
 
-use \zpt\rest\BaseRequestHandler;
-use \zpt\rest\RequestHandler;
-use \zpt\rest\Request;
-use \zpt\rest\Response;
-use \LightOpenId;
+use Psr\Log\LoggerAwareInterface;
+use zpt\cdt\di\InjectedLoggerAwareTrait;
+use zpt\rest\BaseRequestHandler;
+use zpt\rest\RequestHandler;
+use zpt\rest\Request;
+use zpt\rest\Response;
+use LightOpenId;
 
 /**
  * This class provides asynchronous login capabilities.
@@ -27,7 +29,8 @@ use \LightOpenId;
  *
  * @Service
  */
-class LoginService {
+class LoginService implements LoggerAwareInterface {
+  use InjectedLoggerAwareTrait;
 
   /** @Injected */
   private $_authProvider;
