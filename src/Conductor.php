@@ -58,6 +58,8 @@ class Conductor {
   /* Whether or not conductor has been initialized */
   private static $_initialized = false;
 
+  private static $applicationLogger;
+
   /**
    * Retrieve the {@link Configuration} object for the site.
    *
@@ -266,6 +268,16 @@ class Conductor {
     $configurator = new InjectionConfigurator();
     $configurator->configure();
 
+    // Configure application logger
+    $logger = Injector::getBean('logger');
+    if ($isDevMode) {
+      $logger->pushHandler(new StreamHandler($pathInfo['target'] . '/cdt.log'));
+    } else {
+      // Don't log anything in production
+      $logger->pushHandler(new NullLogger());
+    }
+    self::$applicationLogger = $logger;
+
     // TODO Set the CompanionLoader instance used by Clarinet to be the injected
     //      instance.
     // Clarinet::setCompanionLoader($companionLoader);
@@ -317,15 +329,8 @@ class Conductor {
     // Make sure that a generated mapping configurator exists
     $pathInfo = self::getPathInfo();
 
-    $log = new Logger('conductor');
-    if (self::isDevMode()) {
-      $log->pushHandler(new StreamHandler($pathInfo['target'] . '/cdt.log'));
-    } else {
-//      $log->pushHandler(new StreamHandler(self::$_config['logDir'] . '/' . self::$_config['namespace'] . '.' . self::$_config['env'] . '.log'));
-    }
-
     $server = new InjectedRestServer();
-    $server->setLogger($log);
+    $server->setLogger(self::$applicationLogger);
 
     $server->registerExceptionHandler(
       'Exception',

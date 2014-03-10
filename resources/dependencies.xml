@@ -1,6 +1,10 @@
 <?xml version="1.0" standalone="yes"?>
 <beans>
 
+  <!-- Add logger as dependency. Appenders are configured programatically by
+       zpt\cdt\Conductor::init() -->
+  <bean id="logger" class="Monolog\Logger"/>
+
   <bean id="companionNamingStrategy" class="zpt\opal\DefaultNamingStrategy"/>
 
   <bean id="companionLoader" class="zpt\opal\CompanionLoader">
