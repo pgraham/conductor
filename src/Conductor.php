@@ -317,16 +317,15 @@ class Conductor {
     // Make sure that a generated mapping configurator exists
     $pathInfo = self::getPathInfo();
 
-    /*
     $log = new Logger('conductor');
     if (self::isDevMode()) {
-      $log->pushHandler(new RotatingFileHandler($pathInfo['target'] . '/cdt.log', 1));
+      $log->pushHandler(new StreamHandler($pathInfo['target'] . '/cdt.log'));
     } else {
-      $log->pushHandler(new StreamHandler(self::$_config['logDir'] . '/' . self::$_config['namespace'] . '.' . self::$_config['env'] . '.log'));
+//      $log->pushHandler(new StreamHandler(self::$_config['logDir'] . '/' . self::$_config['namespace'] . '.' . self::$_config['env'] . '.log'));
     }
-     */
 
     $server = new InjectedRestServer();
+    $server->setLogger($log);
 
     $server->registerExceptionHandler(
       'Exception',
