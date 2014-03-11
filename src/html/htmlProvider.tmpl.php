@@ -19,6 +19,7 @@ use zpt\oobo\struct\FlowContent;
 use zpt\oobo\Element;
 use zpt\cdt\di\Injector;
 use zpt\cdt\di\InjectedLoggerAwareTrait;
+use zpt\cdt\html\BaseHtmlProvider;
 use zpt\cdt\html\Page;
 use zpt\cdt\L10N;
 use zpt\cdt\LoginForm;
@@ -31,18 +32,14 @@ use zpt\cdt\LoginFormAsync;
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class /*# companionClass #*/ implements LoggerAwareInterface
+class /*# companionClass #*/ extends BaseHtmlProvider
+	implements LoggerAwareInterface
 {
+
 	use InjectedLoggerAwareTrait;
 
 	/** @Injected */
 	private $authProvider;
-
-	/**
-	 * @Injected
-	 * @Collection zpt\cdt\html\PageViewListener
-	 */
-	private $pageViewListeners;
 
 	public function populate(Page $page, array $query = null) {
 		$this->logger->info("HTML: Populating HTML Page");
@@ -160,7 +157,7 @@ class /*# companionClass #*/ implements LoggerAwareInterface
 		$page->bodyAdd(new LoginFormAsync());
 
 		// Invoke any registered page view listeners
-		$this->_onPageView();
+		$this->onPageView();
 	}
 
 	public function getFragment($query) {
@@ -170,11 +167,11 @@ class /*# companionClass #*/ implements LoggerAwareInterface
 				exit;
 			}
 		#}
-		
+
 		$ctnt = $this->getContent($query);
 
 		// Invoke any registered page view listeners
-		$this->_onPageView();
+		$this->onPageView();
 
 		return $ctnt;
 	}
@@ -183,8 +180,12 @@ class /*# companionClass #*/ implements LoggerAwareInterface
 		$this->authProvider = $authProvider;
 	}
 
-	public function setPageViewListeners(array $pageViewListeners) {
-		$this->pageViewListeners = $pageViewListeners;
+	protected function loadJQuery() {
+		#{ if env = dev
+			Element::js('/*# jQueryPath #*//jquery.js')->addToHead();
+		#{ else
+			Element::js('/*# jQueryPath #*//jquery.min.js')->addToHead();
+		#}
 	}
 
 	private function getContent($query) {
@@ -213,31 +214,5 @@ class /*# companionClass #*/ implements LoggerAwareInterface
 				Element::js('/*# jslibPath #*///*# jslib #*/.js')->addToHead();
 			#}
 		#}
-	}
-
-	private function loadJQuery() {
-		#{ if env = dev
-			Element::js('/*# jQueryPath #*//jquery.js')->addToHead();
-		#{ else
-			Element::js('/*# jQueryPath #*//jquery.min.js')->addToHead();
-		#}
-	}
-
-	private function loadLogin() {
-		Element::css('http://fonts.googleapis.com/css?family=Sorts+Mill+Goudy|Varela')->addToHead();
-		Element::css(_P('/css/login.css'))->addToHead();
-
-		$this->loadJQuery();
-		Element::js(_P('/js/login.js'))->addToHead();
-
-		$login = new LoginForm();
-		$login->addToBody();
-		Page::dump();
-	}
-
-	private function _onPageView() {
-		foreach ($this->pageViewListeners as $pageViewListener) {
-			$pageViewListener->pageView();
-		}
 	}
 }
