@@ -86,8 +86,17 @@ class HtmlProvider extends CompanionGenerator {
 		// If the page definition specifies an authorization level then ensure
 		// that it is enforced
 		if (isset($page['auth'])) {
-			$values['auth'] = $page['auth'];
+			$authStr = $page['auth'];
+			if (strpos($authStr, ':') === false) {
+				$values['auth'] = $authStr;
+				$values['authLvl'] = 'read';
+			} else {
+				$authVals = explode(':', $authStr);
+				$values['authLvl'] = array_pop($authVals);
+				$values['auth'] = implode(':', $authVals);
+			}
 		}
+
 
 		// Determine whether JsApp support is needed and the theme to use.	The
 		// default theme for JsApp pages is 'zpt', otherwise it is the default

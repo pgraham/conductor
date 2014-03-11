@@ -1,14 +1,15 @@
 <?php
 namespace /*# companionNs #*/;
 
-use \conductor\Auth;
-use \zpt\oobo\struct\FlowContent;
-use \zpt\oobo\Element;
-use \zpt\cdt\di\Injector;
-use \zpt\cdt\html\Page;
-use \zpt\cdt\L10N;
-use \zpt\cdt\LoginForm;
-use \zpt\cdt\LoginFormAsync;
+use Psr\Log\LoggerAwareInterface;
+use zpt\oobo\struct\FlowContent;
+use zpt\oobo\Element;
+use zpt\cdt\di\Injector;
+use zpt\cdt\di\InjectedLoggerAwareTrait;
+use zpt\cdt\html\Page;
+use zpt\cdt\L10N;
+use zpt\cdt\LoginForm;
+use zpt\cdt\LoginFormAsync;
 
 /**
  * This is a generated class that populates a conductor\Page instance.
@@ -17,7 +18,9 @@ use \zpt\cdt\LoginFormAsync;
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class /*# companionClass #*/ {
+class /*# companionClass #*/ implements LoggerAwareInterface
+{
+  use InjectedLoggerAwareTrait;
 
   /** @Injected */
   private $_authProvider;
@@ -29,6 +32,7 @@ class /*# companionClass #*/ {
   private $_pageViewListeners;
 
   public function populate(Page $page, array $query = null) {
+    $this->logger->info("HTML: Populating HTML Page");
     #{ if env = dev
       $page->setCaptureDebug(true);
     #{ else
@@ -39,18 +43,19 @@ class /*# companionClass #*/ {
       $page->setPageTitle('/*# title #*/');
     #}
 
+    #{ if auth ISSET
+      if (!$this->_authProvider->hasPermission('/*# auth #*/', '/*# authLvl #*/')) {
+        $this->logger->debug("HTML: Insufficient permissions to view page.");
+        $this->_loadLogin();
+        exit;
+      }
+    #}
+
     #{ if template ISSET
       $tmpl = new \/*# template #*/();
       #{ if tmplDependencies ISSET
         Injector::inject($tmpl, /*# php:tmplDependencies #*/);
       #}
-    #}
-
-    #{ if auth ISSET
-      if (!$this->_authProvider->hasPermission('/*# auth #*/')) {
-        $this->_loadLogin();
-        exit;
-      }
     #}
 
     // Base styles
@@ -144,7 +149,7 @@ class /*# companionClass #*/ {
 
   public function getFragment($query) {
     #{ if auth ISSET
-      if (!$this->_authProvider->hasPermission('/*# auth #*/')) {
+      if (!$this->_authProvider->hasPermission('/*# auth #*/', '/*# authLvl #*/')) {
         $this->_loadLogin();
         exit;
       }
