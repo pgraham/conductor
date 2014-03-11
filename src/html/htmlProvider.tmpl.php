@@ -23,13 +23,13 @@ class /*# companionClass #*/ implements LoggerAwareInterface
 	use InjectedLoggerAwareTrait;
 
 	/** @Injected */
-	private $_authProvider;
+	private $authProvider;
 
 	/**
 	 * @Injected
 	 * @Collection zpt\cdt\html\PageViewListener
 	 */
-	private $_pageViewListeners;
+	private $pageViewListeners;
 
 	public function populate(Page $page, array $query = null) {
 		$this->logger->info("HTML: Populating HTML Page");
@@ -44,9 +44,9 @@ class /*# companionClass #*/ implements LoggerAwareInterface
 		#}
 
 		#{ if auth ISSET
-			if (!$this->_authProvider->hasPermission('/*# auth #*/', '/*# authLvl #*/')) {
+			if (!$this->authProvider->hasPermission('/*# auth #*/', '/*# authLvl #*/')) {
 				$this->logger->debug("HTML: Insufficient permissions to view page.");
-				$this->_loadLogin();
+				$this->loadLogin();
 				exit;
 			}
 		#}
@@ -79,7 +79,7 @@ class /*# companionClass #*/ implements LoggerAwareInterface
 		Element::js('/*# jslibPath #*//q/q.min.js')->addToHead();
 
 		// JQuery - If dev mode non-minimized version is included
-		$this->_loadJQuery();
+		$this->loadJQuery();
 
 		// Webshims
 		Element::js('/*# jslibPath #*//webshims/polyfiller.js')->addToHead();
@@ -109,7 +109,7 @@ class /*# companionClass #*/ implements LoggerAwareInterface
 			Element::js('/*# jsPath #*///*# script #*/')->addToHead();
 		#}
 
-		$this->_includeJsLibs();
+		$this->includeJsLibs();
 
 		#{ if jsappsupport
 			Element::js('/*# jslibPath #*//raphael.js')->addToHead();
@@ -152,8 +152,8 @@ class /*# companionClass #*/ implements LoggerAwareInterface
 
 	public function getFragment($query) {
 		#{ if auth ISSET
-			if (!$this->_authProvider->hasPermission('/*# auth #*/', '/*# authLvl #*/')) {
-				$this->_loadLogin();
+			if (!$this->authProvider->hasPermission('/*# auth #*/', '/*# authLvl #*/')) {
+				$this->loadLogin();
 				exit;
 			}
 		#}
@@ -167,11 +167,11 @@ class /*# companionClass #*/ implements LoggerAwareInterface
 	}
 
 	public function setAuthProvider($authProvider) {
-		$this->_authProvider = $authProvider;
+		$this->authProvider = $authProvider;
 	}
 
 	public function setPageViewListeners(array $pageViewListeners) {
-		$this->_pageViewListeners = $pageViewListeners;
+		$this->pageViewListeners = $pageViewListeners;
 	}
 
 	private function getContent($query) {
@@ -185,7 +185,7 @@ class /*# companionClass #*/ implements LoggerAwareInterface
 		return $ctnt;
 	}
 
-	private function _includeJsLibs() {
+	private function includeJsLibs() {
 		#{ each jslibs as jslib
 			#{ if jslib = epiceditor
 				Element::js('/*# jslibPath #*//epiceditor/epiceditor.js')->addToHead();
@@ -202,7 +202,7 @@ class /*# companionClass #*/ implements LoggerAwareInterface
 		#}
 	}
 
-	private function _loadJQuery() {
+	private function loadJQuery() {
 		#{ if env = dev
 			Element::js('/*# jQueryPath #*//jquery.js')->addToHead();
 		#{ else
@@ -210,11 +210,11 @@ class /*# companionClass #*/ implements LoggerAwareInterface
 		#}
 	}
 
-	private function _loadLogin() {
+	private function loadLogin() {
 		Element::css('http://fonts.googleapis.com/css?family=Sorts+Mill+Goudy|Varela')->addToHead();
 		Element::css(_P('/css/login.css'))->addToHead();
 
-		$this->_loadJQuery();
+		$this->loadJQuery();
 		Element::js(_P('/js/login.js'))->addToHead();
 
 		$login = new LoginForm();
@@ -223,7 +223,7 @@ class /*# companionClass #*/ implements LoggerAwareInterface
 	}
 
 	private function _onPageView() {
-		foreach ($this->_pageViewListeners as $pageViewListener) {
+		foreach ($this->pageViewListeners as $pageViewListener) {
 			$pageViewListener->pageView();
 		}
 	}
