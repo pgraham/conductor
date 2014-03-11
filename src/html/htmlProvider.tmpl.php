@@ -20,211 +20,211 @@ use zpt\cdt\LoginFormAsync;
  */
 class /*# companionClass #*/ implements LoggerAwareInterface
 {
-  use InjectedLoggerAwareTrait;
+	use InjectedLoggerAwareTrait;
 
-  /** @Injected */
-  private $_authProvider;
+	/** @Injected */
+	private $_authProvider;
 
-  /**
-   * @Injected
-   * @Collection zpt\cdt\html\PageViewListener
-   */
-  private $_pageViewListeners;
+	/**
+	 * @Injected
+	 * @Collection zpt\cdt\html\PageViewListener
+	 */
+	private $_pageViewListeners;
 
-  public function populate(Page $page, array $query = null) {
-    $this->logger->info("HTML: Populating HTML Page");
-    #{ if env = dev
-      $page->setCaptureDebug(true);
-    #{ else
-      $page->setCaptureDebug(false);
-    #}
+	public function populate(Page $page, array $query = null) {
+		$this->logger->info("HTML: Populating HTML Page");
+		#{ if env = dev
+			$page->setCaptureDebug(true);
+		#{ else
+			$page->setCaptureDebug(false);
+		#}
 
-    #{ if title ISSET
-      $page->setPageTitle('/*# title #*/');
-    #}
+		#{ if title ISSET
+			$page->setPageTitle('/*# title #*/');
+		#}
 
-    #{ if auth ISSET
-      if (!$this->_authProvider->hasPermission('/*# auth #*/', '/*# authLvl #*/')) {
-        $this->logger->debug("HTML: Insufficient permissions to view page.");
-        $this->_loadLogin();
-        exit;
-      }
-    #}
+		#{ if auth ISSET
+			if (!$this->_authProvider->hasPermission('/*# auth #*/', '/*# authLvl #*/')) {
+				$this->logger->debug("HTML: Insufficient permissions to view page.");
+				$this->_loadLogin();
+				exit;
+			}
+		#}
 
-    #{ if template ISSET
-      $tmpl = new \/*# template #*/();
-      #{ if tmplDependencies ISSET
-        Injector::inject($tmpl, /*# php:tmplDependencies #*/);
-      #}
-    #}
+		#{ if template ISSET
+			$tmpl = new \/*# template #*/();
+			#{ if tmplDependencies ISSET
+				Injector::inject($tmpl, /*# php:tmplDependencies #*/);
+			#}
+		#}
 
-    // Base styles
-    // -------------------------------------------------------------------------
-    Element::css('/*# cssPath #*//reset.css')->addToHead();
-    Element::css('/*# cssPath #*//cdt.css')->addToHead();
+		// Base styles
+		// -------------------------------------------------------------------------
+		Element::css('/*# cssPath #*//reset.css')->addToHead();
+		Element::css('/*# cssPath #*//cdt.css')->addToHead();
 
-    #{ each coreCss as css
-      Element::css('/*# cssPath #*///*# css #*/')->addToHead();
-    #}
-    #{ if sheets ISSET
-      #{ each sheets as css
-        Element::css('/*# css #*/')->addToHead();
-      #}
-    #}
+		#{ each coreCss as css
+			Element::css('/*# cssPath #*///*# css #*/')->addToHead();
+		#}
+		#{ if sheets ISSET
+			#{ each sheets as css
+				Element::css('/*# css #*/')->addToHead();
+			#}
+		#}
 
-    // Javascript libraries
-    // -------------------------------------------------------------------------
-    // Non-jquery
-    Element::js('/*# jslibPath #*//date.js')->addToHead();
-    Element::js('/*# jslibPath #*//q/q.min.js')->addToHead();
+		// Javascript libraries
+		// -------------------------------------------------------------------------
+		// Non-jquery
+		Element::js('/*# jslibPath #*//date.js')->addToHead();
+		Element::js('/*# jslibPath #*//q/q.min.js')->addToHead();
 
-    // JQuery - If dev mode non-minimized version is included
-    $this->_loadJQuery();
+		// JQuery - If dev mode non-minimized version is included
+		$this->_loadJQuery();
 
-    // Webshims
-    Element::js('/*# jslibPath #*//webshims/polyfiller.js')->addToHead();
+		// Webshims
+		Element::js('/*# jslibPath #*//webshims/polyfiller.js')->addToHead();
 
-    // JQuery Cookie
-    Element::js('/*# jslibPath #*//jquery-cookie/jquery.cookie.js')->addToHead();
+		// JQuery Cookie
+		Element::js('/*# jslibPath #*//jquery-cookie/jquery.cookie.js')->addToHead();
 
-    // JQuery UI
-    Element::css('/*# jslibPath #*//jquery-ui/jquery.ui.css')->addToHead();
-    Element::css('/*# jslibPath #*//jquery-ui/themes//*# uitheme #*//jquery.ui.theme.css')
-      ->addToHead();
-    Element::js('/*# jslibPath #*//jquery-ui/external/globalize.js')->addToHead();
-    Element::js('/*# jslibPath #*//jquery-ui/jquery.ui.js')->addToHead();
+		// JQuery UI
+		Element::css('/*# jslibPath #*//jquery-ui/jquery.ui.css')->addToHead();
+		Element::css('/*# jslibPath #*//jquery-ui/themes//*# uitheme #*//jquery.ui.theme.css')
+			->addToHead();
+		Element::js('/*# jslibPath #*//jquery-ui/external/globalize.js')->addToHead();
+		Element::js('/*# jslibPath #*//jquery-ui/jquery.ui.js')->addToHead();
 
-    // -------------------------------------------------------------------------
+		// -------------------------------------------------------------------------
 
-    // Load language script
-    $lang = L10N::getLang();
-    Element::js("/*# jsPath #*//$lang.js")->addToHead();
+		// Load language script
+		$lang = L10N::getLang();
+		Element::js("/*# jsPath #*//$lang.js")->addToHead();
 
-    // Client support scripts
-    Element::js('/*# jsPath #*//base.js')->addToHead();
-    #{ each coreScripts as script
-      Element::js('/*# jsPath #*///*# script #*/')->addToHead();
-    #}
-    #{ each utilScripts as script
-      Element::js('/*# jsPath #*///*# script #*/')->addToHead();
-    #}
+		// Client support scripts
+		Element::js('/*# jsPath #*//base.js')->addToHead();
+		#{ each coreScripts as script
+			Element::js('/*# jsPath #*///*# script #*/')->addToHead();
+		#}
+		#{ each utilScripts as script
+			Element::js('/*# jsPath #*///*# script #*/')->addToHead();
+		#}
 
-    $this->_includeJsLibs();
+		$this->_includeJsLibs();
 
-    #{ if jsappsupport
-      Element::js('/*# jslibPath #*//raphael.js')->addToHead();
-      Element::js('/*# jsPath #*//cdt/raphael-util.js')->addToHead();
+		#{ if jsappsupport
+			Element::js('/*# jslibPath #*//raphael.js')->addToHead();
+			Element::js('/*# jsPath #*//cdt/raphael-util.js')->addToHead();
 
-      #{ each widgetCss as sheet
-        Element::css('/*# cssPath #*///*# sheet #*/')->addToHead();
-      #}
-      Element::css('/*# cssPath #*//jsapp.css')->addToHead();
+			#{ each widgetCss as sheet
+				Element::css('/*# cssPath #*///*# sheet #*/')->addToHead();
+			#}
+			Element::css('/*# cssPath #*//jsapp.css')->addToHead();
 
-      #{ each widgetScripts as script
-        Element::js('/*# jsPath #*///*# script #*/')->addToHead();
-      #}
-      Element::js('/*# jsPath #*//jsapp.js')->addToHead();
-    #}
+			#{ each widgetScripts as script
+				Element::js('/*# jsPath #*///*# script #*/')->addToHead();
+			#}
+			Element::js('/*# jsPath #*//jsapp.js')->addToHead();
+		#}
 
-    #{ if fonts ISSET
-      Element::css("http://fonts.googleapis.com/css?family=/*# fonts #*/")->addToHead();
-    #}
+		#{ if fonts ISSET
+			Element::css("http://fonts.googleapis.com/css?family=/*# fonts #*/")->addToHead();
+		#}
 
-    // Javascripts
-    #{ if jscripts ISSET
-      #{ each jscripts as jscript
-        Element::js('/*# jscript #*/')->addToHead();
-      #}
-    #}
+		// Javascripts
+		#{ if jscripts ISSET
+			#{ each jscripts as jscript
+				Element::js('/*# jscript #*/')->addToHead();
+			#}
+		#}
 
-    #{ if template
-      $page->setTemplate($tmpl);
-    #}
-    $page->bodyAdd($this->getContent($query));
+		#{ if template
+			$page->setTemplate($tmpl);
+		#}
+		$page->bodyAdd($this->getContent($query));
 
-    // Add an asynchronous login form that will be initially hidden so that it
-    // can be autocompleted by the browser.
-    $page->bodyAdd(new LoginFormAsync());
+		// Add an asynchronous login form that will be initially hidden so that it
+		// can be autocompleted by the browser.
+		$page->bodyAdd(new LoginFormAsync());
 
-    // Invoke any registered page view listeners
-    $this->_onPageView();
-  }
+		// Invoke any registered page view listeners
+		$this->_onPageView();
+	}
 
-  public function getFragment($query) {
-    #{ if auth ISSET
-      if (!$this->_authProvider->hasPermission('/*# auth #*/', '/*# authLvl #*/')) {
-        $this->_loadLogin();
-        exit;
-      }
-    #}
-    
-    $ctnt = $this->getContent($query);
+	public function getFragment($query) {
+		#{ if auth ISSET
+			if (!$this->_authProvider->hasPermission('/*# auth #*/', '/*# authLvl #*/')) {
+				$this->_loadLogin();
+				exit;
+			}
+		#}
+		
+		$ctnt = $this->getContent($query);
 
-    // Invoke any registered page view listeners
-    $this->_onPageView();
+		// Invoke any registered page view listeners
+		$this->_onPageView();
 
-    return $ctnt;
-  }
+		return $ctnt;
+	}
 
-  public function setAuthProvider($authProvider) {
-    $this->_authProvider = $authProvider;
-  }
+	public function setAuthProvider($authProvider) {
+		$this->_authProvider = $authProvider;
+	}
 
-  public function setPageViewListeners(array $pageViewListeners) {
-    $this->_pageViewListeners = $pageViewListeners;
-  }
+	public function setPageViewListeners(array $pageViewListeners) {
+		$this->_pageViewListeners = $pageViewListeners;
+	}
 
-  private function getContent($query) {
-    $ctnt = '';
-    #{ if hasContent
-      $ctntProvider = new \/*# contentProvider #*/();
-      Injector::inject($ctntProvider, /*# php:dependencies #*/);
-      $ctnt = $ctntProvider->getContent($query);
-    #}
+	private function getContent($query) {
+		$ctnt = '';
+		#{ if hasContent
+			$ctntProvider = new \/*# contentProvider #*/();
+			Injector::inject($ctntProvider, /*# php:dependencies #*/);
+			$ctnt = $ctntProvider->getContent($query);
+		#}
 
-    return $ctnt;
-  }
+		return $ctnt;
+	}
 
-  private function _includeJsLibs() {
-    #{ each jslibs as jslib
-      #{ if jslib = epiceditor
-        Element::js('/*# jslibPath #*//epiceditor/epiceditor.js')->addToHead();
-        Element::css('/*# jslibPath #*//epiceditor/epiceditor.css')->addToHead();
-      #{ elseif jslib = highlight
-        Element::js('/*# jslibPath #*//highlight/highlight.js')->addToHead();
-        Element::css('/*# jslibPath #*//highlight/highlight.css')->addToHead();
-      #{ elseif jslib = raphael
-        Element::js('/*# jslibPath #*//raphael.js')->addToHead();
-        Element::js('/*# jsPath #*//cdt/raphael-util.js')->addToHead();
-      #{ else
-        Element::js('/*# jslibPath #*///*# jslib #*/.js')->addToHead();
-      #}
-    #}
-  }
+	private function _includeJsLibs() {
+		#{ each jslibs as jslib
+			#{ if jslib = epiceditor
+				Element::js('/*# jslibPath #*//epiceditor/epiceditor.js')->addToHead();
+				Element::css('/*# jslibPath #*//epiceditor/epiceditor.css')->addToHead();
+			#{ elseif jslib = highlight
+				Element::js('/*# jslibPath #*//highlight/highlight.js')->addToHead();
+				Element::css('/*# jslibPath #*//highlight/highlight.css')->addToHead();
+			#{ elseif jslib = raphael
+				Element::js('/*# jslibPath #*//raphael.js')->addToHead();
+				Element::js('/*# jsPath #*//cdt/raphael-util.js')->addToHead();
+			#{ else
+				Element::js('/*# jslibPath #*///*# jslib #*/.js')->addToHead();
+			#}
+		#}
+	}
 
-  private function _loadJQuery() {
-    #{ if env = dev
-      Element::js('/*# jQueryPath #*//jquery.js')->addToHead();
-    #{ else
-      Element::js('/*# jQueryPath #*//jquery.min.js')->addToHead();
-    #}
-  }
+	private function _loadJQuery() {
+		#{ if env = dev
+			Element::js('/*# jQueryPath #*//jquery.js')->addToHead();
+		#{ else
+			Element::js('/*# jQueryPath #*//jquery.min.js')->addToHead();
+		#}
+	}
 
-  private function _loadLogin() {
-    Element::css('http://fonts.googleapis.com/css?family=Sorts+Mill+Goudy|Varela')->addToHead();
-    Element::css(_P('/css/login.css'))->addToHead();
+	private function _loadLogin() {
+		Element::css('http://fonts.googleapis.com/css?family=Sorts+Mill+Goudy|Varela')->addToHead();
+		Element::css(_P('/css/login.css'))->addToHead();
 
-    $this->_loadJQuery();
-    Element::js(_P('/js/login.js'))->addToHead();
+		$this->_loadJQuery();
+		Element::js(_P('/js/login.js'))->addToHead();
 
-    $login = new LoginForm();
-    $login->addToBody();
-    Page::dump();
-  }
+		$login = new LoginForm();
+		$login->addToBody();
+		Page::dump();
+	}
 
-  private function _onPageView() {
-    foreach ($this->_pageViewListeners as $pageViewListener) {
-      $pageViewListener->pageView();
-    }
-  }
+	private function _onPageView() {
+		foreach ($this->_pageViewListeners as $pageViewListener) {
+			$pageViewListener->pageView();
+		}
+	}
 }
