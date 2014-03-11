@@ -140,11 +140,14 @@ class /*# companionClass #*/ implements LoggerAwareInterface
     #{ if template
       $page->setTemplate($tmpl);
     #}
-    $page->bodyAdd($this->getFragment($query));
+    $page->bodyAdd($this->getContent($query));
 
     // Add an asynchronous login form that will be initially hidden so that it
     // can be autocompleted by the browser.
     $page->bodyAdd(new LoginFormAsync());
+
+    // Invoke any registered page view listeners
+    $this->_onPageView();
   }
 
   public function getFragment($query) {
@@ -154,13 +157,8 @@ class /*# companionClass #*/ implements LoggerAwareInterface
         exit;
       }
     #}
-
-    $ctnt = '';
-    #{ if hasContent
-      $ctntProvider = new \/*# contentProvider #*/();
-      Injector::inject($ctntProvider, /*# php:dependencies #*/);
-      $ctnt = $ctntProvider->getContent($query);
-    #}
+    
+    $ctnt = $this->getContent($query);
 
     // Invoke any registered page view listeners
     $this->_onPageView();
@@ -174,6 +172,17 @@ class /*# companionClass #*/ implements LoggerAwareInterface
 
   public function setPageViewListeners(array $pageViewListeners) {
     $this->_pageViewListeners = $pageViewListeners;
+  }
+
+  private function getContent($query) {
+    $ctnt = '';
+    #{ if hasContent
+      $ctntProvider = new \/*# contentProvider #*/();
+      Injector::inject($ctntProvider, /*# php:dependencies #*/);
+      $ctnt = $ctntProvider->getContent($query);
+    #}
+
+    return $ctnt;
   }
 
   private function _includeJsLibs() {
