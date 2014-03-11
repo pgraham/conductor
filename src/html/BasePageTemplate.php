@@ -5,7 +5,7 @@
  * All rights reserved.
  *
  * This file is part of Conductor and is licensed by the Copyright holder under
- * the 3-clause BSD License.  The full text of the license can be found in the
+ * the 3-clause BSD License. The full text of the license can be found in the
  * LICENSE.txt file included in the root directory of this distribution or at
  * the link below.
  * =============================================================================
