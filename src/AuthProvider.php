@@ -25,6 +25,8 @@ use LightOpenId;
  * @author Philip Graham <philip@lightbox.org>
  */
 class AuthProvider implements LoggerAwareInterface {
+	//TODO Implement InitializingBean and remove explicit call to init for each
+	//method
 	use InjectedLoggerAwareTrait;
 
 	private $companionLoader;
@@ -139,10 +141,17 @@ class AuthProvider implements LoggerAwareInterface {
 	public function hasPermission($permName, $level = 'write') {
 		$this->init();
 
+		$allowed = false;
 		if ($this->session->getUser() !== null) {
-			return Authorize::allowed($this->session->getUser(), $permName, $level);
+			$allowed = Authorize::allowed($this->session->getUser(), $permName, $level);
 		}
-		return false;
+
+		$this->logger->debug(
+			"AUTH: User " . ($allowed ? 'has' : 'does not have')
+			. " `$permName:$level` permission"
+		);
+
+		return $allowed;
 	}
 
 	/**
