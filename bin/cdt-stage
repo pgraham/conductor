@@ -80,9 +80,8 @@ cdt-stage   [--staging-link=PATH]   [--staging-dir=PATH]
                  then --staging-link must be specified.
 
   staging-link   [Optional] Where to create a symlink to the exported site. This
-                 should be a path that has the /htdocs sub-directory configured
-                 to be served by the webserver. Defaults to
-                 /srv/www/staging.<domain>
+                 should be a path that is configured to be served by the
+                 webserver. Defaults to /srv/www/staging.<domain>
 
   staging-dir    [Optional] The path to where the staging site will be exported.
                  Defaults to /srv/src/<site-nick>/staged. The site itself will 
