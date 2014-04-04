@@ -11,8 +11,12 @@
     bottom: 0;
     left: 0;
     right: 0;
-    
+
     border-collapse: separate;
+  }
+
+  &.paged {
+    border-bottom: none;
   }
 
   tbody {
@@ -22,9 +26,6 @@
     left: 0;
     right: 0;
 
-    border-top: none;
-    border-bottom: none;
-
     overflow: auto;
     overflow-x: hidden;
   }
@@ -33,22 +34,33 @@
     position: relative;
     top: 0;
     left: 0;
+    padding: 5px;
+
     border-right: none;
 
-    &.left-col {
+    &.check-col {
+      width: 40px;
+      padding: 0;
+      text-align: center;
+
       border-left: none;
     }
   }
 
-  th {
-    padding: 10px;
-    border-top: none;
+  td {
     border-bottom: none;
   }
 
-  td {
-    padding: 5px;
+  tbody tr:first-child td {
     border-top: none;
+  }
+
+
+  thead tr:first-child th {
+    border-top: none;
+  }
+
+  td {
     vertical-align: middle;
   }
 

@@ -20,20 +20,22 @@
       var self = this;
       this.element.addClass('cdt-list ui-widget-content');
 
-      this.tbl = $('<table/>').appendTo(this.element).layout('columnLayout');
+      this.tbl = $('<table/>').appendTo(this.element).layout('listLayout');
+      this.cols = $('<colgroup/>').appendTo(this.tbl);
       this.thead = $('<thead/>').appendTo(this.tbl);
       this.tbody = $('<tbody/>').appendTo(this.tbl);
       this.headers = $('<tr/>').appendTo(this.thead);
 
+      this.cols.append($('<col/>').width(40));
       this.selAll = $('<input type="checkbox"/>').click(function (e) {
         self._setAllSelected($(this).is(':checked'));
         self._trigger('selectionchange', e, { selected: self.getSelected() });
       });
       this.headers.append(
-        $('<th/>').addClass('ui-widget-header left-col').append(this.selAll)
+        $('<th/>')
+          .addClass('ui-widget-header check-col')
+          .append(this.selAll)
       );
-
-      this.cols = [];
 
       if (this.options.columns.length > 0) {
         this.addColumns(this.options.columns);
@@ -58,7 +60,13 @@
         config.renderer = createBasicRenderer(config.dataIdx);
       }
 
-      this.cols.push(config);
+      var col = $('<col/>');
+      $.data(col[0], 'config', config);
+      if (config.width) {
+        col.width(config.width);
+      }
+
+      this.cols.append(col);
       this._addHeader(config);
 
       return this;
@@ -79,13 +87,13 @@
       
       row = $('<tr/>')
         .append(this._buildRowSelect(rowData))
-        .layout('listRowLayout')
         .appendTo(this.tbody);
 
-      $.each(this.cols, function (idx, col) {
+      this.cols.children().slice(1).each(function (idx, col) {
         var cell, ctnt;
+        var config = $.data(this, 'config');
         
-        ctnt = col.renderer(rowData);
+        ctnt = config.renderer(rowData);
         cell = $('<td/>')
           .addClass('ui-widget-content')
           .appendTo(row);
@@ -98,11 +106,12 @@
           cell.append(ctnt);
         }
 
-        if (col.align) {
-          CDT.util.align(cell, col.align);
+        if (config.align) {
+          CDT.util.align(cell, config.align);
         }
       });
-      row.layout();
+
+      this.element.layout();
       return this;
     },
 
@@ -170,7 +179,7 @@
         })
 
       return $('<td/>')
-        .addClass('ui-widget-content left-col')
+        .addClass('ui-widget-content check-col')
         .append(check)
         .click(function (e) {
           e.stopPropagation();
