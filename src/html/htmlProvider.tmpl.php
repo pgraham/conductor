@@ -110,7 +110,7 @@ class /*# companionClass #*/ extends BaseHtmlProvider
 		$this->includeJsLibs();
 
 		#{ if jsappsupport
-			Element::js('/*# jslibPath #*//raphael.js')->addToHead();
+			Element::js('/*# webLib #*//raphael.min.js')->addToHead();
 			Element::js('/*# jsPath #*//cdt/raphael-util.js')->addToHead();
 
 			#{ each widgetCss as sheet
@@ -188,7 +188,7 @@ class /*# companionClass #*/ extends BaseHtmlProvider
 				Element::js('/*# jslibPath #*//highlight/highlight.js')->addToHead();
 				Element::css('/*# jslibPath #*//highlight/highlight.css')->addToHead();
 			#{ elseif jslib = raphael
-				Element::js('/*# jslibPath #*//raphael.js')->addToHead();
+				Element::js('/*# webLib #*//raphael.min.js')->addToHead();
 				Element::js('/*# jsPath #*//cdt/raphael-util.js')->addToHead();
 			#{ else
 				Element::js('/*# jslibPath #*///*# jslib #*/.js')->addToHead();

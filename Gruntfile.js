@@ -42,6 +42,10 @@ module.exports = function (grunt) {
 			momentjs: {
 				src: '<%= bowerDir %>/moment/min/moment-with-langs.min.js',
 				dest: '<%= buildDir %>/moment.min.js'
+			},
+			raphael: {
+				src: '<%= bowerDir %>/raphael/raphael-min.js',
+				dest: '<%= buildDir %>/raphael.min.js'
 			}
 		},
 
@@ -102,6 +106,7 @@ module.exports = function (grunt) {
 	grunt.registerTask('momentjs', [ 'copy:momentjs' ]);
 	grunt.registerTask('q', [ 'uglify:q' ]);
 	grunt.registerTask('webshim', [ 'concat:webshim', 'copy:webshim' ]);
+	grunt.registerTask('raphael', [ 'copy:raphael' ]);
 	grunt.registerTask('merge', [ 'concat:merge' ]);
 
 	grunt.registerTask('default', [
@@ -112,6 +117,7 @@ module.exports = function (grunt) {
 		'momentjs',
 		'q',
 		'webshim',
+		'raphael',
 		'merge',
 		'clean:work'
 	]);

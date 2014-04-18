@@ -332,6 +332,10 @@ class SiteCompiler implements LoggerAwareInterface {
 		}
 
 		$jslibOut = "$pathInfo[target]/htdocs/jslib";
+		if (!file_exists($jslibOut)) {
+			mkdir($jslibOut, 0755, true);
+		}
+
 		$jslibs = new DirectoryIterator($dir);
 		foreach ($jslibs as $jslib) {
 			if ($jslib->isDot()) {

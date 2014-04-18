@@ -21,6 +21,7 @@
     "jquery-cookie": "~1.4.0",
     "moment": "~2.6.0",
     "q": "~1.0.0",
-    "webshim": "~1.12.5"
+    "webshim": "~1.12.5",
+    "raphael": "~2.1.2"
   }
 }
