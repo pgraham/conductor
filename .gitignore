@@ -5,9 +5,6 @@ test/target
 vendor/
 composer.lock
 
-# Bower
-bower_components/
-
 # npm
 node_modules/
 
