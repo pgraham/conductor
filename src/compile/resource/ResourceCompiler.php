@@ -23,14 +23,14 @@ class ResourceCompiler {
 	private $templateParser;
 
 	/**
-	 * Create a new resource compiler instance with optional injected 
+	 * Create a new resource compiler instance with optional injected
 	 * dependencies.
 	 *
-	 * @param CodeTemplateParser $templateParser CodeTemplateParser instance. If 
+	 * @param CodeTemplateParser $templateParser CodeTemplateParser instance. If
 	 * not provided a default implementation will be instantiated.
-	 * @param LessCompiler $lessCompiler LessCompiler instance. If not provided 
+	 * @param LessCompiler $lessCompiler LessCompiler instance. If not provided
 	 * a default implementation will be instantiated.
-	 * @param CssCompiler $cssCompiler CssCompiler instance. If no provided 
+	 * @param CssCompiler $cssCompiler CssCompiler instance. If no provided
 	 * a default implementation will be instantiated.
 	 */
 	public function __construct(
@@ -50,18 +50,18 @@ class ResourceCompiler {
 	}
 
 	/**
-	 * Combine a compiled resource group. Given the path to a target directory 
-	 * that contains compiled resources, this function will compile a group of 
-	 * resources of a specified type. The group is specified using a notation 
+	 * Combine a compiled resource group. Given the path to a target directory
+	 * that contains compiled resources, this function will compile a group of
+	 * resources of a specified type. The group is specified using a notation
 	 * similar to Java's package notation. E.g:
 	 *
 	 *     $resourceCompiler->combineGroup($target, 'css', 'my.group');
 	 *
-	 * will combine all CSS files at `$target/css/my/group`. For more information 
+	 * will combine all CSS files at `$target/css/my/group`. For more information
 	 * on how the order in which files are grouped see the
 	 * {@link ResourceDiscoverer} class.
 	 *
-	 * @param string $target The target directory where the compiled resource are 
+	 * @param string $target The target directory where the compiled resource are
 	 * found.
 	 * @param string $resourceType The type of resource to combine.
 	 * @param string $group The resource group to combine.
@@ -80,13 +80,13 @@ class ResourceCompiler {
 	}
 
 	/**
-	 * Compile the resource(s) found in the given source path to the specified 
-	 * target path. If the specified source is a code template then an array of 
+	 * Compile the resource(s) found in the given source path to the specified
+	 * target path. If the specified source is a code template then an array of
 	 * substitution values _must_ be provided.
 	 *
 	 * @param string $src Path to the resource source.
 	 * @param string $target Path to the compilation target.
-	 * @param array $value Optional array of substitution values for a template 
+	 * @param array $value Optional array of substitution values for a template
 	 * resource.
 	 */
 	public function compile($src, $target, $values = array()) {

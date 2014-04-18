@@ -2,8 +2,14 @@ commit.txt
 test/target
 
 # Composer files
-vendor
+vendor/
 composer.lock
+
+# Bower
+bower_components/
+
+# npm
+node_modules/
 
 # Vim files
 .*.un~

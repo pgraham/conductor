@@ -1,0 +1,22 @@
+{
+  "name": "conductor",
+  "version": "0.0.0",
+  "description": "Drivin that train...",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/pgraham/conductor.git"
+  },
+  "author": "Philip Graham <philip@zeptech.ca>",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/pgraham/conductor/issues"
+  },
+  "homepage": "https://github.com/pgraham/conductor",
+  "devDependencies": {
+    "grunt": "~0.4.4",
+    "grunt-contrib-concat": "~0.4.0",
+    "grunt-contrib-uglify": "~0.4.0",
+    "grunt-contrib-copy": "~0.5.0",
+    "grunt-contrib-clean": "~0.5.0"
+  }
+}

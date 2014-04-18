@@ -118,6 +118,7 @@ class HtmlProvider extends CompanionGenerator {
 		$values['jsPath'] = _P('/js');
 		$values['jslibPath'] = _P('/jslib');
 		$values['cssPath'] = _P('/css');
+		$values['webLib'] = _P('/lib');
 
 		$jsResources = new ResourceDiscoverer("$this->htdocs/js", 'js');
 		$values['coreScripts'] = $jsResources->discover('cdt.core');

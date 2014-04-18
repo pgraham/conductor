@@ -46,13 +46,11 @@ abstract class BaseHtmlProvider
 		Element::css('http://fonts.googleapis.com/css?family=Sorts+Mill+Goudy|Varela')->addToHead();
 		Element::css(_P('/css/login.css'))->addToHead();
 
-		$this->loadJQuery();
+		Element::js(_P('/lib/jquery.all.min.js'))->addToHead();
 		Element::js(_P('/js/login.js'))->addToHead();
 
 		$login = new LoginForm();
 		$login->addToBody();
 		Page::dump();
 	}
-
-	abstract protected function loadJQuery();
 }

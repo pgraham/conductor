@@ -1,4 +1,4 @@
-Copyright (c) 2010, Philip Graham
+Copyright (c) 2014, Philip Graham
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,

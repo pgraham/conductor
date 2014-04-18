@@ -4,6 +4,13 @@
 Conductor is a webapp framework for PHP+Javascript providing specific support
 for single page Javascript heavy applications.
 
+## Prerequisites:
+
+ -  composer
+ -  node,npm
+ -  bower
+ -  grunt
+
 ## Install
 
  1. Add as a [Composer](http://getcomposer.org) dependency. (in `composer.json`)
@@ -19,6 +26,20 @@ for single page Javascript heavy applications.
 
     If you get errors about not being able to change groups run the following
     command: `sudo chgrp -R www-data target`
+
+ 4. \*Install bower dependencies:
+
+        $ cd vendor/zeptech/conductor
+        $ bower install
+
+ 5. \*Run Grunt build:
+
+        $ cd vendor/zeptech/conductor
+        $ npm install
+        $ grunt
+
+\* These steps will be eliminated either through a composer install/update hook
+or in the cdt-init script.
 
 ## Configuration
 

@@ -85,24 +85,12 @@ class /*# companionClass #*/ extends BaseHtmlProvider
 		// Javascript libraries
 		// -------------------------------------------------------------------------
 		// Non-jquery
-		Element::js('/*# jslibPath #*//date.js')->addToHead();
-		Element::js('/*# jslibPath #*//q/q.min.js')->addToHead();
+		Element::js('/*# webLib #*//moment.min.js')->addToHead();
+		Element::js('/*# webLib #*//q.min.js')->addToHead();
 
-		// JQuery - If dev mode non-minimized version is included
-		$this->loadJQuery();
-
-		// Webshims
-		Element::js('/*# jslibPath #*//webshims/polyfiller.js')->addToHead();
-
-		// JQuery Cookie
-		Element::js('/*# jslibPath #*//jquery-cookie/jquery.cookie.js')->addToHead();
-
-		// JQuery UI
-		Element::css('/*# jslibPath #*//jquery-ui/jquery.ui.css')->addToHead();
-		Element::css('/*# jslibPath #*//jquery-ui/themes//*# uitheme #*//jquery.ui.theme.css')
-			->addToHead();
-		Element::js('/*# jslibPath #*//jquery-ui/external/globalize.js')->addToHead();
-		Element::js('/*# jslibPath #*//jquery-ui/jquery.ui.js')->addToHead();
+		// JQuery - This includes jQuery and all dependent plugins
+		Element::js('/*# webLib #*//jquery.all.min.js')->addToHead();
+		Element::css('/*# webLib #*//jquery-ui.min.css')->addToHead();
 
 		// -------------------------------------------------------------------------
 
@@ -178,14 +166,6 @@ class /*# companionClass #*/ extends BaseHtmlProvider
 
 	public function setAuthProvider($authProvider) {
 		$this->authProvider = $authProvider;
-	}
-
-	protected function loadJQuery() {
-		#{ if env = dev
-			Element::js('/*# jQueryPath #*//jquery.js')->addToHead();
-		#{ else
-			Element::js('/*# jQueryPath #*//jquery.min.js')->addToHead();
-		#}
 	}
 
 	private function getContent($query) {
