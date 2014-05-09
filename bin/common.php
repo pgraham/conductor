@@ -1,11 +1,11 @@
 <?php
 /**
  * =============================================================================
- * Copyright (c) 2010, Philip Graham
+ * Copyright (c) 2014, Philip Graham
  * All rights reserved.
  *
  * This file is part of Conductor and is licensed by the Copyright holder under
- * the 3-clause BSD License.	The full text of the license can be found in the
+ * the 3-clause BSD License. The full text of the license can be found in the
  * LICENSE.txt file included in the root directory of this distribution or at
  * the link below.
  * =============================================================================
@@ -21,6 +21,11 @@ namespace zpt\cdt\bin {
 	 */
 	class BinCommon {
 
+		/*
+		 * Composer autoloader locations. These paths cover two situations, when
+		 * running the scripts from a project that uses conductor as a dependency or
+		 * from within conductor itself.
+		 */
 		private static $autoloadFiles = array(
 			'../vendor/autoload.php',
 			'../../../autoload.php'
@@ -30,11 +35,23 @@ namespace zpt\cdt\bin {
 		private static $composerLoader;
 		private static $siteRootDir;
 
+		/**
+		 * Find the composer vendor/ directory. It will either be in the base
+		 * directory when running a script from within Conductor or in a parent
+		 * directory when running from a project that uses Conductor as
+		 * a dependency.
+		 *
+		 * @param string $baseDir
+		 *   The basepath from which to find composer. Default is the directory in
+		 *   which this file exists.
+		 * @return string
+		 */
 		public static function getComposerPath($baseDir = null) {
 			if (self::$composerPath === null) {
 				if ($baseDir === null) {
 					$baseDir = __DIR__;
 				}
+
 				foreach (self::$autoloadFiles as $file) {
 					$path = "$baseDir/$file";
 					if (file_exists($path)) {
@@ -51,6 +68,15 @@ namespace zpt\cdt\bin {
 			return self::$composerPath;
 		}
 
+		/**
+		 * Getter for the composer autoloader. A side effect of getting the loader
+		 * is that it is also registered.
+		 *
+		 * @param string $baseDir
+		 *   The basepath from which to find composer. Default is the directory in
+		 *   which this file exists.
+		 * @return Composer\Autoload\ClassLoader
+		 */
 		public static function getComposerLoader($baseDir = null) {
 			if (self::$composerLoader === null) {
 				$composerPath = getComposerPath($baseDir);
@@ -62,6 +88,15 @@ namespace zpt\cdt\bin {
 			return self::$composerLoader;
 		}
 
+		/**
+		 * Determine the root directory of the site that is using Conductor as its 
+		 * dependency.
+		 *
+		 * @param string $baseDir
+		 *   The basepath from which to find composer. Default is the directory in
+		 *   which this file exists.
+		 * @return string
+		 */
 		public static function getSiteRootDir($baseDir = null) {
 			if (self::$siteRootDir === null) {
 				$composerPath = self::getComposerPath($baseDir);
@@ -134,10 +169,6 @@ namespace {
 	 */
 	function binLogError($msg, $depth = 0) {
 		binPrettyLog($msg, '✖', 31, $depth);
-		/*
-		$tabbing = str_repeat(' ', $depth);
-		echo "$tabbing \033[31m✖\033[0m $msg\n";
-		*/
 	}
 
 	/**
@@ -145,10 +176,6 @@ namespace {
 	 */
 	function binLogInfo($msg, $depth = 0) {
 		binPrettyLog($msg, '➜', 39, $depth);
-		/*
-		$tabbing = str_repeat('    ', $depth);
-		echo "$tabbing \033[39m➜\033[0m $msg\n";
-		 */
 	}
 
 	/**
@@ -156,8 +183,6 @@ namespace {
 	 */
 	function binLogSuccess($msg, $depth = 0) {
 		binPrettyLog($msg, '✔', 32, $depth);
-		//$tabbing = str_repeat(' ', $depth);
-		//echo "$tabbing \e[32m✔\e[0m $msg\n";
 	}
 
 	/**
@@ -165,7 +190,5 @@ namespace {
 	 */
 	function binLogWarning($msg, $depth = 0) {
 		binPrettyLog($msg, '⚠', 93, $depth);
-		//$tabbing = str_repeat(' ', $depth);
-		//echo "$tabbing \e[93m⚠\e[0m $msg\n";
 	}
 }
