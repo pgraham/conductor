@@ -30,6 +30,7 @@
     "mrclay/minify": "dev-master",
     "psr/log": "1.0.0",
     "monolog/monolog": "1.7.0",
+    "symfony/yaml": "2.4.4",
 
     "zeptech/utility": "dev-master",
     "zeptech/annotations": "1.0.*",
