@@ -50,7 +50,7 @@ namespace { //global namespace
 
   // Function to transform a file-system path into a web path
   function _fsToWeb($path) {
-    if (substr($path, 0, /*# docRootLen #*/) === '/*# pathInfo[docRoot] #*/') {
+    if (substr($path, 0, /*# docRootLen #*/) === '/*# pathInfo[htdocs] #*/') {
       #{if pathInfo[webRoot] = /
         return substr($path, /*# docRootLen #*/);
       #{else
@@ -64,9 +64,9 @@ namespace { //global namespace
   // Function to transform a context sensitive web path into a file system path.
   function _webToFs($path) {
     #{if pathInfo[webRoot] = /
-      return '/*# pathInfo[docRoot] #*/' . $path;
+      return '/*# pathInfo[htdocs] #*/' . $path;
     #{else
-      return '/*# pathInfo[docRoot] #*/' . substr($path, /*# webRootLen #*/);
+      return '/*# pathInfo[htdocs] #*/' . substr($path, /*# webRootLen #*/);
     #}
   }
 

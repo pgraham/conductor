@@ -30,7 +30,7 @@ class ConfiguratorGenerator extends CompanionGenerator {
 	private $cfg;
 
 	public function __construct(SiteConfiguration $cfg) {
-		parent::__construct($cfg->getTarget());
+		parent::__construct($cfg->getPathInfo()['target']);
 
 		$this->cfg = $cfg;
 	}
@@ -49,8 +49,8 @@ class ConfiguratorGenerator extends CompanionGenerator {
 		$dbConfig = $this->cfg->getDbConfig();
 
 		return array(
-			'pathInfo' => $pathInfo->getArrayCopy(),
-			'docRootLen' => strlen($pathInfo['docRoot']),
+			'pathInfo' => $pathInfo->asArray(),
+			'docRootLen' => strlen($pathInfo['htdocs']),
 			'webRootLen' => strlen($pathInfo['webRoot']),
 			'namespace' => $namespace,
 			'dbConfig' => $dbConfig->asArray(),

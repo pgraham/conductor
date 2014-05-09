@@ -66,18 +66,18 @@ XML;
 		$pathInfo = $config['pathInfo'];
 		$this->assertEquals(__DIR__, $pathInfo['root']);
 		$this->assertEquals('/mytest', $pathInfo['webRoot']);
-		$this->assertEquals(__DIR__ . '/htdocs', $pathInfo['docRoot']);
+		$this->assertEquals(__DIR__ . '/htdocs', $pathInfo['htdocs']);
 		$this->assertEquals(__DIR__ . '/lib', $pathInfo['lib']);
 		$this->assertEquals(__DIR__ . '/src', $pathInfo['src']);
 		$this->assertEquals(__DIR__ . '/target', $pathInfo['target']);
 
 		$this->assertInternalType('array', $config['db_config']);
 		$dbConfig = $config['db_config'];
-		$this->assertEquals('local_user', $dbConfig['db_user']);
-		$this->assertEquals('local_password', $dbConfig['db_pass']);
-		$this->assertEquals('my_schema', $dbConfig['db_schema']);
-		$this->assertEquals('mysql', $dbConfig['db_driver']);
-		$this->assertEquals('localhost', $dbConfig['db_host']);
+		$this->assertEquals('local_user', $dbConfig['username']);
+		$this->assertEquals('local_password', $dbConfig['password']);
+		$this->assertEquals('my_schema', $dbConfig['schema']);
+		$this->assertEquals('mysql', $dbConfig['driver']);
+		$this->assertEquals('localhost', $dbConfig['host']);
 
 		$this->assertEquals('dev', $config['env']);
 		$this->assertEquals('', $config['logDir']);

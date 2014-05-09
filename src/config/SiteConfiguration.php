@@ -1,16 +1,11 @@
 <?php
-/**
- * =============================================================================
+/*
  * Copyright (c) 2014, Philip Graham
  * All rights reserved.
  *
- * This file is part of Conductor and is licensed by the Copyright holder under
- * the 3-clause BSD License.  The full text of the license can be found in the
- * LICENSE.txt file included in the root directory of this distribution or at
- * the link below.
- * =============================================================================
  *
- * @license http://www.opensource.org/licenses/bsd-license.php
+ * This file is part of Conductor. For the full copyright and license information
+ * please view the LICENSE file that was distributed with this source code.
  */
 namespace zpt\cdt\config;
 
@@ -18,15 +13,12 @@ use ArrayObject;
 use Exception;
 
 /**
- * This class encapsulates a sites configurable environment values.
+ * This class encapsulates a sites runtime configuration.
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class SiteConfiguration
+class SiteConfiguration extends ConfigurationSet
 {
-
-	private $root;
-	private $env;
 
 	// Composite configuration
 	private $pathInfo;
@@ -40,34 +32,21 @@ class SiteConfiguration
 	/**
 	 * Load the configuration stored in the specified file.
 	 */
-	public function __construct($root, $path, $env) {
-		$this->root = $root;
-		$this->env = $env;
+	public function __construct($root, $env) {
+		parent::__construct($root, $env);
 
-		$xmlCfg = simplexml_load_file("$root/$path", 'SimpleXMLElement',
-			LIBXML_NOCDATA);
+		$config = Configuration::get($root);
 
-		if (!isset($xmlCfg->namespace)) {
-			throw new ConfigurationException("The site's namespace is not set.");
-		}
+		$this->namespace = $this->getValue('namespace', $config, $env);
 
-		$this->pathInfo = $this->parsePathInfo($root, $xmlCfg);
-		$this->namespace = (string) $xmlCfg->namespace;
-		$this->dbConfig = new DatabaseConfiguration($xmlCfg);
+		$this->pathInfo = new PathConfiguration($root, $env);
+		$this->dbConfig = new DatabaseConfiguration($root, $env);
 
-		$logDir = '';
-		if (isset($this->xmlCfg->logDir)) {
-			$logDir = (string) $this->xmlCfg->logDir;
-		}
-		$this->logDir = $logDir;
+		$this->logDir = $this->getValueOrDefault('logDir', $config, $env, '');
 	}
 
 	public function getDbConfig() {
 		return $this->dbConfig;
-	}
-
-	public function getEnv() {
-		return $this->env;
 	}
 
 	public function getLogDir() {
@@ -81,31 +60,4 @@ class SiteConfiguration
 	public function getPathInfo() {
 		return $this->pathInfo;
 	}
-
-	public function getTarget() {
-		return $this->target;
-	}
-
-	private function parsePathInfo($root, $xmlCfg) {
-		$webRoot = isset($xmlCfg->webRoot)
-			? (string) $xmlCfg->webRoot
-			: '/';
-
-		$docRoot = "$root/htdocs";
-		$cdtRoot = "$root/vendor/zeptech/conductor";
-		$src = "$root/src";
-		$target = "$root/target";
-
-		$this->target = $target;
-
-		return new ArrayObject(array(
-			'root' => $root,
-			'webRoot' => $webRoot,
-			'docRoot' => $docRoot,
-			'cdtRoot' => $cdtRoot,
-			'src' => $src,
-			'target' => $target
-		));
-	}
-
 }

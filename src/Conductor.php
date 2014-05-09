@@ -241,11 +241,11 @@ class Conductor {
     try {
       $dbConfig = self::$_config['db_config'];
 
-      $driver = $dbConfig['db_driver'];
-      $schema = $dbConfig['db_schema'];
-      $host = $dbConfig['db_host'];
-      $user = $dbConfig['db_user'];
-      $pass = $dbConfig['db_pass'];
+      $driver = $dbConfig['driver'];
+      $schema = $dbConfig['schema'];
+      $host = $dbConfig['host'];
+      $user = $dbConfig['username'];
+      $pass = $dbConfig['password'];
 
       // TODO Use zpt\db\DatabaseConnection instead
       $pdo = new PdoExt([
@@ -326,9 +326,6 @@ class Conductor {
    * Process the request.
    */
   public static function processRequest() {
-    // Make sure that a generated mapping configurator exists
-    $pathInfo = self::getPathInfo();
-
     $server = new InjectedRestServer();
     $server->setLogger(self::$applicationLogger);
 

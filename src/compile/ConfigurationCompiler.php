@@ -42,7 +42,7 @@ class ConfigurationCompiler {
 	public function compile($root, $env) {
 		$cfg = array();
 
-		$config = new SiteConfiguration($root, 'conductor.cfg.xml', $env);
+		$config = new SiteConfiguration($root, $env);
 
 		$generator = new ConfiguratorGenerator($config);
 		$generator->generate('Configurator');

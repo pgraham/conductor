@@ -41,9 +41,8 @@ class SiteCompilerTest extends TestCase {
 			'pathInfo' => new ArrayObject(array(
 				'root' => $root,
 				'webRoot' => '/',
-				'docRoot' => "$root/htdocs",
+				'htdocs' => "$root/htdocs",
 				'cdtRoot' => "$root/vendor/zeptech/conductor",
-				'lib' => "$root/lib",
 				'src' => "$root/src",
 				'target' => "$root/target"
 			)),
