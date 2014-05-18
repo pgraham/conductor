@@ -84,8 +84,6 @@ namespace zpt\cdt\bin {
 				$composerPath = getComposerPath($baseDir);
 				$loader = include "$composerPath/autoload.php";
 				self::$composerLoader = $loader;
-
-				\FunBox::init();
 			}
 			return self::$composerLoader;
 		}
@@ -118,7 +116,9 @@ namespace zpt\cdt\bin {
 namespace {
 
 	use zpt\cdt\bin\BinCommon;
+	use zpt\cdt\bin\CmdlnLogger;
 
+	BinCommon::getComposerLoader();
 	BinCommon::$logger = new CmdlnLogger();
 
 	/**
