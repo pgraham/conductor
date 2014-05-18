@@ -76,11 +76,6 @@ $jslibOutBase = File::joinPaths($libOut, 'jslib');
 $modDir = File::joinPaths($input, 'modules');
 $modOutBase = File::joinPaths($output, 'modules');
 
-// Build paths for conductor.cfg.xml
-$cdtCfgSrc = File::joinPaths($input, 'conductor.cfg.xml');
-$cdtCfgPatch = File::joinPaths($input, "$env.xdiff");
-$cdtCfgOut = File::joinPaths($output, 'conductor.cfg.xml');
-
 // Verify that all repos are clean
 // -----------------------------------------------------------------------------
 if (!is_git_repo_clean($input)) {
@@ -197,12 +192,6 @@ chdir($oldDir);
 // Initialize conductor's submodules
 init_git_repo_submodules("$output/vendor/zeptech/conductor");
 
-// Export conductor configuration, applying staging patch to the XML
-//------------------------------------------------------------------------------
-$cdtCfg = Xml::patch($cdtCfgSrc, $cdtCfgPatch);
-$cdtCfg->save($cdtCfgOut);
-exit(0);
-
 //------------------------------------------------------------------------------
 // Utility functions, used to parse and validate command line parameters
 //------------------------------------------------------------------------------
@@ -253,9 +242,9 @@ function validateInput($input) {
 		exit(1);
 	}
 
-	if (!file_exists("$input/conductor.cfg.xml")) {
+	if (!file_exists("$input/conductor.yml")) {
 		echo "Specified input path is not a conductor web site: $input\n",
-				 "No conductor.cfg.xml found\n";
+				 "No conductor.yml found\n";
 		exit(1);
 	}
 }
