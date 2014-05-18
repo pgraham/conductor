@@ -1,54 +1,70 @@
 #!/usr/bin/env php
 <?php
-/**
- * =============================================================================
- * Copyright (c) 2010, Philip Graham
+/*
+ * Copyright (c) 2014, Philip Graham
  * All rights reserved.
  *
- * This file is part of Conductor and is licensed by the Copyright holder under
- * the 3-clause BSD License.  The full text of the license can be found in the
- * LICENSE.txt file included in the root directory of this distribution or at
- * the link below.
- * =============================================================================
  *
- * @license http://www.opensource.org/licenses/bsd-license.php
+ * This file is part of Conductor. For the full copyright and license information
+ * please view the LICENSE file that was distributed with this source code.
  */
 
 /**
- * This script performs a development - staging deployment.
+ * This script performs a development -> staging deployment.
  *
  * File System deployment:
  * -----------------------
  * The general strategy is to export the development site to a site dump that 
  * will contain a certain number of previous staging sites. The newly exported 
- * site will then be symlinked to a specified location that should be configured 
- * to be served by the web server.
+ * site will then be symlinked to a specified location that is configured to be
+ * served by the web server.
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-use \zpt\cdt\compile\SiteCompiler;
+use zpt\cdt\bin\BinCommon;
+use zpt\cdt\bin\CmdlnLogger;
+use zpt\cdt\bin\StagingProcess;
+use zpt\cdt\compile\SiteCompiler;
+use zpt\cdt\config\DatabaseConfiguration;
+use zpt\cdt\config\DeploymentConfiguration;
+use zpt\db\exception\DatabaseException;
+use zpt\db\DatabaseConnection;
 
-require_once __DIR__ . '/common.php';
+require_once __DIR__ . '/setup.php';
 
-$loader = getComposerLoader();
-$devDir = getSiteRootDir();
+$usage = <<<USAGE
+cdt-stage   [--staging-db=DB]   [--production-db=DB]   [--ws-link=PATH]
+   [--prod-dir=PATH]   [path]
 
-// Make sure conductor configuration file exists
-if (!file_exists("$devDir/conductor.yml")) {
-  echo "Unable to locate conductor configuration file in $devDir\n";
-  exit(1);
-}
+All options and arguments used by this script can be specified in the site's
+configuration file. Any parameters and arguments specified on the command line
+will override those specified in the configuration file.
 
-// The site's nickname is the name of the dev dir.  This will be used to
-// generate defaults for missing options
-$siteNick = basename($devDir);
+  path          The path to where the staging site will be exported. The actual
+                site itself will be exported to a subdirectory of this path
+                which is named as the current Unix timestamp.
 
-/*
- * =============================================================================
- * Include necessary FunBox functions.
- * =============================================================================
- */
+  --staging-db  The name of the database to use for the staging site. This can
+                be specified in the site's configuration file. If not specified
+                no database updates will occur.
 
+  --prod-db     The name of the production database. This is copied over the
+                staging database before applying any necessary alters.
+
+  --ws-link     [Optional] Where to create a symlink to the exported site. This
+                should be a path that is configured to be served by the web
+                server.
+
+  --prod-dir    [Optional] The path to the current production site. This will be
+                used to copy user content into the staging site. This can be
+                specified in the site's configuration file.
+
+Any parameters not marked as optional need to either be specified in the site's
+configuration file or on the command line.
+USAGE;
+
+
+// Include necessary FunBox functions.
 ensureFn(
   'announceWait',
   'applyDatabaseAlters',
@@ -66,85 +82,70 @@ if (!checkRoot()) {
   exit(1);
 }
 
-/*
- * =============================================================================
- * Parse command line
- * =============================================================================
- */
-
-$usage = <<<USAGE
-cdt-stage   [--staging-link=PATH]   [--staging-dir=PATH]
-   [--production-dir=PATH]   [--staging-db=DB]   [--production-db=DB]   [domain]
-
-  domain         [Optional] The domain used to serve the site. If not provided
-                 then --staging-link must be specified.
-
-  staging-link   [Optional] Where to create a symlink to the exported site. This
-                 should be a path that is configured to be served by the
-                 webserver. Defaults to /srv/www/staging.<domain>
-
-  staging-dir    [Optional] The path to where the staging site will be exported.
-                 Defaults to /srv/src/<site-nick>/staged. The site itself will 
-                 be exported to a subdirectory of this path which is named as
-                 the current Unix timestamp.
-
-  production-dir [Optional] The path to the current production site. This will
-                 be used to copy user content into the staging site.
-
-  staging-db     [Optional] The name of the database to use for the staging
-                 site. Defaults to `<site-nick>_s`.
-
-  production-db  [Optional] The name of the production database. This is copied
-                 over the staging database before applying any necessary alters.
-                 Defaults to `<site-nick>`.
-
-USAGE;
-
+// Parse command line
 $opts = array(
-  'staging-link',
-  'staging-dir',
-  'production-dir',
   'staging-db',
-  'production-db'
+  'prod-db',
+  'ws-link',
+  'prod-dir'
 );
 $cmdln = getcmdln($argv, $opts);
 
-$domain = null;
+// Load configuration
+$deployConfig = new DeploymentConfiguration($devDir, 'stage');
+$deployConfigProd = new DeploymentConfiguration($devDir, 'prod');
+$dbConfig = new DatabaseConfiguration($devDir, 'stage');
+$dbConfigProd = new DatabaseConfiguration($devDir, 'prod');
+
 if ($cmdln->argc > 1) {
-  $domain = $cmdln->argv[1];
-}
-
-// Save a timestamp for identifying and associating output files
-$ts = time();
-
-if (isset($cmdln->opt['staging-link'])) {
-  $stageLink = $cmdln->opt['staging-link'];
-} else if (isset($domain)) {
-  $stageLink = "/srv/www/staging.$domain";
+  $stageDir = $cmdln->argv[1];
+} else if (isset($deployConfig['path'])) {
+  $stageDir = $deployConfig['path'];
 } else {
-  echo "Either one of domain or --staging-link must be specified\n";
+  binLogError("You must specify or configure a path to deploy to.");
   echo $usage;
   exit(1);
 }
 
-$stageDir = isset($cmdln->opt['staging-dir'])
-  ? $cmdln->opts['staging-dir'] . "/$ts"
-  : "/srv/src/$siteNick/staging/$ts";
-
-$prodDir = null;
-if (isset($cmdln->opt['production-dir'])) {
-  $prodDir = $cmdln->opt['production-dir'];
-} else if (isset($domain)) {
-  $prodDir = "/srv/www/$domain";
+if (isset($cmdln->opt['staging-db'])) {
+  $stageDb = $cmdln->opt['staging-db'];
+} else if (isset($dbConfig['schema'])) {
+  $stageDb = $dbConfig['schema'];
+} else {
+  binLogError("Staging database is not configured.");
+  echo $usage;
+  exit(1);
 }
 
-$stageDb = isset($cmdln->opt['staging-db'])
-  ? $cmdln->opts['staging-db']
-  : $siteNick . '_s';
+if (isset($cmdln->opt['prod-db'])) {
+  $prodDb = $cmdln->opt['prod-db'];
+} else if (isset($dbConfigProd['schema'])) {
+  $prodDb = $dbConfigProd['schema'];
+} else {
+  binLogError("Production database is not configured.");
+  echo $usage;
+  exit(1);
+}
 
-$prodDb = isset($cmdln->opt['production-db'])
-  ? $cmdln->opts['production-db']
-  : $siteNick;
+if (isset($cmdln->opt['ws-link'])) {
+  $stageLink = $cmdln->opt['ws-link'];
+} else if (isset($deployConfig['wsLink'])) {
+  $stageLink = $deployConfig['wsLink'];
+} else {
+  $stageLink = null;
+}
+
+if (isset($cmdln->opt['prod-dir'])) {
+  $prodDir = $cmdln->opt['prod-dir'];
+} else if (isset($deployConfigProd['wsLink'])) {
+  $prodDir = $deployConfigProd['wsLink'];
+} else {
+  $prodDir = null;
+}
+
+// Save a timestamp for identifying and associating output files
+$ts = time();
+$stageDir = "$stageDir/$ts";
 
 /*
  * =============================================================================
@@ -156,45 +157,53 @@ $prodDb = isset($cmdln->opt['production-db'])
 if (file_exists($stageDir)) {
   // TODO Should the target be overwritten should the user be prompted for this
   //      decision?
-  echo "Specified target directory already exists: {$stageDir}\n";
+  binLogError("Specified target directory already exists: {$stageDir}");
   exit(1);
 }
 
 if (!is_createable($stageDir)) {
-  echo "Insufficient permissions to create target directory {$stageDir}\n";
-  echo "Please ";
+  binLogError(
+    "Insufficient permissions to create target directory {$stageDir}"
+  );
   if (!checkRoot()) {
-    echo "try again as root or ";
+    binLogError("Please try again as root.");
   }
-  echo "try specifying another directory using --staging-dir\n";
   echo $usage;
   exit(1);
 }
 
-// If the specified staging link doesn't exist WARN the user that they may have
-// to configure their webserver
-if (!file_exists($stageLink)) {
+if ($stageLink && !file_exists($stageLink)) {
   if (!is_createable($stageLink)) {
-    echo "Unable to create the specified webserver link.\n";
-    echo "Please ";
+    binLogError("Unable to create the specified webserver link.");
     if (!checkRoot()) {
-      echo "try again as root or ";
+      binLogError("Please try again as root.");
     }
-    echo "try specifying another link using --staging-link\n";
   } else {
-    echo "WARNING: The specified webserver link does not currently exist and "
-      .  "will be created. You may need to configure your webserver to serve the "
-      .  "staged site from:\n\n  $stageLink\n";
+    binLogWarning(
+        "The specified webserver link does not currently exist and will be "
+        . "created. You may need to configure your webserver to serve the staged "
+        . "site from:\n\n  $stageLink\n"
+    );
   }
 }
 
-// Get and test root database password.
-$dbPass = passwordPrompt('Please enter the Mysql ROOT password: ');
+// Get and test priviledged database username and password.
+$dbUserPrompt = String('Please enter priviledged {0} database username');
+$privDbUser = passwordPrompt(
+  $dbUserPrompt->format($dbConfig['driver']),
+  'root'
+);
+$dbPassPrompt = String('Please enter the priviledged {0} database password');
+$privDbPass = passwordPrompt($dbPassPrompt->format($dbConfig['driver']));
+
 try {
-  $pdo = new PDO("mysql:host=localhost", 'root', $dbPass);
-} catch (PDOException $e) {
-  echo "Unable to connect to database, {$e->getMessage()}\n";
-  exit(1);
+  $db = new DatabaseConnection([
+    'driver' => $dbConfig['driver'],
+    'username' => $privDbUser,
+    'password' => $privDbPass
+  ]);
+} catch (DatabaseException $e) {
+  binLogError("Unable to connect to database, {$e->getMessage()}");
 }
 
 /*
@@ -202,125 +211,27 @@ try {
  * Export the site to the specified target
  * =============================================================================
  */
-
-// 1. Compile site
-// -----------------------------------------------------------------------------
-$exportCmd = String(__DIR__ . "/cdt-export {0} {1}")
-  ->format($devDir, $stageDir);
-$failure = false;
-passthru($exportCmd, $failure);
-if ($failure) {
-  echo "Error exporting site\n";
-  return $failure;
-}
-
-$compileCmd = String("$stageDir/vendor/bin/cdt-compile {0}")
-  ->format(SiteCompiler::ENV_STAGE);
-$failure = false;
-passthru($compileCmd, $failure);
-if ($failure) {
-  echo "Error compiling site\n";
-  return $failure;
-}
-
-// Copy production xdiff to staging directory so that it is available for
-// deployment
-/*
-copy("$devDir/production.xdiff", "$stageDir/production.xdiff");
-chmod("$stageDir/production.xdiff", 0600);
- */
-
-// Create a symlink for htdocs
-symlinkInDir($stageDir, 'target/htdocs', 'htdocs');
-
-// 2. Update Staging Database
-// -----------------------------------------------------------------------------
-echo "Copying $prodDb to $stageDb\n";
-copyDb($prodDb, $stageDb, 'root', $dbPass);
-
-// 3. If a usr content directory exists, copy any existing content from the
-//    production deployment
-// -----------------------------------------------------------------------------
-if (file_exists("$devDir/htdocs/usr")) {
-
-  if (file_exists("$prodDir/htdocs/usr")) {
-    passthru("cp -a $prodDir/htdocs/usr $stageDir/htdocs/");
-  } else {
-    mkdir("$stageDir/htdocs/usr", 0755, true);
-  }
-
-}
-
-if (file_exists("$devDir/target/usr")) {
-
-  if (file_exists("$prodDir/target/usr")) {
-    passthru("cp -a $prodDir/target/usr $stageDir/");
-  } else {
-    mkdir("$stageDir/usr", 0755, true);
-  }
-
-}
+$stageProcess = new StagingProcess($devDir, $stageDir);
+$stageProcess->setDatabaseConnection($db);
+$stageProcess->setStagingDatabase($stageDb);
+$stageProcess->setProductionDatabase($prodDb);
+$stageProcess->setWebServerLink($stageLink);
+$stageProcess->setCurrentProductionPath($prodDir);
+$stageProcess->execute(BinCommon::$logger);
 
 // 4. Apply development alters
 // ---------------------------
 //
-// Order here is important.  Performing site alters first because they can
-// manipulate the alter versions for conductor and modules in order to resolve
-// any conflicts between existing structure are pending updates.
 // -----------------------------------------------------------------------------
 
 // Do site alters
-$stmt = $pdo->query(
-  "SELECT `value` FROM $stageDb.`config_values` WHERE `name` = 'site-alter'");
-$siteVersion = (int) $stmt->fetchColumn();
-$siteAlterPath = "$stageDir/src/sql";
-if (file_exists($siteAlterPath)) {
-  applyDatabaseAlters('root', $dbPass, $stageDb, $siteVersion,
-    $siteAlterPath);
-}
 
 // Do module alters
-if (file_exists("$stageDir/modules")) {
-  $modules = new DirectoryIterator("$stageDir/modules");
-  foreach ($modules as $module) {
-    $moduleName = $module->getBasename();
-
-    $stmt = $pdo->query(
-      "SELECT `value`
-       FROM $stageDb.`config_values`
-       WHERE `name` = 'module-$moduleName-alter'");
-
-    $moduleVersion = (int) $stmt->fetchColumn();
-    $moduleAlterPath = "$stageDir/modules/$moduleName/sql";
-    if (file_exists($moduleAlterPath)) {
-      applyDatabaseAlters('root', $dbPass, $stageDb, $moduleVersion,
-        $moduleAlterPath);
-    }
-  }
-}
 
 // Do conductor alters
-$stmt = $pdo->query(
-  "SELECT `value` FROM $stageDb.`config_values` WHERE `name` = 'cdt-alter'");
-$cdtVersion = (int) $stmt->fetchColumn();
-$cdtAlterPath = "$stageDir/vendor/zeptech/conductor/resources/sql";
-applyDatabaseAlters('root', $dbPass, $stageDb, $cdtVersion, $cdtAlterPath);
-
-// 5. Set permissions on special files and directories
-// -----------------------------------------------------------------------------
-if (file_exists("$stageDir/htdocs/usr")) {
-  chgrp("$stageDir/htdocs/usr", 'www-data');
-  chmod("$stageDir/htdocs/usr", 0775);
-}
-
-if (file_exists("$stageDir/usr")) {
-  chgrp("$stageDir/usr", 'www-data');
-  chmod("$stageDir/usr", 0775);
-}
 
 // 6. Link compiled website into web server
 // -----------------------------------------------------------------------------
-atomicSymlink($stageLink, "$stageDir/htdocs");
 
 // Return 0 to indicate success
 return 0;

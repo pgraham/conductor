@@ -32,6 +32,7 @@
     "monolog/monolog": "1.7.0",
     "symfony/yaml": "2.4.4",
 
+    "zeptech/database": "dev-master",
     "zeptech/utility": "dev-master",
     "zeptech/annotations": "1.0.*",
     "zeptech/oobo": "dev-master",

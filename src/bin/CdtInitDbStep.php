@@ -56,7 +56,7 @@ class CdtInitDbStep {
 
 			// Apply database alters
 			$dbup = new DatabaseUpdater();
-			$dbup->setLogger(new CmdLnPsrLoggerImpl());
+			$dbup->setLogger(new CmdlnLogger());
 
 			$versionRetriever = new CdtDatabaseVersionManager();
 			$dbup->setDatabaseVersionManager($versionRetriever);

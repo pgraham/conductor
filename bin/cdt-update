@@ -24,7 +24,7 @@
 require_once __DIR__ . '/common.php';
 
 use zpt\cdt\bin\CdtDatabaseVersionManager;
-use zpt\cdt\bin\CmdLnPsrLoggerImpl;
+use zpt\cdt\bin\CmdlnLogger;
 use zpt\cdt\config\SiteConfiguration;
 use zpt\dbup\DatabaseUpdater;
 use zpt\util\StringUtils;
@@ -61,7 +61,7 @@ $db = $dbConfig->connect([
 ]);
 
 $dbUp = new DatabaseUpdater();
-$dbUp->setLogger(new CmdLnPsrLoggerImpl());
+$dbUp->setLogger(new CmdlnLogger());
 
 $verManager = new CdtDatabaseVersionManager();
 $dbUp->setDatabaseVersionManager($verManager);

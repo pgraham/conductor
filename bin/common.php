@@ -21,6 +21,8 @@ namespace zpt\cdt\bin {
 	 */
 	class BinCommon {
 
+		public static $logger;
+
 		/*
 		 * Composer autoloader locations. These paths cover two situations, when
 		 * running the scripts from a project that uses conductor as a dependency or
@@ -82,14 +84,12 @@ namespace zpt\cdt\bin {
 				$composerPath = getComposerPath($baseDir);
 				$loader = include "$composerPath/autoload.php";
 				self::$composerLoader = $loader;
-
-				\FunBox::init();
 			}
 			return self::$composerLoader;
 		}
 
 		/**
-		 * Determine the root directory of the site that is using Conductor as its 
+		 * Determine the root directory of the site that is using Conductor as its
 		 * dependency.
 		 *
 		 * @param string $baseDir
@@ -116,6 +116,10 @@ namespace zpt\cdt\bin {
 namespace {
 
 	use zpt\cdt\bin\BinCommon;
+	use zpt\cdt\bin\CmdlnLogger;
+
+	BinCommon::getComposerLoader();
+	BinCommon::$logger = new CmdlnLogger();
 
 	/**
 	 * This function finds and returns the Composer vendor directory relative to
@@ -147,17 +151,6 @@ namespace {
 	}
 
 	/**
-	 * Log a message with a coloured marker and optional indentation.
-	 */
-	function binPrettyLog($msg, $marker, $colour, $depth = 0) {
-		if (is_array($msg)) {
-			$msg = implode(' ', $msg);
-		}
-		$tabbing = str_repeat('    ', $depth);
-		echo "$tabbing \e[{$colour}m{$marker}\e[0m $msg\n";
-	}
-
-	/**
 	 * Log a header
 	 */
 	function binLogHeader($msg) {
@@ -167,28 +160,28 @@ namespace {
 	/**
 	 * Log an error message.
 	 */
-	function binLogError($msg, $depth = 0) {
-		binPrettyLog($msg, '✖', 31, $depth);
+	function binLogError($msg) {
+		BinCommon::$logger->error($msg);
 	}
 
 	/**
 	 * Log an info message.
 	 */
-	function binLogInfo($msg, $depth = 0) {
-		binPrettyLog($msg, '➜', 39, $depth);
+	function binLogInfo($msg) {
+		BinCommon::$logger->info($msg);
 	}
 
 	/**
 	 * Log a success message.
 	 */
-	function binLogSuccess($msg, $depth = 0) {
-		binPrettyLog($msg, '✔', 32, $depth);
+	function binLogSuccess($msg) {
+		BinCommon::$logger->notice($msg);
 	}
 
 	/**
 	 * Log a warning message.
 	 */
-	function binLogWarning($msg, $depth = 0) {
-		binPrettyLog($msg, '⚠', 93, $depth);
+	function binLogWarning($msg) {
+		BinCommon::$logger->warning($msg);
 	}
 }
