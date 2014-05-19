@@ -41,7 +41,7 @@ class CopyDatabaseProcess implements LifecycleProcess
 
 		try {
 			$logger->info("Coping database $this->source to $this->target");
-			//$db->getAdminAdapter()->copyDatabase($this->source, $this->target);
+			$db->getAdminAdapter()->copyDatabase($this->source, $this->target);
 		} catch (RuntimeException $e) {
 			$logger->error("Unable to clone database $this->source to $this->target: "
 				. $e->getMessage());
