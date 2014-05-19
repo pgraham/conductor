@@ -17,6 +17,7 @@ namespace zpt\cdt;
 use Monolog\Logger;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Handler\StreamHandler;
+use Psr\Log\NullLogger;
 
 use zpt\oobo\head\Javascript;
 use zpt\oobo\head\Link;
