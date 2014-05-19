@@ -204,6 +204,7 @@ try {
   ]);
 } catch (DatabaseException $e) {
   binLogError("Unable to connect to database, {$e->getMessage()}");
+  exit(1);
 }
 
 /*
