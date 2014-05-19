@@ -11,6 +11,7 @@ namespace zpt\cdt\bin;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use zpt\db\DatabaseConnection;
+use DirectoryIterator;
 
 /**
  * This class encapsulates the process of applying database alters.
