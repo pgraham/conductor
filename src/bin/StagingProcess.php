@@ -11,6 +11,8 @@ namespace zpt\cdt\bin;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use zpt\db\DatabaseConnection;
+use InvalidArgumentException;
+use RuntimeException;
 
 /**
  * This class encapsulates the process for deploying a development site to
@@ -50,7 +52,7 @@ class StagingProcess implements LifecycleProcess
 		}
 
 		$logger->info("Staging site from $this->source to $this->target");
-		$this->verifyParameters();
+		$this->verifyParameters($logger);
 
 		$queue = new ProcessQueue();
 		$queue->add(new ExportProcess($this->source, $this->target));
@@ -100,7 +102,34 @@ class StagingProcess implements LifecycleProcess
 		$this->curProd = $currentProductionPath;
 	}
 
-	private function verifyParameters() {
+	private function verifyParameters($logger) {
+		if (file_exists($this->target)) {
+			// Make sure target doesn't already exist
+			// TODO Should the target be overwritten should the user be prompted for
+			//      this decision?
+			throw new InvalidArgumentException("Specified target directory already exists: "
+				. $this->target);
+		}
+
+		if (!is_createable($this->target)) {
+			throw new InvalidArgumentException(
+				"Insufficient permissions to create target directory $this->target"
+			);
+		}
+
+		if ($this->wsLink && !file_exists($this->wsLink)) {
+			if (!is_createable($this->wsLink)) {
+				throw new InvalidArgumentException(
+					"Unable to create the specified webserver link."
+				);
+			} else {
+				$logger->warning(
+					"The specified webserver link does not currently exist and will be "
+					. "created. You may need to configure your webserver to serve the "
+					. "staged site from:\n\n  $this->wsLink\n"
+				);
+			}
+		}
 
 	}
 

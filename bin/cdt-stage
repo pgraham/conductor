@@ -147,53 +147,13 @@ if (isset($cmdln->opt['prod-dir'])) {
 $ts = time();
 $stageDir = "$stageDir/$ts";
 
-/*
- * =============================================================================
- * Validate command line
- * =============================================================================
- */
-
-// Make sure that the target directory is writeable
-if (file_exists($stageDir)) {
-  // TODO Should the target be overwritten should the user be prompted for this
-  //      decision?
-  binLogError("Specified target directory already exists: {$stageDir}");
-  exit(1);
-}
-
-if (!is_createable($stageDir)) {
-  binLogError(
-    "Insufficient permissions to create target directory {$stageDir}"
-  );
-  if (!checkRoot()) {
-    binLogError("Please try again as root.");
-  }
-  echo $usage;
-  exit(1);
-}
-
-if ($stageLink && !file_exists($stageLink)) {
-  if (!is_createable($stageLink)) {
-    binLogError("Unable to create the specified webserver link.");
-    if (!checkRoot()) {
-      binLogError("Please try again as root.");
-    }
-  } else {
-    binLogWarning(
-        "The specified webserver link does not currently exist and will be "
-        . "created. You may need to configure your webserver to serve the staged "
-        . "site from:\n\n  $stageLink\n"
-    );
-  }
-}
-
 // Get and test priviledged database username and password.
 $dbUserPrompt = String('Please enter priviledged {0} database username');
 $privDbUser = passwordPrompt(
   $dbUserPrompt->format($dbConfig['driver']),
   'root'
 );
-$dbPassPrompt = String('Please enter the priviledged {0} database password');
+$dbPassPrompt = String('Please enter priviledged {0} database password');
 $privDbPass = passwordPrompt($dbPassPrompt->format($dbConfig['driver']));
 
 try {
@@ -207,32 +167,22 @@ try {
   exit(1);
 }
 
-/*
- * =============================================================================
- * Export the site to the specified target
- * =============================================================================
- */
-$stageProcess = new StagingProcess($devDir, $stageDir);
-$stageProcess->setDatabaseConnection($db);
-$stageProcess->setStagingDatabase($stageDb);
-$stageProcess->setProductionDatabase($prodDb);
-$stageProcess->setWebServerLink($stageLink);
-$stageProcess->setCurrentProductionPath($prodDir);
-$stageProcess->execute(BinCommon::$logger);
+try {
+  $stageProcess = new StagingProcess($devDir, $stageDir);
+  $stageProcess->setDatabaseConnection($db);
+  $stageProcess->setStagingDatabase($stageDb);
+  $stageProcess->setProductionDatabase($prodDb);
+  $stageProcess->setWebServerLink($stageLink);
+  $stageProcess->setCurrentProductionPath($prodDir);
+  $stageProcess->execute(BinCommon::$logger);
 
-// 4. Apply development alters
-// ---------------------------
-//
-// -----------------------------------------------------------------------------
-
-// Do site alters
-
-// Do module alters
-
-// Do conductor alters
-
-// 6. Link compiled website into web server
-// -----------------------------------------------------------------------------
-
-// Return 0 to indicate success
-return 0;
+  // Return 0 to indicate success
+  return 0;
+} catch (InvalidArgumentException $e) {
+  binLogError($e->getMessage());
+  echo $usage;
+  return 1;
+} catch (RuntimeException $e) {
+  binLogError($e->getMessage());
+  return 1;
+}
