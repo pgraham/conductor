@@ -37,6 +37,6 @@ class ProcessQueue implements LifecycleProcess
 				return false;
 			}
 		}
-		return $true;
+		return true;
 	}
 }
