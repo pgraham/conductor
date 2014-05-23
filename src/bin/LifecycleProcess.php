@@ -23,8 +23,11 @@ interface LifecycleProcess
 	 *
 	 * @param LoggerInterface $logger
 	 * @return mixed
-	 *   Use boolean `false` to indicate failure, otherwise any value can be
-	 *   returned.
+	 * @throws InvalidArgumentException
+	 *   If the process cannot complete because any of its supplied parameters are
+	 *   invalid.
+	 * @throws RuntimeException
+	 *   If the process aborts unexpectedly while processing.
 	 */
 	public function execute(LoggerInterface $logger = null);
 
