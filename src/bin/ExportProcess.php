@@ -50,10 +50,8 @@ class ExportProcess implements LifecycleProcess
 		$failure = false;
 		passthru($exportCmd, $failure);
 		if ($failure) {
-			$logger->error("Unable to export site.");
-			return false;
+			throw new RuntimeException("Unable to export site.");
 		}
-		return true;
 	}
 
 }
