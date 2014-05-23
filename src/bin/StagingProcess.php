@@ -59,7 +59,10 @@ class StagingProcess implements LifecycleProcess
 		$queue->add(new CompileProcess($this->target));
 
 		if ($this->curProd !== null) {
-			$queue->add(new CopyUserContentProcess($this->curProd, $this->target));
+			// The current production link should be pointing to 
+			// <production-root>/target/htdocs
+			$productionPath = realpath(realpath($this->curProd) . '/../..');
+			$queue->add(new CopyUserContentProcess($productionPath, $this->target));
 		}
 
 		$queue->add(new CopyDatabaseProcess(
@@ -98,8 +101,8 @@ class StagingProcess implements LifecycleProcess
 		$this->wsLink = $webServerLink;
 	}
 
-	public function setCurrentProductionPath($currentProductionPath) {
-		$this->curProd = $currentProductionPath;
+	public function setCurrentProductionLink($currentProductionLink) {
+		$this->curProd = $currentProductionLink;
 	}
 
 	private function verifyParameters($logger) {

@@ -34,7 +34,7 @@ require_once __DIR__ . '/setup.php';
 
 $usage = <<<USAGE
 cdt-stage   [--staging-db=DB]   [--production-db=DB]   [--ws-link=PATH]
-   [--prod-dir=PATH]   [path]
+   [--prod-link=PATH]   [path]
 
 All options and arguments used by this script can be specified in the site's
 configuration file. Any parameters and arguments specified on the command line
@@ -55,9 +55,9 @@ will override those specified in the configuration file.
                 should be a path that is configured to be served by the web
                 server.
 
-  --prod-dir    [Optional] The path to the current production site. This will be
-                used to copy user content into the staging site. This can be
-                specified in the site's configuration file.
+  --prod-link   [Optional] The link from which the current production site is
+                being served. This will be used to copy user content into the
+                staging site.
 
 Any parameters not marked as optional need to either be specified in the site's
 configuration file or on the command line.
@@ -87,7 +87,7 @@ $opts = array(
   'staging-db',
   'prod-db',
   'ws-link',
-  'prod-dir'
+  'prod-link'
 );
 $cmdln = getcmdln($argv, $opts);
 
@@ -135,12 +135,12 @@ if (isset($cmdln->opt['ws-link'])) {
   $stageLink = null;
 }
 
-if (isset($cmdln->opt['prod-dir'])) {
-  $prodDir = $cmdln->opt['prod-dir'];
+if (isset($cmdln->opt['prod-link'])) {
+  $prodLink = $cmdln->opt['prod-link'];
 } else if (isset($deployConfigProd['wsLink'])) {
-  $prodDir = $deployConfigProd['wsLink'];
+  $prodLink = $deployConfigProd['wsLink'];
 } else {
-  $prodDir = null;
+  $prodLink = null;
 }
 
 // Save a timestamp for identifying and associating output files
@@ -173,7 +173,7 @@ try {
   $stageProcess->setStagingDatabase($stageDb);
   $stageProcess->setProductionDatabase($prodDb);
   $stageProcess->setWebServerLink($stageLink);
-  $stageProcess->setCurrentProductionPath($prodDir);
+  $stageProcess->setCurrentProductionLink($prodLink);
   $stageProcess->execute(BinCommon::$logger);
 
   // Return 0 to indicate success

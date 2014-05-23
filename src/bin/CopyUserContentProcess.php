@@ -41,6 +41,7 @@ class CopyUserContentProcess implements LifecycleProcess
 				$logger->info("Copying user content from $usrSrc to $usrTgt");
 				passthru("cp -a $usrSrc $usrTgt");
 			} else {
+				$logger->warning("User content $usrSrc does not exist");
 				$logger->info("Creating user content directory: $usrTgt");
 				mkdir($usrTgt, 0775, true);
 			}
