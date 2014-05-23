@@ -17,7 +17,7 @@ namespace zpt\cdt;
 use Monolog\Logger;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Handler\StreamHandler;
-use Psr\Log\NullLogger;
+use Monolog\Handler\NullHandler;
 
 use zpt\oobo\head\Javascript;
 use zpt\oobo\head\Link;
@@ -275,7 +275,7 @@ class Conductor {
       $logger->pushHandler(new StreamHandler($pathInfo['target'] . '/cdt.log'));
     } else {
       // Don't log anything in production
-      $logger->pushHandler(new NullLogger());
+      $logger->pushHandler(new NullHandler());
     }
     self::$applicationLogger = $logger;
 
