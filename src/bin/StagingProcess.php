@@ -59,7 +59,7 @@ class StagingProcess implements LifecycleProcess
 		$queue->add(new CompileProcess($this->target));
 
 		if ($this->curProd !== null) {
-			// The current production link should be pointing to 
+			// The current production link should be pointing to
 			// <production-root>/target/htdocs
 			$productionPath = realpath(realpath($this->curProd) . '/../..');
 			$queue->add(new CopyUserContentProcess($productionPath, $this->target));
