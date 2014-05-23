@@ -26,7 +26,9 @@
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-use \zpt\cdt\compile\SiteCompiler;
+use zpt\cdt\bin\BinCommon;
+use zpt\cdt\bin\ExportProcess;
+use zpt\cdt\compile\SiteCompiler;
 
 require_once __DIR__ . '/common.php';
 
@@ -187,13 +189,16 @@ try {
 
 // 1. Compile site
 // -----------------------------------------------------------------------------
-$exportCmd = String(__DIR__ . "/cdt-export {0} {1} {2}")
-  ->format($devDir, $productionDir, 'production');
-$failure = false;
-passthru($exportCmd, $failure);
-if ($failure) {
-  echo "Error exporting site\n";
-  return $failure;
+try {
+  $exportProcess = new ExportProcess($devDir, $productionDir);
+  $result = $exportProcess->execute(BinCommon::$logger);
+} catch (InvalidArgumentException $e) {
+  binLogError($e->getMessage());
+  echo $usage;
+  exit(1);
+} catch (RuntimeException $e) {
+  binLogError($e->getMessage());
+  exit(1);
 }
 
 $compileCmd = String("$productionDir/vendor/bin/cdt-compile {0}")
