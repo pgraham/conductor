@@ -18,9 +18,29 @@
  * This script exports the source files for the given dev site
  * to the specified target path.
  *
+ * @deprecated
+ *    This script will eventually be completely encapsulated in the
+ *    {@link zpt\cdt\bin\ExportProcess} class. Once this is finished this script
+ *    will be transformed into a wrapper for the ExportProcess class and the 
+ *    expected parameters will change. Also the relationship between this script 
+ *    and the ExportProcess class will be inverted; this script will
+ *    create/invoke an instance of the ExportProcess class rather than having
+ *    the class invoke this script. In the meantime, if there appears to be
+ *    logic missing from this script it may have already been moved into the
+ *    ExportProcess class.
+ *
  * @author Philip Graham <philip@zeptech.ca>
  */
 require_once __DIR__ . '/common.php';
+
+$usage = <<<USAGE
+site-export input-path [output-path]
+
+  input-path     Path to the directory that contains the web site
+
+  output-path    Optional. Path to the directory to which the site
+                 is exported. Defaults to INPUT_PATH/target
+USAGE;
 
 $composerPath = getComposerPath();
 if (!$composerPath) {
@@ -45,12 +65,6 @@ ensureFn(
 
 // Verify input parameters
 // -----------------------------------------------------------------------------
-$usage = <<<USAGE
-site-export input-path [output-path]
-  input-path     Path to the directory that contains the web site
-  output-path    Optional. Path to the directory to which the site
-                 is exported. Defaults to INPUT_PATH/target
-USAGE;
 
 list($input, $output, $env) = parseCmdLn($argc, $argv);
 validateInput($input);
