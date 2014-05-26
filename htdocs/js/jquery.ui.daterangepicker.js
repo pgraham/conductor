@@ -52,14 +52,13 @@
 				.append(this.to)
 				.append( $('<span class="ui-icon ui-icon-triangle-1-s"/>') )
 				.hover(toggleHoverState, toggleHoverState)
-				.toggle(
-					function () {
-						self._showPicker();
-					},
-					function () {
+				.click(function () {
+					if (self.picker.parent().length > 0) {
 						self._hidePicker();
+					} else {
+						self._showPicker();
 					}
-				);
+				});
 
 			this._setValue(this.options.value);
 		},
@@ -68,7 +67,8 @@
 		},
 
 		getFrom: function () {
-			return this.from.data('date');
+			var from = this.from.data('date');
+			return from;
 		},
 
 		getRange: function () {
@@ -76,7 +76,8 @@
 		},
 
 		getTo: function () {
-			return this.to.data('date');
+			var to = this.to.data('date');
+			return to;
 		},
 
 		_hidePicker: function () {
@@ -101,9 +102,9 @@
 		},
 		
 		_setValue: function (value) {
-			var range = value.split(/\s+TO\s+/i),
-					fromDate = Date.parse(range[0]),
-					toDate = Date.parse(range[1]);
+			var range = value.split(/\s+TO\s+/i);
+			var fromDate = Date.parse(range[0]);
+			var toDate = Date.parse(range[1]);
 
 			this.from.data('date', fromDate);
 			this.to.data('date', toDate);

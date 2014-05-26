@@ -90,6 +90,9 @@ module.exports = function (grunt) {
 				dest: '<%= workDir %>/polyfiller.min.js'
 			},
 			merge: {
+				options: {
+					footer: "jQuery(function ($) { $.datepicker.setDefaults($.datepicker.regional[''])});"
+				},
 				src: [
 					'<%= workDir %>/jquery.min.js',
 					'<%= workDir %>/jquery-cookie.min.js',
