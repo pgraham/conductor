@@ -50,11 +50,11 @@ class CmdlnLogger extends AbstractLogger implements LoggerInterface
 
 			case LogLevel::DEBUG:
 			if ($this->showDebug) {
-				if (is_array($msg)) {
-					$msg = implode(' ', $msg);
+				if (is_array($message)) {
+					$message = implode(' ', $message);
 				}
-				$msg = String($msg)->format($context);
-				echo "$msg\n";
+				$message = String($message)->format($context);
+				echo "$message\n";
 			}
 			break;
 
