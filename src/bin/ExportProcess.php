@@ -52,6 +52,17 @@ class ExportProcess implements LifecycleProcess
 		if ($failure) {
 			throw new RuntimeException("Unable to export site.");
 		}
+
+		$targetCdt = "$this->target/vendor/zeptech/conductor";
+		if (!file_exists($targetCdt)) {
+			$logger->warning("Exported site does not contain Conductor");
+		}
+
+		$queue = new ProcessQueue();
+		$queue->add(new NpmInstallStep($targetCdt));
+		$queue->add(new BowerInstallStep($targetCdt));
+		$queue->add(new GruntBuildStep($targetCdt));
+		$queue->execute($logger);
 	}
 
 }
