@@ -71,7 +71,6 @@ ensureFn(
   'atomicSymlink',
   'checkRoot',
   'copyDb',
-  'getcmdln',
   'is_createable',
   'passwordPrompt',
   'symlinkInDir'
@@ -81,15 +80,6 @@ if (!checkRoot()) {
   echo "This script must be run as root.\n";
   exit(1);
 }
-
-// Parse command line
-$opts = array(
-  'staging-db',
-  'prod-db',
-  'ws-link',
-  'prod-link'
-);
-$cmdln = getcmdln($argv, $opts);
 
 // Load configuration
 $deployConfig = new DeploymentConfiguration($devDir, 'stage');

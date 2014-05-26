@@ -115,11 +115,18 @@ namespace zpt\cdt\bin {
  */
 namespace {
 
+	// Initialize command line logger
 	use zpt\cdt\bin\BinCommon;
 	use zpt\cdt\bin\CmdlnLogger;
 
 	BinCommon::getComposerLoader();
 	BinCommon::$logger = new CmdlnLogger();
+
+	ensureFn('getcmdln');
+	$cmdln = getcmdln($argv, [ 'verbose' ]);
+	if ($cmdln->opt['verbose']) {
+		BinCommon::$logger->setShowDebug(true);
+	}
 
 	/**
 	 * This function finds and returns the Composer vendor directory relative to
