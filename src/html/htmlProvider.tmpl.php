@@ -85,6 +85,7 @@ class /*# companionClass #*/ extends BaseHtmlProvider
 		// Javascript libraries
 		// -------------------------------------------------------------------------
 		// Non-jquery
+		Element::js('/*# webLib #*//date.min.js')->addToHead();
 		Element::js('/*# webLib #*//moment.min.js')->addToHead();
 		Element::js('/*# webLib #*//q.min.js')->addToHead();
 

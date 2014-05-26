@@ -2,10 +2,12 @@ module.exports = function (grunt) {
 
 	var target = 'vendor/target';
 	var bower = 'vendor/bower';
+	var lib = 'htdocs/lib';
 
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
 
+		libDir: lib,
 		bowerDir: bower,
 		targetDir: target,
 		buildDir: target + '/build',
@@ -38,6 +40,10 @@ module.exports = function (grunt) {
 			webshim: {
 				src: '<%= bowerDir %>/webshim/js-webshim/minified/shims/styles/shim.css',
 				dest: '<%= buildDir %>/shims/styles/shim.css'
+			},
+			datejs: {
+				src: '<%= libDir %>/date.min.js',
+				dest: '<%= buildDir %>/date.min.js'
 			},
 			momentjs: {
 				src: '<%= bowerDir %>/moment/min/moment-with-langs.min.js',
@@ -103,6 +109,7 @@ module.exports = function (grunt) {
 	grunt.registerTask('jquery', [ 'copy:jquery' ]);
 	grunt.registerTask('jquery-cookie', [ 'uglify:jqueryCookie' ]);
 	grunt.registerTask('jquery-ui', [ 'concat:jqueryUi', 'copy:jqueryUi' ]);
+	grunt.registerTask('datejs', [ 'copy:datejs' ]);
 	grunt.registerTask('momentjs', [ 'copy:momentjs' ]);
 	grunt.registerTask('q', [ 'uglify:q' ]);
 	grunt.registerTask('webshim', [ 'concat:webshim', 'copy:webshim' ]);
@@ -114,6 +121,7 @@ module.exports = function (grunt) {
 		'jquery',
 		'jquery-cookie',
 		'jquery-ui',
+		'datejs',
 		'momentjs',
 		'q',
 		'webshim',
