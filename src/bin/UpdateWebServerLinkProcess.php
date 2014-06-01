@@ -12,30 +12,23 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
 /**
- * This class encapsulates the process of updating symlink which has been
- * pointed to by the webserver in order to server content to point to
- * a different site.
+ * This class encapsulates the process of updating a symlink which is used by
+ * the web server to serve content.
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class UpdateWebServerLinkProcess implements LifecycleProcess
+class UpdateWebServerLinkProcess extends SymlinkUpdateStep
+	implements LifecycleProcess
 {
 
-	private $wsLink;
-	private $target;
-
+	/**
+	 * Create a process object which updates the specified link to point to the
+	 * given target. This process is atomic.
+	 *
+	 * @param string $wsLink The path of the symlink to update.
+	 * @param string $target The path to which the symlink will point.
+	 */
 	public function __construct($wsLink, $target) {
-		$this->wsLink = $wsLink;
-		$this->target = $target;
-	}
-
-	public function execute(LoggerInterface $logger = null) {
-		if ($logger === null) {
-			$logger = new NullLogger();
-		}
-
-		$linkTarget = "$this->target/target/htdocs";
-		$logger->info("Creating symlink from $linkTarget to $this->wsLink");
-		atomicSymlink($this->wsLink, $linkTarget);
+		parent::__construct($wsLink, "$target/target/htdocs");
 	}
 }
