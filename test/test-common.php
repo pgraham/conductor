@@ -17,6 +17,13 @@
 
 $loader = require __DIR__ . '/../vendor/autoload.php';
 $loader->add('zpt\dyn', __DIR__ . '/target');
+$loader->addPsr4('zpt\\orm\\test\\',
+                 __DIR__ . '/../vendor/zeptech/clarinet/test/common');
+
+function getComposerLoader() {
+	global $loader;
+	return $loader;
+}
 
 class ComposerLoaderContainer {
 
@@ -24,3 +31,5 @@ class ComposerLoaderContainer {
 
 }
 ComposerLoaderContainer::$loader = $loader;
+
+return $loader;
