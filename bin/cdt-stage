@@ -133,10 +133,6 @@ if (isset($cmdln->opt['prod-link'])) {
   $prodLink = null;
 }
 
-// Save a timestamp for identifying and associating output files
-$ts = time();
-$stageDir = "$stageDir/$ts";
-
 // Get and test priviledged database username and password.
 $dbUserPrompt = String('Please enter priviledged {0} database username');
 $privDbUser = passwordPrompt(

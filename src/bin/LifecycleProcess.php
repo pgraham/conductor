@@ -18,6 +18,8 @@ use Psr\Log\LoggerInterface;
 interface LifecycleProcess
 {
 
+	const STAGED_TAG = 'staged';
+
 	/**
 	 * Execute the process
 	 *

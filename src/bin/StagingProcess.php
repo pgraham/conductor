@@ -39,11 +39,13 @@ class StagingProcess implements LifecycleProcess
 	 * @param string $source
 	 *   Root of the development site to deploy.
 	 * @param string $target
-	 *   Target path of the deployed site.
+	 *   Target path of the deployed site. The site will be exported to
+	 *   a subdirectory of this path named for the time the site was staged.
 	 */
 	public function __construct($source, $target) {
 		$this->source = $source;
 		$this->target = $target;
+
 	}
 
 	public function execute(LoggerInterface $logger = null) {
@@ -51,18 +53,21 @@ class StagingProcess implements LifecycleProcess
 			$logger = new NullLogger();
 		}
 
-		$logger->info("Staging site from $this->source to $this->target");
-		$this->verifyParameters($logger);
+		$ts = time();
+		$exportTarget = "$this->target/$ts";
+
+		$logger->info("Staging site from $this->source to $exportTarget");
+		$this->verifyParameters($logger, $exportTarget);
 
 		$queue = new ProcessQueue();
-		$queue->add(new ExportProcess($this->source, $this->target));
-		$queue->add(new CompileProcess($this->target));
+		$queue->add(new ExportProcess($this->source, $exportTarget));
+		$queue->add(new CompileProcess($exportTarget));
 
 		if ($this->curProd !== null) {
 			// The current production link should be pointing to
 			// <production-root>/target/htdocs
 			$productionPath = realpath(realpath($this->curProd) . '/../..');
-			$queue->add(new CopyUserContentProcess($productionPath, $this->target));
+			$queue->add(new CopyUserContentProcess($productionPath, $exportTarget));
 		}
 
 		$queue->add(new CopyDatabaseProcess(
@@ -73,9 +78,10 @@ class StagingProcess implements LifecycleProcess
 		$queue->add(new AlterDatabaseProcess(
 			$this->db,
 			$this->stagingDb,
-			$this->target
+			$exportTarget
 		));
-		$queue->add(new UpdateWebServerLinkProcess($this->wsLink, $this->target));
+		$queue->add(new TagStagedVersionStep($this->source, "v{$ts}s"));
+		$queue->add(new UpdateWebServerLinkProcess($this->wsLink, $exportTarget));
 
 		$result = $queue->execute($logger);
 		if (!$result) {
@@ -105,18 +111,18 @@ class StagingProcess implements LifecycleProcess
 		$this->curProd = $currentProductionLink;
 	}
 
-	private function verifyParameters($logger) {
-		if (file_exists($this->target)) {
+	private function verifyParameters($logger, $exportTarget) {
+		if (file_exists($exportTarget)) {
 			// Make sure target doesn't already exist
 			// TODO Should the target be overwritten should the user be prompted for
 			//      this decision?
 			throw new InvalidArgumentException("Specified target directory already exists: "
-				. $this->target);
+				. $exportTarget);
 		}
 
-		if (!is_createable($this->target)) {
+		if (!is_createable($exportTarget)) {
 			throw new InvalidArgumentException(
-				"Insufficient permissions to create target directory $this->target"
+				"Insufficient permissions to create target directory $exportTarget"
 			);
 		}
 
