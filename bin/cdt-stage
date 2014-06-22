@@ -22,9 +22,7 @@
  * @author Philip Graham <philip@zeptech.ca>
  */
 use zpt\cdt\bin\BinCommon;
-use zpt\cdt\bin\CmdlnLogger;
 use zpt\cdt\bin\StagingProcess;
-use zpt\cdt\compile\SiteCompiler;
 use zpt\cdt\config\DatabaseConfiguration;
 use zpt\cdt\config\DeploymentConfiguration;
 use zpt\db\exception\DatabaseException;
@@ -59,6 +57,7 @@ will override those specified in the configuration file.
                 being served. This will be used to copy user content into the
                 staging site.
 
+All options and parameters can be specified in the site's configuration file.
 Any parameters not marked as optional need to either be specified in the site's
 configuration file or on the command line.
 USAGE;
