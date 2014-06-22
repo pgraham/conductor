@@ -34,12 +34,15 @@
 require_once __DIR__ . '/common.php';
 
 $usage = <<<USAGE
-site-export input-path [output-path]
+site-export input-path [output-path] [version]
 
   input-path     Path to the directory that contains the web site
 
   output-path    Optional. Path to the directory to which the site
                  is exported. Defaults to INPUT_PATH/target
+
+  version        Optional. Commit identifier for the version of the input-path
+                 repo to export.
 USAGE;
 
 $composerPath = getComposerPath();
@@ -66,7 +69,7 @@ ensureFn(
 // Verify input parameters
 // -----------------------------------------------------------------------------
 
-list($input, $output, $env) = parseCmdLn($argc, $argv);
+list($input, $output, $env, $version) = parseCmdLn($argc, $argv);
 validateInput($input);
 validateOutput($output);
 
@@ -147,7 +150,7 @@ mkdir($output, 0755, true);
 // Export site repos
 // -----------------------------------------------------------------------------
 echo "Exporting site from $input to $output\n";
-git_export($input, $output);
+git_export($input, $output, null, $version);
 
 mkdir($libOut, 0755);
 // Export optional libraries if present
@@ -235,10 +238,16 @@ function parseCmdLn($argc, $argv) {
 		$env = 'staging';
 	}
 
+	if ($argc >= 5) {
+		$version = $argv[4];
+	} else {
+		$version = 'HEAD';
+	}
+
 	$input = rtrim($input, '/');
 	$output = rtrim($output, '/');
 
-	return array($input, $output, $env);
+	return array($input, $output, $env, $version);
 }
 
 function validateInput($input) {
