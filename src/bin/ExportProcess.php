@@ -23,6 +23,7 @@ class ExportProcess implements LifecycleProcess
 
 	private $source;
 	private $target;
+	private $version;
 
 	/**
 	 * Create a new process that exports the site root at the specified source
@@ -30,10 +31,13 @@ class ExportProcess implements LifecycleProcess
 	 *
 	 * @param string $source
 	 * @param string $target
+	 * @param string $version
+	 *   Commit identifier for the version of the source repo to export.
 	 */
-	public function __construct($source, $target) {
+	public function __construct($source, $target, $version = null) {
 		$this->source = $source;
 		$this->target = $target;
+		$this->version = $version;
 	}
 
 	/**
