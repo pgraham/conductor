@@ -49,6 +49,7 @@ class TagRepositoryStep implements LifecycleProcess
 			$logger = new NullLogger();
 		}
 
+		$logger->info("Tagging $this->repo as $this->tag");
 		if ($this->force) {
 			git_move_tag($this->repo, $this->tag);
 		} else {
