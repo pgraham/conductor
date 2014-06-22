@@ -57,6 +57,7 @@ class TagStagedVersionStep implements LifecycleProcess
 			$this->repo,
 			$this->buildVersion
 		));
+		$queue->execute($logger);
 	}
 
 }
