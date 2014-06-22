@@ -116,8 +116,8 @@ class StagingProcess implements LifecycleProcess
 			// Make sure target doesn't already exist
 			// TODO Should the target be overwritten should the user be prompted for
 			//      this decision?
-			throw new InvalidArgumentException("Specified target directory already exists: "
-				. $exportTarget);
+			throw new InvalidArgumentException("Specified target directory already "
+				. "exists: $exportTarget");
 		}
 
 		if (!is_createable($exportTarget)) {
