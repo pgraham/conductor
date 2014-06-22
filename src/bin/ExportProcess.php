@@ -10,6 +10,7 @@ namespace zpt\cdt\bin;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use RuntimeException;
 
 /**
  * This class encapsulates the process for exporting a site to a local or remote
