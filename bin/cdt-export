@@ -92,14 +92,14 @@ $modOutBase = File::joinPaths($output, 'modules');
 
 // Verify that all repos are clean
 // -----------------------------------------------------------------------------
-if (!is_git_repo_clean($input)) {
+if (!git_is_clean($input)) {
 	echo "Unable to export site, $input has uncommited changes.\n";
 	exit(1);
 }
 
 foreach ($libOpt as $repo) {
 	if (file_exists($repo)) {
-		if (!is_git_repo_clean($repo)) {
+		if (!git_is_clean($repo)) {
 			echo "Unable to export site, $repo has uncommited chages.\n";
 			exit(1);
 		}
@@ -147,7 +147,7 @@ mkdir($output, 0755, true);
 // Export site repos
 // -----------------------------------------------------------------------------
 echo "Exporting site from $input to $output\n";
-export_git_repo($input, $output);
+git_export($input, $output);
 
 mkdir($libOut, 0755);
 // Export optional libraries if present
@@ -155,7 +155,7 @@ foreach ($libOpt as $repo) {
 	if (file_exists($repo)) {
 		$repoName = basename($repo);
 		echo "Exporting $repoName from $repo to $libOut\n";
-		export_git_repo($repo, $libOut, $repoName);
+		git_export($repo, $libOut, $repoName);
 	}
 }
 
@@ -193,7 +193,7 @@ if (file_exists($modDir)) {
 		$modPath = $mod->getPathname();
 		$modOut = File::joinPaths($modOutBase, $mod->getBasename());
 		echo "Exporting module $modPath to $modOut\n";
-		export_git_repo($modPath, $modOut);
+		git_export($modPath, $modOut);
 	}
 }
 
@@ -204,7 +204,7 @@ passthru("composer install");
 chdir($oldDir);
 
 // Initialize conductor's submodules
-init_git_repo_submodules("$output/vendor/zeptech/conductor");
+git_init_submodules("$output/vendor/zeptech/conductor");
 
 //------------------------------------------------------------------------------
 // Utility functions, used to parse and validate command line parameters
