@@ -183,6 +183,11 @@ class SiteCompiler implements LoggerAwareInterface {
 		// but the converse should not be true and is not supported
 		$this->collectDependencyXmls($pathInfo);
 
+		// Ensure that the target directories are created
+		if (!file_exists("$pathInfo[target]/htdocs")) {
+			mkdir("$pathInfo[target]/htdocs", 0755, true);
+		}
+
 		// Compile server dispatcher
 		$this->dispatcherCompiler->compile($pathInfo, $ns, $env);
 
