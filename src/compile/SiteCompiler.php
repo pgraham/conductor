@@ -239,6 +239,12 @@ class SiteCompiler implements LoggerAwareInterface {
 		$libOut = "$pathInfo[target]/htdocs/lib";
 
 		File::copy($libSrc, $libOut);
+
+		$this->doWithModules(function ($modulePath) use ($pathInfo) {
+			if (file_exists("$modulePath/htdocs/lib")) {
+				$this->compileJslibDir($pathInfo, "$modulePath/htdocs/lib");
+			}
+		});
 	}
 
 	/**
