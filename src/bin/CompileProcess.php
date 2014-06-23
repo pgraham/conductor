@@ -21,9 +21,11 @@ class CompileProcess implements LifecycleProcess
 {
 
 	private $root;
+	private $env;
 
-	public function __construct($root) {
+	public function __construct($root, $env = SiteCompiler::ENV_STAGE) {
 		$this->root = $root;
+		$this->env = $env;
 	}
 
 	public function execute(LoggerInterface $logger = null) {
@@ -33,7 +35,7 @@ class CompileProcess implements LifecycleProcess
 
 		$logger->info("Compiling site rooted at $this->root");
 		$compileCmd = String("{0}/vendor/bin/cdt-compile {1}")
-			->format($this->root, SiteCompiler::ENV_STAGE);
+			->format($this->root, $this->env);
 
 		$failure = false;
 		passthru($compileCmd, $failure);
