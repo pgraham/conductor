@@ -15,8 +15,8 @@
 namespace zpt\cdt\compile;
 
 /**
- * This class compiles the request dispatcher by placing the startup script in 
- * the /htdocs directory as well as the .htaccess file that redirects all 
+ * This class compiles the request dispatcher by placing the startup script in
+ * the /htdocs directory as well as the .htaccess file that redirects all
  * requests to that script.
  *
  * @author Philip Graham <philip@zeptech.ca>
