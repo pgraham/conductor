@@ -75,7 +75,5 @@ if (file_exists("$target/target")) {
 	exec("rm -r $target/target");
 }
 
-mkdir ("$target/target", 0755);
-mkdir ("$target/target/htdocs", 0755);
 $compiler = new SiteCompiler();
 $compiler->compile($target, $loader, $env);
