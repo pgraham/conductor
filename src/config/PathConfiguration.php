@@ -39,6 +39,6 @@ class PathConfiguration extends ConfigurationSet
 		$this->cdtRoot = "$root/vendor/zeptech/conductor";
 		$this->src = "$root/src";
 		$this->target = "$root/target";
-		$this->htdocs = "$root/htdocs";
+		$this->htdocs = "$root/target/htdocs";
 	}
 }
