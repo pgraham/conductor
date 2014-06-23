@@ -19,6 +19,7 @@ interface LifecycleProcess
 {
 
 	const STAGED_TAG = 'staged';
+	const DEPLOYED_TAG = 'deployed';
 
 	/**
 	 * Execute the process
