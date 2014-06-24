@@ -157,6 +157,7 @@ class SiteCompiler implements LoggerAwareInterface {
 	 *   this class.
 	 */
 	public function compile($root, $loader, $env = 'dev') {
+		$this->logger->info("Compiling site rooted at $root for $env environment");
 		$this->ensureDependencies();
 
 		// Configuration needs to be compiled first so that the site path
