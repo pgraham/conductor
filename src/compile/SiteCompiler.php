@@ -231,7 +231,6 @@ class SiteCompiler implements LoggerAwareInterface {
 	protected function compileJslibs($pathInfo, $ns) {
 		// TODO Once all front end dependencies have been migrated to bower this
 		// will no longer be necessary
-		$this->compileJslibDir($pathInfo, "$pathInfo[cdtRoot]/lib/jslib");
 		$this->compileJslibDir($pathInfo, "$pathInfo[root]/lib/jslib");
 
 		// Copy bower build artifact to htdocs
