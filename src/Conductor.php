@@ -183,11 +183,11 @@ class Conductor {
           $log = new Logger('compile');
           $log->pushHandler(new RotatingFileHandler(
             "$root/target/compile.log",
-            Logger::DEBUG,
-            1
+            Logger::INFO,
+            1 /* only keep most recent file */
           ));
 
-          $compiler = new SiteCompiler($log);
+          $compiler = new SiteCompiler();
           $compiler->setLogger($log);
           $compiler->compile($root, $loader);
           File::dirunlock("$root/target");
