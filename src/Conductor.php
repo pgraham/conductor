@@ -165,8 +165,8 @@ class Conductor {
 
       if (isset($_GET['clean'])) {
         $dirs = array( 'i18n', 'zeptech', 'zpt', 'htdocs/css', 'htdocs/img',
-                       'htdocs/js', 'htdocs/jslib');
-        $files = array( 'php.error' );
+                       'htdocs/js', 'htdocs/jslib', 'htdocs/lib');
+        $files = array( 'php.error', 'cdt.log' );
 
         foreach ($dirs as $dir) {
           passthru("rm -r $root/target/$dir");
