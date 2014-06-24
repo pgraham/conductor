@@ -101,13 +101,13 @@ class HtmlProvider extends CompanionGenerator {
 
 
 		// Determine whether JsApp support is needed and the theme to use.	The
-		// default theme for JsApp pages is 'zpt', otherwise it is the default
+		// default theme for JsApp pages is 'admin', otherwise it is the default
 		// jquery-ui theme
 		$values['jsappsupport'] = isset($page['jsappsupport']);
 		if (isset($page['page']['theme'])) {
 			$values['uitheme'] = $page['page']['theme'];
 		} else if ($values['jsappsupport']) {
-			$values['uitheme'] = 'zpt';
+			$values['uitheme'] = 'admin';
 		}  else {
 			$values['uitheme'] = 'base';
 		}

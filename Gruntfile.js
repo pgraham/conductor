@@ -27,13 +27,19 @@ module.exports = function (grunt) {
 				files: [
 					{
 						src: '<%= bowerDir %>/jquery-ui/themes/base/minified/jquery-ui.min.css',
-						dest: '<%= buildDir %>/jquery-ui/jquery-ui.min.css'
+						dest: '<%= buildDir %>/jquery-ui/base/jquery-ui.min.css'
 					},
 					{
 						expand: true,
 						cwd: '<%= bowerDir %>/jquery-ui/themes/base/minified/images',
 						src: '**',
-						dest: '<%= buildDir %>/jquery-ui/images/'
+						dest: '<%= buildDir %>/jquery-ui/base/images/'
+					},
+					{
+						expand: true,
+						cwd: 'resources/themes',
+						src: '**',
+						dest: '<%= buildDir %>/jquery-ui/'
 					}
 				]
 			},
