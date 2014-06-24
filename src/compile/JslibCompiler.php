@@ -27,7 +27,7 @@ class JslibCompiler {
   public function compile($jslibPath, $pathInfo) {
     $jslibName = basename($jslibPath);
 
-    $jslibOut = "$pathInfo[target]/htdocs/jslib/$jslibName";
+    $jslibOut = "$pathInfo[target]/htdocs/lib/$jslibName";
     if (!file_exists($jslibOut)) {
       mkdir($jslibOut, 0755, true);
     }
