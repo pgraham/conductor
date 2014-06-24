@@ -91,7 +91,7 @@ class /*# companionClass #*/ extends BaseHtmlProvider
 
 		// JQuery - This includes jQuery and all dependent plugins
 		Element::js('/*# webLib #*//jquery.all.min.js')->addToHead();
-		Element::css('/*# webLib #*//jquery-ui.min.css')->addToHead();
+		Element::css('/*# webLib #*//jquery-ui/jquery-ui.min.css')->addToHead();
 
 		// -------------------------------------------------------------------------
 
