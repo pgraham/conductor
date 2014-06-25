@@ -19,9 +19,6 @@ use Monolog\Handler\RotatingFileHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\NullHandler;
 
-use zpt\oobo\head\Javascript;
-use zpt\oobo\head\Link;
-use zpt\oobo\Element;
 use zpt\dyn\Configurator;
 use zpt\dyn\InjectionConfigurator;
 use zpt\dyn\ServerConfigurator;
@@ -37,7 +34,6 @@ use zpt\cdt\rest\PdoExceptionHandler;
 use zpt\cdt\rest\ValidationExceptionHandler;
 use zpt\orm\Clarinet;
 use zpt\orm\Criteria;
-use zpt\util\Db;
 use zpt\util\File;
 use zpt\util\DirectoryLockTimeoutException;
 use zpt\util\PdoExt;
