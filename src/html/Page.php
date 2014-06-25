@@ -92,6 +92,14 @@ class Page extends \zpt\oobo\Page {
 		return parent::__toString();
 	}
 
+	public function getBody() {
+		return $this->_body;
+	}
+
+	public function getHead() {
+		return $this->_head;
+	}
+
 	/**
 	 * Initializes the debug catcher.
 	 *
