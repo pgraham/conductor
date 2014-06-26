@@ -37,7 +37,7 @@
     "zeptech/annotations": "1.0.*",
     "zeptech/oobo": "dev-master",
     "zeptech/clarinet": "dev-master",
-    "zeptech/php-rest-server": "0.1.0",
+    "zeptech/php-rest-server": "0.1.*@dev",
     "zeptech/dbup": "dev-master",
     "zeptech/fun-box": "dev-master"
   },
