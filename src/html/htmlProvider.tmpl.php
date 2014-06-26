@@ -141,7 +141,15 @@ class /*# companionClass #*/ extends BaseHtmlProvider
 			$page->setTemplate($tmpl);
 		#}
 
-		$page->bodyAdd($this->getContent($request->getQuery()));
+		$head = $page->getHead();
+		$body = $page->getBody();
+		$provider = $this->getContentProvider();
+		#{ if isContentProvider
+			$provider->populateHead($head, $request);
+			$provider->populateBody($body, $request);
+		#{ elseif hasContent
+			$page->bodyAdd($provider->getContent($request->getQuery()));
+		#}
 
 		// Add an asynchronous login form that will be initially hidden so that it
 		// can be autocompleted by the browser.
@@ -159,7 +167,9 @@ class /*# companionClass #*/ extends BaseHtmlProvider
 			}
 		#}
 
-		$ctnt = $this->getContent($request->getQuery());
+		#{ if hasContent
+			$ctnt = $this->getContentProvider()->getContent($request->getQuery());
+		#}
 
 		// Invoke any registered page view listeners
 		$this->onPageView();
@@ -171,15 +181,10 @@ class /*# companionClass #*/ extends BaseHtmlProvider
 		$this->authProvider = $authProvider;
 	}
 
-	private function getContent($query) {
-		$ctnt = '';
-		#{ if hasContent
-			$ctntProvider = new \/*# contentProvider #*/();
-			Injector::inject($ctntProvider, /*# php:dependencies #*/);
-			$ctnt = $ctntProvider->getContent($query);
-		#}
-
-		return $ctnt;
+	private function getContentProvider($query) {
+		$ctntProvider = new \/*# contentProvider #*/();
+		Injector::inject($ctntProvider, /*# php:dependencies #*/);
+		return $ctntProvider;
 	}
 
 	private function includeJsLibs() {

@@ -165,13 +165,16 @@ class HtmlProvider extends CompanionGenerator {
 		}
 
 		$values['hasContent'] = false;
+		$values['isContentProvider'] = false;
+		$values['contentProvider'] = $className;
 		if ($pageDef->hasMethod('getContent')) {
 			$values['hasContent'] = true;
-			$values['contentProvider'] = $className;
-
-			$dependencies = DependencyParser::parse('htmlProvider', $pageDef);
-			$values['dependencies'] = $dependencies['props'];
+		} else if ($pageDef->implementsInterface('zpt\cdt\html\HtmlContentProvider')) {
+			$values['isContentProvider'] = true;
 		}
+
+		$dependencies = DependencyParser::parse('htmlProvider', $pageDef);
+		$values['dependencies'] = $dependencies['props'];
 
 		return $values;
 	}
