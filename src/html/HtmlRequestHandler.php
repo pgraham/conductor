@@ -46,7 +46,7 @@ class HtmlRequestHandler extends BaseRequestHandler implements RequestHandler {
     $page = Page::getInstance();
 
     $this->_htmlProvider = Injector::getBean($this->_beanId);
-    $this->_htmlProvider->populate($page, $request->getQuery());
+    $this->_htmlProvider->populate($page, $request);
 
     $response->setData($page);
   }

@@ -24,6 +24,7 @@ use zpt\cdt\html\Page;
 use zpt\cdt\L10N;
 use zpt\cdt\LoginForm;
 use zpt\cdt\LoginFormAsync;
+use zpt\rest\Request;
 
 /**
  * This is a generated class that populates a conductor\Page instance.
@@ -41,7 +42,7 @@ class /*# companionClass #*/ extends BaseHtmlProvider
 	/** @Injected */
 	private $authProvider;
 
-	public function populate(Page $page, array $query = null) {
+	public function populate(Page $page, Request $request) {
 		$this->logger->info("HTML: Populating HTML Page");
 		#{ if env = dev
 			$page->setCaptureDebug(true);
@@ -139,7 +140,8 @@ class /*# companionClass #*/ extends BaseHtmlProvider
 		#{ if template
 			$page->setTemplate($tmpl);
 		#}
-		$page->bodyAdd($this->getContent($query));
+
+		$page->bodyAdd($this->getContent($request->getQuery()));
 
 		// Add an asynchronous login form that will be initially hidden so that it
 		// can be autocompleted by the browser.
@@ -149,7 +151,7 @@ class /*# companionClass #*/ extends BaseHtmlProvider
 		$this->onPageView();
 	}
 
-	public function getFragment($query) {
+	public function getFragment($request) {
 		#{ if auth ISSET
 			if (!$this->authProvider->hasPermission('/*# auth #*/', '/*# authLvl #*/')) {
 				$this->loadLogin();
@@ -157,7 +159,7 @@ class /*# companionClass #*/ extends BaseHtmlProvider
 			}
 		#}
 
-		$ctnt = $this->getContent($query);
+		$ctnt = $this->getContent($request->getQuery());
 
 		// Invoke any registered page view listeners
 		$this->onPageView();

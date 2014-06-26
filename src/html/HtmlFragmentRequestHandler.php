@@ -50,7 +50,7 @@ class HtmlFragmentRequestHandler extends BaseRequestHandler
     $htmlProvider = Injector::getBean($this->_beanId);
     $htmlProvider->setAuthProvider($this->_authProvider);
 
-    $frag = $htmlProvider->getFragment($request->getQuery());
+    $frag = $htmlProvider->getFragment($request);
     if (!is_array($frag)) {
       $frag = array($frag);
     }
