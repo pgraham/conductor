@@ -32,30 +32,30 @@ class ResourceDiscoverer {
 
   /**
    * Discover all of the files that create the given group, or groups.
-   * Discovered files are ordered according to the following rules.  All files 
-   * mentioned in the ordering rules are assumed to have the appropriate 
-   * extension for the resource type. So when discovering CSS resources `__init` 
+   * Discovered files are ordered according to the following rules.  All files
+   * mentioned in the ordering rules are assumed to have the appropriate
+   * extension for the resource type. So when discovering CSS resources `__init`
    * really refers to `__init.css`.
    *
    *  1.  If it exists, a file named either `__setup` or `__init` will be
    *      combined first. If both exist `__init` will be added first.
    *
-   *  2.  This is followed by any subgroups.  Sub groups are simply directories 
-   *      within the group directory. The ordering process is recursive so sub 
-   *      groups will follow the same ordering rules and can themselves contain 
+   *  2.  This is followed by any subgroups.  Sub groups are simply directories
+   *      within the group directory. The ordering process is recursive so sub
+   *      groups will follow the same ordering rules and can themselves contain
    *      subgroups.
    *
    *  3.  If it exists subgroups will be followed by a script named
    *      `__post-sub`.
    *
-   *  4.  This will followed by all files with the resource type extension 
+   *  4.  This will followed by all files with the resource type extension
    *      except for a file that has the same name as the base name of the
    *      group.
    *
-   *  5.  If it a exists, a file with the same name as the base name of the 
+   *  5.  If it a exists, a file with the same name as the base name of the
    *      group and the appropriate resource extension.
    *
-   *  6.  Subgroups and normal resource files will be ordered alphabetically by 
+   *  6.  Subgroups and normal resource files will be ordered alphabetically by
    *      their basename. N.B. This is currently done with a SORT_TYPE_REGULAR
    *      to the PHP function sort and ksort, however this should not be relied
    *      on *at this point* as the rules surrounding this ordering will likely
