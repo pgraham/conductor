@@ -25,6 +25,13 @@ use \zpt\rest\RestServer;
  */
 class InjectedRestServer extends RestServer {
 
+  private $pathInfo;
+
+  public function __construct($pathInfo) {
+    parent::__construct();
+    $this->pathInfo = $pathInfo;
+  }
+
   /**
    * Add a BeanRequestHandler.  Bean request handlers provide their own
    * mapping information.
@@ -43,6 +50,15 @@ class InjectedRestServer extends RestServer {
         isset($mapping->method) ? $mapping->method : null
       );
     }
+  }
+
+  /**
+   * @Override
+   */
+  protected function createRequest($uri, $action, $mappingId, $parameters) {
+    $request = parent::createRequest($uri, $action, $mappingId, $parameters);
+    $request->setDocumentRoot($this->pathInfo['htdocs']);
+    return $request;
   }
 
 }

@@ -290,7 +290,7 @@ class Conductor {
 		L10N::load('en', $pathInfo['target']);
 
 		// Now that initialization is finished the request can be processed
-		self::processRequest();
+		self::processRequest($pathInfo);
 	}
 
 	/**
@@ -316,8 +316,8 @@ class Conductor {
 	/**
 	 * Process the request.
 	 */
-	public static function processRequest() {
-		$server = new InjectedRestServer();
+	public static function processRequest($pathInfo) {
+		$server = new InjectedRestServer($pathInfo);
 		$server->setLogger(self::$applicationLogger);
 
 		$server->registerExceptionHandler(
