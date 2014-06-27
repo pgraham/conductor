@@ -42,7 +42,7 @@ class PdoExceptionHandler implements ExceptionHandler
 		Response $response
 	) {
 
-		$exceptionParser = new PdoExceptionWrapperParser($e); 
+		$exceptionParser = new PdoExceptionWrapperParser($e);
 		$modelMessages = $this->companionLoader->get(
 			'zpt\dyn\i18n',
 			$e->getModelClass()
@@ -51,7 +51,7 @@ class PdoExceptionHandler implements ExceptionHandler
 		$response->clearHeaders();
 		$hdrMsg = _L('http.status.header.403');
 		$msg = _L('http.status.message.403'); // Default message
-		 
+
 		$info = $exceptionParser->getResponseInfo();
 		if ($exceptionParser->isDuplicate()) {
 			$msg = $modelMessages->duplicateMsg($info['field'], $info['value']);
