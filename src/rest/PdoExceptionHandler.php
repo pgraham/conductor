@@ -14,13 +14,13 @@
  */
 namespace zpt\cdt\rest;
 
-use \zpt\cdt\exception\PdoExceptionWrapperParser;
-use \zpt\rest\ExceptionHandler;
-use \zpt\rest\Request;
-use \zpt\rest\Response;
-use \zpt\rest\RestException;
-use \zpt\opal\CompanionLoader;
-use \Exception;
+use zpt\cdt\exception\PdoExceptionWrapperParser;
+use zpt\rest\ExceptionHandler;
+use zpt\rest\Request;
+use zpt\rest\Response;
+use zpt\rest\RestException;
+use zpt\opal\CompanionLoader;
+use Exception;
 
 /**
  * REST server exception handler for PdoExceptions.
