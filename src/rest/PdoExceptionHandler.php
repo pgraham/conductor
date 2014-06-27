@@ -5,7 +5,7 @@
  * All rights reserved.
  *
  * This file is part of Conductor and is licensed by the Copyright holder under
- * the 3-clause BSD License.  The full text of the license can be found in the
+ * the 3-clause BSD License. The full text of the license can be found in the
  * LICENSE.txt file included in the root directory of this distribution or at
  * the link below.
  * =============================================================================
@@ -30,44 +30,44 @@ use \Exception;
 class PdoExceptionHandler implements ExceptionHandler
 {
 
-    private $companionLoader;
+	private $companionLoader;
 
-    public function __construct(CompanionLoader $companionLoader) {
-        $this->companionLoader = $companionLoader;
-    }
+	public function __construct(CompanionLoader $companionLoader) {
+		$this->companionLoader = $companionLoader;
+	}
 
-    public function handleException(
-        Exception $e,
-        Request $request,
-        Response $response
-    ) {
+	public function handleException(
+		Exception $e,
+		Request $request,
+		Response $response
+	) {
 
-        $exceptionParser = new PdoExceptionWrapperParser($e); 
-        $modelMessages = $this->companionLoader->get(
-            'zpt\dyn\i18n',
-            $e->getModelClass()
-        );
+		$exceptionParser = new PdoExceptionWrapperParser($e); 
+		$modelMessages = $this->companionLoader->get(
+			'zpt\dyn\i18n',
+			$e->getModelClass()
+		);
 
-        $response->clearHeaders();
-        $hdrMsg = _L('http.status.header.403');
-        $msg = _L('http.status.message.403'); // Default message
-       
-        $info = $exceptionParser->getResponseInfo();
-        if ($exceptionParser->isDuplicate()) {
-          $msg = $modelMessages->duplicateMsg($info['field'], $info['value']);
+		$response->clearHeaders();
+		$hdrMsg = _L('http.status.header.403');
+		$msg = _L('http.status.message.403'); // Default message
+		 
+		$info = $exceptionParser->getResponseInfo();
+		if ($exceptionParser->isDuplicate()) {
+			$msg = $modelMessages->duplicateMsg($info['field'], $info['value']);
 
-        } else if ($exceptionParser->isInvalidFilter()) {
-          $msg = $modelMessages->invalidFilterMsg($info['filter']);
+		} else if ($exceptionParser->isInvalidFilter()) {
+			$msg = $modelMessages->invalidFilterMsg($info['filter']);
 
-        } else if ($exceptionParser->isInvalidSort()) {
-          $msg = $modelMessages->invalidSortMsg($info['sort']);
+		} else if ($exceptionParser->isInvalidSort()) {
+			$msg = $modelMessages->invalidSortMsg($info['sort']);
 
-        } else if ($exceptionParser->isNotNullViolation()) {
-          $msg = $modelMessages->notNullMsg($info['field']);
+		} else if ($exceptionParser->isNotNullViolation()) {
+			$msg = $modelMessages->notNullMsg($info['field']);
 
-        }
+		}
 
-        $response->header("HTTP/1.1 403 $hdrMsg");
-        $response->setData($msg);
-    }
+		$response->header("HTTP/1.1 403 $hdrMsg");
+		$response->setData($msg);
+	}
 }
