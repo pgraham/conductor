@@ -55,7 +55,8 @@ class ConfiguratorGenerator extends CompanionGenerator {
 			'namespace' => $namespace,
 			'dbConfig' => $dbConfig->asArray(),
 			'env' => $this->cfg->getEnv(),
-			'logDir' => $this->cfg->getLogDir()
+			'logDir' => $this->cfg->getLogDir(),
+			'logLevel' => $this->cfg->getLogLevel()
 		);
 	}
 

@@ -19,7 +19,8 @@ class Configurator {
       'namespace' => /*# php:namespace #*/,
       'db_config' => /*# php:dbConfig #*/,
       'env' => /*# php:env #*/,
-      'logDir' => '/*# logDir #*/'
+      'logDir' => '/*# logDir #*/',
+      'logLevel' => '/*# logLevel #*/'
     );
   }
 }

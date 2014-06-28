@@ -12,6 +12,7 @@ use Monolog\Logger;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\NullHandler;
+use Monolog\Processor\PsrLogMessageProcessor;
 
 use zpt\dyn\Configurator;
 use zpt\dyn\InjectionConfigurator;
@@ -261,10 +262,15 @@ class Conductor {
 
 		// Configure application logger
 		$logger = Injector::getBean('logger');
-		if ($isDevMode) {
-			$logger->pushHandler(new StreamHandler($pathInfo['target'] . '/cdt.log'));
+		$cfgLogLevel = self::$_config['logLevel'];
+		$logLevel = 0;
+		if ($cfgLogLevel !== 'NONE') {
+			$logLevel = array_search($cfgLogLevel, LogLevel::$levels);
+		}
+		if ($logLevel > 0) {
+			$handler = new StreamHandler($pathInfo['target'] . '/cdt.log', $logLevel);
+			$logger->pushHandler($handler);
 		} else {
-			// Don't log anything in production
 			$logger->pushHandler(new NullHandler());
 		}
 		self::$applicationLogger = $logger;

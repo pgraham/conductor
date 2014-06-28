@@ -27,6 +27,7 @@ class SiteConfiguration extends ConfigurationSet
 
 	// Path configuration
 	private $logDir;
+	private $logLevel;
 	private $target;
 
 	/**
@@ -43,6 +44,12 @@ class SiteConfiguration extends ConfigurationSet
 		$this->dbConfig = new DatabaseConfiguration($root, $env);
 
 		$this->logDir = $this->getValueOrDefault('logDir', $config, $env, '');
+		$this->logLevel = $this->getValueOrDefault(
+			'logLevel',
+			$config,
+			$env,
+			'NONE'
+		);
 	}
 
 	public function getDbConfig() {
@@ -51,6 +58,10 @@ class SiteConfiguration extends ConfigurationSet
 
 	public function getLogDir() {
 		return $this->logDir;
+	}
+
+	public function getLogLevel() {
+		return $this->logLevel;
 	}
 
 	public function getNamespace() {
