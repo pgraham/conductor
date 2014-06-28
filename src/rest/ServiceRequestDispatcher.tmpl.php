@@ -36,6 +36,7 @@ class /*# companionClass #*/ extends BaseRequestHandler
     $this->service = $service;
   }
 
+  // TODO Session should be available through the request object
   public function setSession($session) {
     $this->session = $session;
   }
