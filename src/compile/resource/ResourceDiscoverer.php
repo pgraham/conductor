@@ -52,17 +52,17 @@ class ResourceDiscoverer {
    *      except for a file that has the same name as the base name of the
    *      group.
    *
-   *  5.  If it a exists, a file with the same name as the base name of the
-   *      group and the appropriate resource extension.
+   *  5.  If it exists, a file with the same name as the base name of the
+   *      group and the appropriate resource extension will be added last.
    *
    *  6.  Subgroups and normal resource files will be ordered alphabetically by
-   *      their basename. N.B. This is currently done with a SORT_TYPE_REGULAR
+   *      their basename. **N.B. This is currently done with a SORT_TYPE_REGULAR
    *      to the PHP function sort and ksort, however this should not be relied
    *      on *at this point* as the rules surrounding this ordering will likely
-   *      be revised in a later release.
+   *      be revised in a later release**.
    *
-   * @param string|array $groups Either the name of a single group to discover
-   *   or an array of group names.
+   * @param string|array $groups
+   *   Either the name of a single group to discover or an array of group names.
    */
   public function discover($groups) {
     if (is_array($groups)) {
