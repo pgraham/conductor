@@ -32,7 +32,7 @@ class /*# companionClass #*/ extends BaseRequestHandler
     return $this->mappings;
   }
 
-  public function setService($service) {
+  public function setService(\/*# model #*/ $service) {
     $this->service = $service;
   }
 
