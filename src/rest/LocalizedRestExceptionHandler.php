@@ -14,12 +14,12 @@
  */
 namespace zpt\cdt\rest;
 
-use \zpt\rest\ExceptionHandler;
-use \zpt\rest\Request;
-use \zpt\rest\Response;
-use \zpt\rest\RestExceptionHandler;
-use \zpt\cdt\L10N;
-use \Exception;
+use zpt\rest\ExceptionHandler;
+use zpt\rest\Request;
+use zpt\rest\Response;
+use zpt\rest\RestExceptionHandler;
+use zpt\cdt\L10N;
+use Exception;
 
 /**
  * Replacement for the default RestExceptionHandler which will detect messages
