@@ -4,13 +4,13 @@
  */
 namespace /*# companionNs #*/;
 
-use \zpt\rest\BaseRequestHandler;
-use \zpt\rest\RequestHandler;
-use \zpt\rest\Request;
-use \zpt\rest\Response;
-use \zpt\cdt\di\Injector;
-use \zpt\cdt\rest\BeanRequestHandler;
-use \Exception;
+use zpt\cdt\di\Injector;
+use zpt\cdt\rest\BeanRequestHandler;
+use zpt\rest\BaseRequestHandler;
+use zpt\rest\RequestHandler;
+use zpt\rest\Request;
+use zpt\rest\Response;
+use Exception;
 
 class /*# companionClass #*/ extends BaseRequestHandler implements BeanRequestHandler {
 
