@@ -516,6 +516,7 @@ class SiteCompiler implements LoggerAwareInterface {
 		// Dependency Injection
 		$serviceRequestDispatcher = new ServiceRequestDispatcher(
 			$pathInfo['target']);
+		$serviceRequestDispatcher->setLogger($this->logger);
 		$this->serviceCompiler->setServiceRequestDispatcher(
 			$serviceRequestDispatcher);
 		$this->serviceCompiler->setDependencyInjectionCompiler($this->diCompiler);

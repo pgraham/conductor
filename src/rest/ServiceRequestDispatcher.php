@@ -14,6 +14,8 @@
  */
 namespace zpt\cdt\rest;
 
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use \zpt\anno\Annotations;
 use \zpt\cdt\di\Injector;
 use \zpt\opal\CompanionGenerator;
@@ -34,7 +36,11 @@ use \StdClass;
  * All service methods must accept accept two parameters, a zpt\rest\Request
  * object and a zpt\rest\Response object.
  */
-class ServiceRequestDispatcher extends CompanionGenerator {
+class ServiceRequestDispatcher extends CompanionGenerator
+	implements LoggerAwareInterface
+{
+
+	use LoggerAwareTrait;
 
 	const BEAN_ID_SUFFIX = 'ServiceRequestDispatcher';
 
@@ -49,6 +55,7 @@ class ServiceRequestDispatcher extends CompanionGenerator {
 	}
 
 	protected function getValues($className) {
+		$this->logger->info("[DISPATCH] Generating request dispatcher for $className service");
 		$defClass = new ReflectionClass($className);
 		$defAnnos = new Annotations($defClass);
 		if (!isset($defAnnos['service'])) {
