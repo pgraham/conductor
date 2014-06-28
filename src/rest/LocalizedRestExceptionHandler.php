@@ -14,6 +14,8 @@
  */
 namespace zpt\cdt\rest;
 
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use zpt\rest\ExceptionHandler;
 use zpt\rest\Request;
 use zpt\rest\Response;
@@ -27,11 +29,14 @@ use Exception;
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class LocalizedRestExceptionHandler implements ExceptionHandler
+class LocalizedRestExceptionHandler
+    implements ExceptionHandler, LoggerAwareInterface
 {
 
+    use LoggerAwareTrait;
+
     private $defaultHandler;
-    
+
     /**
      * Create a new LocalizedRestExceptionHandler.  An instance of the
      * default exception handler is required to build the actual response.
