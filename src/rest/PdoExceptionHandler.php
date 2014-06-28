@@ -49,25 +49,30 @@ class PdoExceptionHandler implements ExceptionHandler
 		);
 
 		$response->clearHeaders();
-		$hdrMsg = _L('http.status.header.403');
-		$msg = _L('http.status.message.403'); // Default message
+		$status = 500;
+		$msg = _L("http.status.message.500"); // Default message
 
 		$info = $exceptionParser->getResponseInfo();
 		if ($exceptionParser->isDuplicate()) {
+			$status = 403;
 			$msg = $modelMessages->duplicateMsg($info['field'], $info['value']);
 
 		} else if ($exceptionParser->isInvalidFilter()) {
+			$status = 403;
 			$msg = $modelMessages->invalidFilterMsg($info['filter']);
 
 		} else if ($exceptionParser->isInvalidSort()) {
+			$status = 403;
 			$msg = $modelMessages->invalidSortMsg($info['sort']);
 
 		} else if ($exceptionParser->isNotNullViolation()) {
+			$status = 403;
 			$msg = $modelMessages->notNullMsg($info['field']);
 
 		}
 
-		$response->header("HTTP/1.1 403 $hdrMsg");
+		$reasonPhrase = _L("http.status.header.$status");
+		$response->header("HTTP/1.1 $status $reasonPhrase");
 		$response->setData($msg);
 	}
 }
