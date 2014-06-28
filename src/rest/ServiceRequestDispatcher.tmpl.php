@@ -4,6 +4,8 @@
  */
 namespace /*# companionNs #*/;
 
+use Psr\Log\LoggerAwareInterface;
+use zpt\cdt\di\InjectedLoggerAwareTrait;
 use zpt\cdt\di\Injector;
 use zpt\cdt\rest\BeanRequestHandler;
 use zpt\rest\BaseRequestHandler;
@@ -12,7 +14,10 @@ use zpt\rest\Request;
 use zpt\rest\Response;
 use Exception;
 
-class /*# companionClass #*/ extends BaseRequestHandler implements BeanRequestHandler {
+class /*# companionClass #*/ extends BaseRequestHandler
+  implements BeanRequestHandler, LoggerAwareInterface {
+
+  use InjectedLoggerAwareTrait;
 
   private $service;
   private $session;
@@ -45,6 +50,10 @@ class /*# companionClass #*/ extends BaseRequestHandler implements BeanRequestHa
         $this->pdo->beginTransaction();
 
         $mappingId = $request->getMappingId();
+        $uri = $request->getUri();
+        $this->logger->debug(
+          "[DISPATCH] Mapping $uri ($mappingId) to /*# model #*/ service
+        ");
         switch ($mappingId) {
 
           #{ each methodType[methods] as method
