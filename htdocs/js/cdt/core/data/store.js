@@ -30,6 +30,8 @@
     };
 
     that.load = function (spf, cb) {
+      var deferred = $.Deferred();
+
       spf = spf || {};
       cb = cb || $.noop;
 
@@ -45,8 +47,11 @@
 
         e = { items: items, total: total };
         cb.apply(that, [ e ]);
+        deferred.resolve(e);
         that.trigger('load', [ e ]);
       });
+
+      return deferred.promise();
     };
 
     that.get = function (id) {
