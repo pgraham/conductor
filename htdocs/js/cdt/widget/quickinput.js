@@ -9,6 +9,9 @@
 
   $.widget('cdt.quickinput', {
     options: {
+      addClass: null,
+      maxWidth: null,
+      prompt: null,
       width: null
     },
 
@@ -53,7 +56,10 @@
       }
       this.input.addClass('detached');
 
-      this.input.tooltip('disable').detach();
+      if (this.options.prompt) {
+        this.input.tooltip('disable');
+      }
+      this.input.detach();
       this.element.fadeTo('fast', 1);
     },
 
@@ -97,12 +103,15 @@
         })
         .queue(function (next) {
           self.input
-            .tooltip('enable')
             .show()
             .focus()
             .outerHeight(self.element.outerHeight())
             .outerWidth(self.element.outerWidth())
             .animate({ width: w }, 'fast', next);
+
+          if (self.option.prompt) {
+            self.input.tooltip('enable');
+          }
         });
     }
   });
