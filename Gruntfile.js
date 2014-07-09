@@ -80,8 +80,7 @@ module.exports = function (grunt) {
 		concat: {
 			jqueryUi: {
 				src: [
-					'<%= bowerDir %>/jquery-ui/ui/minified/jquery-ui.min.js',
-					'<%= bowerDir %>/jquery-ui/ui/minified/i18n/jquery-ui-i18n.min.js'
+					'<%= bowerDir %>/jquery-ui/jquery-ui.min.js',
 				],
 				dest: '<%= workDir %>/jquery-ui.min.js'
 			},
@@ -96,9 +95,6 @@ module.exports = function (grunt) {
 				dest: '<%= workDir %>/polyfiller.min.js'
 			},
 			merge: {
-				options: {
-					footer: "jQuery(function ($) { $.datepicker.setDefaults($.datepicker.regional[''])});"
-				},
 				src: [
 					'<%= workDir %>/jquery.min.js',
 					'<%= workDir %>/jquery-cookie.min.js',

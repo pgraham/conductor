@@ -107,7 +107,7 @@ class HtmlProvider extends CompanionGenerator {
 		if (isset($page['page']['theme'])) {
 			$values['uitheme'] = $page['page']['theme'];
 		} else if ($values['jsappsupport']) {
-			$values['uitheme'] = 'admin';
+			$values['uitheme'] = 'zpt';
 		}  else {
 			$values['uitheme'] = 'base';
 		}
