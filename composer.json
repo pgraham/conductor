@@ -16,10 +16,11 @@
     }
   },
   "bin": [
-    "bin/cdt-stage",
+    "bin/cdt-compile",
+    "bin/cdt-dbup",
     "bin/cdt-deploy",
     "bin/cdt-export",
-    "bin/cdt-compile",
+    "bin/cdt-stage",
     "bin/cdt-init",
     "bin/cdt-update"
   ],
