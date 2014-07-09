@@ -4,14 +4,14 @@
 -- ConfigValue
 CREATE TABLE "config_values" (
   "id"             integer      AUTO_INCREMENT PRIMARY KEY,
-  "name"           varchar(256) NOT NULL UNIQUE,
-  "value"          varchar(256) NULL
+  "name"           varchar(255) NOT NULL UNIQUE,
+  "value"          varchar(255) NULL
 );
 
 -- Permission
 CREATE TABLE "permissions" (
   "id"             integer      AUTO_INCREMENT PRIMARY KEY,
-  "name"           varchar(256) NOT NULL UNIQUE
+  "name"           varchar(255) NOT NULL UNIQUE
 );
 INSERT INTO "permissions" ("name") VALUES ('cdt-admin');
 
