@@ -69,6 +69,7 @@ class DeployProcess implements LifecycleProcess
 		));
 		$queue->add(new TagDeployedVersionStep($this->source, "v{$ts}"));
 		$queue->add(new UpdateWebServerLinkProcess($this->wsLink, $exportTarget));
+		$queue->add(new SymlinkUpdateStep("$this->target/current", $exportTarget));
 
 		$result = $queue->execute($logger);
 		if (!$result) {

@@ -82,6 +82,7 @@ class StagingProcess implements LifecycleProcess
 		));
 		$queue->add(new TagStagedVersionStep($this->source, "v{$ts}s"));
 		$queue->add(new UpdateWebServerLinkProcess($this->wsLink, $exportTarget));
+		$queue->add(new SymlinkUpdateStep("$this->target/current", $exportTarget));
 
 		$result = $queue->execute($logger);
 		if (!$result) {
