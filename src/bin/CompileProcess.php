@@ -10,7 +10,8 @@ namespace zpt\cdt\bin;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use zpt\cdt\compile\SiteCompiler;
+use zpt\cdt\Env;
+use Exception;
 
 /**
  * This class encapsulates the process for compiling a site.
@@ -23,8 +24,13 @@ class CompileProcess implements LifecycleProcess
 	private $root;
 	private $env;
 
-	public function __construct($root, $env = SiteCompiler::ENV_STAGE) {
+	public function __construct($root, $env = Env::STAGE) {
 		$this->root = $root;
+
+		// TODO Create an InvalidEnvironment exception class
+		if (!Env::verify($env)) {
+			throw new Exception("Invalid environment $env");
+		}
 		$this->env = $env;
 	}
 

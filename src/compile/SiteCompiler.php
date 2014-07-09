@@ -50,10 +50,6 @@ use ReflectionClass;
  */
 class SiteCompiler implements LoggerAwareInterface {
 
-	const ENV_DEV = 'dev';
-	const ENV_STAGE = 'stage';
-	const ENV_PROD = 'prod';
-
 	private $logger;
 
 	private $modelParser;
@@ -196,7 +192,7 @@ class SiteCompiler implements LoggerAwareInterface {
 		$this->compileServices($pathInfo, $ns);
 		$this->resourcesCompiler->compile($pathInfo, $ns, $env);
 		$this->htmlCompiler->compile($pathInfo, $ns, $env);
-		if ($env !== self::ENV_DEV) {
+		if ($env !== Env::DEV) {
 			$this->resourcesCompiler->combineResourceGroups(
 				"$pathInfo[target]/htdocs"
 			);

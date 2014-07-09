@@ -37,9 +37,10 @@ $target = dirname($composerPath);
  * =============================================================================
  */
 
-use \zpt\cdt\compile\SiteCompiler;
-use \zpt\cdt\Configuration;
-use \zpt\cdt\Loader;
+use zpt\cdt\compile\SiteCompiler;
+use zpt\cdt\Configuration;
+use zpt\cdt\Env;
+use zpt\cdt\Loader;
 
 /*
  * =============================================================================
@@ -59,12 +60,7 @@ if ($argc < 2) {
 }
 
 $env = $argv[1];
-$envs = array(
-	SiteCompiler::ENV_DEV,
-	SiteCompiler::ENV_STAGE,
-	SiteCompiler::ENV_PROD
-);
-if (!in_array($env, $envs)) {
+if (!Env::verifyEnv($env)) {
 	echo $usage;
 	exit(1);
 }

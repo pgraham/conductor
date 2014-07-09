@@ -10,7 +10,7 @@ namespace zpt\cdt\bin;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use zpt\cdt\compile\SiteCompiler;
+use zpt\cdt\Env;
 use zpt\db\DatabaseConnection;
 use InvalidArgumentException;
 use RuntimeException;
@@ -54,7 +54,7 @@ class DeployProcess implements LifecycleProcess
 			$exportTarget,
 			LifecycleProcess::STAGED_TAG
 		));
-		$queue->add(new CompileProcess($exportTarget, SiteCompiler::ENV_PROD));
+		$queue->add(new CompileProcess($exportTarget, Env::PROD));
 		if ($curProd !== null) {
 			$queue->add(new CopyUserContentProcess($curProd, $exportTarget));
 		}
