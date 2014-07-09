@@ -45,6 +45,13 @@ class DeployProcess implements LifecycleProcess
 		$exportTarget = "$this->target/$ts";
 		$curProd = $this->getCurrentProduction();
 
+		try {
+			$prodDbConn = $this->db->connectTo($this->prodDb);
+		} catch (DatabaseException $e) {
+			$msg = "Unable to connect to production database";
+			throw new RuntimeException($msg, 0, $e);
+		}
+
 		$logger->info("Deploying site from $this->source to $exportTarget");
 		$this->verifyParameters($logger, $exportTarget);
 
@@ -58,11 +65,7 @@ class DeployProcess implements LifecycleProcess
 		if ($curProd !== null) {
 			$queue->add(new CopyUserContentProcess($curProd, $exportTarget));
 		}
-		$queue->add(new AlterDatabaseProcess(
-			$this->db,
-			$this->prodDb,
-			$exportTarget
-		));
+		$queue->add(new AlterDatabaseProcess($prodDbConn, $exportTarget));
 		$queue->add(new CopySymlinksStep(
 			$this->wsLink,
 			"$exportTarget/target/htdocs"

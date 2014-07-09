@@ -56,6 +56,13 @@ class StagingProcess implements LifecycleProcess
 		$ts = time();
 		$exportTarget = "$this->target/$ts";
 
+		try {
+			$stagingDbConn = $this->db->connectTo($this->stagingDb);
+		} catch (DatabaseException $e) {
+			$msg = "Unable to connect to staging database";
+			throw new RuntimeException($msg, 0, $e);
+		}
+
 		$logger->info("Staging site from $this->source to $exportTarget");
 		$this->verifyParameters($logger, $exportTarget);
 
@@ -66,6 +73,7 @@ class StagingProcess implements LifecycleProcess
 		if ($this->curProd !== null) {
 			// The current production link should be pointing to
 			// <production-root>/target/htdocs
+			// TODO is it possible to make use of <prod-dump>/current link for this?
 			$productionPath = realpath(realpath($this->curProd) . '/../..');
 			$queue->add(new CopyUserContentProcess($productionPath, $exportTarget));
 		}
@@ -75,11 +83,7 @@ class StagingProcess implements LifecycleProcess
 			$this->productionDb,
 			$this->stagingDb
 		));
-		$queue->add(new AlterDatabaseProcess(
-			$this->db,
-			$this->stagingDb,
-			$exportTarget
-		));
+		$queue->add(new AlterDatabaseProcess($stagingDbConn, $exportTarget));
 		$queue->add(new TagStagedVersionStep($this->source, "v{$ts}s"));
 		$queue->add(new UpdateWebServerLinkProcess($this->wsLink, $exportTarget));
 		$queue->add(new SymlinkUpdateStep("$this->target/current", $exportTarget));
