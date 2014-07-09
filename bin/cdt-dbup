@@ -1,0 +1,109 @@
+#!/usr/bin/env php
+<?php
+/*
+ * Copyright (c) 2014, Philip Graham
+ * All rights reserved.
+ *
+ *
+ * This file is part of Conductor. For the full copyright and license information
+ * please view the LICENSE file that was distributed with this source code.
+ */
+
+/**
+ * This script runs database alters for the current site.
+ *
+ * @author Philip Graham <philip@zeptech.ca>
+ */
+use zpt\cdt\bin\AlterDatabaseProcess;
+use zpt\cdt\bin\BinCommon;
+use zpt\cdt\config\DatabaseConfiguration;
+use zpt\cdt\config\DeploymentConfiguration;
+use zpt\cdt\exception\InvalidEnvironmentException;
+use zpt\cdt\Env;
+use zpt\db\exception\DatabaseException;
+use zpt\db\DatabaseConnection;
+
+require_once __DIR__ . '/setup.php';
+
+ensureFn([ 'prompt', 'passwordPrompt' ]);
+
+$usage = <<<USAGE
+cdt-dbup	[env]
+
+	Applies database alters for the specified environment.
+	WARNING: Current script applies the alters found in the dev root, not in the
+	current staged or production roots, even if either is the specified
+	environment
+
+	env	The environment for which the database should be updated. Defaults to
+		`dev`.
+USAGE;
+
+try {
+	if ($cmdln->argc > 1) {
+		$env = Env::get($cmdln->argv[1]);
+	} else {
+		$env = Env::get(Env::DEV);
+	}
+
+} catch (InvalidEnvironmentException $e) {
+	echo "Invalid environment $env\n\n";
+	echo $usage;
+	exit(1);
+}
+
+$deployConfig = new DeploymentConfiguration($devDir, (string) $env);
+if ($env->is(Env::DEV)) {
+	$envDir = $devDir;
+} else {
+	$envDir = "$deployConfig[path]/current";
+
+	if (!file_exists($envDir)) {
+		echo "Unable to find current $env deployment. ",
+				" Expected to find it at $envDir.",
+				" Are you sure that the site has been deployed to the $env environment?";
+		exit(1);
+	}
+}
+
+$dbConfig = new DatabaseConfiguration($devDir, (string) $env);
+$dbType = $dbConfig['driver'];
+
+switch ($dbType) {
+	case 'pgsql':
+	$defaultDbUser = 'postgres';
+	break;
+
+	default:
+	$defaultDbUser = 'root';
+}
+
+$dbUserPrompt = String("Priviledged {0} user");
+$dbUser = prompt($dbUserPrompt->format($dbType), $defaultDbUser);
+$dbPass = passwordPrompt("Password: ");
+
+try {
+	$db = new DatabaseConnection([
+		'driver' => $dbConfig['driver'],
+		'username' => $dbUser,
+		'password' => $dbPass,
+		'schema'   => $dbConfig['schema']
+	]);
+} catch (DatabaseException $e) {
+	binLogError("Unable to connect to database, {$e->getMessage()}", $e);
+	exit(1);
+}
+
+try {
+	if (isset($cmdln->opt['verbose']) && $cmdln->opt['verbose']) {
+		BinCommon::$logger->setShowDebug(true);
+	}
+
+	$process = new AlterDatabaseProcess($db, $envDir);
+	$process->execute(BinCommon::$logger);
+
+	return 0;
+} catch (RuntimeException $e) {
+	binLogError("Error applying alters, {$e->getMessage()}", $e);
+	exit(1);
+}
