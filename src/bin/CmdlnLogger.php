@@ -34,6 +34,15 @@ class CmdlnLogger extends AbstractLogger implements LoggerInterface
 			case LogLevel::CRITICAL:
 			case LogLevel::ERROR:
 			$this->printError(String($message)->format($context));
+			if ($this->showDebug && isset($context['exception'])) {
+				$e = $context['exception'];
+				echo "[DEBUG] {$e->getTraceAsString()}\n";
+
+				while($e = $e->getPrevious()) {
+					echo "[DEBUG] Caused by: {$e->getMessage()}\n";
+					echo "[DEBUG] {$e->getTraceAsSTring()}\n\n";
+				}
+			}
 			break;
 
 			case LogLevel::WARNING:

@@ -167,8 +167,12 @@ namespace {
 	/**
 	 * Log an error message.
 	 */
-	function binLogError($msg) {
-		BinCommon::$logger->error($msg);
+	function binLogError($msg, Exception $exception = null) {
+		$context = [];
+		if ($exception !== null) {
+			$context['exception'] = $exception;
+		}
+		BinCommon::$logger->error($msg, $context);
 	}
 
 	/**
