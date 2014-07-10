@@ -118,13 +118,13 @@ namespace {
 	// Initialize command line logger
 	use zpt\cdt\bin\BinCommon;
 	use zpt\cdt\bin\CmdlnLogger;
+	use zpt\util\Cmdln;
 
 	BinCommon::getComposerLoader();
 	BinCommon::$logger = new CmdlnLogger();
 
-	ensureFn('getcmdln');
-	$cmdln = getcmdln($argv, [ 'verbose' ]);
-	if ($cmdln->opt['verbose']) {
+	$cmdln = new Cmdln($argv, $argc);
+	if ($cmdln->option('verbose')->isTrue()) {
 		BinCommon::$logger->setShowDebug(true);
 	}
 

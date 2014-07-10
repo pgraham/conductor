@@ -95,9 +95,6 @@ try {
 }
 
 try {
-	if (isset($cmdln->opt['verbose']) && $cmdln->opt['verbose']) {
-		BinCommon::$logger->setShowDebug(true);
-	}
 
 	$process = new AlterDatabaseProcess($db, $envDir);
 	$process->execute(BinCommon::$logger);
