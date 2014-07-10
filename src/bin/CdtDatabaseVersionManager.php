@@ -16,7 +16,7 @@ namespace zpt\cdt\bin;
 
 use zpt\db\DatabaseConnection;
 use zpt\dbup\DatabaseVersionManager;
-use zpt\util\db\DatabaseException;
+use zpt\db\exception\DatabaseException;
 
 /**
  * Conductor zpt\dbup\DatabaseVersionManager implementation.
