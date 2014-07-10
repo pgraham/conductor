@@ -82,7 +82,7 @@ class AlterDatabaseProcess implements LifecycleProcess
 		}
 
 		$logger->notice("Database $schema is up-to-date");
-	} 
+	}
 
 	protected function applyConductorAlters($logger) {
 		$this->dbVerManager->setConfigurationProperty('cdt-alter');
