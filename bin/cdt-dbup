@@ -61,7 +61,8 @@ if ($env->is(Env::DEV)) {
 	if (!file_exists($envDir)) {
 		echo "Unable to find current $env deployment. ",
 				" Expected to find it at $envDir.",
-				" Are you sure that the site has been deployed to the $env environment?";
+				" Are you sure that the site has been deployed to the $env",
+				" environment?";
 		exit(1);
 	}
 }
@@ -90,7 +91,7 @@ try {
 		'schema'   => $dbConfig['schema']
 	]);
 } catch (DatabaseException $e) {
-	binLogError("Unable to connect to database, {$e->getMessage()}", $e);
+	binLogError("Unable to connect to database", $e);
 	exit(1);
 }
 
@@ -101,6 +102,7 @@ try {
 
 	return 0;
 } catch (RuntimeException $e) {
-	binLogError("Error applying alters, {$e->getMessage()}", $e);
+	$msg = "Unable to apply $env alters to $dbConfig[driver]:$dbConfig[schema]";
+	binLogError($msg, $e);
 	exit(1);
 }

@@ -36,12 +36,17 @@ class CmdlnLogger extends AbstractLogger implements LoggerInterface
 			$this->printError(String($message)->format($context));
 			if ($this->showDebug && isset($context['exception'])) {
 				$e = $context['exception'];
-				echo "[DEBUG] {$e->getTraceAsString()}\n";
 
+				$msg = $this->formatException($e);
+
+				$nl2 = PHP_EOL . PHP_EOL;
 				while($e = $e->getPrevious()) {
-					echo "[DEBUG] Caused by: {$e->getMessage()}\n";
-					echo "[DEBUG] {$e->getTraceAsSTring()}\n\n";
+					$msg = $msg
+						->join("Caused by:", $nl2)
+						->join($this->formatException($e), $nl2);
 				}
+
+				echo $msg->prefix('[DEBUG] ', $multiline = true);
 			}
 			break;
 
@@ -74,6 +79,11 @@ class CmdlnLogger extends AbstractLogger implements LoggerInterface
 
 	public function setShowDebug($showDebug) {
 		$this->showDebug = (bool) $showDebug;
+	}
+
+	private function formatException($e) {
+		$nl2 = PHP_EOL . PHP_EOL;
+		return String($e->getMessage())->join($e->getTraceAsString(), $nl2);
 	}
 
 	private function printError($msg) {
