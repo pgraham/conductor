@@ -12,6 +12,3 @@ CREATE TABLE "content" (
   "key"            varchar(128) NOT NULL UNIQUE,
   "txt"            text         NOT NULL DEFAULT ''
 );
-
--- Update conductor database version
-UPDATE "config_values" SET "value" = '4' WHERE "name" = 'cdt-alter';
