@@ -8,6 +8,8 @@
  */
 namespace zpt\cdt;
 
+use zpt\cdt\exception\InvalidEnvironmentException;
+
 /**
  * This class encapsulates information about an enviroment.
  *
