@@ -67,7 +67,7 @@ class CmdlnLogger extends AbstractLogger implements LoggerInterface
 				if (is_array($message)) {
 					$message = implode(' ', $message);
 				}
-				$message = String($message)->format($context);
+				$message = String($message)->format($context)->prefix('[DEBUG] ');
 				echo "$message\n";
 			}
 			break;
