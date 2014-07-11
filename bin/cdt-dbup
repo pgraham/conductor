@@ -37,11 +37,12 @@ cdt-dbup	[env]
 
 	env	The environment for which the database should be updated. Defaults to
 		`dev`.
+
 USAGE;
 
 try {
-	if ($cmdln->argc > 1) {
-		$env = Env::get($cmdln->argv[1]);
+	if ($cmdln->argc() > 1) {
+		$env = Env::get($cmdln->arg(1));
 	} else {
 		$env = Env::get(Env::DEV);
 	}
