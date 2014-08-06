@@ -15,7 +15,7 @@
 namespace zpt\cdt\compile;
 
 use zpt\cdt\config\SiteConfiguration;
-use zpt\opal\CompanionGenerator;
+use zpt\opal\BaseCompanionDirector;
 use ArrayObject;
 use Exception;
 
@@ -25,18 +25,18 @@ use Exception;
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class ConfiguratorGenerator extends CompanionGenerator {
+class ConfiguratorGenerator extends BaseCompanionDirector {
 
 	private $cfg;
 
 	public function __construct(SiteConfiguration $cfg) {
-		parent::__construct($cfg->getPathInfo()['target']);
+		parent::__construct($cfg->getPathInfo()['target'] . '/generated', 'dyn');
 
 		$this->cfg = $cfg;
 	}
 
 	public function getCompanionNamespace($defClass) {
-		return 'zpt\dyn';
+		return '';
 	}
 
 	public function getTemplatePath($defClass) {

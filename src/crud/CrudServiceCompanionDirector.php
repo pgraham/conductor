@@ -14,11 +14,11 @@
  */
 namespace zpt\cdt\crud;
 
-use \zeptech\orm\generator\model\Model;
-use \zeptech\orm\generator\model\Parser as ModelParser;
+use zpt\orm\model\Model;
+use zpt\orm\model\ModelFactory;
 use \zpt\cdt\di\Injector;
 use \zpt\cdt\i18n\ModelDisplayParser;
-use \zpt\orm\ModelCompanionGenerator;
+use \zpt\orm\BaseModelCompanionDirector;
 
 /**
  * This class encapsulates information about a CRUD remote service for a model
@@ -29,13 +29,13 @@ use \zpt\orm\ModelCompanionGenerator;
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class CrudService extends ModelCompanionGenerator {
+class CrudServiceCompanionDirector extends BaseModelCompanionDirector {
 
-	protected function getCompanionNamespace($defClass) {
-		return 'zpt\dyn\crud';
+	public function __construct(ModelFactory $modelFactory = null) {
+		parent::__construct('crud', $modelFactory);
 	}
 
-	protected function getTemplatePath($defClass) {
+	protected function getTemplatePath() {
 		return __DIR__ . '/CrudService.tmpl.php';
 	}
 

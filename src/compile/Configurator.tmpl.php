@@ -5,7 +5,7 @@
  *
  * DO NOT EDIT.
  */
-namespace zpt\dyn {
+namespace /*# companionNs #*/ {
 
 use \ArrayObject;
 

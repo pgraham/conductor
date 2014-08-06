@@ -6,13 +6,10 @@
 namespace zpt\dyn;
 
 use \zpt\cdt\di\Injector;
-use \zpt\orm\PdoWrapper;
 
 class InjectionConfigurator {
 
   public function configure() {
-    // Add the Clarinet PDOWrapper as a bean
-    Injector::addBean('pdo', PdoWrapper::get());
 
     // Create beans and set scalar property values
     #{ each beans as bean

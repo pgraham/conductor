@@ -14,9 +14,9 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Handler\NullHandler;
 use Monolog\Processor\PsrLogMessageProcessor;
 
-use zpt\dyn\Configurator;
-use zpt\dyn\InjectionConfigurator;
-use zpt\dyn\ServerConfigurator;
+use dyn\Configurator;
+use dyn\InjectionConfigurator;
+use dyn\ServerConfigurator;
 use zpt\cdt\compile\SiteCompiler;
 use zpt\cdt\di\Injector;
 use zpt\cdt\exception\AuthException;
@@ -27,13 +27,14 @@ use zpt\cdt\rest\LocalizedDefaultExceptionHandler;
 use zpt\cdt\rest\LocalizedRestExceptionHandler;
 use zpt\cdt\rest\PdoExceptionHandler;
 use zpt\cdt\rest\ValidationExceptionHandler;
+use zpt\db\DatabaseConnection;
+use zpt\db\exception\DatabaseException;
 use zpt\orm\Clarinet;
 use zpt\orm\Criteria;
+use zpt\orm\Repository;
 use zpt\util\File;
 use zpt\util\DirectoryLockTimeoutException;
-use zpt\util\PdoExt;
 use Exception;
-use PDO;
 
 /**
  * The main interface for Conductor setup.
@@ -155,8 +156,8 @@ class Conductor {
 			set_error_handler(array($exceptionHandler, 'handleError'));
 
 			if (isset($_GET['clean'])) {
-				$dirs = array( 'i18n', 'zeptech', 'zpt', 'htdocs/css', 'htdocs/img',
-											 'htdocs/js', 'htdocs/jslib', 'htdocs/lib');
+				$dirs = array( 'i18n', 'zeptech', 'zpt', 'generated', 'htdocs/css',
+				               'htdocs/img', 'htdocs/js', 'htdocs/jslib', 'htdocs/lib');
 				$files = array( 'php.error', 'cdt.log' );
 
 				foreach ($dirs as $dir) {
@@ -240,21 +241,22 @@ class Conductor {
 			$pass = $dbConfig['password'];
 
 			// TODO Use zpt\db\DatabaseConnection instead
-			$pdo = new PdoExt([
+			$db = new DatabaseConnection([
 				'driver' => $driver,
 				'host' => $host,
 				'username' => $user,
 				'password' => $pass,
-				'database' => $schema,
-				'pdoAttributes' => [ PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION ]
+				'schema' => $schema
 			]);
+			Injector::addBean('db', $db);
 
-		} catch (PDOException $e) {
+		} catch (DatabaseException $e) {
 			throw new Exception("Unable to connect to database");
 		}
 
 		// Initialize clarinet
-		Clarinet::init($pdo);
+		$orm = new OrmContainer($db);
+		Injector::addBean('orm', $orm);
 
 		// Initialize Dependency injection
 		$configurator = new InjectionConfigurator();

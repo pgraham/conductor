@@ -5,9 +5,9 @@
  */
 namespace zpt\cdt\i18n;
 
-use \zeptech\orm\generator\model\Model;
-use \zpt\pct\CodeTemplateParser;
-use \zpt\orm\ModelCompanionGenerator;
+use zpt\orm\model\Model;
+use zpt\orm\model\ModelFactory;
+use zpt\orm\BaseModelCompanionDirector;
 
 /**
  * This class encapsulates model info required by Conductor for compiling the
@@ -17,13 +17,14 @@ use \zpt\orm\ModelCompanionGenerator;
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class ModelMessages extends ModelCompanionGenerator {
+class ModelMessagesCompanionDirector extends BaseModelCompanionDirector
+{
 
-	protected function getCompanionNamespace($defClass) {
-		return 'zpt\dyn\i18n';
+	public function __construct(ModelFactory $modelFactory = null) {
+		parent::__construct('modelmsgs', $modelFactory);
 	}
 
-	protected function getTemplatePath($defClass) {
+	protected function getTemplatePath() {
 		return __DIR__ . '/ModelMessages.tmpl.php';
 	}
 

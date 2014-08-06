@@ -44,7 +44,7 @@ class ServiceRequestDispatcher extends CompanionGenerator
 
 	const BEAN_ID_SUFFIX = 'ServiceRequestDispatcher';
 
-	const COMPANION_NAMESPACE = 'zpt\dyn\rest';
+	const COMPANION_NAMESPACE = 'rest';
 
 	protected function getCompanionNamespace($defClass) {
 		return self::COMPANION_NAMESPACE;

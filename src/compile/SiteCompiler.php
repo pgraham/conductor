@@ -19,7 +19,6 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
 use zpt\anno\AnnotationFactory;
-use zpt\anno\Annotations;
 use zpt\cdt\compile\resource\ResourceCompiler;
 use zpt\cdt\crud\CrudService;
 use zpt\cdt\di\Injector;
@@ -29,14 +28,12 @@ use zpt\cdt\i18n\ModelMessages;
 use zpt\cdt\rest\ServiceRequestDispatcher;
 use zpt\cdt\Env;
 use zpt\dyn\Configurator;
-use zpt\opal\DefaultNamingStrategy as CompanionNamingStrategy;
-use zpt\orm\companion\PersisterGenerator;
-use zpt\orm\companion\QueryBuilder;
-use zpt\orm\companion\TransformerGenerator;
-use zpt\orm\companion\ValidatorGenerator;
-use zpt\orm\model\parser\DefaultNamingStrategy as ModelNamingStrategy;
-use zpt\orm\model\parser\ModelParser;
-use zpt\orm\model\ModelCache;
+use zpt\opal\CompanionGenerator;
+use zpt\orm\companion\PersisterCompanionDirector;
+use zpt\orm\companion\QueryBuilderCompanionDirector;
+use zpt\orm\companion\TransformerCompanionDirector;
+use zpt\orm\companion\ValidatorCompanionDirector;
+use zpt\orm\model\ModelFactory;
 use zpt\pct\CodeTemplateParser;
 use zpt\util\File;
 use zpt\util\StringUtils;
@@ -53,15 +50,13 @@ class SiteCompiler implements LoggerAwareInterface {
 
 	private $logger;
 
-	private $modelParser;
-	private $modelCache;
-	private $namingStrategy;
 	private $annotationFactory;
+	private $modelFactory;
 
 	private $persisterGen;
 	private $transformerGen;
 	private $validatorGen;
-	private $infoGen;
+	private $msgGen;
 	private $crudGen;
 	private $queryBuilderGen;
 
@@ -103,18 +98,7 @@ class SiteCompiler implements LoggerAwareInterface {
 	 */
 	public function __construct() {
 		$this->annotationFactory = new AnnotationFactory();
-		$this->namingStrategy = new ModelNamingStrategy();
-		$this->modelCache = new ModelCache();
-		$this->modelParser = new ModelParser();
-
-		$this->namingStrategy->setAnnotationFactory($this->annotationFactory);
-
-		$this->modelCache->setModelParser($this->modelParser);
-
-		$this->modelParser->setAnnotationFactory($this->annotationFactory);
-		$this->modelParser->setNamingStrategy($this->namingStrategy);
-		$this->modelParser->setModelCache($this->modelCache);
-		$this->modelParser->init();
+		$this->modelFactory = new ModelFactory($this->annotationFactory);
 
 		$this->tmplParser = new CodeTemplateParser();
 
@@ -380,9 +364,9 @@ class SiteCompiler implements LoggerAwareInterface {
 		}
 	}
 
-	// TODO This should be made private once PHP 5.4 is available.	It is public
-	//			for now because it is accessed from the scope of an anonymous
-	//			function.
+	// TODO This should be made private once PHP 5.4 is available. It is public
+	//      for now because it is accessed from the scope of an anonymous
+	//      function.
 	public function compileModelDir($pathInfo, $models, $ns, $urlBase = '') {
 		if (!file_exists($models)) {
 			// Nothing to do here
@@ -405,17 +389,17 @@ class SiteCompiler implements LoggerAwareInterface {
 
 			$modelName = substr($fname, 0, -4);
 			$modelClass = "$ns\\$modelName";
-			$annos = new Annotations(new ReflectionClass($modelClass));
+			$annos = $this->annotationFactory->get($modelClass);
 
 			// Only try and parse entities.  This allows other types of related
 			// classes, such as gatekeepers, to be included in the model directory.
 			if (isset($annos['Entity'])) {
-				$model = $this->modelParser->parse($modelClass);
+				$model = $this->modelFactory->get($modelClass);
 
 				$this->persisterGen->generate($modelClass);
 				$this->transformerGen->generate($modelClass);
 				$this->validatorGen->generate($modelClass);
-				$this->infoGen->generate($modelClass);
+				$this->msgGen->generate($modelClass);
 				$this->queryBuilderGen->generate($modelClass);
 
 				// Add model gatekeeper as a bean
@@ -430,8 +414,7 @@ class SiteCompiler implements LoggerAwareInterface {
 				if ( !isset($annos['nocrud']) ) {
 					$this->crudGen->generate($modelClass);
 
-					$actorName = $model->getActor();
-					$crudSrvc = "zpt\\dyn\\crud\\$actorName";
+					$crudSrvc = "dyn\\crud\\$modelClass";
 					$beanId = Injector::generateBeanId($crudSrvc, 'Crud');
 					$this->diCompiler->addBean($beanId, $crudSrvc);
 
@@ -493,20 +476,28 @@ class SiteCompiler implements LoggerAwareInterface {
 
 	/* Initialize the compiler once configuration has been parsed */
 	private function initCompiler($pathInfo, $env) {
-		$target = $pathInfo['target'];
-		$this->persisterGen = new PersisterGenerator($target);
-		$this->transformerGen = new TransformerGenerator($target);
-		$this->validatorGen = new ValidatorGenerator($target);
-		$this->infoGen = new ModelMessages($target);
-		$this->crudGen = new CrudService($target);
-		$this->queryBuilderGen = new QueryBuilder($target);
+		$target = "$pathInfo[target]/generated";
+		$baseNs = 'dyn';
 
-		$this->persisterGen->setModelCache($this->modelCache);
-		$this->transformerGen->setModelCache($this->modelCache);
-		$this->validatorGen->setModelCache($this->modelCache);
-		$this->infoGen->setModelCache($this->modelCache);
-		$this->crudGen->setModelCache($this->modelCache);
-		$this->queryBuilderGen->setModelCache($this->modelCache);
+		$dynTarget = new Psr4Dir($target, 'dyn\\');
+
+		$director = new PersisterCompanionDirector($this->modelFactory);
+		$this->persisterGen = new CompanionGenerator($director, $dynTarget);
+
+		$director = new TransformerCompanionDirector($this->modelFactory);
+		$this->transformerGen = new CompanionGenerator($director, $dynTarget);
+
+		$director = new ValidatorCompanionDirector($this->modelFactory);
+		$this->validatorGen = new CompanionGenerator($director, $dynTarget);
+
+		$director = new QueryBuilderCompanionDirector($this->modelFactory);
+		$this->queryBuilderGen = new CompanionGenerator($director, $dynTarget);
+
+		$director = new ModelMessagesCompanionDirector($this->modelFactory);
+		$this->msgGen = new CompanionGenerator($director, $dynTarget);
+
+		$director = new CrudServiceCompanionDirector($this->modelFactory);
+		$this->crudGen = new CompanionGenerator($director, $dynTarget);
 
 		$this->modulesPath = "$pathInfo[root]/modules";
 
