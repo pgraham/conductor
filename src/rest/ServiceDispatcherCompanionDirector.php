@@ -16,12 +16,13 @@ namespace zpt\cdt\rest;
 
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
-use \zpt\anno\Annotations;
-use \zpt\cdt\di\Injector;
-use \zpt\opal\CompanionGenerator;
-use \Exception;
-use \ReflectionClass;
-use \StdClass;
+use Psr\Log\NullLogger;
+use zpt\anno\AnnotationFactory;
+use zpt\cdt\di\Injector;
+use zpt\opal\BaseCompanionDirector;
+use Exception;
+use ReflectionClass;
+use StdClass;
 
 /**
  * This class generates zpt\rest\RequestHandler implementations that dispatch
@@ -36,28 +37,36 @@ use \StdClass;
  * All service methods must accept accept two parameters, a zpt\rest\Request
  * object and a zpt\rest\Response object.
  */
-class ServiceRequestDispatcher extends CompanionGenerator
+class ServiceDispatcherCompanionDirector extends BaseCompanionDirector
 	implements LoggerAwareInterface
 {
 
 	use LoggerAwareTrait;
 
-	const BEAN_ID_SUFFIX = 'ServiceRequestDispatcher';
+	const BEAN_ID_SUFFIX = 'ServiceDispatcher';
 
-	const COMPANION_NAMESPACE = 'rest';
+	public function __construct(AnnotationFactory $annotationFactory = null) {
+		parent::__construct('dispatcher');
 
-	protected function getCompanionNamespace($defClass) {
-		return self::COMPANION_NAMESPACE;
+		if ($annotationFactory === null) {
+			$annotationFactory = new AnnotationFactory();
+		}
+		$this->annotationFactory = $annotationFactory;
 	}
 
-	protected function getTemplatePath($defClass) {
+	public function getTemplatePath() {
 		return __DIR__ . '/ServiceRequestDispatcher.tmpl.php';
 	}
 
-	protected function getValues($className) {
+	public function getValuesFor(ReflectionClass $classDef) {
+		if ($this->logger === null) {
+			$this->logger = new NullLogger();
+		}
+
+		$className = $classDef->getName();
 		$this->logger->info("[DISPATCH] Generating request dispatcher for $className service");
-		$defClass = new ReflectionClass($className);
-		$defAnnos = new Annotations($defClass);
+
+		$defAnnos = $this->annotationFactory->get($classDef);
 		if (!isset($defAnnos['service'])) {
 			throw new Exception("$className is not a service definition");
 		}
@@ -68,9 +77,9 @@ class ServiceRequestDispatcher extends CompanionGenerator
 		$postMethods = array();
 		$putMethods = array();
 
-		$methods = $defClass->getMethods();
+		$methods = $classDef->getMethods();
 		foreach ($methods as $method) {
-			$methodAnnos = new Annotations($method);
+			$methodAnnos = $this->annotationFactory->get($method);
 			if (!isset($methodAnnos['uri']) || !isset($methodAnnos['method'])) {
 				// This isn't a service method so ignore it.
 				continue;

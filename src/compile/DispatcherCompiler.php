@@ -14,6 +14,8 @@
  */
 namespace zpt\cdt\compile;
 
+use zpt\cdt\config\RuntimeConfig;
+
 /**
  * This class compiles the request dispatcher by placing the startup script in
  * the /htdocs directory as well as the .htaccess file that redirects all
@@ -23,7 +25,8 @@ namespace zpt\cdt\compile;
  */
 class DispatcherCompiler implements Compiler {
 
-	public function compile($pathInfo, $ns, $env = 'dev') {
+	public function compile(RuntimeConfig $config) {
+		$pathInfo = $config->getPathInfo();
 		copy(
 			"$pathInfo[root]/vendor/zeptech/conductor/htdocs/.htaccess",
 			"$pathInfo[target]/htdocs/.htaccess");

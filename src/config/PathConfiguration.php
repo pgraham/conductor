@@ -24,6 +24,7 @@ class PathConfiguration extends ConfigurationSet
 	private $src;
 	private $target;
 	private $htdocs;
+	private $dyn;
 
 	public function __construct($root, $env) {
 		parent::__construct($root, $env);
@@ -40,5 +41,9 @@ class PathConfiguration extends ConfigurationSet
 		$this->src = "$root/src";
 		$this->target = "$root/target";
 		$this->htdocs = "$root/target/htdocs";
+		$this->dyn = [
+			'target' => "$root/target/generated",
+			'prefix' => 'dyn\\'
+		];
 	}
 }

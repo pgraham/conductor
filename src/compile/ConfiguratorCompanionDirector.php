@@ -18,6 +18,7 @@ use zpt\cdt\config\SiteConfiguration;
 use zpt\opal\BaseCompanionDirector;
 use ArrayObject;
 use Exception;
+use ReflectionClass;
 
 /**
  * This class generates a Configurator class that is used in production mode to
@@ -25,28 +26,25 @@ use Exception;
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class ConfiguratorGenerator extends BaseCompanionDirector {
+class ConfiguratorCompanionDirector extends BaseCompanionDirector {
 
 	private $cfg;
 
 	public function __construct(SiteConfiguration $cfg) {
-		parent::__construct($cfg->getPathInfo()['target'] . '/generated', 'dyn');
-
+		parent::__construct('cdtconfig');
 		$this->cfg = $cfg;
 	}
 
-	public function getCompanionNamespace($defClass) {
-		return '';
-	}
-
-	public function getTemplatePath($defClass) {
+	public function getTemplatePath() {
 		return __DIR__ . '/Configurator.tmpl.php';
 	}
 
-	public function getValues($className) {
+	public function getValuesFor(ReflectionClass $classDef) {
+
 		$pathInfo = $this->cfg->getPathInfo();
 		$namespace = $this->cfg->getNamespace();
 		$dbConfig = $this->cfg->getDbConfig();
+		$dynTarget = $this->cfg->getDynamicClassTarget();
 
 		return array(
 			'pathInfo' => $pathInfo->asArray(),
@@ -56,7 +54,11 @@ class ConfiguratorGenerator extends BaseCompanionDirector {
 			'dbConfig' => $dbConfig->asArray(),
 			'env' => $this->cfg->getEnv(),
 			'logDir' => $this->cfg->getLogDir(),
-			'logLevel' => $this->cfg->getLogLevel()
+			'logLevel' => $this->cfg->getLogLevel(),
+			'dyn' => [
+				'target' => $dynTarget->getPath()->__toString(),
+				'prefix' => $dynTarget->getPrefix()->__toString()
+			]
 		);
 	}
 

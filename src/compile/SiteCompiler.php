@@ -20,15 +20,18 @@ use Psr\Log\NullLogger;
 
 use zpt\anno\AnnotationFactory;
 use zpt\cdt\compile\resource\ResourceCompiler;
-use zpt\cdt\crud\CrudService;
+use zpt\cdt\config\SiteConfiguration;
+use zpt\cdt\crud\CrudServiceCompanionDirector;
 use zpt\cdt\di\Injector;
 use zpt\cdt\html\NotAPageDefinitionException;
 use zpt\cdt\i18n\ModelDisplayParser;
-use zpt\cdt\i18n\ModelMessages;
-use zpt\cdt\rest\ServiceRequestDispatcher;
+use zpt\cdt\i18n\ModelMessagesCompanionDirector;
+use zpt\cdt\rest\ServiceDispatcherCompanionDirector;
 use zpt\cdt\Env;
 use zpt\dyn\Configurator;
 use zpt\opal\CompanionGenerator;
+use zpt\opal\CompanionLoader;
+use zpt\opal\Psr4Dir;
 use zpt\orm\companion\PersisterCompanionDirector;
 use zpt\orm\companion\QueryBuilderCompanionDirector;
 use zpt\orm\companion\TransformerCompanionDirector;
@@ -58,10 +61,7 @@ class SiteCompiler implements LoggerAwareInterface {
 	private $validatorGen;
 	private $msgGen;
 	private $crudGen;
-	private $queryBuilderGen;
-
-	/* Configuration compiler. */
-	private $configurationCompiler;
+	private $qbGen;
 
 	/* Dependency Injection compiler. */
 	private $diCompiler;
@@ -113,10 +113,6 @@ class SiteCompiler implements LoggerAwareInterface {
 		$this->serviceCompiler = new ServiceCompiler();
 	}
 
-	public function setConfigurationCompiler(ConfigurationCompiler $compiler) {
-		$this->configurationCompiler = $compiler;
-	}
-
 	public function setDispatcherCompiler(Compiler $compiler) {
 		$this->dispatcherCompiler = $compiler;
 	}
@@ -137,28 +133,30 @@ class SiteCompiler implements LoggerAwareInterface {
 	 * @param string $env The target environment. One of the ENV_* constants of
 	 *   this class.
 	 */
-	public function compile($root, $loader, $env = 'dev') {
+	public function compile(SiteConfiguration $cfg, $loader) {
+		$root = $cfg->getRoot();
+		$env = $cfg->getEnv();
+		$dynTarget = $cfg->getDynamicClassTarget();
+
+		// The rest of the compilation process will require the dynamic class
+		// namespace to be registered so that some generated classes can be
+		// reflected.
+		$dynTarget->registerWith($loader);
+
 		$this->logger->info("Compiling site rooted at $root for $env environment");
 		$this->ensureDependencies();
 
-		// Configuration needs to be compiled first so that the site path
-		// information is available for the rest of the compilation process
-		$this->configurationCompiler->compile($root, $env);
+		$config = $this->generateRuntimeConfig($cfg);
 
-		// The rest of the compilation process needs the environment configuration.
-		// This will also register the global functions for working with context
-		// sensitive paths
-		$config = Configurator::getConfig();
-
-		$pathInfo = $config['pathInfo'];
-		$ns = $config['namespace'];
+		$pathInfo = $config->getPathInfo();
+		$ns = $config->getNamespace();
 
 		// The rest of the compilation process will require the site's namespace
 		// to be registered so that class files can be reflected.
 		$loader->add($ns, $pathInfo['src']);
 
 		// Initiate the compiler
-		$this->initCompiler($pathInfo, $env);
+		$this->initCompiler($config);
 
 		// Add XML dependency files before any annotation configured beans get
 		// added as annotation configured beans may depend on XML configured beans
@@ -171,22 +169,20 @@ class SiteCompiler implements LoggerAwareInterface {
 		}
 
 		// Compile server dispatcher
-		$this->dispatcherCompiler->compile($pathInfo, $ns, $env);
+		$this->dispatcherCompiler->compile($config);
 
 		$this->compileModels($pathInfo, $ns);
 		$this->compileServices($pathInfo, $ns);
-		$this->resourcesCompiler->compile($pathInfo, $ns, $env);
-		$this->htmlCompiler->compile($pathInfo, $ns, $env);
+		$this->resourcesCompiler->compile($config);
+		$this->htmlCompiler->compile($config);
 		if ($env !== Env::DEV) {
-			$this->resourcesCompiler->combineResourceGroups(
-				"$pathInfo[target]/htdocs"
-			);
+			$this->resourcesCompiler->combineResourceGroups($pathInfo['htdocs']);
 		}
 
 		$this->compileJslibs($pathInfo, $ns);
 		$this->compileLanguageFiles($pathInfo, $ns);
 
-		$this->diCompiler->compile($pathInfo, $ns);
+		$this->diCompiler->compile($config);
 
 		$this->serverCompiler->compile($pathInfo);
 	}
@@ -393,6 +389,7 @@ class SiteCompiler implements LoggerAwareInterface {
 
 			// Only try and parse entities.  This allows other types of related
 			// classes, such as gatekeepers, to be included in the model directory.
+			// TODO Reverse this if to apply 'exit early'
 			if (isset($annos['Entity'])) {
 				$model = $this->modelFactory->get($modelClass);
 
@@ -400,7 +397,7 @@ class SiteCompiler implements LoggerAwareInterface {
 				$this->transformerGen->generate($modelClass);
 				$this->validatorGen->generate($modelClass);
 				$this->msgGen->generate($modelClass);
-				$this->queryBuilderGen->generate($modelClass);
+				$this->qbGen->generate($modelClass);
 
 				// Add model gatekeeper as a bean
 				$gatekeeper = $model->getGatekeeper();
@@ -412,12 +409,10 @@ class SiteCompiler implements LoggerAwareInterface {
 				}
 
 				if ( !isset($annos['nocrud']) ) {
-					$this->crudGen->generate($modelClass);
+					$crudSrvc = $this->crudGen->generate($modelClass);
 
-					$crudSrvc = "dyn\\crud\\$modelClass";
 					$beanId = Injector::generateBeanId($crudSrvc, 'Crud');
 					$this->diCompiler->addBean($beanId, $crudSrvc);
-
 
 					$this->serviceCompiler->compileService($crudSrvc, $beanId);
 				}
@@ -440,6 +435,29 @@ class SiteCompiler implements LoggerAwareInterface {
 		}
 	}
 
+	private function generateRuntimeConfig($cfg) {
+		$root = $cfg->getRoot();
+		$dynTarget = $cfg->getDynamicClassTarget();
+
+		// Configuration needs to be compiled first so that the site path
+		// information is available for the rest of the compilation process
+		$director = new ConfiguratorCompanionDirector($cfg);
+		$gen = new CompanionGenerator($director, $dynTarget);
+		$cfgClass = $gen->generate('StdClass');
+
+		// Write the shortcut class for loading the config when not running in dev
+		// mode.
+		$fp = fopen($dynTarget->getPath() . '/RuntimeConfigLoader.php', 'w');
+		fwrite($fp, "<?php\nnamespace dyn;\nclass RuntimeConfigLoader { public static function loadConfig() { return (new \\$cfgClass())->getConfig(); } }");
+		fclose($fp);
+
+		// The rest of the compilation process needs the environment configuration.
+		// This will also register the global functions for working with context
+		// sensitive paths
+		$ldr = new CompanionLoader($director, $dynTarget);
+		return $ldr->get('StdClass');
+	}
+
 	/*
 	 * Ensure that all injectable dependencies that are not set have a default
 	 * instantiated.
@@ -447,10 +465,6 @@ class SiteCompiler implements LoggerAwareInterface {
 	private function ensureDependencies() {
 		if ($this->logger === null) {
 			$this->logger = new NullLogger;
-		}
-
-		if ($this->configurationCompiler === null) {
-			$this->configurationCompiler = new ConfigurationCompiler();
 		}
 
 		if ($this->dispatcherCompiler === null) {
@@ -469,17 +483,17 @@ class SiteCompiler implements LoggerAwareInterface {
 			$this->htmlCompiler = new HtmlCompiler(
 				$this->diCompiler,
 				$this->resourcesCompiler,
-				$this->serverCompiler
+				$this->serverCompiler,
+				$this->annotationFactory
 			);
 		}
 	}
 
 	/* Initialize the compiler once configuration has been parsed */
-	private function initCompiler($pathInfo, $env) {
-		$target = "$pathInfo[target]/generated";
-		$baseNs = 'dyn';
-
-		$dynTarget = new Psr4Dir($target, 'dyn\\');
+	private function initCompiler($cfg) {
+		$pathInfo = $cfg->getPathInfo();
+		$env = $cfg->getEnvironment();
+		$dynTarget = $cfg->getDynamicClassTarget();
 
 		$director = new PersisterCompanionDirector($this->modelFactory);
 		$this->persisterGen = new CompanionGenerator($director, $dynTarget);
@@ -491,7 +505,7 @@ class SiteCompiler implements LoggerAwareInterface {
 		$this->validatorGen = new CompanionGenerator($director, $dynTarget);
 
 		$director = new QueryBuilderCompanionDirector($this->modelFactory);
-		$this->queryBuilderGen = new CompanionGenerator($director, $dynTarget);
+		$this->qbGen = new CompanionGenerator($director, $dynTarget);
 
 		$director = new ModelMessagesCompanionDirector($this->modelFactory);
 		$this->msgGen = new CompanionGenerator($director, $dynTarget);
@@ -502,11 +516,11 @@ class SiteCompiler implements LoggerAwareInterface {
 		$this->modulesPath = "$pathInfo[root]/modules";
 
 		// Dependency Injection
-		$serviceRequestDispatcher = new ServiceRequestDispatcher(
-			$pathInfo['target']);
-		$serviceRequestDispatcher->setLogger($this->logger);
-		$this->serviceCompiler->setServiceRequestDispatcher(
-			$serviceRequestDispatcher);
+		$director = new ServiceDispatcherCompanionDirector(
+			$this->annotationFactory
+		);
+		$srvcDispatcherGen = new CompanionGenerator($director, $dynTarget);
+		$this->serviceCompiler->setServiceDispatcherGenerator($srvcDispatcherGen);
 		$this->serviceCompiler->setDependencyInjectionCompiler($this->diCompiler);
 		$this->serviceCompiler->setServerCompiler($this->serverCompiler);
 

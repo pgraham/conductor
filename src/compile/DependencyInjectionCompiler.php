@@ -14,13 +14,14 @@
  */
 namespace zpt\cdt\compile;
 
-use \zpt\orm\actor\QueryBuilder;
-use \zpt\orm\companion\PersisterGenerator;
-use \zpt\orm\companion\TransformerGenerator;
-use \zpt\orm\companion\ValidatorGenerator;
-use \zpt\cdt\di\DependencyParser;
-use \zpt\cdt\i18n\ModelMessages;
-use \zpt\pct\TemplateResolver;
+use zpt\cdt\config\RuntimeConfig;
+use zpt\cdt\di\DependencyParser;
+use zpt\cdt\i18n\ModelMessages;
+use zpt\orm\actor\QueryBuilder;
+use zpt\orm\companion\PersisterGenerator;
+use zpt\orm\companion\TransformerGenerator;
+use zpt\orm\companion\ValidatorGenerator;
+use zpt\pct\TemplateResolver;
 
 /**
  * This class compiles a script which initializes the dependency injection
@@ -117,7 +118,8 @@ class DependencyInjectionCompiler implements Compiler {
     }
   }
 
-  public function compile($pathInfo, $ns, $env = 'dev') {
+  public function compile(RuntimeConfig $config) {
+    $pathInfo = $config->getPathInfo();
 
     // Build the InjectionConfiguration script
     $srcPath = __DIR__ . '/InjectionConfigurator.tmpl.php';

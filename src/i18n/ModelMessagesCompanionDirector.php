@@ -24,7 +24,7 @@ class ModelMessagesCompanionDirector extends BaseModelCompanionDirector
 		parent::__construct('modelmsgs', $modelFactory);
 	}
 
-	protected function getTemplatePath() {
+	public function getTemplatePath() {
 		return __DIR__ . '/ModelMessages.tmpl.php';
 	}
 

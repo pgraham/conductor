@@ -5,7 +5,7 @@
  */
 namespace zpt\cdt\i18n;
 
-use \zeptech\orm\generator\model\Model;
+use zpt\orm\model\Model;
 
 /**
  * This class parses display strings from a model and generates defaults for

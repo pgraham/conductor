@@ -14,6 +14,8 @@
  */
 namespace zpt\cdt\compile;
 
+use zpt\cdt\config\RuntimeConfig;
+
 /**
  * Interface for classes that perform compilation work as part of a site
  * compile.
@@ -30,6 +32,6 @@ interface Compiler {
 	 * @param string $ns The website's namespace
 	 * @param string $env The environment for which compilation is targetted.
 	 */
-	public function compile($pathInfo, $ns, $env = 'dev');
+	public function compile(RuntimeConfig $config);
 
 }

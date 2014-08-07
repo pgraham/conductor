@@ -14,12 +14,12 @@
  */
 namespace zpt\cdt\html;
 
-use \zpt\anno\Annotations;
+use zpt\anno\AnnotationFactory;
 use \zpt\cdt\compile\resource\ResourceDiscoverer;
 use \zpt\cdt\di\DependencyParser;
 use \zpt\cdt\di\Injector;
 use \zpt\cdt\Conductor;
-use \zpt\opal\CompanionGenerator;
+use \zpt\opal\BaseCompanionDirector;
 use \zpt\util\file\GlobFileLister;
 use \DirectoryIterator;
 use \Exception;
@@ -31,9 +31,7 @@ use \ReflectionClass;
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class HtmlProvider extends CompanionGenerator {
-
-	const COMPANION_NAMESPACE = 'zpt\dyn\html';
+class HtmlProviderCompanionDirector extends BaseCompanionDirector {
 
 	/* The type of environment for which HtmlProviders will be generated. */
 	private $env;
@@ -41,24 +39,31 @@ class HtmlProvider extends CompanionGenerator {
 	/* Filesystem path to htdocs. Used to resolve script groups. */
 	private $htdocs;
 
-	public function __construct($outputPath, $env) {
-		parent::__construct($outputPath);
+	private $annotationFactory;
 
-		$this->htdocs = "$outputPath/htdocs";
+	public function __construct(
+		$htdocs,
+		$env,
+		AnnotationFactory $annotationFactory = null
+	) {
+		parent::__construct('htmlprovider');
+
+		$this->htdocs = $htdocs;
 		$this->env = $env;
+
+		if ($annotationFactory === null) {
+			$annotationFactory = new AnnotationFactory();
+		}
+		$this->annotationFactory = $annotationFactory;
 	}
 
-	protected function getCompanionNamespace($defClass) {
-		return 'zpt\dyn\html';
-	}
-
-	protected function getTemplatePath($defClass) {
+	public function getTemplatePath() {
 		return __DIR__ . '/htmlProvider.tmpl.php';
 	}
 
-	protected function getValues($className) {
-		$pageDef = new ReflectionClass($className);
-		$page = new Annotations($pageDef);
+	public function getValuesFor(ReflectionClass $classDef) {
+		$className = $classDef->getName();
+		$page = $this->annotationFactory->get($classDef);
 		if (!isset($page['page'])) {
 			throw new NotAPageDefinitionException($className);
 		}
@@ -72,7 +77,7 @@ class HtmlProvider extends CompanionGenerator {
 		if (isset($page['template'])) {
 			$templateClass = $this->getTemplateClass($page['template'], $className);
 			$templateDef = new ReflectionClass($templateClass);
-			$template = new Annotations($templateDef);
+			$template = $this->annotationFactory->get($templateDef);
 
 			$values['template'] = $templateClass;
 			$tmplDependencies = DependencyParser::parse(Injector::generateBeanId($templateClass), $templateDef);
@@ -80,7 +85,7 @@ class HtmlProvider extends CompanionGenerator {
 				$values['tmplDependencies'] = $tmplDependencies['props'];
 			}
 		} else {
-			$template = new Annotations();
+			$template = $this->annotationFactory->get();
 		}
 
 		$values['title'] = $this->parseTitle($page, $template);
@@ -167,13 +172,13 @@ class HtmlProvider extends CompanionGenerator {
 		$values['hasContent'] = false;
 		$values['isContentProvider'] = false;
 		$values['contentProvider'] = $className;
-		if ($pageDef->hasMethod('getContent')) {
+		if ($classDef->hasMethod('getContent')) {
 			$values['hasContent'] = true;
-		} else if ($pageDef->implementsInterface('zpt\cdt\html\HtmlContentProvider')) {
+		} else if ($classDef->implementsInterface('zpt\cdt\html\HtmlContentProvider')) {
 			$values['isContentProvider'] = true;
 		}
 
-		$dependencies = DependencyParser::parse('htmlProvider', $pageDef);
+		$dependencies = DependencyParser::parse('htmlProvider', $classDef);
 		$values['dependencies'] = $dependencies['props'];
 
 		return $values;

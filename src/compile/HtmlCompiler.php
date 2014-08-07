@@ -14,10 +14,12 @@
  */
 namespace zpt\cdt\compile;
 
-use zpt\cdt\html\HtmlProvider;
+use zpt\anno\AnnotationFactory;
+use zpt\cdt\config\RuntimeConfig;
+use zpt\cdt\html\HtmlProviderCompanionDirector;
 use zpt\cdt\html\NotAPageDefinitionException;
 use zpt\cdt\html\PageResourceParser;
-use zpt\opal\DefaultNamingStrategy;
+use zpt\opal\CompanionGenerator;
 use zpt\util\File;
 use DirectoryIterator;
 
@@ -32,27 +34,39 @@ class HtmlCompiler implements Compiler
 	private $diCompiler;
 	private $resourcesCompiler;
 	private $serverCompiler;
-
-	private $htmlProvider;
+	private $annotationFactory;
 
 	public function __construct(
 		DependencyInjectionCompiler $diCompiler,
 		ResourcesCompiler $resourcesCompiler,
-		ServerCompiler $serverCompiler
+		ServerCompiler $serverCompiler,
+		AnnotationFactory $annotationFactory
 	) {
 		$this->diCompiler = $diCompiler;
 		$this->resourcesCompiler = $resourcesCompiler;
 		$this->serverCompiler = $serverCompiler;
+		$this->annotationFactory = $annotationFactory;
 	}
 
-	public function compile($pathInfo, $ns, $env = 'dev') {
-		$this->htmlProvider = new HtmlProvider($pathInfo['target'], $env);
+	public function compile(RuntimeConfig $config) {
+		$pathInfo = $config->getPathInfo();
+		$ns = $config->getNamespace();
+		$env = $config->getEnvironment();
+		$dynTarget = $config->getDynamicClassTarget();
+
+		$director = new HtmlProviderCompanionDirector(
+			$pathInfo['htdocs'],
+			$env,
+			$this->annotationFactory
+		);
+		$providerGen = new CompanionGenerator($director, $dynTarget);
 
 		$htmlDir = "$pathInfo[src]/$ns/html";
-		$this->compileHtmlDir($htmlDir, $ns, $env);
+		$this->compileHtmlDir($providerGen, $htmlDir, $ns, $env);
 	}
 
-	private function compileHtmlDir($dir, $ns, $env, $webBase = '') {
+	private function compileHtmlDir($providerGen, $dir, $ns, $env, $webBase = '')
+	{
 		if (!file_exists($dir)) {
 			return;
 		}
@@ -89,7 +103,7 @@ class HtmlCompiler implements Compiler
 			$beanId .= 'HtmlProvider';
 
 			try {
-				$this->htmlProvider->generate($viewClass);
+				$instClass = $providerGen->generate($viewClass);
 			} catch (NotAPageDefinitionException $e) {
 				// Just ignore files that are not page definitions
 				error_log($e->getMessage());
@@ -99,11 +113,6 @@ class HtmlCompiler implements Compiler
 			$pageResourceParser = new PageResourceParser($viewClass);
 			$cssGroups = $pageResourceParser->getCssGroups();
 			$this->resourcesCompiler->addResourceGroups('css', $cssGroups);
-
-			$namingStrategy = new DefaultNamingStrategy();
-			$instClass = HtmlProvider::COMPANION_NAMESPACE . '\\' .
-				$namingStrategy->getCompanionClassName($viewClass);
-			$this->diCompiler->addBean($beanId, $instClass);
 
 			$args = array("'$beanId'");
 

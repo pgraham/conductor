@@ -14,8 +14,9 @@
  */
 namespace zpt\cdt\compile;
 
-use \zpt\cdt\compile\resource\ResourceCompiler;
-use \DirectoryIterator;
+use zpt\cdt\compile\resource\ResourceCompiler;
+use zpt\cdt\config\RuntimeConfig;
+use DirectoryIterator;
 
 /**
  * This class oversees the compilation of all necessary resources for a site.
@@ -53,7 +54,10 @@ class ResourcesCompiler implements Compiler {
 		}
 	}
 
-	public function compile($pathInfo, $ns, $env = 'dev') {
+	public function compile(RuntimeConfig $config) {
+		$pathInfo = $config->getPathInfo();
+		$ns = $config->getNamespace();
+
 		$resourceOut = "$pathInfo[target]/htdocs";
 
 		// -------------------------------------------------------------------------

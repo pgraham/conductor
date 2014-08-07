@@ -14,10 +14,11 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Handler\NullHandler;
 use Monolog\Processor\PsrLogMessageProcessor;
 
-use dyn\Configurator;
+use dyn\RuntimeConfigLoader;
 use dyn\InjectionConfigurator;
 use dyn\ServerConfigurator;
 use zpt\cdt\compile\SiteCompiler;
+use zpt\cdt\config\SiteConfiguration;
 use zpt\cdt\di\Injector;
 use zpt\cdt\exception\AuthException;
 use zpt\cdt\exception\TopLevelDebugExceptionHandler;
@@ -29,6 +30,7 @@ use zpt\cdt\rest\PdoExceptionHandler;
 use zpt\cdt\rest\ValidationExceptionHandler;
 use zpt\db\DatabaseConnection;
 use zpt\db\exception\DatabaseException;
+use zpt\opal\Psr4Dir;
 use zpt\orm\Clarinet;
 use zpt\orm\Criteria;
 use zpt\orm\Repository;
@@ -179,9 +181,10 @@ class Conductor {
 						1 /* only keep most recent file */
 					));
 
+					$cfg = new SiteConfiguration($root, 'dev');
 					$compiler = new SiteCompiler();
 					$compiler->setLogger($log);
-					$compiler->compile($root, $loader);
+					$compiler->compile($cfg, $loader);
 					File::dirunlock("$root/target");
 				} else {
 					// This currently shouldn't happen since the only reason File::dirlock
@@ -218,7 +221,8 @@ class Conductor {
 		}
 
 		// Load the site's configuration
-		self::$_config = Configurator::getConfig();
+		self::$_config = RuntimeConfigLoader::loadConfig();
+		self::$_config['dynTarget']->registerWith($loader);
 
 		$pathInfo = self::$_config['pathInfo'];
 		$namespace = self::$_config['namespace'];
@@ -276,10 +280,6 @@ class Conductor {
 			$logger->pushHandler(new NullHandler());
 		}
 		self::$applicationLogger = $logger;
-
-		// TODO Set the CompanionLoader instance used by Clarinet to be the injected
-		//			instance.
-		// Clarinet::setCompanionLoader($companionLoader);
 
 		// Initialize localization
 		// TODO Make the language determination smart.	Should be retrieved from the

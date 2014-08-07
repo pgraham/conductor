@@ -7,7 +7,8 @@ namespace zpt\cdt\compile;
 
 use \zpt\anno\Annotations;
 use \zpt\cdt\di\Injector;
-use \zpt\cdt\rest\ServiceRequestDispatcher;
+use \zpt\cdt\rest\ServiceDispatcherCompanionDirector;
+use \zpt\opal\CompanionGenerator;
 use \zpt\util\File;
 use \DirectoryIterator;
 use \ReflectionClass;
@@ -44,7 +45,7 @@ class ServiceCompiler {
   private $_serverCompiler;
 
   /* Service request dispatcher generator. */
-  private $_serviceRequestDispatcher;
+  private $srvcDispatcherGen;
 
   /**
    * Compile the services in the given directory.
@@ -138,7 +139,7 @@ class ServiceCompiler {
       // service.
 
       // Generate a service handler for this class
-      $this->_serviceRequestDispatcher->generate($srvcClass);
+      $genClass = $this->srvcDispatcherGen->generate($srvcClass);
 
       // Add a DI bean for the actual service
       if (!$srvcBeanId) {
@@ -150,14 +151,10 @@ class ServiceCompiler {
       // will be injected with the service instance using annotation
       // configuration
       $dispatcherBeanId = Injector::generateBeanId($srvcClass,
-        ServiceRequestDispatcher::BEAN_ID_SUFFIX);
-      $dispatcherNamespace = ServiceRequestDispatcher::COMPANION_NAMESPACE;
-      $dispatcherClassName = $this->_serviceRequestDispatcher
-        ->getNamingStrategy()
-        ->getCompanionClassName($srvcClass);
+        ServiceDispatcherCompanionDirector::BEAN_ID_SUFFIX);
       $this->_diCompiler->addBean(
         $dispatcherBeanId,
-        "$dispatcherNamespace\\$dispatcherClassName",
+        $genClass,
         array(
           array(
             'name' => 'service',
@@ -207,7 +204,7 @@ class ServiceCompiler {
    * @param \zpt\cdt\rest\ServiceRequestDispatcher $serviceRequestDispatcher The
    *   generator instance.
    */
-  public function setServiceRequestDispatcher($serviceRequestDispatcher) {
-    $this->_serviceRequestDispatcher = $serviceRequestDispatcher;
+  public function setServiceDispatcherGenerator(CompanionGenerator $generator) {
+    $this->srvcDispatcherGen = $generator;
   }
 }

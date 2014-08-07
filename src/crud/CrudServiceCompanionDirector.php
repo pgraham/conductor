@@ -35,7 +35,7 @@ class CrudServiceCompanionDirector extends BaseModelCompanionDirector {
 		parent::__construct('crud', $modelFactory);
 	}
 
-	protected function getTemplatePath() {
+	public function getTemplatePath() {
 		return __DIR__ . '/CrudService.tmpl.php';
 	}
 

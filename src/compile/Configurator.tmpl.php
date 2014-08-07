@@ -7,21 +7,54 @@
  */
 namespace /*# companionNs #*/ {
 
-use \ArrayObject;
+use zpt\cdt\config\RuntimeConfig;
+use zpt\opal\Psr4Dir;
+use ArrayObject;
 
-class Configurator {
+class /*# companionClass #*/ implements RuntimeConfig {
 
-  public static function getConfig() {
-    $pathInfo = new ArrayObject(/*# php:pathInfo #*/);
+  private $pathInfo;
+  private $ns;
+  private $env;
+  private $dynTarget;
+
+  public function __construct() {
+    $this->pathInfo = new ArrayObject(/*# php:pathInfo #*/);
+    $this->ns = /*# php:namespace #*/;
+    $this->env = /*# php:env #*/;
+    $this->dynTarget = new Psr4Dir(
+      /*# php:dyn[target] #*/,
+      /*# php:dyn[prefix] #*/
+    );
+  }
+
+  public function getConfig() {
 
     return array(
-      'pathInfo' => $pathInfo,
-      'namespace' => /*# php:namespace #*/,
+      'pathInfo' => $this->pathInfo,
+      'namespace' => $this->ns,
       'db_config' => /*# php:dbConfig #*/,
-      'env' => /*# php:env #*/,
+      'env' => $this->env,
       'logDir' => '/*# logDir #*/',
-      'logLevel' => '/*# logLevel #*/'
+      'logLevel' => '/*# logLevel #*/',
+      'dynTarget' => $this->dynTarget
     );
+  }
+
+  public function getPathInfo() {
+    return $this->pathInfo;
+  }
+
+  public function getNamespace() {
+    return $this->ns;
+  }
+
+  public function getEnvironment() {
+    return $this->env;
+  }
+
+  public function getDynamicClassTarget() {
+    return $this->dynTarget;
   }
 }
 

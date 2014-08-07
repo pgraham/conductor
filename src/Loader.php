@@ -59,12 +59,6 @@ class Loader {
       }
     }
 
-    // Class loader for generated classes
-    // TODO Capture this namespace in a Psr4Dir instance so that is can be
-    // shared thoughout the request
-    $loader->setPsr4('dyn\\', "$target/generated");
-    $loader->add('zpt\dyn', "$target/generated");
-
     // Register loaders for the site's modules
     if (file_exists("$root/modules")) {
       $dir = new DirectoryIterator("$root/modules");

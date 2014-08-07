@@ -53,6 +53,10 @@ abstract class ConfigurationSet implements ArrayAccess
 		return $this->env;
 	}
 
+	public function getRoot() {
+		return $this->root;
+	}
+
 	protected function getValue($name, $config, $env) {
 		if (isset($config['env']) &&
 		    isset($config['env'][$env]) &&

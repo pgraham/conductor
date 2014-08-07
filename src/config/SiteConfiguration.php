@@ -9,6 +9,7 @@
  */
 namespace zpt\cdt\config;
 
+use zpt\opal\Psr4Dir;
 use ArrayObject;
 use Exception;
 
@@ -54,6 +55,10 @@ class SiteConfiguration extends ConfigurationSet
 
 	public function getDbConfig() {
 		return $this->dbConfig;
+	}
+
+	public function getDynamicClassTarget() {
+		return new Psr4Dir($this->pathInfo['dyn']['target'], $this->pathInfo['dyn']['prefix']);
 	}
 
 	public function getLogDir() {
