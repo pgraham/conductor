@@ -259,7 +259,7 @@ class Conductor {
 		}
 
 		// Initialize clarinet
-		$orm = new OrmContainer($db);
+		$orm = new Repository($db);
 		Injector::addBean('orm', $orm);
 
 		// Initialize Dependency injection
