@@ -111,6 +111,8 @@ class SiteCompiler implements LoggerAwareInterface {
 		$this->serverCompiler->setTemplateParser($this->tmplParser);
 
 		$this->serviceCompiler = new ServiceCompiler();
+
+		$this->diCompiler = new DependencyInjectionCompiler($this->tmplParser);
 	}
 
 	public function setDispatcherCompiler(Compiler $compiler) {
@@ -471,9 +473,6 @@ class SiteCompiler implements LoggerAwareInterface {
 			$this->dispatcherCompiler = new DispatcherCompiler();
 		}
 
-		if ($this->diCompiler === null) {
-			$this->diCompiler = new DependencyInjectionCompiler();
-		}
 
 		if ($this->resourcesCompiler === null) {
 			$this->resourcesCompiler = new ResourcesCompiler();
@@ -523,7 +522,5 @@ class SiteCompiler implements LoggerAwareInterface {
 		$this->serviceCompiler->setServiceDispatcherGenerator($srvcDispatcherGen);
 		$this->serviceCompiler->setDependencyInjectionCompiler($this->diCompiler);
 		$this->serviceCompiler->setServerCompiler($this->serverCompiler);
-
-		$this->diCompiler->setTemplateParser($this->tmplParser);
 	}
 }

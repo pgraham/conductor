@@ -15,6 +15,7 @@ use zpt\orm\actor\QueryBuilder;
 use zpt\orm\companion\PersisterGenerator;
 use zpt\orm\companion\TransformerGenerator;
 use zpt\orm\companion\ValidatorGenerator;
+use zpt\pct\CodeTemplateParser;
 use zpt\pct\TemplateResolver;
 
 /**
@@ -34,6 +35,13 @@ class DependencyInjectionCompiler implements Compiler
 	private $beans = array();
 
 	private $tmplParser;
+
+	public function __construct(CodeTemplateParser $tmplParser = null) {
+		if ($tmplParser === null) {
+			$tmplParser = new CodeTemplateParser();
+		}
+		$this->tmplParser = $tmplParser;
+	}
 
 	public function addBean($id, $class, $props = array()) {
 		$bean = DependencyParser::parse($id, $class);
@@ -128,10 +136,6 @@ class DependencyInjectionCompiler implements Compiler
 		);
 		$tmplResolver = new TemplateResolver($this->tmplParser);
 		$tmplResolver->resolve($srcPath, $outPath, $values);
-	}
-
-	public function setTemplateParser($templateParser) {
-		$this->tmplParser = $templateParser;
 	}
 
 	private function getScalar($val, $quoteStrings = false)
