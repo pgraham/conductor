@@ -3,7 +3,7 @@
  * Dynamically generated Injector configurator.  Configures the Injector
  * for all required objects.
  */
-namespace zpt\dyn;
+namespace /*# namespace #*/;
 
 use \zpt\cdt\di\Injector;
 

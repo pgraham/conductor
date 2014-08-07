@@ -119,12 +119,13 @@ class DependencyInjectionCompiler implements Compiler {
   }
 
   public function compile(RuntimeConfig $config) {
-    $pathInfo = $config->getPathInfo();
+    $dynTarget = $config->getDynamicClassTarget();
 
     // Build the InjectionConfiguration script
     $srcPath = __DIR__ . '/InjectionConfigurator.tmpl.php';
-    $outPath = "$pathInfo[target]/zpt/dyn/InjectionConfigurator.php";
+    $outPath = $dynTarget->getPath()->pathJoin('InjectionConfigurator.php');
     $values = array(
+      'namespace' => $dynTarget->getPrefix()->rtrim('\\')->__toString(),
       'beans' => $this->_beans
     );
     $tmplResolver = new TemplateResolver($this->_tmplParser);
