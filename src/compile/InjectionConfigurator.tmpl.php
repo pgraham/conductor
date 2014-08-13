@@ -6,6 +6,7 @@
 namespace /*# namespace #*/;
 
 use \zpt\cdt\di\Injector;
+use ReflectionClass;
 
 class InjectionConfigurator {
 
@@ -13,7 +14,24 @@ class InjectionConfigurator {
 
     // Create beans and set scalar property values
     #{ each beans as bean
-      $/*# bean[id] #*/ = new \/*# bean[class] #*/(/*# join:bean[ctor]:, #*/);
+      #{ if bean[ctor]
+        // Once minimum PHP is bumped to 5.6 use argument unpacking instead of
+        // reflection
+        $ctorArgs = [];
+        #{ each bean[ctor] as ctor
+          #{ if ctor[ref] ISSET
+            $ctorArgs[] = Injector::getBean('/*# ctor[ref] #*/');
+          #{ elseif ctor[val] ISSET
+            $ctorArgs[] = /*# php:ctor[val] #*/;
+          #{ elseif ctor[type] ISSET
+            $ctorArgs[] = Injector::getBeans('/*# ctor[type] #*/');
+          #}
+        #}
+        $classDef = new ReflectionClass('/*# bean[class] #*/');
+        $/*# bean[id] #*/ = $classDef->newInstanceArgs($ctorArgs);
+      #{ else
+        $/*# bean[id] #*/ = new \/*# bean[class] #*/();
+      #}
       Injector::addBean('/*# bean[id] #*/', $/*# bean[id] #*/);
     #}
 
