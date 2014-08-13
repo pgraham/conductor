@@ -35,12 +35,14 @@ class DependencyInjectionCompiler implements Compiler
 	private $beans = array();
 
 	private $tmplParser;
+	private $tmplResolver;
 
 	public function __construct(CodeTemplateParser $tmplParser = null) {
 		if ($tmplParser === null) {
 			$tmplParser = new CodeTemplateParser();
 		}
 		$this->tmplParser = $tmplParser;
+		$this->tmplResolver = new TemplateResolver($this->tmplParser);
 	}
 
 	public function addBean($id, $class, $props = array()) {
@@ -59,7 +61,8 @@ class DependencyInjectionCompiler implements Compiler
 	public function compile(RuntimeConfig $config) {
 		// Resolve dependency XML files
 		$xmlFiles = $this->findDependencyXmls($config->getPathInfo());
-		$xmlBeans = $this->parseDependencyXmls($xmlFiles);
+		$resolvedXmlFiles = $this->resolveDependencyXmls($config, $xmlFiles);
+		$xmlBeans = $this->parseDependencyXmls($resolvedXmlFiles);
 
 		// Make sure dynamically defined beans override any xml defined beans with
 		// the same name
@@ -72,8 +75,7 @@ class DependencyInjectionCompiler implements Compiler
 			'namespace' => $dynTarget->getPrefix()->rtrim('\\')->__toString(),
 			'beans' => $beans
 		);
-		$tmplResolver = new TemplateResolver($this->tmplParser);
-		$tmplResolver->resolve($srcPath, $outPath, $values);
+		$this->tmplResolver->resolve($srcPath, $outPath, $values);
 	}
 
 	private function findDependencyXmls($pathInfo) {
@@ -94,6 +96,24 @@ class DependencyInjectionCompiler implements Compiler
 		return $files;
 	}
 
+	/*
+	 * Resolve dependency XMLs with configuration.
+	 */
+	private function resolveDependencyXmls(RuntimeConfig $cfg, array $files) {
+		$resolvedPaths = [];
+
+		$values = $cfg->getConfig();
+		$baseOut = $cfg->getDynamicClassTarget()->getPath()->pathJoin('xml');
+
+		foreach ($files as $idx => $file) {
+			$outPath = $baseOut->pathJoin("dependencies_$idx.xml");
+			$this->tmplResolver->resolve($file, $outPath, $values);
+			$resolvedPaths[] = $outPath;
+		}
+
+		return $resolvedPaths;
+	}
+
 	private function parseDependencyXmls(array $files) {
 		$xmlBeanParser = new XmlBeanParser();
 		$xmlBeans = [];
@@ -101,7 +121,7 @@ class DependencyInjectionCompiler implements Compiler
 			$fileBeans = $xmlBeanParser->parseFile($file);
 			$xmlBeans = array_merge($xmlBeans, $fileBeans);
 		}
-
 		return $xmlBeans;
 	}
+
 }
