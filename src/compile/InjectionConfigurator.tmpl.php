@@ -15,8 +15,6 @@ class InjectionConfigurator {
     // Create beans and set scalar property values
     #{ each beans as bean
       #{ if bean[ctor]
-        // Once minimum PHP is bumped to 5.6 use argument unpacking instead of
-        // reflection
         $ctorArgs = [];
         #{ each bean[ctor] as ctor
           #{ if ctor[ref] ISSET
@@ -33,6 +31,7 @@ class InjectionConfigurator {
         $/*# bean[id] #*/ = new \/*# bean[class] #*/();
       #}
       Injector::addBean('/*# bean[id] #*/', $/*# bean[id] #*/);
+
     #}
 
     // Inject bean dependencies
