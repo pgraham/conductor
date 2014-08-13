@@ -9,7 +9,6 @@ namespace /*# companionNs #*/ {
 
 use zpt\cdt\config\RuntimeConfig;
 use zpt\opal\Psr4Dir;
-use ArrayObject;
 
 class /*# companionClass #*/ implements RuntimeConfig {
 
@@ -19,7 +18,7 @@ class /*# companionClass #*/ implements RuntimeConfig {
   private $dynTarget;
 
   public function __construct() {
-    $this->pathInfo = new ArrayObject(/*# php:pathInfo #*/);
+    $this->pathInfo = /*# php:pathInfo #*/;
     $this->ns = /*# php:namespace #*/;
     $this->env = /*# php:env #*/;
     $this->dynTarget = new Psr4Dir(
