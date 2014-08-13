@@ -55,13 +55,7 @@ class XmlBeanParser
 		$ctorArgs = [];
 		if (isset($bean->ctorArg)) {
 			foreach ($bean->ctorArg as $arg) {
-				if (isset($arg['value'])) {
-					$ctorArgs[] = $this->getScalar((string) $arg['value'], true);
-				} else if (isset($arg['ref'])) {
-					// TODO Eliminate '$' which is currently required for template
-					// resolution.
-					$ctorArgs[] = '$' . ((string) $arg['ref']);
-				}
+				$ctorArgs[] = $this->parseProperty($arg);
 			}
 		}
 		return $ctorArgs;
@@ -70,24 +64,29 @@ class XmlBeanParser
 	private function parseXmlProperties(SimpleXMLElement $bean) {
 		$props = [];
 		if (isset($bean->property)) {
-			foreach ($bean->property as $propDef) {
-				$prop = [ 'name' => (string) $propDef['name'] ];
-
-				if (isset($propDef['value'])) {
-					$prop['val'] = $this->getScalar((string) $propDef['value']);
-				} else if (isset($propDef['ref'])) {
-					$prop['ref'] = (string) $propDef['ref'];
-				} else if (isset($propDef['type'])) {
-					$prop['type'] = (string) $propDef['type'];
-				}
-
-				$props[] = $prop;
+			foreach ($bean->property as $prop) {
+				$props[] = $this->parseProperty($prop);
 			}
 		}
 		return $props;
 	}
 
-	private function getScalar($val, $quoteStrings = false)
+	private function parseProperty(SimpleXMLElement $propDef) {
+		$prop = [ 'name' => (string) $propDef['name'] ];
+
+		if (isset($propDef['value'])) {
+			$prop['val'] = $this->parseScalar((string) $propDef['value']);
+		} else if (isset($propDef['ref'])) {
+			$prop['ref'] = (string) $propDef['ref'];
+		} else if (isset($propDef['type'])) {
+			$prop['type'] = (string) $propDef['type'];
+		} else if (isset($propDef->map)) {
+			$prop['val'] = $this->parseMap($propDef->map);
+		}
+		return $prop;
+	}
+
+	private function parseScalar($val, $quoteStrings = false)
 	{
 			if (is_numeric($val)) {
 					return (float) $val;
@@ -99,5 +98,19 @@ class XmlBeanParser
 					return null;
 			}
 			return $quoteStrings ? "'" . $val . "'" : $val;
+	}
+
+	private function parseMap(SimpleXMLElement $mapDef) {
+		error_log("Parsing map");
+		$map = [];
+		if (isset($mapDef->entry)) {
+			error_log("Parsing map entry");
+			foreach ($mapDef->entry as $entry) {
+				$key = (string) $entry['key'];
+				$val = (string) $entry;
+				$map[$key] = $val;
+			}
+		}
+		return $map;
 	}
 }
