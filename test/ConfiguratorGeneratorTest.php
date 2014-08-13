@@ -62,7 +62,7 @@ XML;
 
 		$config = $configurator->getConfig();
 
-		$this->assertInstanceOf('ArrayObject', $config['pathInfo']);
+		$this->assertInternalType('array', $config['pathInfo']);
 		$pathInfo = $config['pathInfo'];
 		$this->assertEquals(__DIR__, $pathInfo['root']);
 		$this->assertEquals('/mytest', $pathInfo['webRoot']);
@@ -71,8 +71,8 @@ XML;
 		$this->assertEquals(__DIR__ . '/src', $pathInfo['src']);
 		$this->assertEquals(__DIR__ . '/target', $pathInfo['target']);
 
-		$this->assertInternalType('array', $config['db_config']);
-		$dbConfig = $config['db_config'];
+		$this->assertInternalType('array', $config['db']);
+		$dbConfig = $config['db'];
 		$this->assertEquals('local_user', $dbConfig['username']);
 		$this->assertEquals('local_password', $dbConfig['password']);
 		$this->assertEquals('my_schema', $dbConfig['schema']);

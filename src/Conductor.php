@@ -236,7 +236,7 @@ class Conductor {
 
 		// Initiate a database connection
 		try {
-			$dbConfig = self::$_config['db_config'];
+			$dbConfig = self::$_config['db'];
 
 			$driver = $dbConfig['driver'];
 			$schema = $dbConfig['schema'];

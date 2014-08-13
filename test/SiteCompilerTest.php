@@ -38,16 +38,16 @@ class SiteCompilerTest extends TestCase {
 		$root = __DIR__ . '/mock-site';
 
 		$this->mockConfig = array(
-			'pathInfo' => new ArrayObject(array(
+			'pathInfo' => [
 				'root' => $root,
 				'webRoot' => '/',
 				'htdocs' => "$root/htdocs",
 				'cdtRoot' => "$root/vendor/zeptech/conductor",
 				'src' => "$root/src",
 				'target' => "$root/target"
-			)),
+			],
 			'namespace' => 'test',
-			'db_config' => array(),
+			'db' => [],
 			'env' => 'dev',
 			'logDir' => $root
 		);

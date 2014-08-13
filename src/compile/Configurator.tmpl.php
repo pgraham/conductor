@@ -32,7 +32,7 @@ class /*# companionClass #*/ implements RuntimeConfig {
     return array(
       'pathInfo' => $this->pathInfo,
       'namespace' => $this->ns,
-      'db_config' => /*# php:dbConfig #*/,
+      'db' => /*# php:dbConfig #*/,
       'env' => $this->env,
       'logDir' => '/*# logDir #*/',
       'logLevel' => '/*# logLevel #*/',
