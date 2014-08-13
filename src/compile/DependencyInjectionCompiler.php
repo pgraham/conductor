@@ -10,6 +10,7 @@ namespace zpt\cdt\compile;
 
 use zpt\cdt\config\RuntimeConfig;
 use zpt\cdt\di\DependencyParser;
+use zpt\cdt\di\XmlBeanParser;
 use zpt\cdt\i18n\ModelMessages;
 use zpt\orm\actor\QueryBuilder;
 use zpt\orm\companion\PersisterGenerator;
@@ -31,7 +32,6 @@ use zpt\pct\TemplateResolver;
 class DependencyInjectionCompiler implements Compiler
 {
 
-	private $files = array();
 	private $beans = array();
 
 	private $tmplParser;
@@ -56,99 +56,52 @@ class DependencyInjectionCompiler implements Compiler
 		$this->beans[] = $bean;
 	}
 
-	public function addFile($file) {
-		if (file_exists($file)) {
-			$this->files[] = $file;
-		}
-
-		$cfg = simplexml_load_file($file, 'SimpleXMLElement',
-			LIBXML_NOCDATA);
-
-		foreach ($cfg->bean as $beanDef) {
-			$bean['id'] = $beanDef['id'];
-			$bean['class'] = $beanDef['class'];
-
-			// Parse any annotation configuration or marker interfaces before
-			// applying XML configuration
-			$bean = DependencyParser::parse(
-				(string) $beanDef['id'],
-				(string) $beanDef['class']
-			);
-
-			if (isset($beanDef['initMethod'])) {
-				$bean['init'] = (string) $beanDef['initMethod'];
-			}
-
-			$props = array();
-			if (isset($beanDef->property)) {
-				$propDefs = $beanDef->property;
-
-				foreach ($propDefs as $propDef) {
-					$prop = array();
-					$prop['name'] = (string) $propDef['name'];
-
-					if (isset($propDef['value'])) {
-						$prop['val'] = $this->getScalar((string) $propDef['value']);
-					} else if (isset($propDef['ref'])) {
-						$prop['ref'] = (string) $propDef['ref'];
-					} else if (isset($propDef['type'])) {
-						$prop['type'] = (string) $propDef['type'];
-					} else {
-						// TODO Warn about an invalid bean definition
-					}
-					$props[] = $prop;
-				}
-			}
-			$bean['props'] = array_merge($bean['props'], $props);
-
-			$ctorArgs = array();
-			if (isset($beanDef->ctorArg)) {
-				$ctor = $beanDef->ctorArg;
-
-				// TODO Is order guaranteed by XML parser?
-				// TODO Combine this with logic in dependency parser to eliminate
-				//			duplication
-				foreach ($ctor as $arg) {
-					if (isset($arg['value'])) {
-						$ctorArgs[] = $this->getScalar((string) $arg['value'], true);
-					} else if (isset($arg['ref'])) {
-						$ctorArgs[] = '$' . ((string) $arg['ref']);
-					} else {
-						// TODO Warn about an invalid bean definition
-					}
-				}
-			}
-			$bean['ctor'] = $ctorArgs;
-
-			$this->beans[] = $bean;
-		}
-	}
-
 	public function compile(RuntimeConfig $config) {
-		$dynTarget = $config->getDynamicClassTarget();
+		// Resolve dependency XML files
+		$xmlFiles = $this->findDependencyXmls($config->getPathInfo());
+		$xmlBeans = $this->parseDependencyXmls($xmlFiles);
 
-		// Build the InjectionConfiguration script
+		// Make sure dynamically defined beans override any xml defined beans with
+		// the same name
+		$beans = array_merge($xmlBeans, $this->beans);
+
 		$srcPath = __DIR__ . '/InjectionConfigurator.tmpl.php';
+		$dynTarget = $config->getDynamicClassTarget();
 		$outPath = $dynTarget->getPath()->pathJoin('InjectionConfigurator.php');
 		$values = array(
 			'namespace' => $dynTarget->getPrefix()->rtrim('\\')->__toString(),
-			'beans' => $this->beans
+			'beans' => $beans
 		);
 		$tmplResolver = new TemplateResolver($this->tmplParser);
 		$tmplResolver->resolve($srcPath, $outPath, $values);
 	}
 
-	private function getScalar($val, $quoteStrings = false)
-	{
-			if (is_numeric($val)) {
-					return (float) $val;
-			} else if (strtolower($val) === 'true') {
-					return true;
-			} else if (strtolower($val) === 'false') {
-					return false;
-			} else if (strtolower($val) === 'null') {
-					return null;
+	private function findDependencyXmls($pathInfo) {
+		$files = [ "$pathInfo[cdtRoot]/resources/dependencies.xml" ];
+
+		$moduleIterator = new ModuleIterator($pathInfo['modules']);
+		foreach ($moduleIterator as $modulePath) {
+			$diPath = "$modulePath/resources/dependencies.xml";
+			if (file_exists($diPath)) {
+				$files[] = $diPath;
 			}
-			return $quoteStrings ? "'" . $val . "'" : $val;
+		}
+
+		$siteDiPath = "$pathInfo[src]/resources/dependencies.xml";
+		if (file_exists($siteDiPath)) {
+			$files[] = $diPath;
+		}
+		return $files;
+	}
+
+	private function parseDependencyXmls(array $files) {
+		$xmlBeanParser = new XmlBeanParser();
+		$xmlBeans = [];
+		foreach ($files as $file) {
+			$fileBeans = $xmlBeanParser->parseFile($file);
+			$xmlBeans = array_merge($xmlBeans, $fileBeans);
+		}
+
+		return $xmlBeans;
 	}
 }

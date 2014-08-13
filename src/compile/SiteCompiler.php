@@ -160,11 +160,6 @@ class SiteCompiler implements LoggerAwareInterface {
 		// Initiate the compiler
 		$this->initCompiler($config);
 
-		// Add XML dependency files before any annotation configured beans get
-		// added as annotation configured beans may depend on XML configured beans
-		// but the converse should not be true and is not supported
-		$this->collectDependencyXmls($pathInfo);
-
 		// Ensure that the target directories are created
 		if (!file_exists("$pathInfo[target]/htdocs")) {
 			mkdir("$pathInfo[target]/htdocs", 0755, true);
@@ -187,25 +182,6 @@ class SiteCompiler implements LoggerAwareInterface {
 		$this->diCompiler->compile($config);
 
 		$this->serverCompiler->compile($pathInfo);
-	}
-
-	protected function collectDependencyXmls($pathInfo) {
-		$diCompiler = $this->diCompiler;
-		$diCompiler->addFile(
-			"$pathInfo[cdtRoot]/resources/dependencies.xml"
-		);
-
-		$this->doWithModules(function ($modulePath) use ($diCompiler) {
-			$diPath = "$modulePath/resources/dependencies.xml";
-			if (file_exists($diPath)) {
-				$diCompiler->addFile($diPath);
-			}
-		});
-
-		$siteDiPath = "$pathInfo[src]/resources/dependencies.xml";
-		if (file_exists($siteDiPath)) {
-			$diCompiler->addFile($siteDiPath);
-		}
 	}
 
 	protected function compileJslibs($pathInfo, $ns) {
@@ -447,8 +423,8 @@ class SiteCompiler implements LoggerAwareInterface {
 		$gen = new CompanionGenerator($director, $dynTarget);
 		$cfgClass = $gen->generate('StdClass');
 
-		// Write the shortcut class for loading the config when not running in dev
-		// mode.
+		// Write a shortcut class for loading the config when not running in dev
+		// mode without requiring a CompanionLoader.
 		$fp = fopen($dynTarget->getPath() . '/RuntimeConfigLoader.php', 'w');
 		fwrite($fp, "<?php\nnamespace dyn;\nclass RuntimeConfigLoader { public static function loadConfig() { return (new \\$cfgClass())->getConfig(); } }");
 		fclose($fp);

@@ -24,6 +24,7 @@ class PathConfiguration extends ConfigurationSet
 	private $src;
 	private $target;
 	private $htdocs;
+	private $modules;
 	private $dyn;
 
 	public function __construct($root, $env) {
@@ -39,6 +40,7 @@ class PathConfiguration extends ConfigurationSet
 		$this->webRoot = $this->getValueOrDefault('webRoot', $config, $env, '/');
 		$this->cdtRoot = "$root/vendor/zeptech/conductor";
 		$this->src = "$root/src";
+		$this->modules = "$root/modules";
 		$this->target = "$root/target";
 		$this->htdocs = "$root/target/htdocs";
 		$this->dyn = [
