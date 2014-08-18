@@ -1,27 +1,21 @@
 <?php
-/**
- * =============================================================================
- * Copyright (c) 2010, Philip Graham
+/*
+ * Copyright (c) 2014, Philip Graham
  * All rights reserved.
  *
- * This file is part of Conductor and is licensed by the Copyright holder under
- * the 3-clause BSD License.	The full text of the license can be found in the
- * LICENSE.txt file included in the root directory of this distribution or at
- * the link below.
- * =============================================================================
- *
- * @license http://www.opensource.org/licenses/bsd-license.php
+ * This file is part of Conductor. For the full copyright and license information
+ * please view the LICENSE file that was distributed with this source code.
  */
 namespace zpt\cdt\srvc;
 
-use \zpt\rest\BaseRequestHandler;
-use \zpt\rest\RestException;
-use \zpt\rest\Request;
-use \zpt\rest\Response;
-use \zpt\cdt\di\InitializingBean;
-use \zpt\cdt\rest\BeanRequestHandler;
-use \zpt\opal\CompanionLoader;
-use \zpt\orm\Criteria;
+use zpt\rest\BaseRequestHandler;
+use zpt\rest\RestException;
+use zpt\rest\Request;
+use zpt\rest\Response;
+use zpt\cdt\di\InitializingBean;
+use zpt\cdt\rest\BeanRequestHandler;
+use zpt\opal\CompanionLoader;
+use zpt\orm\Criteria;
 
 /**
  * This class provides a remote service for retrieving and updating global
