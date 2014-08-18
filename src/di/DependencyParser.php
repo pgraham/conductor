@@ -11,14 +11,14 @@ namespace zpt\cdt\di;
 use zpt\anno\Annotations;
 use Exception;
 use ReflectionClass;
+use SimpleXMLElement;
 
 /**
  * Parser for annotation configured bean dependencies.
  *
  * @author Philip Graham <philip@zeptech.ca>
  */
-class DependencyParser
-{
+class DependencyParser {
 
 	/**
 	 * Parse the specified class for DI information.
@@ -93,7 +93,7 @@ class DependencyParser
 
 				$beanProps[] = array(
 					'name' => $propertyName,
-					'ref'		=> $beanId,
+					'ref'  => $beanId,
 				);
 			}
 		}
@@ -104,7 +104,7 @@ class DependencyParser
 	public static function parseConstructorArgs($classDef) {
 		$ctor = $classDef->getConstructor();
 		if ($ctor === null) {
-			return array();
+			return [];
 		}
 
 		$annos = new Annotations($ctor->getDocComment());
@@ -113,15 +113,47 @@ class DependencyParser
 		}
 
 		$args = array();
+		// TODO This should use the same logic as XmlBeanParser::parseProperty
 		foreach ($annos->asArray('ctorArg') as $ctorArg) {
+			$arg = [];
 			if (isset($ctorArg['value'])) {
-				$args[] = $ctorArg['value'];
+				$arg['val'] = self::parseScalar($ctorArg['value']);
 			} else if (isset($ctorArg['ref'])) {
-				$args[] = '$' . $ctorArg['ref'];
+				$arg['ref'] = $ctorArg['ref'];
+			} else if (isset($ctorArg['type'])) {
+				$arg['type'] = $ctorArg['type'];
 			} else {
 				// TODO Warn about invalid ctorArg annotations
 			}
+
+			$args[] = $arg;
 		}
 		return $args;
+	}
+
+	public static  function parseScalar($val, $quoteStrings = false)
+	{
+			if (is_numeric($val)) {
+					return (float) $val;
+			} else if (strtolower($val) === 'true') {
+					return true;
+			} else if (strtolower($val) === 'false') {
+					return false;
+			} else if (strtolower($val) === 'null') {
+					return null;
+			}
+			return $quoteStrings ? "'" . $val . "'" : $val;
+	}
+
+	public static function parseMap(SimpleXMLElement $mapDef) {
+		$map = [];
+		if (isset($mapDef->entry)) {
+			foreach ($mapDef->entry as $entry) {
+				$key = (string) $entry['key'];
+				$val = (string) $entry;
+				$map[$key] = $val;
+			}
+		}
+		return $map;
 	}
 }

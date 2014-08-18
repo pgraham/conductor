@@ -75,42 +75,14 @@ class XmlBeanParser
 		$prop = [ 'name' => (string) $propDef['name'] ];
 
 		if (isset($propDef['value'])) {
-			$prop['val'] = $this->parseScalar((string) $propDef['value']);
+			$prop['val'] = DependencyParser::parseScalar((string) $propDef['value']);
 		} else if (isset($propDef['ref'])) {
 			$prop['ref'] = (string) $propDef['ref'];
 		} else if (isset($propDef['type'])) {
 			$prop['type'] = (string) $propDef['type'];
 		} else if (isset($propDef->map)) {
-			$prop['val'] = $this->parseMap($propDef->map);
+			$prop['val'] = DependencyParser::parseMap($propDef->map);
 		}
 		return $prop;
-	}
-
-	private function parseScalar($val, $quoteStrings = false)
-	{
-			if (is_numeric($val)) {
-					return (float) $val;
-			} else if (strtolower($val) === 'true') {
-					return true;
-			} else if (strtolower($val) === 'false') {
-					return false;
-			} else if (strtolower($val) === 'null') {
-					return null;
-			}
-			return $quoteStrings ? "'" . $val . "'" : $val;
-	}
-
-	private function parseMap(SimpleXMLElement $mapDef) {
-		error_log("Parsing map");
-		$map = [];
-		if (isset($mapDef->entry)) {
-			error_log("Parsing map entry");
-			foreach ($mapDef->entry as $entry) {
-				$key = (string) $entry['key'];
-				$val = (string) $entry;
-				$map[$key] = $val;
-			}
-		}
-		return $map;
 	}
 }
