@@ -1,27 +1,59 @@
 <?xml version="1.0" standalone="yes"?>
 <beans>
 
-  <!-- Add logger as dependency. Appenders are configured programatically by
-       zpt\cdt\Conductor::init() -->
+  <!--
+       *************************************************************************
+       This section will get populated with configuration values.
+
+       This could be done directly in the generated InjectionConfigurator but
+       doing it here makes it easier to view the dependencies.
+       *************************************************************************
+  -->
+
+  <bean id="dynTarget" class="zpt\opal\Psr4Dir">
+    <ctorArg value="/*# pathInfo[dyn][target] #*/"/>
+    <ctorArg value="/*# pathInfo[dyn][prefix] #*/"/>
+  </bean>
+
+  <bean id="dbInfo" class="zpt\db\DatabaseConnectionInfo">
+    <ctorArg><map>
+        <entry key="driver">/*# xml:db[driver] #*/</entry>
+        <entry key="host">/*# xml:db[host] #*/</entry>
+        <entry key="username">/*# xml:db[username] #*/</entry>
+        <entry key="password">/*# xml:db[password] #*/</entry>
+        <entry key="schema">/*# xml:db[schema] #*/</entry>
+    </map></ctorArg>
+  </bean>
+
+  <!--
+       *************************************************************************
+       This section contains static dependencies.
+       *************************************************************************
+  -->
+
+  <bean id="db" class="zpt\db\DatabaseConnection">
+    <ctorArg ref="dbInfo"/>
+  </bean>
+
+  <bean id="orm" class="zpt\orm\Repository">
+    <ctorArg ref="db"/>
+  </bean>
+
+  <!-- Appenders are configured programatically by zpt\cdt\Conductor::init() -->
   <bean id="logger" class="Monolog\Logger">
     <ctorArg value="cdt"/>
   </bean>
 
-  <bean id="companionNamingStrategy" class="zpt\opal\DefaultNamingStrategy"/>
-
-  <bean id="companionLoader" class="zpt\opal\CompanionLoader">
-    <ctorArg ref="companionNamingStrategy"/>
-  </bean>
-
   <bean id="configValueProvider" class="zpt\cdt\ConfigValueProvider">
-    <ctorArg ref="companionLoader"/>
+    <ctorArg ref="orm"/>
   </bean>
 
   <bean id="authProvider" class="zpt\cdt\AuthProvider" initMethod="init">
-    <ctorArg ref="companionLoader" />
+    <ctorArg ref="orm"/>
   </bean>
 
   <bean id="defaultGatekeeper" class="zpt\cdt\crud\DefaultGatekeeper">
+    <ctorArg ref="orm"/>
     <property name="authProvider" ref="authProvider"/>
   </bean>
 

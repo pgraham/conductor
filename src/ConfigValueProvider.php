@@ -8,8 +8,8 @@
  */
 namespace zpt\cdt;
 
-use zpt\opal\CompanionLoader;
 use zpt\orm\Criteria;
+use zpt\orm\Repository;
 
 /**
  * This class retrieves configuration values from the database.
@@ -24,15 +24,8 @@ class ConfigValueProvider
 
 	private $persister;
 
-	public function __construct(CompanionLoader $companionLoader = null) {
-		if ($companionLoader === null) {
-			$companionLoader = new CompanionLoader();
-		}
-
-		$this->persister = $companionLoader->get(
-			'zpt\dyn\orm\persister',
-			'zpt\cdt\model\ConfigValue'
-		);
+	public function __construct(Repository $repository) {
+		$this->persister = $repository->getPersister('zpt\cdt\model\ConfigValue');
 	}
 
 	/**

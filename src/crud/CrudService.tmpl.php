@@ -18,9 +18,9 @@ use zpt\cdt\crud\SpfParser;
 use zpt\cdt\exception\AuthException;
 use zpt\cdt\AuthProvider;
 use zpt\cdt\Session;
-use zpt\opal\CompanionLoader;
 use zpt\orm\Criteria;
 use zpt\orm\PdoExceptionWrapper;
+use zpt\orm\Repository;
 use StdClass;
 
 /**
@@ -46,29 +46,19 @@ class /*# companionClass #*/
 	/** @Injected */
 	private $spfParser;
 
-	private $companionLoader;
 	private $persister;
 	private $transformer;
 	private $messages;
 
 	/**
-	 * @ctorArg ref = companionLoader
+	 * @ctorArg ref = orm
 	 */
-	public function __construct(CompanionLoader $companionLoader) {
-		$this->companionLoader = $companionLoader;
+	public function __construct(Repository $orm) {
+		$this->orm = $orm;
 
-		$this->persister = $companionLoader->get(
-			'zpt\dyn\orm\persister',
-			'/*# model #*/'
-		);
-		$this->transformer = $companionLoader->get(
-			'zpt\dyn\orm\transformer',
-			'/*# model #*/'
-		);
-		$this->messages = $companionLoader->get(
-			'zpt\dyn\i18n',
-			'/*# model #*/'
-		);
+		$this->persister = $orm->getPersister('/*# model #*/');
+		$this->transformer = $orm->getTransformer('/*# model #*/');
+		$this->messages = $orm->getMessageGenerator('/*# model #*/');
 	}
 
 	/**
@@ -109,11 +99,7 @@ class /*# companionClass #*/
 			$this->checkAuth('read');
 		#}
 
-		$qb = $this->companionLoader->get(
-			'zpt\dyn\orm\qb',
-			'/*# model #*/',
-			false
-		);
+		$qb = $this->orm->getQueryBuilder('/*# model #*/');
 
 		$spf = $this->spfParser->parseRequest($request);
 		$this->spfParser->populateQueryBuilder($spf, $qb);

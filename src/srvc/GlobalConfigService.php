@@ -14,8 +14,8 @@ use zpt\rest\Request;
 use zpt\rest\Response;
 use zpt\cdt\di\InitializingBean;
 use zpt\cdt\rest\BeanRequestHandler;
-use zpt\opal\CompanionLoader;
 use zpt\orm\Criteria;
+use zpt\orm\Repository;
 
 /**
  * This class provides a remote service for retrieving and updating global
@@ -33,38 +33,29 @@ class GlobalConfigService extends BaseRequestHandler
 	/** @Injected */
 	private $authProvider;
 
-	private $companionLoader;
+	private $orm;
 
 	private $mappings;
 
 	/**
-	 * @ctorArg( ref = companionLoader )
+	 * @ctorArg ref = orm
 	 */
-	public function __construct(CompanionLoader $companionLoader = null) {
-		if ($companionLoader === null) {
-			$companionLoader = new CompanionLoader();
-		}
-		$this->companionLoader = $companionLoader;
+	public function __construct(Repository $orm) {
+		$this->orm = $orm;
 	}
 
 	public function get(Request $request, Response $response) {
 		$configName = $request->getParameter('name');
 		if ($configName === null) {
 			// Get all global configuration values
-			$persister = $this->companionLoader->get(
-				'zpt\dyn\orm\persister',
-				'zpt\cdt\model\ConfigValue'
-			);
+			$persister = $this->orm->getPersister('zpt\cdt\model\ConfigValue');
 			$c = new Criteria();
 			$c->addSelect('name')->addSelect('value')
 				->addEquals('editable', true)
 				->addSort('name');
 			$globalConfig = $persister->retrieve($c);
 
-			$transformer = $this->companionLoader->get(
-				'zpt\dyn\orm\transformer',
-				'zpt\cdt\model\ConfigValue'
-			);
+			$transformer = $this->orm->getPersister('zpt\cdt\model\ConfigValue');
 			$response->setData($transformer->asCollection($globalConfig));
 			return;
 		}
@@ -85,10 +76,7 @@ class GlobalConfigService extends BaseRequestHandler
 		$c = new Criteria();
 		$c->addEquals('name', $configName);
 
-		$persister = $this->companionLoader->get(
-			'zpt\dyn\orm\persister',
-			'zpt\cdt\model\ConfigValue'
-		);
+		$persister = $this->orm->getPersister('zpt\cdt\model\ConfigValue');
 		$model = $persister->retrieveOne($c);
 		if ($model === null) {
 			throw new RestException(404);

@@ -13,14 +13,14 @@ use zpt\cdt\auth\SessionManager;
 use zpt\cdt\exception\AuthException;
 use zpt\cdt\model\User;
 use zpt\cdt\model\Visitor;
-use zpt\opal\CompanionLoader;
 use zpt\orm\Criteria;
+use zpt\orm\Repository;
 
 use LightOpenId;
 
 /**
- * This class ensures that the requesting user is assigned to a session.	The
- * session can optionally be associated with a user.
+ * This class ensures that the requesting user is assigned to a session. The
+ * session can optionally be associated with a registered user.
  *
  * @author Philip Graham <philip@lightbox.org>
  */
@@ -29,18 +29,13 @@ class AuthProvider implements LoggerAwareInterface {
 	//method
 	use InjectedLoggerAwareTrait;
 
-	private $companionLoader;
+	private $orm;
 	private $openId;
 	private $session;
 	private $visitor;
 
-	public function __construct(CompanionLoader $companionLoader = null) {
-		if ($companionLoader === null) {
-			$companionLoader = new CompanionLoader();
-		}
-		$this->companionLoader = $companionLoader;
-
-		// Make sure a logger is available. Avoids null checks throughout the code.
+	public function __construct(Repository $orm) {
+		$this->orm = $orm;
 		$this->logger = new NullLogger();
 	}
 
@@ -289,7 +284,7 @@ class AuthProvider implements LoggerAwareInterface {
 	}
 
 	private function getPersister($model) {
-		return $this->companionLoader->get('zpt\dyn\orm\persister', $model);
+		return $this->orm->getPersister($model);
 	}
 
 	/* Initialize the session. */
