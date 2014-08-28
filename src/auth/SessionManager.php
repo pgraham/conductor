@@ -10,8 +10,8 @@ namespace zpt\cdt\auth;
 
 use zpt\cdt\model\Session;
 use zpt\cdt\model\User;
-use zpt\orm\Clarinet;
 use zpt\orm\Criteria;
+use zpt\orm\Repository;
 
 /**
  * This class manages session objects.
@@ -37,37 +37,55 @@ class SessionManager
 	/* Characters from which a session id prefix will be randomly generated */
 	private static $keyPrefixChars = "abcdefghijklmnopqrstuvwxyz0123456789";
 
+	/* ORM Repository which manages Session entities. */
+	private $orm;
+
+	/**
+	 * Create a SessionManager for {@link Session} entities stored in the given
+	 * repository.
+	 *
+	 * @param Repository $orm
+	 */
+	public function __construct(Repository $orm) {
+		$this->orm = $orm;
+	}
+
 	/**
 	 * Loads the session with the given session key if it exists.  If the session
 	 * does not exist or the session is expired then a new session is returned.
 	 *
 	 * @param string $sessionKey
-	 * @return zpt\cdt\model\Session|null Return the session with the given key
-	 *	 or null the session has expired or does not exist.
+	 * @param boolean $newIfAuthenticated
+	 *   Force logout if session is attached to a user and it not expired
+	 * @return zpt\cdt\model\Session|null
+	 *   Return the session with the given key or null the session has expired or
+	 *   does not exist.
 	 */
-	public static function loadSession($sessionKey, $newIfAuthenticated = false) {
+	public function loadSession($sessionKey, $newIfAuthenticated = false) {
 		if ($sessionKey === null) {
-			return self::newSession();
+			return $this->newSession();
 		}
+
+		$persister = $this->orm->getPersister('zpt\cdt\model\Session');
 
 		$c = new Criteria();
 		$c->addEquals('sess_key', $sessionKey);
 
-		$session = Clarinet::getOne('zpt\cdt\model\Session', $c);
+		$session = $persister->retrieveOne($c);
 		if ($session === null) {
-			return self::newSession();
+			return $this->newSession();
 		}
 
 		if ($session->isExpired(self::DEFAULT_SESSION_TTL)) {
-			return self::newSession();
+			return $this->newSession();
 		}
 
 		if ($newIfAuthenticated && $session->getUser() !== null) {
-			return self::newSession();
+			return $this->newSession();
 		}
 
 		$session->setLastAccess(time());
-		Clarinet::save($session);
+		$persister->save($session);
 		return $session;
 	}
 
@@ -78,7 +96,7 @@ class SessionManager
 	 *	 session
 	 * @return new session instance
 	 */
-	public static function newSession(User $user = null) {
+	public function newSession(User $user = null) {
 		$session = new Session();
 		if ($user !== null) {
 			$session->setUser($user);
@@ -95,7 +113,7 @@ class SessionManager
 		$key = uniqid($prefix, true);
 		$session->setKey($key);
 
-		Clarinet::save($session);
+		$this->orm->getPersister('zpt\cdt\model\Session')->save($session);
 
 		// Send the session key to the client
 		$path = _P('/');

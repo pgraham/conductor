@@ -258,10 +258,6 @@ class Conductor {
 			throw new Exception("Unable to connect to database");
 		}
 
-		// Initialize clarinet
-		$orm = new Repository($db);
-		Injector::addBean('orm', $orm);
-
 		// Initialize Dependency injection
 		$configurator = new InjectionConfigurator();
 		$configurator->configure();

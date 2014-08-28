@@ -4,15 +4,12 @@
   <!--
        *************************************************************************
        This section will get populated with configuration values.
-
-       This could be done directly in the generated InjectionConfigurator but
-       doing it here makes it easier to view the dependencies.
        *************************************************************************
   -->
 
   <bean id="dynTarget" class="zpt\opal\Psr4Dir">
-    <ctorArg value="/*# pathInfo[dyn][target] #*/"/>
-    <ctorArg value="/*# pathInfo[dyn][prefix] #*/"/>
+    <ctorArg value="/*# xml:pathInfo[dyn][target] #*/"/>
+    <ctorArg value="/*# xml:pathInfo[dyn][prefix] #*/"/>
   </bean>
 
   <bean id="dbInfo" class="zpt\db\DatabaseConnectionInfo">
@@ -37,6 +34,7 @@
 
   <bean id="orm" class="zpt\orm\Repository">
     <ctorArg ref="db"/>
+    <ctorArg ref="dynTarget"/>
   </bean>
 
   <!-- Appenders are configured programatically by zpt\cdt\Conductor::init() -->

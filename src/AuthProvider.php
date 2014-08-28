@@ -30,13 +30,17 @@ class AuthProvider implements LoggerAwareInterface {
 	use InjectedLoggerAwareTrait;
 
 	private $orm;
+	private $sessionManager;
+
 	private $openId;
 	private $session;
 	private $visitor;
 
 	public function __construct(Repository $orm) {
-		$this->orm = $orm;
 		$this->logger = new NullLogger();
+
+		$this->orm = $orm;
+		$this->sessionManager = new SessionManager($orm);
 	}
 
 	public function authenticate($username, $password) {
@@ -180,7 +184,7 @@ class AuthProvider implements LoggerAwareInterface {
 		// with a user.  Another way to consider this is that a login attempt
 		// is an implicit logout, whether the login succeeds or not
 		if ($this->session->getUser() !== null) {
-			$this->session = SessionManager::newSession();
+			$this->session = $this->sessionManager->newSession();
 		}
 
 		$user = $this->authenticate($username, $password);
@@ -233,7 +237,7 @@ class AuthProvider implements LoggerAwareInterface {
 				// if a current session is unauthenticated, it will be associated with
 				// the now logged in user.
 				if ($this->session->getUser() !== null) {
-					$this->session = SessionManager::newSession();
+					$this->session = $this->sessionManager->newSession();
 				}
 
 				// Need to assign a user ID to the session
@@ -294,7 +298,7 @@ class AuthProvider implements LoggerAwareInterface {
 		}
 
 		// Initialize session
-		$this->session = SessionManager::loadSession(
+		$this->session = $this->sessionManager->loadSession(
 			isset($_COOKIE['conductorsessid'])
 				? $_COOKIE['conductorsessid']
 				: null
